@@ -1,0 +1,64 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-scheme" data-sub="")
+
+  section.main-section.vet-module
+
+    .animal-results-container.vet-scheme-container#add-vet-scheme(class=`${forOne === true ? 'animal-results-big' : 'animal-results-full'}`)
+
+      .ar-block-title Создать схему
+
+      .aa-input-block
+        lable.aa-label(for="name") 
+          p Название
+        input.aa-text-input#name(type="text")
+
+      .scheme-step-container(data-step="1")
+        .scheme-step-container-label #1
+        //-.scheme-step-container-close
+          ion-icon(name="close")
+        .aa-input-block
+          lable.aa-label(for="name") 
+            p Действие
+          input.aa-text-input.scheme-step-action(type="text")
+
+      .scheme-step-container(data-step="2")
+        .scheme-step-container-label #2
+        //-.scheme-step-container-close
+          ion-icon(name="close")
+        .aa-input-block
+          lable.aa-label(for="name") 
+            p Действие
+          input.aa-text-input.scheme-step-action(type="text")
+        .aa-input-block.scheme-step
+          lable.aa-label 
+            p Временной отрезок
+          .aa-double-input-block
+            input.aa-double-input.scheme-step-in(type="number")
+            select.aa-double-input.scheme-step-unit
+              option(value="h" selected) Часов
+              option(value="d") Дней
+            select.aa-double-input.scheme-step-count
+              option(value="start" selected) От начала
+              option(value="last-point") От пред. действия
+
+      //-.aa-input-block.hidden-input-block.scheme-step
+        lable.aa-label 
+          p Шаг #1
+        .aa-double-input-block
+          input.aa-double-input.scheme-step-in(type="number")
+          select.aa-double-input.scheme-step
+            option(value="mg" selected) Мг.
+            option(value="ml") Мл.
+            option(value="g") Гм.
+
+      .aa-add-more#add-step
+        p Добавить шаг
+        ion-icon.aa-add-more-icon(name="add-circle")
+    
+      a.ar-add-button Сохранить
+
+
+
+

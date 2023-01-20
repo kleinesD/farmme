@@ -1,0 +1,100 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+    include _animalHeader
+
+
+    //-.animal-results-history
+      .ar-block-title.ar-block-title-chart Дополнительная информация
+
+      .invis-animals-data-container
+        each anim in animals
+          each lact in anim.lactations 
+            .invis-animals-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
+
+      .ar-bonus-info-line 
+        .ar-bi-big 293
+        .ar-bi-small дней - средняя длинна лактации на вашей ферме.
+
+      .ar-tip-container 
+        .ar-tip-icon 
+          ion-icon(name="bulb")
+        .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
+
+
+    -if(!forEdit)
+      .animal-results-container.animal-results-big#add-lactation-container
+        img.ar-image-back(src="/img/images/milking-cow-icon.png")
+        .ar-block-title Добавить лактацию
+        .ar-one-line-result
+          .aa-input-block.aa-input-block-half
+            label.aa-label(for="start-date")
+              p Начало
+            input.aa-text-input.aa-date-input#start-date(type="date" data-birth-date=`${animal.birthDate}`)
+          .aa-input-block.aa-input-block-half 
+            label.aa-label(for="finish-date") 
+              p Окончание
+            input.aa-text-input.aa-date-input#finish-date(type="date")
+        .aa-input-block
+          each lactation in animal.lactations
+            .aa-input-invis(data-number=`${lactation.number}`)
+          lable.aa-label(for="number")
+            p Номер лактации
+          .invis-lact-data-container
+            each lact in animal.lactations 
+              .invis-lact-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
+          .aa-pick-box.aa-pick-box-one#lactation-number
+            .aa-pick 1
+            .aa-pick 2
+            .aa-pick 3
+            .aa-pick 4
+            .aa-pick 5
+            .aa-pick 6
+            .aa-pick 7
+            .aa-pick 8
+            .aa-pick 9
+            .aa-pick 10
+        .ar-btn-box  
+          a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
+
+    -if(forEdit)
+      .animal-results-container.animal-results-big#edit-lactation-container
+        img.ar-image-back(src="/img/images/milking-cow-icon.png")
+        .ar-block-title Редактировать лактацию
+        .ar-one-line-result
+          .aa-input-block.aa-input-block-half
+            label.aa-label(for="start-date")
+              p Начало
+            input.aa-text-input.aa-date-input#start-date(type="date" data-birth-date=`${animal.birthDate}` data-value=`${lactation.startDate}`)
+          .aa-input-block.aa-input-block-half 
+            label.aa-label(for="finish-date") 
+              p Окончание
+            input.aa-text-input.aa-date-input#finish-date(type="date" data-value=`${lactation.finishDate}`)
+        .aa-input-block
+          each lactation in animal.lactations
+            .aa-input-invis(data-number=`${lactation.number}`)
+          lable.aa-label(for="number")
+            p Номер лактации
+          .invis-lact-data-container
+            each lact in animal.lactations 
+              .invis-lact-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
+          .aa-pick-box.aa-pick-box-one#lactation-number
+            .aa-pick(class=`${lactation.number === 1 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 1 ? 'true' : 'false'}`) 1
+            .aa-pick(class=`${lactation.number === 2 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 2 ? 'true' : 'false'}`) 2
+            .aa-pick(class=`${lactation.number === 3 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 3 ? 'true' : 'false'}`) 3
+            .aa-pick(class=`${lactation.number === 4 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 4 ? 'true' : 'false'}`) 4
+            .aa-pick(class=`${lactation.number === 5 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 5 ? 'true' : 'false'}`) 5
+            .aa-pick(class=`${lactation.number === 6 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 6 ? 'true' : 'false'}`) 6
+            .aa-pick(class=`${lactation.number === 7 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 7 ? 'true' : 'false'}`) 7
+            .aa-pick(class=`${lactation.number === 8 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 8 ? 'true' : 'false'}`) 8
+            .aa-pick(class=`${lactation.number === 9 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 9 ? 'true' : 'false'}`) 9
+            .aa-pick(class=`${lactation.number === 10 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 10 ? 'true' : 'false'}`) 10
+        .ar-btn-box  
+          a.ar-add-button(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+
+
+
+

@@ -1,0 +1,41 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+    .all-animals-container.animals-result-list#list-inseminations
+      .ar-block-title Осеменение
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#all-animals-search(type="text" placeholder="Найти животное")
+
+      .result-list-btns-block.result-list-btns-block-insem
+        .rl-add-btn Сохранить результаты
+
+      .animal-list-header
+        .alh-item.alh-item-photo Фото 
+        .alh-item Кличка 
+        .alh-item #
+        .alh-item.alh-item-date Дата
+        .alh-item.alh-item-insem-result Результат
+      .animals-list-block
+        each animal in animals
+          .al-animal(data-id=`${animal._id}`)
+            .al-animal-mark •
+            .al-item.al-item-photo 
+              img(src=`/img/images/${animal.mainPhoto}`)
+            .al-item.al-item-name= animal.name
+            .al-item.al-item-number= animal.number
+            .al-item.al-item-insem-date
+              input.rl-result(type="date")
+            .al-item.al-item-insem-result
+              .rl-big-lact#success Успешно
+              .rl-big-lact#failure Не успешно
+            a.al-more-options-link(href=`/herd/add-insemination/${animal._id}`) Больше опций >
+        
+          
+
+
+      
+

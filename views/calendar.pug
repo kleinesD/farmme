@@ -1,0 +1,420 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-calendar" data-sub="")
+
+  section.main-section
+
+    .big-calendar-container
+      .bc-navigation-block
+        .bc-nav-user-block
+          img(src="/img/images/cows-login-2.jpg")
+          .bc-nav-user-info
+            .bc-nav-user-name Даниил Коробко
+            .bc-nav-user-title Создатель
+          ion-icon.bc-nav-user-more(name="chevron-down")
+        a.bc-add-event-btn(href="/add-reminder")
+          .bc-add-event-btn-icon +
+          .bc-add-event-btn-text Добавить Мероприятие
+
+        .bc-small-calendar-block
+          .bc-small-calendar-header
+            .bc-small-calendar-title Янваwdawdрь 2023
+            .bc-small-calendar-buttons-box
+              .bc-small-move-btn#prev-small-month(data-state="first-click")
+                ion-icon.bc-small-calendar-btn(name="chevron-back")
+              .bc-small-move-btn#next-small-month
+                ion-icon.bc-small-calendar-btn(name="chevron-forward")
+          .bc-small-calendar-week-box
+            .bc-small-calendar-weekday-title ПН
+            .bc-small-calendar-weekday-title ВТ
+            .bc-small-calendar-weekday-title СР
+            .bc-small-calendar-weekday-title ЧТ
+            .bc-small-calendar-weekday-title ПТ
+            .bc-small-calendar-weekday-title СБ
+            .bc-small-calendar-weekday-title ВС
+
+          .bc-small-calendar-week-box
+            .bc-small-calendar-weekday-column#small-weekday-column-1
+              .bc-small-calendar-weekday 1
+              .bc-small-calendar-weekday 8
+              .bc-small-calendar-weekday 15
+              .bc-small-calendar-weekday 22
+              .bc-small-calendar-weekday 29
+            .bc-small-calendar-weekday-column#small-weekday-column-2
+            .bc-small-calendar-weekday-column#small-weekday-column-3
+            .bc-small-calendar-weekday-column#small-weekday-column-4
+            .bc-small-calendar-weekday-column#small-weekday-column-5
+            .bc-small-calendar-weekday-column#small-weekday-column-6
+            .bc-small-calendar-weekday-column#small-weekday-column-0
+
+        .bc-categories-title Категории
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-general
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Общее
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-herd
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Животные
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-vet
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Ветеринария
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-warehouse
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Склад
+
+
+      .bc-full-calendar-block
+        .bc-full-calendar-header
+          .bc-full-calendar-title Янвwadaарь 2023
+          .bc-small-calendar-buttons-box
+            .bc-big-move-btn#prev-big-month(data-state="first-click")
+              ion-icon.bc-small-calendar-btn(name="chevron-back")
+            .bc-big-move-btn#next-big-month
+              ion-icon.bc-small-calendar-btn(name="chevron-forward")
+          .bc-full-calendar-small-btn Сегодня
+          //-.bc-full-calendar-search
+        .bc-main-calendar-box
+          .bc-main-calendar-column#weekday-column-1
+            .bc-main-calendar-day
+              .bc-main-calendar-day-number 1
+            .bc-main-calendar-day
+              .bc-main-calendar-day-number 8
+            .bc-main-calendar-day
+              .bc-main-calendar-day-number 15
+            .bc-main-calendar-day
+              .bc-main-calendar-day-number 22
+            .bc-main-calendar-day
+              .bc-main-calendar-day-number 29
+          .bc-main-calendar-column#weekday-column-2
+          .bc-main-calendar-column#weekday-column-3
+          .bc-main-calendar-column#weekday-column-4
+          .bc-main-calendar-column#weekday-column-5
+          .bc-main-calendar-column#weekday-column-6
+          .bc-main-calendar-column#weekday-column-0
+
+        .bc-info-block
+          .bc-info-block-title Январь 16, 2023
+          .bc-info-block-close  
+            ion-icon(name="close")
+          .bc-info-reminders-conatiner
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа Побрить ежа Побрить ежа Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек него нет волос, но очень много колючекнего нет волос, но очень много колючек
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек
+            .bc-info-reminder
+              .bc-info-reminder-time 23:20
+              .bc-info-reminder-title Побрить ежа
+              .bc-info-reminder-sub-title У него нет волос, но очень много колючек
+          
+          .bc-info-detailed
+            .bc-info-detailed-header
+              .bc-info-detailed-back 
+                ion-icon(name="arrow-back")
+              a.bc-info-detailed-edit(href="")
+                ion-icon(name="create-outline")
+            .bc-info-detailed-group
+              .bc-info-detailed-icon  
+                ion-icon(name="calendar-number-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-title#reminder-title Побрить ежа
+                .bc-info-detailed-sub-text#reminder-time Понедельник, Январь 16 2023, 23:20
+            .bc-info-detailed-group
+              .bc-info-detailed-icon  
+                ion-icon(name="menu")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-text#reminder-note У него нет волос, но очень много колючек него нет волос, но очень много колючекнего нет волос, но очень много колючек
+            .bc-info-detailed-group
+              .bc-info-detailed-icon  
+                ion-icon(name="person-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double
+                  img(src="/img/images/cows-login-2.jpg")
+                  .bc-info-detailed-double-info
+                    .bc-info-detailed-double-title#reminder-user-name Даниил Коробко
+                    .bc-info-detailed-double-sub-title#reminder-user-title Создатель
+            .bc-info-detailed-group
+              .bc-info-detailed-icon  
+                ion-icon(name="paw-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double
+                  img(src="/img/images/default-cow-image.png")
+                  .bc-info-detailed-double-info
+                    .bc-info-detailed-double-title#reminder-animal-number #04515026
+                    .bc-info-detailed-double-sub-title#reminder-animal-name Березка
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #1
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:00
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #2
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:10
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #1
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:00
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #2
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:10
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #1
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:00
+            .bc-info-detailed-group.reminder-notification-el
+              .bc-info-detailed-icon  
+                ion-icon(name="notifications-outline")
+              .bc-info-detailed-text-box
+                .bc-info-detailed-double-title Напоминание #2
+                .bc-info-detailed-double-sub-title Понедельник, Январь 16 2023, 23:10
+              
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //-.big-calendar-container(data-farm-id=`${user.farm}`)
+      .bc-dates-block
+        .bc-dates-header
+          a.bc-add-reminder(href=`/vet/add-schedule/multiple`) + Напоминание 
+          p August 2023
+          .bc-dates-header-icon.bc-dates-header-btn#prev-month(data-state=`first-click`)
+            ion-icon(name="chevron-back-outline")
+          .bc-dates-header-icon
+            ion-icon(name="calendar-outline")
+          .bc-dates-header-icon.bc-dates-header-btn#next-month
+            ion-icon(name="chevron-forward-outline")
+        .bc-dates-sub-title В ветеринарном календаре показаны только ветеренарные напоминания.
+        .bc-dates-sub-title.bc-dates-sub-title-last Чтобы посмотреть все напоминания откройте общий календарь.
+
+        .bc-week-days-line
+          .bc-week-day ПН
+          .bc-week-day ВТ
+          .bc-week-day СР
+          .bc-week-day ЧТ
+          .bc-week-day ПТ
+          .bc-week-day СБ
+          .bc-week-day ВС
+
+        .bc-dates-columns-block 
+          .bc-dates-column#weekday-column-1
+            //-.bc-date.bc-date-other.bc-date-past
+              .bc-date-number 30
+            //-.bc-date.bc-date-past
+              .bc-date-number 6
+            //-.bc-date
+              .bc-date-number 13
+            //-.bc-date
+              .bc-date-number 20
+            //-.bc-date
+              .bc-date-number 27
+
+
+          .bc-dates-column#weekday-column-2
+            //-.bc-date.bc-date-other.bc-date-past
+              .bc-date-number 31
+            //-.bc-date.bc-date-past
+              .bc-date-number 7
+            //-.bc-date
+              .bc-date-number 14
+            //-.bc-date
+              .bc-date-number 21
+            //-.bc-date
+              .bc-date-number 28
+
+
+          .bc-dates-column#weekday-column-3
+            //-.bc-date.bc-date-past
+              .bc-date-number 1
+            //-.bc-date.bc-date-past 
+              .bc-date-number 8
+            //-.bc-date
+              .bc-date-number 15
+            //-.bc-date
+              .bc-date-number 22
+            //-.bc-date
+              .bc-date-number 29
+
+
+          .bc-dates-column#weekday-column-4
+            //-.bc-date.bc-date-past 
+              .bc-date-number 2
+            //-.bc-date.bc-date-now.bc-date-active
+              .bc-date-number 9
+              .bc-date-quick 
+                .bc-date-quick-title Сделать укол всем животным
+                .bc-date-quick-time 13:00 - 15:00
+              .bc-date-more-btn И еще 3
+            //-.bc-date 
+              .bc-date-number 16
+            //-.bc-date 
+              .bc-date-number 23
+            //-.bc-date 
+              .bc-date-number 30
+
+
+          .bc-dates-column#weekday-column-5
+            //-.bc-date.bc-date-past
+              .bc-date-number 3
+            //-.bc-date 
+              .bc-date-number 10
+            //-.bc-date
+              .bc-date-number 17
+            //-.bc-date 
+              .bc-date-number 24
+            //-.bc-date.bc-date-other 
+              .bc-date-number 1
+
+
+          .bc-dates-column#weekday-column-6
+            //-.bc-date.bc-date-past 
+              .bc-date-number 4
+            //-.bc-date 
+              .bc-date-number 11
+            //-.bc-date 
+              .bc-date-number 18
+            //-.bc-date 
+              .bc-date-number 25
+            //-.bc-date.bc-date-other 
+              .bc-date-number 2
+
+
+          .bc-dates-column#weekday-column-0
+            //-.bc-date.bc-date-past 
+              .bc-date-number 5
+            //-.bc-date 
+              .bc-date-number 12
+            //-.bc-date 
+              .bc-date-number 19
+            //-.bc-date 
+              .bc-date-number 26
+            //-.bc-date.bc-date-other 
+              .bc-date-number 3
+
+
+      .bc-date-expanded-back
+        .bc-date-expanded-block#expanded-all
+          .expanded-header
+            .expanded-title-block
+              .expanded-title Расписание на
+              .expanded-title-date Июль 11
+            .expanded-close-btn 
+              ion-icon(name="close")
+
+          a.expanded-add-btn(href="/vet/add-schedule/multiple")
+            ion-icon(name="add-outline")
+
+          .expanded-body
+            .expanded-item
+              .expanded-item-time 11:00 - 13:00
+              .expanded-item-title Зделать укол таким то животным
+              .expanded-animals-block
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+                .expanded-item-animal #23142
+
+            .expanded-item
+              .expanded-item-time 11:00 - 13:00
+              .expanded-item-title Зделать укол таким то животным
+              .expanded-animals-block
+                .expanded-item-animal #23142
+            .expanded-item
+              .expanded-item-time 11:00 - 13:00
+              .expanded-item-title Зделать укол таким то животным
+              .expanded-animals-block
+                .expanded-item-animal #23142
+            .expanded-item
+              .expanded-item-time 11:00 - 13:00
+              .expanded-item-title Зделать укол таким то животным
+              .expanded-animals-block
+                .expanded-item-animal #23142
+            .expanded-item
+              .expanded-item-time 11:00 - 13:00
+              .expanded-item-title Зделать укол таким то животным
+              .expanded-animals-block
+                .expanded-item-animal #23142
+
+
+
+        .bc-date-expanded-block#expanded-one
+          .expanded-header
+            .expanded-title 11:00 - 13:00
+            .expanded-close-btn 
+              ion-icon(name="close")
+
+          .expanded-body
+            .expanded-one-title Зделать укол таким то животным
+            .expanded-one-text Зделать укол таким то животным. Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животнымЗделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животнымЗделать укол таким то животнымv Зделать укол таким то животнымЗделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным Зделать укол таким то животным
+            a.expanded-animals-block(href="#")
+              img.expanded-item-animal-img(src="")
+              .expanded-item-animal-name
+              .expanded-item-animal-number
+
+          a.expanded-add-btn.expanded-edit-btn(href="/vet/add-schedule/multiple")
+            ion-icon(name="pencil")
+
+
+
+
+

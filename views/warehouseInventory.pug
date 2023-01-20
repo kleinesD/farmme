@@ -1,0 +1,155 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+
+    -if(!forEdit)
+      .animal-results-container.animal-results-big#add-inventory-container
+        img.ar-image-back(src="/img/images/inventory-icon.png")
+        .ar-block-title Добавить инвентарь
+        .aa-input-block 
+          label.aa-label(for="name")
+            p Наименование
+          input.aa-text-input#name(type="text")
+
+        .aa-input-block 
+          label.aa-label(for="quantity")
+            p Количество
+          input.aa-text-input#quantity(type="number")
+        .aa-input-block 
+          label.aa-label(for="type")
+            p Категория
+          .aa-pick-box.aa-pick-box-one#type
+            .aa-pick#equipment Оборудование
+            .aa-pick#food Корм
+            .aa-pick#vet Ветеринария
+            .aa-pick#other Другое
+
+        .aa-add-more#add-date
+          p Добавить дату
+          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-input-block.hidden-input-block#add-date-input
+          label.aa-label(for="date")
+            p Дата
+          input.aa-text-input.aa-date-input#date(type="date")
+
+        .aa-add-more#add-cost
+          p Добавить стоимость
+          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-input-block.hidden-input-block#add-cost-input
+          label.aa-label(for="cost")
+            p Стоимость | ₽
+          input.aa-text-input#cost(type="number")
+
+        .aa-add-more#add-exp-date
+          p Добавить срок годности
+          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-input-block.hidden-input-block#add-exp-date-input
+          label.aa-label(for="exp-date")
+            p Срок годности
+          input.aa-text-input.aa-date-input#exp-date(type="date")
+        
+        .aa-add-more#add-note
+          p Добавить заметку
+          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-input-block.hidden-input-block#add-note-input
+          label.aa-label(for="note")
+            p Заметка
+          input.aa-text-input#note(type="text")
+
+        .ar-btn-box  
+          a.ar-add-button Сохранить
+
+    -if(forEdit)
+      .animal-results-container.animal-results-big#edit-inventory-container
+        img.ar-image-back(src="/img/images/inventory-icon.png")
+        .ar-block-title Редактировать инвентарь
+        .aa-input-block 
+          label.aa-label(for="name")
+            p Наименование
+          input.aa-text-input#name(type="text" value=`${inventory.name}`)
+        .aa-input-block 
+          label.aa-label(for="quantity")
+            p Количество
+          input.aa-text-input#quantity(type="number" value=`${inventory.quantity}`)
+        .aa-input-block 
+          label.aa-label(for="type")
+            p Категория
+          .aa-pick-box.aa-pick-box-one#type
+            -if(inventory.inventoryType === 'equipment')
+              .aa-pick.aa-pick-picked#equipment Оборудование
+            -else
+              .aa-pick#equipment Оборудование
+            -if(inventory.inventoryType === 'food')
+              .aa-pick.aa-pick-picked#food Корм
+            -else
+              .aa-pick#food Корм
+            -if(inventory.inventoryType === 'vet')
+              .aa-pick.aa-pick-picked#vet Ветеринария
+            -else
+              .aa-pick#vet Ветеринария
+            -if(inventory.inventoryType === 'other')
+              .aa-pick.aa-pick-picked#other Другое
+            -else
+              .aa-pick#other Другое
+
+        -if(inventory.date)
+          .aa-input-block#add-date-input
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date" value=`${inventory.date.toLocaleString('ru-RU', {year: 'numeric'})}-${inventory.date.toLocaleString('ru-RU', {month: '2-digit'})}-${inventory.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+        -else
+          .aa-add-more#add-date
+            p Добавить дату
+            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-input-block.hidden-input-block#add-date-input
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date")
+
+        -if(inventory.cost) 
+          .aa-input-block#add-cost-input
+            label.aa-label(for="cost")
+              p Стоимость | ₽
+            input.aa-text-input#cost(type="number" value=`${inventory.cost}`)
+        -else 
+          .aa-add-more#add-cost
+            p Добавить стоимость
+            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-input-block.hidden-input-block#add-cost-input
+            label.aa-label(for="cost")
+              p Стоимость | ₽
+            input.aa-text-input#cost(type="number")
+
+        -if(inventory.expDate)
+          .aa-input-block#add-exp-date-input
+            label.aa-label(for="exp-date")
+              p Срок годности
+            input.aa-text-input.aa-date-input#exp-date(type="date" value=`${inventory.expDate.toLocaleString('ru-RU', {year: 'numeric'})}-${inventory.expDate.toLocaleString('ru-RU', {month: '2-digit'})}-${inventory.expDate.toLocaleString('ru-RU', {day: '2-digit'})}`)
+        -else
+          .aa-add-more#add-exp-date
+            p Добавить срок годности
+            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-input-block.hidden-input-block#add-exp-date-input
+            label.aa-label(for="exp-date")
+              p Срок годности
+            input.aa-text-input.aa-date-input#exp-date(type="date")
+        
+        -if(inventory.note)
+          .aa-input-block#add-note-input
+            label.aa-label(for="note")
+              p Заметка
+            input.aa-text-input#note(type="text" value=`${inventory.note}`)
+        -else
+          .aa-add-more#add-note
+            p Добавить заметку
+            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-input-block.hidden-input-block#add-note-input
+            label.aa-label(for="note")
+              p Заметка
+            input.aa-text-input#note(type="text")
+
+        .ar-btn-box  
+          a.ar-add-button(data-inventory-id=`${inventory._id}`) Сохранить

@@ -1,0 +1,189 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-add-animal" data-sub="")
+
+  section.main-section 
+    .add-animal-container#edit-animal-container
+      a.aa.back-btn(href=`/herd/animal-card/${animal._id}`)
+        ion-icon(name='arrow-back-outline')
+      .aa-main-block
+        .aa-info-block
+          .aa-block-title Введите информацию о животном.
+          .aa-block-sub-title * поля обязательные для заполнения.
+          form.aa-form.aa-form-buy
+            .aa-input-block
+              lable.aa-label(for="number") 
+                p Номер*
+                //-.aa-label-warning -&nbsp; Данный номер уже занят
+              input.aa-text-input#number(type="text" value=`${animal.number}`)
+            -if(animal.name)
+              .aa-input-block
+                lable.aa-label(for="name")
+                  p Имя
+                input.aa-text-input#name(type="text" value=`${animal.name}`)
+            -else
+              .aa-input-block
+                lable.aa-label(for="name")
+                  p Имя
+                input.aa-text-input#name(type="text")
+
+            -if(animal.buyCost)
+              .aa-input-block.info-buy-items
+                lable.aa-label(for="buy-cost")
+                  p Цена покупки
+                  p |
+                  p ₽
+                input.aa-text-input#buy-cost(type="number" value=`${animal.buyCost}`)
+            -else
+              .aa-input-block.info-buy-items
+                lable.aa-label(for="buy-cost")
+                  p Цена покупки
+                  p |
+                  p ₽
+                input.aa-text-input#buy-cost(type="number")
+
+            //-.aa-input-block 
+              label.aa-label(for="main-photos")
+                p Главное фото
+                p |
+                ion-icon(name="images-outline")
+              input.aa-photo-input#main-photos(type="file" accept="image/*")
+              .aa-photo-preview-box
+                //-img.aa-photo-preview(src=`/img/images/${anim.mainPhoto}`)
+            //-.aa-input-block 
+              label.aa-label(for="add-photos")
+                p Доп. фото
+                p |
+                ion-icon(name="images-outline")
+              input.aa-photo-input#add-photos(type="file" accept="image/*" multiple)
+              .aa-photo-preview-box
+                //-img.aa-photo-preview(src=`/img/images/${anim.mainPhoto}`)
+
+            -if(potMother.length > 0)
+              -if(animal.mother)
+                .aa-input-block.info-birth-items
+                  lable.aa-label(for="mother") 
+                    p Мать
+                  input.aa-search-input.aa-animal-search#mother(data-id=`${animal.mother}` value=`${animal.mother.name !== undefined ? `${animal.mother.name} #${animal.mother.number}`: `#${animal.mother.number}`}` data-placeholder="Имя или #Номер")
+                  .animal-search-block#mother-search-block
+                    each anim in potMother
+                      .animal-search-item(data-id=`${anim._id}`)
+                        -if(anim.mainPhoto)
+                          img(src=`/img/images/${anim.mainPhoto}`)
+                        -if(anim.name)
+                          .animal-search-name= anim.name
+                        .animal-search-number= `#${anim.number}`
+              -else
+                .aa-input-block.info-birth-items
+                  lable.aa-label(for="mother") 
+                    p Мать
+                  input.aa-search-input.aa-animal-search#mother(data-id="" data-placeholder="Имя или #Номер")
+                  .animal-search-block#mother-search-block
+                    each anim in potMother
+                      .animal-search-item(data-id=`${anim._id}`)
+                        -if(anim.mainPhoto)
+                          img(src=`/img/images/${anim.mainPhoto}`)
+                        -if(anim.name)
+                          .animal-search-name= anim.name
+                        .animal-search-number= `#${anim.number}`
+
+            -if(potFather.length > 0)
+              -if(animal.father)
+                .aa-input-block.info-birth-items
+                  lable.aa-label(for="father") 
+                    p Отец
+                  input.aa-search-input.aa-animal-search#father(data-id=`${animal.father}` value=`${animal.father.name !== undefined ? `${animal.father.name} #${animal.father.number}`: `#${animal.father.number}`}` data-placeholder="Имя или #Номер")
+                  .animal-search-block
+                    each anim in potFather
+                      .animal-search-item(data-id=`${anim._id}`)
+                        -if(anim.mainPhoto)
+                          img(src=`/img/images/${anim.mainPhoto}`)
+                        -if(anim.name)
+                          .animal-search-name= anim.name
+                        .animal-search-number= `#${anim.number}`
+              -else
+                .aa-input-block.info-birth-items
+                  lable.aa-label(for="father") 
+                    p Отец
+                  input.aa-search-input.aa-animal-search#father(data-id="" data-placeholder="Имя или #Номер")
+                  .animal-search-block
+                    each anim in potFather
+                      .animal-search-item(data-id=`${anim._id}`)
+                        -if(anim.mainPhoto)
+                          img(src=`/img/images/${anim.mainPhoto}`)
+                        -if(anim.name)
+                          .animal-search-name= anim.name
+                        .animal-search-number= `#${anim.number}`
+
+            -if(animal.birthDate)
+              .aa-input-block 
+                label.aa-label(for="birth-date")
+                  p Дата рождения*
+                input.aa-text-input.aa-date-input#birth-date(type="date" value=`${animal.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}-${animal.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}-${animal.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+            -if(animal.breedEnglish)
+              .aa-input-block
+                lable.aa-label(for="breed") 
+                  p Порода
+                input.aa-search-input.aa-breed-search#breed(type=`text` value=`${animal.breedRussian}` data-rus=`${animal.breedRussian}` data-eng=`${animal.breedEnglish}` data-placeholder="Название пароды")
+                .animal-search-block
+                  .animal-search-item(data-rus="Айршир" data-eng="Ayrshire")
+                    p.animal-search-name Айршир
+                  .animal-search-item(data-rus="Голштин" data-eng="Holstein")
+                    p.animal-search-name Голштин
+                  .animal-search-item(data-rus="Сементал" data-eng="Semental")
+                    p.animal-search-name Сементал
+                  .animal-search-item(data-rus="Швицкая" data-eng="Swiss")
+                    p.animal-search-name Швицкая
+                  .animal-search-item(data-rus="Джерси" data-eng="Jersey")
+                    p.animal-search-name Джерси
+                  .animal-search-item(data-rus="Монбельярд" data-eng="Montbéliarde")
+                    p.animal-search-name Монбельярд
+            
+            -if(animal.gender)
+              .aa-input-block 
+                label.aa-label(for="gender")
+                  p Пол*
+                .aa-pick-box.aa-pick-box-one.valid-aa-input#gender
+                  -if(animal.gender === 'male')
+                    .aa-pick#female Женский
+                    .aa-pick.aa-pick-picked#male Мужской
+                  -if(animal.gender === 'female')
+                    .aa-pick.aa-pick-picked#female Женский
+                    .aa-pick#male Мужской
+            -else
+              .aa-input-block 
+                label.aa-label(for="gender")
+                  p Пол*
+                .aa-pick-box.aa-pick-box-one#gender
+                  .aa-pick#female Женский
+                  .aa-pick#male Мужской
+            
+            -if(animal.colors)
+              .aa-input-block 
+                label.aa-label(for="colors")
+                  p Цвета
+                each color in animal.colors 
+                  .aa-invis-colors(data-color=`${color}`)
+                .aa-pick-box.aa-pick-box-few#colors
+                  .aa-pick#black Черный
+                  .aa-pick#red Красный
+                  .aa-pick#white Белый
+            -else
+              .aa-input-block 
+                label.aa-label(for="colors")
+                  p Цвета
+                .aa-pick-box.aa-pick-box-few#colors
+                  .aa-pick#black Черный
+                  .aa-pick#red Красный
+                  .aa-pick#white Белый
+
+
+            a.ar-add-button.edit-animal-button(data-animal-id=`${animal._id}`) Сохранить
+        .aa-success-block 
+          ion-icon(name="checkmark-circle")
+          //-p Животное успешно добавленно!
+
+
+

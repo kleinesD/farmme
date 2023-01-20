@@ -1,0 +1,82 @@
+.main-menu
+  .menu-back-btn 
+    ion-icon(name="arrow-back")
+  .menu-toggle
+    .menu-toggle-btn
+      #bar-1.menu-bar
+      #bar-2.menu-bar
+  a.menu-top(href="/")
+    img.menu-logo(src='/img/logos/farmme-logo-6.png')
+    .menu-title Farmme
+  .menu-block
+    //-.menu-block-title Главное Меню
+    .menu-item#herd-block
+      .menu-item-header
+        //-ion-icon.menu-item-arrow(name='caret-down-outline')
+        ion-icon.menu-item-icon(name='pricetag')
+        .menu-item-title Животные
+        //-.menu-item-notif 7
+      .menu-sub-item-box
+        a.menu-sub-item#herd-main(href="/herd")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Главная
+        a.menu-sub-item#herd-all-animals(href="/herd/all-animals")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Все Животные
+        a.menu-sub-item#herd-add-animal(href="/herd/add-animal")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Добавить Животное
+        a.menu-sub-item#herd-results-list(href="/herd/list-milking-results")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Добавить Результаты Доения
+        a.menu-sub-item#herd-results-list(href="/herd/list-inseminations")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Добавить Осеменения
+        a.menu-sub-item#herd-results-list(href="/herd/write-off-animal/multiple")
+          .menu-thread-box
+            .menu-thread-dash
+          .menu-sub-item-text Списать животных
+
+
+    -if(user.accessBlocks.includes('vet'))
+      .menu-item#vet-block
+        .menu-item-header
+          //-ion-icon.menu-item-arrow(name='caret-down-outline')
+          ion-icon.menu-item-icon(name='medical')
+          .menu-item-title Ветеринария
+          //-.menu-item-notif 7
+        .menu-sub-item-box
+          a.menu-sub-item#vet-main(href="/vet/main")
+            .menu-thread-box
+              .menu-thread-dash
+            .menu-sub-item-text Главная
+          a.menu-sub-item#vet-all-animals(href="/vet/calendar")
+            .menu-thread-box
+              .menu-thread-dash
+            .menu-sub-item-text Календарь
+          a.menu-sub-item#vet-add-animal(href="/vet/add-action/multiple")
+            .menu-thread-box
+              .menu-thread-dash
+            .menu-sub-item-text Добавить действие
+          a.menu-sub-item#vet-add-animal(href="/vet/add-problem/multiple")
+            .menu-thread-box
+              .menu-thread-dash
+            .menu-sub-item-text Добавить проблему
+          a.menu-sub-item#vet-add-animal(href="#")
+            .menu-thread-box
+              .menu-thread-dash
+            .menu-sub-item-text Начать схему
+
+
+
+  .menu-item-bottom#logout-btn
+    .menu-item-header
+      //-ion-icon.menu-item-arrow(name='caret-down-outline')
+      ion-icon.menu-item-icon(name='power')
+      .menu-item-title Выйти
+

@@ -1,0 +1,225 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-main" data-sub="")
+
+  section.main-section 
+
+    .main-page-block-full
+      .mp-small-column
+        .mp-stat-block  
+          .mp-herd-label  
+            ion-icon(name="paw")
+          .mp-block-header
+            p Статистика
+          .mp-graphs-block
+            .mp-graps-header 
+              .mp-graphs-header-item.mp-graphs-header-item-active#milking-results-graph-btn
+                .mp-graphs-header-img
+                  img(src="/img/images/milk-icon.png")
+                p Сред. доение
+              //-.mp-graphs-header-item#weight-results-graph-btn
+                .mp-graphs-header-img
+                  img(src="/img/images/weight-icon.png")
+                p Вес
+              .mp-graphs-header-item#milk-per-day-graph-btn
+                .mp-graphs-header-img
+                  img(src="/img/images/milk-icon.png")
+                p Молока в день
+
+            .mp-graph-box#milking-results-graph-box
+              .mp-graph
+                each cow in cows 
+                  -if(cow.milkingResults.length > 0)
+                    each result in cow.milkingResults
+                      .mp-graph-result-invis(data-result=`${result.result}` data-date=`${result.date}` data-name=`${cow.name}`)
+                canvas#main-milking-results
+              .mp-graph-timeline
+                .mp-timeline-item(data-months='120') 10л
+                .mp-timeline-item(data-months='60') 5л
+                .mp-timeline-item(data-months='36') 36м
+                .mp-timeline-item(data-months='24') 24м
+                .mp-timeline-item(data-months='12') 12м
+                .mp-timeline-item(data-months='6') 6м
+
+            //-.mp-graph-box#weight-results-graph-box
+              .mp-graph-timeline
+                .mp-timeline-item(data-months='120') 10л
+                .mp-timeline-item(data-months='60') 5л
+                .mp-timeline-item(data-months='36') 36м
+                .mp-timeline-item(data-months='24') 24м
+                .mp-timeline-item(data-months='12') 12м
+                .mp-timeline-item(data-months='6') 6м
+              .mp-graph
+                each cow in cows 
+                  -if(cow.weightResults.length > 0)
+                    each result in cow.weightResults
+                      .mp-graph-result-invis.mp-graph-result-cow(data-result=`${result.result}` data-date=`${result.date}`)
+                each bull in bulls 
+                  -if(bull.weightResults.length > 0)
+                    each result in bull.weightResults
+                      .mp-graph-result-invis.mp-graph-result-bull(data-result=`${result.result}` data-date=`${result.date}`)
+                canvas#main-weight-results
+
+            .mp-graph-box#milk-per-day-graph-box
+              .mp-graph
+                each cow in cows 
+                  -if(cow.milkingResults.length > 0)
+                    each result in cow.milkingResults
+                      .mp-graph-result-invis(data-result=`${result.result}` data-date=`${result.date}` data-name=`${cow.name}`)
+                canvas#main-milk-per-day
+              .mp-graph-timeline
+                .mp-timeline-item(data-months='120') 10л
+                .mp-timeline-item(data-months='60') 5л
+                .mp-timeline-item(data-months='36') 36м
+                .mp-timeline-item(data-months='24') 24м
+                .mp-timeline-item(data-months='12') 12м
+                .mp-timeline-item(data-months='6') 6м
+
+        .mp-stat-block.mp-stat-animal-block
+          .mp-block-header
+            p Лучший результат
+          .mp-list-block#top-milking
+            each cow in cows 
+              -if(cow.milkingResults.length > 0 && cow.milkingResults[cow.milkingResults.length - 1].date >= Date.now() - 30 * 24 * 60 * 60 * 1000)
+                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                  .mp-insem-cow-info
+                    .mp-insem-cow-name 
+                      -if(cow.name)
+                        | #{cow.name}
+                      | &nbsp; ##{cow.number}
+                    .mp-insem-cow-urgent= `Результат доения ${cow.milkingResults[cow.milkingResults.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.milkingResults[cow.milkingResults.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.milkingResults[cow.milkingResults.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+                  .mp-insem-details
+                    .mp-insem-day= `${cow.milkingResults[cow.milkingResults.length - 1].result} л.`
+                    .mp-insem-date
+
+
+
+      .mp-big-column
+        .mp-quick-info-block.mp-quick-info-block-top
+          .hh-item#milk-per-day
+            .hh-item-label КОЛИЧЕСТВО МОЛОКА В ДЕНЬ
+            .hh-item-growth 
+              ion-icon.hh-item-growth-indi(name="caret-up-outline")
+              .hh-item-growth-numb 0.0%
+            .hh-item-info 600 л.
+            img.hh-item-image(src="/img/images/milk-icon.png")
+          .hh-item#milk-per-month
+            .hh-item-label КОЛИЧЕСТВО МОЛОКА В МЕС.
+            .hh-item-growth 
+              ion-icon.hh-item-growth-indi(name="caret-up-outline")
+              .hh-item-growth-numb 0.0%
+            .hh-item-info 18000 л.
+            img.hh-item-image(src="/img/images/milk-icon.png")
+          .hh-item#milk-average
+            .hh-item-label В СРЕДНЕМ МОЛОКА ОТ КОРОВЫ
+            .hh-item-growth 
+              ion-icon.hh-item-growth-indi(name="caret-up-outline")
+              .hh-item-growth-numb 0.0%
+            .hh-item-info 15 л.
+            img.hh-item-image(src="/img/images/milk-icon.png")
+
+        .mp-quick-info-block.mp-quick-info-block-mid
+          .hh-item
+            .hh-item-label ВСЕГО ЖИВОТНЫХ
+            .hh-item-info= animals.length
+            img.hh-item-image(src="/img/images/cow-icon.png")
+          .hh-item
+            .hh-item-label КОРОВЫ
+            .hh-item-info= cows.length
+            img.hh-item-image(src="/img/images/female-icon.png")
+          .hh-item
+            .hh-item-label БЫКИ
+            .hh-item-info= bulls.length
+            img.hh-item-image(src="/img/images/male-icon.png")
+
+        .mp-quick-info-block.mp-quick-info-block-bottom  
+          .hh-item
+            .hh-item-label ДОЯЩИЕСЯ КОРОВЫ
+            .hh-item-info= milkingCows
+            img.hh-item-image(src="/img/images/milking-cow-icon.png")
+          .hh-item
+            .hh-item-label ОСЕМЕНЕННЫЕ КОРОВЫ
+            .hh-item-info= inseminatedCows
+            img.hh-item-image(src="/img/images/needle-icon.png")
+          //-if(bullsReady > 0)
+          .hh-item
+              .hh-item-label БЫКИ НА ЗАБОЙ
+              .hh-item-info= bullsReady
+              img.hh-item-image(src="/img/images/butcher-icon.png")
+        .mp-stat-block.mp-stat-animal-block 
+          .mp-block-header
+            p Ближайшие осеменения
+          .mp-list-block#soon-insem
+            each cow in cows 
+              -if(cow.lactations.length === 0 && cow.inseminations.length === 0 || cow.lactations.length === 0 && cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
+                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                  .mp-insem-cow-info
+                    .mp-insem-cow-name 
+                      -if(cow.name)
+                        | #{cow.name}
+                      | &nbsp; ##{cow.number}
+                    -if(cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
+                      .mp-insem-cow-urgent= `Первое осеменение • Неуспешное осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                    -else
+                      .mp-insem-cow-urgent Первое осеменение
+                  .mp-insem-details
+                    .mp-insem-day(class=`${((cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
+                    .mp-insem-date= `${new Date(cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+
+              -if(cow.lactations.length > 0)
+                -if(cow.inseminations.length > 0)
+                  -if(cow.lactations[cow.lactations.length - 1].startDate > cow.inseminations[cow.inseminations.length - 1].date || cow.lactations[cow.lactations.length - 1].startDate < cow.inseminations[cow.inseminations.length - 1].date && !cow.inseminations[cow.inseminations.length - 1].success)
+                    a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                      img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                      .mp-insem-cow-info
+                        .mp-insem-cow-name 
+                          -if(cow.name)
+                            | #{cow.name}
+                          | &nbsp; ##{cow.number}
+                        -if(!cow.inseminations[cow.inseminations.length - 1].success)
+                          .mp-insem-cow-urgent= `Осеменение после ${cow.lactations[cow.lactations.length - 1].number} отела • Неуспешное осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                        -else
+                          .mp-insem-cow-urgent= `Осеменение после ${cow.lactations[cow.lactations.length - 1].number} лактации`
+                      .mp-insem-details
+                        .mp-insem-day(class=`${((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
+                        .mp-insem-date= `${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+                -else
+                  a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                    img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                    .mp-insem-cow-info
+                      .mp-insem-cow-name 
+                        -if(cow.name)
+                          | #{cow.name}
+                        | &nbsp; ##{cow.number}
+                      .mp-insem-cow-urgent= `Осеменение после ${cow.lactations[cow.lactations.length - 1].number} отела`
+                    .mp-insem-details
+                      .mp-insem-day(class=`${((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
+                      .mp-insem-date= `${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+
+
+        .mp-stat-block.mp-stat-animal-block
+          .mp-block-header
+            p Ближайший отел
+          .mp-list-block#soon-calv
+            each cow in cows 
+              -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
+                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                  .mp-insem-cow-info
+                    .mp-insem-cow-name 
+                      -if(cow.name)
+                        | #{cow.name}
+                      | &nbsp; ##{cow.number}
+                    .mp-insem-cow-urgent= `Осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .mp-insem-details
+                    .mp-insem-day(class=`${((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
+                    .mp-insem-date= `${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+
+
+    .mp-empty-block 
+      img(src='/img/images/no-data-image.png')
+      .mp-empty-title Нет актуальных данных

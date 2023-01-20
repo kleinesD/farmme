@@ -1,0 +1,70 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-scheme" data-sub="")
+
+  section.main-section.vet-module
+
+    .animal-results-container.animal-results-big.vet-scheme-container#edit-vet-scheme
+
+      .ar-block-title Изменить схему
+
+      .aa-input-block
+        lable.aa-label(for="name") 
+          p Название
+        input.aa-text-input#name(type="text" value=`${scheme.name}`)
+
+      each point in scheme.points
+        -if(point.firstPoint)
+          .scheme-step-container(data-step="1")
+            .scheme-step-container-label #1
+            //-.scheme-step-container-close
+              ion-icon(name="close")
+            .aa-input-block
+              lable.aa-label(for="name") 
+                p Действие
+              input.aa-text-input.scheme-step-action(type="text" value=`${point.action}`)
+
+        -else
+          .scheme-step-container(data-step=`${scheme.points.indexOf(point) + 1}`)
+            .scheme-step-container-label= `#${scheme.points.indexOf(point) + 1}`
+            -if(scheme.points.indexOf(point) >= 2)
+              .scheme-step-container-close
+                ion-icon(name="close")
+            .aa-input-block
+              lable.aa-label(for="name") 
+                p Действие
+              input.aa-text-input.scheme-step-action(type="text" value=`${point.action}`)
+            .aa-input-block.scheme-step
+              lable.aa-label 
+                p Временной отрезок
+              .aa-double-input-block
+                input.aa-double-input.scheme-step-in(type="number" value=`${point.scheduledIn}`)
+                select.aa-double-input.scheme-step-unit
+                  option(selected hidden value=`${point.timeUnit === 'h' ? 'h' : 'd'}`)= `${point.timeUnit === 'h' ? 'Часов' : 'Дней'}`
+                  option(value="h") Часов
+                  option(value="d") Дней
+                select.aa-double-input.scheme-step-count
+                  option(selected hidden value=`${point.countFrom === 'start' ? 'start' : 'last-point'}`)= `${point.countFrom === 'start' ? 'От начала' : 'От пред. действия'}`
+                  option(value="start") От начала
+                  option(value="last-point") От пред. действия
+
+      //-.aa-input-block.hidden-input-block.scheme-step
+        lable.aa-label 
+          p Шаг #1
+        .aa-double-input-block
+          input.aa-double-input.scheme-step-in(type="number")
+          select.aa-double-input.scheme-step
+            option(value="mg" selected) Мг.
+            option(value="ml") Мл.
+            option(value="g") Гм.
+
+      .aa-add-more#add-step
+        p Добавить шаг
+        ion-icon.aa-add-more-icon(name="add-circle")
+    
+      a.ar-add-button(data-id=`${scheme._id}`) Сохранить
+
+
+
+

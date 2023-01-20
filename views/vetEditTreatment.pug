@@ -1,0 +1,173 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-treatment" data-sub="")
+
+  section.main-section.vet-module
+
+    include _animalHeader
+
+    .animal-results-container.animal-results-big#edit-vet-treatment-container
+
+      .ar-block-title Редактировать лечение
+
+      .aa-input-block
+        lable.aa-label
+          p Проблема
+        .ar-problem-block 
+          .ar-problem-header
+            .ar-problem-title= treatment.disease.name
+            .ar-problem-date= `${treatment.disease.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+            .ar-problem-expand-btn(data-state=`to-show`)
+              ion-icon(name="chevron-down")
+          .ar-problem-text= treatment.disease.note
+
+
+      .aa-input-block
+        lable.aa-label(for="name") 
+          p Лечение
+        input.aa-text-input#name(type="text" value=`${treatment.name}`)
+
+      -if(treatment.dose.amount)
+        .aa-input-block#dose-input
+          lable.aa-label(for="dose") 
+            p Дозировка
+          .aa-double-input-block
+            input.aa-double-input#dose(type="number" value=`${parseFloat(treatment.dose.amount)}`)
+            select.aa-double-input#unit
+              -if(treatment.dose.unit === 'mg')
+                option(value="mg" selected hidden) Мг.
+              -if(treatment.dose.unit === 'ml')
+                option(value="ml" selected hidden) Мл.
+              -if(treatment.dose.unit === 'g')
+                option(value="g" selected hidden) Гм.
+              option(value="mg") Мг.
+              option(value="ml") Мл.
+              option(value="g") Гм.
+      -else
+        .aa-input-block.hidden-input-block#dose-input
+          lable.aa-label(for="dose") 
+            p Дозировка
+          .aa-double-input-block
+            input.aa-double-input#dose(type="number")
+            select.aa-double-input#unit
+              option(value="mg" selected) Мг.
+              option(value="ml") Мл.
+              option(value="g") Гм.
+        .aa-add-more#add-dose-input
+          p Добавить дозировку
+          ion-icon.aa-add-more-icon(name="add-circle")
+      .aa-input-block
+        lable.aa-label(for="note") 
+          p Описание
+          //-.aa-label-warning -&nbsp; Данный номер уже занят
+        input.aa-text-input#note(type="text" value=`${treatment.note}`)
+
+      .aa-input-block 
+        label.aa-label(for="cured")
+          p Результат
+        .aa-pick-box.aa-pick-box-one#cured
+          -if(treatment.cured)
+            .aa-pick.aa-pick-picked#cured Вылечено
+            .aa-pick#not-cured Не помогло
+          -else
+            .aa-pick#cured Вылечено
+            .aa-pick.aa-pick-picked#not-cured Не помогло
+      .aa-input-block.aa-triple-date-block
+        label.aa-label(for="date")
+          p Дата и время
+        input.aa-triple-date-input-big#date(type="date" data-disease-date=`${treatment.disease.date}` value=`${treatment.date.toLocaleString('ru-RU', {year: 'numeric'})}-${treatment.date.toLocaleString('ru-RU', {month: '2-digit'})}-${treatment.date.toLocaleString('ru-RU', {day: '2-digit'})}`) 
+        select.aa-triple-date-input#hour
+          option(selected hidden value=`${treatment.date.toLocaleString('ru-RU', {hour: 'numeric'})}`)= `${treatment.date.toLocaleString('ru-RU', {hour: 'numeric'})}`
+          option(value="0") 00
+          option(value="1") 01
+          option(value="2") 02
+          option(value="3") 03
+          option(value="4") 04
+          option(value="5") 05
+          option(value="6") 06
+          option(value="7") 07
+          option(value="8") 08
+          option(value="9") 09
+          option(value="10") 10
+          option(value="11") 11
+          option(value="12") 12
+          option(value="13") 13
+          option(value="14") 14
+          option(value="15") 15
+          option(value="16") 16
+          option(value="17") 17
+          option(value="18") 18
+          option(value="19") 19
+          option(value="20") 20
+          option(value="21") 21
+          option(value="22") 22
+          option(value="23") 23     
+        .aa-triple-date-divider :
+        select.aa-triple-date-input#minute
+          option(selected hidden value=`${treatment.date.toLocaleString('ru-RU', {minute: '2-digit'})}`)= `${treatment.date.toLocaleString('ru-RU', {minute: '2-digit'})}`
+          option(value="0") 00
+          option(value="1") 01
+          option(value="2") 02
+          option(value="3") 03
+          option(value="4") 04
+          option(value="5") 05
+          option(value="6") 06
+          option(value="7") 07
+          option(value="8") 08
+          option(value="9") 09
+          option(value="10") 10
+          option(value="11") 11
+          option(value="12") 12
+          option(value="13") 13
+          option(value="14") 14
+          option(value="15") 15
+          option(value="16") 16
+          option(value="17") 17
+          option(value="18") 18
+          option(value="19") 19
+          option(value="20") 20
+          option(value="21") 21
+          option(value="22") 22
+          option(value="23") 23
+          option(value="24") 24
+          option(value="25") 25
+          option(value="26") 26
+          option(value="27") 27
+          option(value="28") 28
+          option(value="29") 29
+          option(value="30") 30
+          option(value="31") 31
+          option(value="32") 32
+          option(value="33") 33
+          option(value="34") 34
+          option(value="35") 35
+          option(value="36") 36
+          option(value="37") 37
+          option(value="38") 38
+          option(value="39") 39
+          option(value="40") 40
+          option(value="41") 41
+          option(value="42") 42
+          option(value="43") 43
+          option(value="44") 44
+          option(value="45") 45
+          option(value="46") 46
+          option(value="47") 47
+          option(value="48") 48
+          option(value="49") 49
+          option(value="50") 50
+          option(value="51") 51
+          option(value="52") 52
+          option(value="53") 53
+          option(value="54") 54
+          option(value="55") 55
+          option(value="56") 56
+          option(value="57") 57
+          option(value="58") 58
+          option(value="59") 59
+      a.ar-add-button(data-id=`${treatment._id}`) Сохранить
+
+
+
+

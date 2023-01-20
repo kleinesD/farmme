@@ -1,0 +1,41 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+    .all-animals-container.animals-result-list#list-milking-results
+      .ar-block-title Контрольное доение
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#all-animals-search(type="text" placeholder="Найти животное")
+
+      .result-list-btns-block
+        input.rl-date-btn(type="date")
+        .rl-add-btn Сохранить результаты
+
+      .animal-list-header
+        .alh-item.alh-item-photo Фото 
+        .alh-item Кличка 
+        .alh-item #
+        .alh-item.alh-item-result Результат
+        .alh-item.alh-item-lact-number Номер лактации
+      .animals-list-block
+        each animal in animals
+          .al-animal(data-id=`${animal._id}`)
+            .al-item.al-item-photo 
+              img(src=`/img/images/${animal.mainPhoto}`)
+            .al-item.al-item-name= animal.name
+            .al-item.al-item-number= animal.number
+            .al-item.al-item-result
+              input.rl-result(type="number")
+              .lr-unit л.
+            .al-item.al-item-lact-number
+              each lact in animal.lactations
+                .rl-small-lact(data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)= lact.number
+        
+          
+
+
+      
+

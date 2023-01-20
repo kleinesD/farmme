@@ -1,0 +1,10 @@
+.animal-results-header
+  img.ar-header-photo(src=`/img/images/${animal.mainPhoto}`)
+  -if(animal.name)
+    .ar-header-info= animal.name
+  .ar-header-info= `#${animal.number}`
+  .ar-header-important-info(class=`current-info-${animal.currentInfoAB.status}`)
+    -if(animal.currentInfoAB && animal.currentInfoAB.message !== '')
+      .ar-outter-circle
+      .ar-important-text= animal.currentInfoAB.message
+  a.ar-header-animal-btn(href=`/herd/animal-card/${animal._id}`)= `Карта: #${animal.number}`

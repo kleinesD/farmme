@@ -1,0 +1,35 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-action" data-sub="")
+
+  section.main-section.vet-module
+
+    include _animalHeader
+
+    .animal-results-container.animal-results-big#vet-edit-started-scheme-container
+
+      .ar-block-title Изменить начатую схему
+
+
+
+      .aa-input-block 
+        label.aa-label(for="date")
+          p Дата
+        input.aa-text-input.aa-date-input#date(type="date" value=`${firstSchemeAction.date.toLocaleString('ru-RU', {year: 'numeric'})}-${firstSchemeAction.date.toLocaleString('ru-RU', {month: '2-digit'})}-${firstSchemeAction.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+      .aa-input-block
+        lable.aa-label(for="scheme") 
+          p Схема
+        input.aa-search-input.aa-scheme-search#scheme(data-id=`${firstSchemeAction.scheme._id}` data-placeholder="Выберите схему" value=`${firstSchemeAction.scheme.name} Шагов: ${firstSchemeAction.scheme.points.length}`)
+        .animal-search-block#scheme-search-block
+          each scheme in schemes
+            .animal-search-item(data-id=`${scheme._id}`)
+              .animal-search-name= scheme.name
+              .animal-search-number= `Шагов: ${scheme.points.length}`
+
+      a.ar-add-button(data-action-id=`${firstSchemeAction._id}`) Сохранить
+
+
+
+

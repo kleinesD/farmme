@@ -1,0 +1,43 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+    include _animalHeader
+    .animal-results-container.animal-results-big#edit-lactation-container
+      img.ar-image-back(src="/img/images/milking-cow-icon.png")
+      .ar-block-title Редактировать лактацию
+      .ar-one-line-result
+        .aa-input-block.aa-input-block-half
+          label.aa-label(for="start-date")
+            p Начало
+          input.aa-text-input.aa-date-input#start-date(type="date" data-value=`${lactation.startDate}`)
+        .aa-input-block.aa-input-block-half
+          label.aa-label(for="finish-date")
+            p Конец
+          input.aa-text-input.aa-date-input#finish-date(type="date" data-value=`${lactation.finishDate}`)
+      .aa-input-block
+        each lactation in animal.lactations
+          .aa-input-invis(data-number=`${lactation.number}`)
+        lable.aa-label(for="number")
+          p Номер лактации
+        .invis-lact-data-container
+          each lact in animal.lactations 
+            .invis-lact-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
+        .aa-pick-box.aa-pick-box-one#lactation-number
+          .aa-pick(class=`${lactation.number === 1 ? 'aa-pick-picked' : ''}`) 1
+          .aa-pick(class=`${lactation.number === 2 ? 'aa-pick-picked' : ''}`) 2
+          .aa-pick(class=`${lactation.number === 3 ? 'aa-pick-picked' : ''}`) 3
+          .aa-pick(class=`${lactation.number === 4 ? 'aa-pick-picked' : ''}`) 4
+          .aa-pick(class=`${lactation.number === 5 ? 'aa-pick-picked' : ''}`) 5
+          .aa-pick(class=`${lactation.number === 6 ? 'aa-pick-picked' : ''}`) 6
+          .aa-pick(class=`${lactation.number === 7 ? 'aa-pick-picked' : ''}`) 7
+          .aa-pick(class=`${lactation.number === 8 ? 'aa-pick-picked' : ''}`) 8
+          .aa-pick(class=`${lactation.number === 9 ? 'aa-pick-picked' : ''}`) 9
+          .aa-pick(class=`${lactation.number === 10 ? 'aa-pick-picked' : ''}`) 10
+      a.ar-add-button(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+
+    
+
+

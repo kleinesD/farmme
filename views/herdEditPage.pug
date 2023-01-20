@@ -1,0 +1,100 @@
+extends base
+
+block content
+  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
+
+  section.main-section 
+    include _animalHeader
+    .animal-results-container.animal-results-big#all-edit-container
+
+      -if(type === 'milking-results')
+        .ar-block-title Редактировать результаты доения
+        .ar-reverse-block
+          each result in animal.milkingResults 
+            .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+              .ar-edit-btns-block
+                .ar-edit-item-btn.delete-btns.initial-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                  ion-icon(name='close-outline')
+              a.ar-edit-item-inside(href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.indexOf(result)}`)
+                .ar-edit-text= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .ar-edit-text= `${result.result} л.`
+
+      -if(type === 'weight-results')
+        .ar-block-title Редактировать изменения веса
+        .ar-reverse-block
+          each result in animal.weightResults 
+            .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+              .ar-edit-btns-block
+                .ar-edit-item-btn.delete-btns.initial-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                  ion-icon(name='close-outline')
+              a.ar-edit-item-inside(href=`/herd/edit-weight-result/${animal._id}/${animal.weightResults.indexOf(result)}`)
+                .ar-edit-text= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .ar-edit-text= `${result.result} кг.`
+
+      -if(type === 'inseminations')
+        .ar-block-title Редактировать осеменение
+        .ar-reverse-block
+          each result in animal.inseminations 
+            -if(result.success === undefined)
+              .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+                .ar-edit-btns-block
+                  .ar-edit-item-btn.delete-btns.initial-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                    ion-icon(name='close-outline')
+                a.ar-edit-item-inside(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(result)}`)
+                  .ar-edit-text= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+            -if(result.success !== undefined && result.success)
+              .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+                .ar-edit-btns-block
+                  .ar-edit-item-btn.delete-btns.initial-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                    ion-icon(name='close-outline')
+                a.ar-edit-item-inside.ar-edit-item-succ(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(result)}`)
+                  .ar-edit-text= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .ar-edit-text= `Успешно`
+            -if(result.success !== undefined && !result.success)
+              .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+                .ar-edit-btns-block
+                  .ar-edit-item-btn.delete-btns.initial-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                    ion-icon(name='trash-outline')
+                  .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                    ion-icon(name='close-outline')
+                a.ar-edit-item-inside.ar-edit-item-fail(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(result)}`)
+                  .ar-edit-text= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .ar-edit-text= `Не успешно`
+
+      -if(type === 'lactations')
+        .ar-block-title Редактировать лактации
+        .ar-reverse-block
+          each result in animal.lactations 
+            .ar-edit-item(data-type=`${type}` data-animal-id=`${animal._id}` data-item-id=`${result._id}`)
+              .ar-edit-btns-block
+                .ar-edit-item-btn.delete-btns.initial-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.delete-btns.confirm-btns.confirm-delete-btn
+                  ion-icon(name='trash-outline')
+                .ar-edit-item-btn.confirm-btns.confirm-btns.confirm-cancel-btn
+                  ion-icon(name='close-outline')
+              a.ar-edit-item-inside(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(result)}`)
+                .ar-edit-text= `Начало: ${result.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${result.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${result.startDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -if(result.finishDate)
+                  .ar-edit-text= `Конец: ${result.finishDate.toLocaleString('ru-RU', {day: '2-digit'})}.${result.finishDate.toLocaleString('ru-RU', {month: '2-digit'})}.${result.finishDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+
+

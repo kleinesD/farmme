@@ -1,0 +1,52 @@
+const mongoose = require('mongoose');
+
+const calendarScheme = new mongoose.Schema({
+  farm: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Farm'
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User'
+  },
+  animal: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Animal'
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  note: String,
+  date: {
+    type: Date,
+    required: true
+  },
+  creationDate: {
+    type: Date,
+    required: true,
+    default: Date.now()
+  },
+  module: {
+    type: String,
+    required: true,
+    enum: ['general', 'herd', 'vet', 'warehouse']
+  },
+  notified: {
+    type: Boolean,
+    default: false
+  },
+  reminders: [
+    {
+      date: Date,
+      notified: {
+        type: Boolean,
+        default: false
+      }
+    }
+  ],
+  subId: String
+});
+
+const Calendar = mongoose.model('Calendar', calendarScheme);
+module.exports = Calendar;

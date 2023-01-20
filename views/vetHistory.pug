@@ -1,0 +1,62 @@
+extends base
+
+block content
+  .menu-ref(data-block="vet-block" data-page="vet-history" data-sub="")
+
+  section.main-section 
+    .all-animals-container
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#vet-history-search(type="text" placeholder="Поиск по названию")
+      .vet-history-categories-block
+        .vh-category.vh-category-action.vh-category-active#action 
+          ion-icon(name="medical")
+          p Действия
+        .vh-category.vh-category-problem.vh-category-active#problem
+          ion-icon(name="thermometer")
+          p Проблемы
+        .vh-category.vh-category-treatment.vh-category-active#treatment  
+          ion-icon(name="bandage")
+          p Лечения
+        .vh-category.vh-category-schedule.vh-category-active#scheduled  
+          ion-icon(name="calendar")
+          p Напоминания
+      
+      .vet-history-searched
+
+      .vet-history-container
+        //-.vet-history-month Январь, 2022
+
+        each doc in actions
+          .vet-history-item.vet-history-action(data-date=`${doc.date}`)
+            .vet-history-icon
+              ion-icon(name="medical")
+            .vet-history-title= doc.name
+            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+        each doc in problems
+          .vet-history-item.vet-history-problem(data-date=`${doc.date}`)
+            .vet-history-icon
+              ion-icon(name="thermometer")
+            .vet-history-title= doc.name
+            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+        each doc in treatments
+          .vet-history-item.vet-history-treatment(data-date=`${doc.date}`)
+            .vet-history-icon
+              ion-icon(name="bandage")
+            .vet-history-title= doc.name
+            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+        each doc in scheduled
+          .vet-history-item.vet-history-scheduled(data-date=`${doc.date}`)
+            .vet-history-icon
+              ion-icon(name="calendar")
+            .vet-history-title= doc.name
+            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+      
+          
+
+
+      
+
