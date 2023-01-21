@@ -16,21 +16,23 @@ block content
           p Показывать прошлых животных
         //-select.all-animals-sort 
           option(selected hidden disabled) Сортировать
-          option(value="old") Старые
+          option(value="calving") Отел
+          option(value="calving") Осеменение
+          options(value="age") Возраст
       .animal-list-header
         .alh-item.alh-item-photo Фото 
-        .alh-item Кличка 
+        .alh-item # 
         .alh-item Возраст 
         .alh-item Пол
         .alh-item.alh-item-info Важная информация
-        .alh-item # 
+        .alh-item Кличка 
       .animals-list-block
         each animal in animals
           -if(animal.status === 'alive')
             a.al-animal(href=`/herd/animal-card/${animal._id}`)
               .al-item.al-item-photo 
                 img(src=`/img/images/${animal.mainPhoto}`)
-              .al-item.al-item-name= animal.name
+              .al-item.al-item-number= animal.number
               -if([1, 21].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
                 .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} год`
               -if([2, 3, 4, 22, 23, 24].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
@@ -42,14 +44,14 @@ block content
                 -if(animal.currentInfoAB && animal.currentInfoAB.status !== undefined && animal.currentInfoAB.message !== '')
                   .ar-outter-circle
                   .ar-important-text= animal.currentInfoAB.message
-              .al-item.al-item-number= animal.number
+              .al-item.al-item-name= animal.name
           -else
             a.al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}`)
               .al-former-icon 
                 ion-icon(name="close")
               .al-item.al-item-photo 
                 img(src=`/img/images/${animal.mainPhoto}`)
-              .al-item.al-item-name= animal.name
+              .al-item.al-item-number= animal.number
               .al-item &dash;
               .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
               .al-item.al-item-info
@@ -60,7 +62,7 @@ block content
                 -if(animal.writeOffReason === 'sickness')
                   .ar-important-text= `Болезнь: ${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
                   
-              .al-item.al-item-number= animal.number
+              .al-item.al-item-name= animal.name
           
 
 
