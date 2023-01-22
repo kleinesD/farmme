@@ -1,4 +1,54 @@
+.main-menu-back-btn
+  ion-icon(name="arrow-back")
+.main-menu-btn
+  ion-icon(name="apps")
 .main-menu
+  .main-menu-logout-btn#logout-btn
+    ion-icon(name="exit-outline")
+  .main-menu-header
+    a.menu-logo-box(href="/")
+      img.menu-logo(src='/img/logos/farmme-logo-6.png')
+    .header-search-block
+      .header-search-block-icon
+        ion-icon(name="search")
+      input.header-search-input(type="text" placeholder="Поиск")
+
+    .header-user-block
+      .header-user-notifications
+        ion-icon.hun-bell-icon(name="notifications-outline")
+        .header-user-notif-number 12
+        ion-icon.hun-arrow-icon(name="caret-down")
+      a.header-user-link(href="#")
+        .header-user-info
+          .huf-name Даниил Коробко
+          .huf-title Создатель
+        img(src="/img/images/cows-login-2.jpg")
+  
+  .main-menu-items-container
+    //-.menu-item-box.menu-item-box-openned
+    .menu-item-box
+      .menu-item-title СТАДО
+      a.menu-item-link(href="/herd") ГЛАВНАЯ
+      a.menu-item-link(href="/herd/all-animals") ВСЕ ЖИВОТНЫЕ
+      a.menu-item-link(href="/herd/list-milking-results") ДОБАВИТЬ ЖИВОТНОЕ
+      a.menu-item-link(href="/herd/list-inseminations") ДОБАВИТЬ РЕЗУЛЬТАТЫ ДОЕНИЯ
+      a.menu-item-link(href="/herd/write-off-animal/multiple") ДОБАВИТЬ ОСЕМЕНЕНИЯ
+      a.menu-item-link(href="/herd/write-off-animal/multiple") СПИСАТЬ ЖИВОТНЫХ
+    .menu-item-box
+      .menu-item-title ВЕТЕРИНАРИЯ
+      a.menu-item-link(href="/vet/main") ГЛАВНАЯ
+      a.menu-item-link(href="/vet/add-problem/multiple") ДОБАВИТЬ ДЕЙСТВИЕ
+      a.menu-item-link(href="/vet/add-problem/multiple") ДОБАВИТЬ ПРОБЛЕМУ
+    .menu-item-box
+      .menu-item-title СКЛАД
+    .menu-item-box.menu-item-box-soon
+      .menu-item-title КОРМЛЕНИЕ
+        .menu-title-soon-tag Скоро
+    .menu-item-box.menu-item-box-soon
+      .menu-item-title МОЛОКО
+        .menu-title-soon-tag Скоро
+
+//.main-menu
   .menu-back-btn 
     ion-icon(name="arrow-back")
   .menu-toggle
