@@ -4,14 +4,59 @@ block content
   .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
 
   section.main-section 
-    .mp-block-changer
-      ion-icon.mp-block-changer-btn(name="chevron-back")
-      .mp-block-changer-item.mp-block-changer-item-off ЖИВОТНЫЕ
-      .mp-block-changer-item.mp-block-changer-item-on ВЕТЕРИНАРИЯ
-      .mp-block-changer-item.mp-block-changer-item-off СКЛАД
-      .mp-block-changer-item.mp-block-changer-item-off КОРМ
-      ion-icon.mp-block-changer-btn(name="chevron-forward")
-    .main-page-container#mp-herd-container 
+    .main-welcome-block
+      .mw-title-block
+        .mw-title FARMME
+      a.mw-account-block.mw-link-block(href="#")
+        .mw-marquee-container
+          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы. 
+          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы. 
+        .mw-block-line
+          .mw-account-name Даниил Коробко
+          img.mw-account-image(src="/img/images/cows-login-2.jpg")
+        .mw-block-line
+          .mw-block-name.mw-white Мой Аккаунт
+          ion-icon.mw-block-icon.mw-white(name="arrow-forward")
+        .mw-animation-block
+          //-img.mw-animation-icon.mw-animation-icon-1(src="/img/images/cow-icon.png")
+          //-img.mw-animation-icon.mw-animation-icon-2(src="/img/images/med-cross-icon.png")
+          //-img.mw-animation-icon.mw-animation-icon-3(src="/img/images/inventory-icon.png")
+          ion-icon.mw-animation-icon.mw-animation-icon-1#herd-main-icon(name="paw")
+          ion-icon.mw-animation-icon.mw-animation-icon-2#vet-main-icon(name="thermometer")
+          ion-icon.mw-animation-icon.mw-animation-icon-3#warehouse-main-icon(name="cube")
+
+      a.mw-link-herd-block.mw-link-block.mw-small-link-block#herd-main-block(href="/herd/")
+        .mw-marquee-container
+          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы. 
+          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы. 
+        .mw-block-line
+          .mw-block-name Стадо
+          ion-icon.mw-block-icon(name="paw")
+      a.mw-link-vet-block.mw-link-block.mw-small-link-block#vet-main-block(href="/vet/")
+        .mw-marquee-container
+          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий. 
+          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий. 
+        .mw-block-line
+          .mw-block-name Ветеринария
+          ion-icon.mw-block-icon(name="thermometer")
+      a.mw-link-warehouse-block.mw-link-block.mw-small-link-block#warehouse-main-block(href="/warehouse/")
+        .mw-marquee-container
+          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря.
+          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря.
+        .mw-block-line
+          .mw-block-name Склад
+          ion-icon.mw-block-icon(name="cube")
+      a.mw-link-quick-block.mw-link-block(href="#")
+        .mw-block-line
+          .mw-block-name Быстрая информация
+          ion-icon.mw-block-icon(name="chevron-down")
+    
+    
+    
+    
+    
+    
+    //-.main-page-container#mp-herd-container 
       .mp-info-block
         each cow in cows
           each result in cow.milkingResults

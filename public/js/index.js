@@ -66,6 +66,10 @@ $(document).ready(async function () {
       if (result) location.assign('/login');
     });
 
+    /* Back button */
+    $('.main-menu-back-btn').on('click', function() {
+      history.back(-1)
+    });
 
   }
 
@@ -1764,6 +1768,22 @@ $(document).ready(async function () {
   ///////////////////////
   /* THE MAIN PAGE */
   ///////////////////////
+  if(document.querySelector('.main-welcome-block')) {
+    $('.mw-small-link-block').on('mouseenter', function() {
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({'font-size': '1000%', 'opacity': '1', 'color': `${$(this).css('background-color')}`});
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).siblings().css('font-size', '500%')
+      $('.mw-account-block').find('.mw-marquee-text').css('opacity', '0');
+    });
+    
+    $('.mw-small-link-block').on('mouseleave', function() {
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({'font-size': '750%', 'opacity': '0.5', 'color': `#ffffff`})
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).siblings().css('font-size', '750%')
+      $('.mw-account-block').find('.mw-marquee-text').css('opacity', '1');
+
+    });
+  }
+
+
   if (document.querySelector('#mp-herd-container')) {
     /* Making navigation work */
     $('.mp-block-changer-item-on').click(function () {
