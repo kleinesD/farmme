@@ -4680,7 +4680,7 @@ ion-icon {
   height: calc(100% - 80px);
   padding: 40px 50px;
   border-radius: 50px;
-  background-color: #f0f0f0;
+  background-color: #555555;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -4737,6 +4737,50 @@ ion-icon {
 }
 .mw-small-link-block:hover .mw-marquee-text {
   opacity: 1;
+}
+.main-page-herd-block {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.mph-info-line {
+  width: calc(100% - 20px);
+  height: 300px;
+  padding: 0 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.mph-info-value-box {
+  width: 60%;
+  height: 100%;
+  background-color: #555555;
+  border-radius: 50px;
+  z-index: 100;
+  position: absolute;
+}
+.mph-info-value-icon {
+  width: 20%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mph-info-value-icon ion-icon {
+  font-size: 200%;
+  color: #FFBA08;
+}
+.mph-info-description-box {
+  width: 50%;
+  height: 100%;
+  background-color: #FFBA08;
+  border-radius: 50px;
+  z-index: 101;
+  position: absolute;
+  right: 10px;
 }
 
 
