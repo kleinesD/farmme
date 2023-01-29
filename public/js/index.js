@@ -33,8 +33,8 @@ $(document).ready(async function () {
   /////////////////////// 
   if (document.querySelector('.main-menu')) {
     /* Showing the menu on button click */
-    $('.main-menu-btn').on('click', function() {
-      if($(this).find('ion-icon').attr('name') !== 'close') {
+    $('.main-menu-btn').on('click', function () {
+      if ($(this).find('ion-icon').attr('name') !== 'close') {
         $(this).find('ion-icon').css('transform', 'rotate(180deg)')
         $(this).find('ion-icon').attr('name', 'close')
         $('.main-menu').css('display', 'flex');
@@ -44,10 +44,10 @@ $(document).ready(async function () {
         $('.main-menu').css('display', 'none');
       }
     });
-    
+
     /* Working with menu title */
-    $('.menu-item-title').on('click', function() {
-      if(!$(this).parent().hasClass('menu-item-box-openned')) {
+    $('.menu-item-title').on('click', function () {
+      if (!$(this).parent().hasClass('menu-item-box-openned')) {
         $('.menu-item-link').hide();
         $(this).parent().addClass('menu-item-box-openned');
         $(this).parent().find('.menu-item-link').show();
@@ -57,7 +57,7 @@ $(document).ready(async function () {
       }
     });
 
-    
+
 
     /* Logout btn */
     $('#logout-btn').click(async function () {
@@ -67,7 +67,7 @@ $(document).ready(async function () {
     });
 
     /* Back button */
-    $('.main-menu-back-btn').on('click', function() {
+    $('.main-menu-back-btn').on('click', function () {
       history.back(-1)
     });
 
@@ -657,9 +657,9 @@ $(document).ready(async function () {
       if (reminder.reminders.length > 0) {
         reminder.reminders.forEach((notif, index) => {
           let notifDate = moment(notif.date).lang('ru').format('MMMM DD YYYY, HH:mm');
-         notifDate =notifDate.charAt(0).toUpperCase() +notifDate.slice(1);
+          notifDate = notifDate.charAt(0).toUpperCase() + notifDate.slice(1);
           let notifWeekDay = moment(notif.date).lang('ru').format('dddd');
-         notifWeekDay =notifWeekDay.charAt(0).toUpperCase() +notifWeekDay.slice(1);
+          notifWeekDay = notifWeekDay.charAt(0).toUpperCase() + notifWeekDay.slice(1);
 
           $('.bc-info-detailed').append(`
             <div class="bc-info-detailed-group reminder-notification-el">
@@ -676,11 +676,11 @@ $(document).ready(async function () {
       }
     });
 
-    $('.bc-info-block-close').on('click', function() {
+    $('.bc-info-block-close').on('click', function () {
       $('.bc-info-detailed').hide();
       $('.bc-info-block').hide();
     });
-    $('.bc-info-detailed-back').on('click', function() {
+    $('.bc-info-detailed-back').on('click', function () {
       $('.bc-info-detailed').hide();
     });
 
@@ -1106,12 +1106,12 @@ $(document).ready(async function () {
         $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
       }
     });
-    
-    if($('#multiple-animals-container').children().length > 0 ) {
+
+    if ($('#multiple-animals-container').children().length > 0) {
       $('.ar-selected-animals-block').show();
       $('.ar-selected-animals-block').css('opacity', '1');
       $('#multiple-animals-container').children().css('pointer-events', 'none')
-    } 
+    }
 
     let inputMarkup = `<div class="aa-input-block aa-triple-date-block reminder">
     <div class="additional-delete-btn"><ion-icon name="close-circle"></ion-icon></div>
@@ -1128,7 +1128,7 @@ $(document).ready(async function () {
     </select>
   </div>`
 
-  let addReminderBtn = `
+    let addReminderBtn = `
   <div class="aa-add-more-container">
     <div class="aa-add-more" id="add-reminder">
       <ion-icon class="aa-add-more-icon" name="calendar-number-outline"></ion-icon>
@@ -1160,31 +1160,31 @@ $(document).ready(async function () {
         'position': 'absolute',
         'right': '-35px'
       });
-      
-        let id = $(this).attr('data-reminder-id')
-        let name = $('#name').val();
-        let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-        let note = $('#note').val() === '' ? undefined : $('#note').val();
-        let module = $('#type').attr('data-value');
-        let reminders = [];
-        $('.reminder').each(function () {
-          reminders.push({
-            date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
-          });
+
+      let id = $(this).attr('data-reminder-id')
+      let name = $('#name').val();
+      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
+      let note = $('#note').val() === '' ? undefined : $('#note').val();
+      let module = $('#type').attr('data-value');
+      let reminders = [];
+      $('.reminder').each(function () {
+        reminders.push({
+          date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
         });
+      });
 
-        const response = await editReminder(id, { name, date, note, module, reminders });
-        //console.log({ name, date, note, subId, module, reminders });
+      const response = await editReminder(id, { name, date, note, module, reminders });
+      //console.log({ name, date, note, subId, module, reminders });
 
-        if (response) {
-          $('.mini-loader').hide();
-          addConfirmationEmpty($('.animal-results-container'));
-          setTimeout(() => {
-            location.reload(true);
-          }, 1500)
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
 
-          /* location.assign('/herd/all-animals'); */
-        }
+        /* location.assign('/herd/all-animals'); */
+      }
 
     })
   }
@@ -1770,24 +1770,35 @@ $(document).ready(async function () {
   ///////////////////////
   /* THE MAIN PAGE */
   ///////////////////////
-  if(document.querySelector('.main-welcome-block')) {
-    $('.mw-small-link-block').on('mouseenter', function() {
-      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({'font-size': '1000%', 'opacity': '1', 'color': `${$(this).css('background-color')}`});
+  if (document.querySelector('.main-welcome-block')) {
+    $('.mw-small-link-block').on('mouseenter', function () {
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({ 'font-size': '1000%', 'opacity': '1', 'color': `${$(this).css('background-color')}` });
       $(`#${$(this).attr('id').replace('block', 'icon')}`).siblings().css('font-size', '500%')
       $('.mw-account-block').find('.mw-marquee-text').css('opacity', '0');
     });
-    
-    $('.mw-small-link-block').on('mouseleave', function() {
-      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({'font-size': '750%', 'opacity': '0.5', 'color': `#ffffff`})
+
+    $('.mw-small-link-block').on('mouseleave', function () {
+      $(`#${$(this).attr('id').replace('block', 'icon')}`).css({ 'font-size': '750%', 'opacity': '0.5', 'color': `#ffffff` })
       $(`#${$(this).attr('id').replace('block', 'icon')}`).siblings().css('font-size', '750%')
       $('.mw-account-block').find('.mw-marquee-text').css('opacity', '1');
+    });
 
+    $(window).on('scroll', function () {
+      if ($(this).scrollTop() < 50) {
+        $('.mw-title').css({ 'transform': 'scale(1)', 'opacity': '1' });
+      } else if ($(this).scrollTop() >= 50 && $(this).scrollTop() < 150) {
+        $('.mw-title').css({ 'transform': 'scale(0.95)', 'opacity': '0.8' });
+      } else if ($(this).scrollTop() >= 150 && $(this).scrollTop() < 250) {
+        $('.mw-title').css({ 'transform': 'scale(0.90)', 'opacity': '0.6' });
+      } else if ($(this).scrollTop() >= 250) {
+        $('.mw-title').css({ 'transform': 'scale(0.85)', 'opacity': '0.4' });
+      }
     });
   }
 
-  if(document.querySelector('.main-page-herd-block')) {
+  if (document.querySelector('.main-page-herd-block')) {
     let herdData = []
-    $('.mph-data').each(function() {
+    $('.mph-data').each(function () {
       herdData.push({
         result: parseFloat($(this).attr('data-result')),
         date: new Date($(this).attr('data-date')),
@@ -1798,7 +1809,7 @@ $(document).ready(async function () {
 
     let lastMonthHerdData = [];
     herdData.forEach((data) => {
-      if(moment(data.date).month() === moment(herdData[herdData.length - 1].date).month() && moment(data.date).year() === moment(herdData[herdData.length - 1].date).year()) {
+      if (moment(data.date).month() === moment(herdData[herdData.length - 1].date).month() && moment(data.date).year() === moment(herdData[herdData.length - 1].date).year()) {
         lastMonthHerdData.push(data);
       }
     });
@@ -1811,15 +1822,34 @@ $(document).ready(async function () {
     /* Adding all the info */
     $('#mph-average').text(`${(total / lastMonthHerdData.length).toFixed(1)}`)
     $('#mph-day').text(`${Math.round(total)}`)
-    if(total * 30 > 1000) {
+    if (total * 30 > 1000) {
       $('#mph-month').text(`${((total * 30) / 1000).toFixed(1)}`);
       $('#mph-month').parent().find('.mph-info-box-text').text('тыс. литров');
     } else {
       $('#mph-month').text(`${Math.round(total * 30)}`)
     }
 
-    console.log(herdData);
-    console.log(lastMonthHerdData);
+    let rusDate = moment(lastMonthHerdData[0].date).lang('ru').format('MMMM YYYY');
+    rusDate = rusDate.charAt(0).toUpperCase() + rusDate.slice(1);
+    $('.mph-info-month').text(rusDate)
+
+    
+
+    /* Adding animation of appearence */
+    $(window).on('scroll', function () {
+      let itemsBottom = $('.mph-info-box').position().top + ($('.mph-info-box').height() / 2);
+      if($(this).scrollTop() >= 300 ) {
+        $('body').css({'transition': '0.5s', 'background-color': '#0A0908'})
+      } else if($(this).scrollTop() < 300) {
+        $('body').css({'transition': '0.5s', 'background-color': '#ffffff'})
+      }
+      if ($(this).scrollTop() >= itemsBottom) {
+        $('#box-1').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1');
+        setTimeout(() => { $('#box-2').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1'); }, 250);
+        setTimeout(() => { $('#box-3').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1'); }, 500);
+
+      }
+    });
   }
 
 

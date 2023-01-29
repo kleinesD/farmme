@@ -48,28 +48,29 @@ block content
           ion-icon.mw-block-icon(name="cube")
       a.mw-link-quick-block.mw-link-block(href="#")
         .mw-block-line
-          .mw-block-name.mw-white Быстрая информация
-          ion-icon.mw-block-icon.mw-white(name="chevron-down")
+          .mw-block-name Быстрая информация
+          ion-icon.mw-block-icon(name="chevron-down")
 
     .main-page-herd-block
       each cow in cows
         each result in cow.milkingResults
           .mph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
-      .mph-info-box 
+      .mph-info-month Январь 2023
+      .mph-info-box#box-1
         .mph-info-box-result#mph-average 19
         .mph-info-box-text литров
         .mph-info-box-title МОЛОКА В СРЕДНЕМ
         //-.mph-diff-block.mph-diff-block-pos 
           ion-icon(name="chevron-up") 
           p 12%
-      .mph-info-box 
+      .mph-info-box#box-2
         .mph-info-box-result#mph-day 560
         .mph-info-box-text литров
         .mph-info-box-title МОЛОКА В ДЕНЬ
         //-.mph-diff-block.mph-diff-block-pos 
           ion-icon(name="chevron-up") 
           p 6%
-      .mph-info-box 
+      .mph-info-box#box-3 
         .mph-info-box-result#mph-month 15
         .mph-info-box-text литров
         .mph-info-box-title МОЛОКА В МЕСЯЦ
@@ -77,13 +78,17 @@ block content
           ion-icon(name="chevron-down") 
           p -1%
 
-    .main-page-vet-block
+    //-.main-page-vet-block
       .mpv-big-info
-        img(src="/img/images/thermometr-main-icon.png")
+        img(src="/img/images/thermometer-main-icon.png")
         .mpv-big-info-text-box
           .mpv-big-info-title 3
           .mpv-big-info-text Животных
           .mpv-big-info-text Требуют внимания
+      .mpv-problems-list
+        .mpv-problems-item
+          img(src="/img/images/default-cow-image.png")
+
 
 
 
