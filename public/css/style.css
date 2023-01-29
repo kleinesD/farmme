@@ -13,6 +13,7 @@
   transition: all 0.2s;
   color: #000000;
   scroll-behavior: smooth;
+
 }
 body {
   width: calc(100%);
@@ -4749,6 +4750,41 @@ ion-icon {
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+.mph-info-box-result {
+  font-size: 600%;
+  font-weight: 700;
+  font-family: 'Rubik';
+}
+.mph-info-box-text {
+  font-weight: 900;
+  margin-bottom: 10px;
+  margin-top: -10px;
+}
+.mph-info-box-title {
+  font-weight: 600;
+  font-size: 110%;
+}
+.mph-diff-block {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.mph-diff-block ion-icon {
+  margin-right: 5px;
+}
+.mph-diff-block p {
+  font-size: 90%;
+  font-weight: 600;
+}
+.mph-diff-block-pos * {
+  color: #297045;
+}
+.mph-diff-block-neg * {
+  color: #D44D5C;
+}
+.mph-data {
+  display: none;
 }
 
 

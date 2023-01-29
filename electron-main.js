@@ -56,7 +56,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/login');
   contentWindow.loadURL('http://127.0.0.1:604/calendar?sort=vet');
   contentWindow.loadURL('http://127.0.0.1:604/');
-  contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/63c035044e50bae0b76b0acc');
+ // contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/63be548d9358c2910cb5d847');
 
 
   contentWindow.maximize();

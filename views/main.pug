@@ -50,10 +50,32 @@ block content
         .mw-block-line
           .mw-block-name.mw-white Быстрая информация
           ion-icon.mw-block-icon.mw-white(name="chevron-down")
-    
+
     .main-page-herd-block
-      .mph-info-box  
-        svg(width="300px" height="300px")
+      each cow in cows
+        each result in cow.milkingResults
+          .mph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
+      .mph-info-box 
+        .mph-info-box-result#mph-average 19
+        .mph-info-box-text литров
+        .mph-info-box-title МОЛОКА В СРЕДНЕМ
+        //-.mph-diff-block.mph-diff-block-pos 
+          ion-icon(name="chevron-up") 
+          p 12%
+      .mph-info-box 
+        .mph-info-box-result#mph-day 560
+        .mph-info-box-text литров
+        .mph-info-box-title МОЛОКА В ДЕНЬ
+        //-.mph-diff-block.mph-diff-block-pos 
+          ion-icon(name="chevron-up") 
+          p 6%
+      .mph-info-box 
+        .mph-info-box-result#mph-month 15
+        .mph-info-box-text литров
+        .mph-info-box-title МОЛОКА В МЕСЯЦ
+        //-.mph-diff-block.mph-diff-block-neg 
+          ion-icon(name="chevron-down") 
+          p -1%
 
     .main-page-vet-block
       .mpv-big-info
@@ -62,11 +84,11 @@ block content
           .mpv-big-info-title 3
           .mpv-big-info-text Животных
           .mpv-big-info-text Требуют внимания
-          
-      
-    
-    
-    
+
+
+
+
+
     //-.main-page-container#mp-herd-container 
       .mp-info-block
         each cow in cows

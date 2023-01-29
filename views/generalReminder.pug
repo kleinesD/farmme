@@ -8,7 +8,7 @@ block content
     -if(!forEdit)
 
 
-      .animal-results-container.animal-results-full#general-reminder-container
+      .animal-results-container.animal-results-full#add-general-reminder-container
 
         .ar-block-sub-title ДОБАВИТЬ
         .ar-block-title Напоминание
@@ -152,7 +152,7 @@ block content
     -if(forEdit)
 
 
-      .animal-results-container.animal-results-full#general-reminder-container
+      .animal-results-container.animal-results-full#edit-general-reminder-container
 
         .ar-block-sub-title РЕДАКТИРОВАТЬ
         .ar-block-title Напоминание
@@ -296,7 +296,7 @@ block content
             .additional-delete-btn
               ion-icon(name='close-circle')
             label.aa-label(for='date')
-              p Уведомление
+              p= `Уведомление` 
             input.aa-triple-date-input-big.date(type='date' value=`${rem.date.toLocaleString('ru-RU', {year: 'numeric'})}-${rem.date.toLocaleString('ru-RU', {month: '2-digit'})}-${rem.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
             select.aa-triple-date-input.hour
               option(selected hidden value=`${rem.date.toLocaleString('ru-RU', {hour: 'numeric'})}`)= `${rem.date.toLocaleString('ru-RU', {hour: 'numeric'})}`

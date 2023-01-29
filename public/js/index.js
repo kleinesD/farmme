@@ -934,7 +934,7 @@ $(document).ready(async function () {
   ///////////////////////
   /* ADD GENERAL REMINDER */
   ///////////////////////
-  if (document.querySelector('#general-reminder-container')) {
+  if (document.querySelector('#add-general-reminder-container')) {
     /* Validating form */
     $('input').on('keyup change blur click', function () {
       if ($(this).val().length > 0) {
@@ -1074,9 +1074,9 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* EDIT VET CALENDAR */
+  /* EDIT GENERAL REMINDER */
   ///////////////////////
-  if (document.querySelector('#edit-vet-schedule-container')) {
+  if (document.querySelector('#edit-general-reminder-container')) {
     /* Validating form */
     $('input').on('keyup change blur click', function () {
       if ($(this).val().length > 0) {
@@ -1092,7 +1092,7 @@ $(document).ready(async function () {
           $(this).parent().find('.aa-label').append(`<div class="aa-label-warning">-&nbsp; Введите правильную дату</div>`);
           $(this).removeClass('valid-aa-input');
         } else {
-          $(this).parent().find('.aa-label *').css('color', '#297045');
+          $(this).parent().find('.aa-label *').css('color', '#000000');
           $(this).parent().find('.aa-label-warning').remove();
           $(this).addClass('valid-aa-input');
         }
@@ -1100,20 +1100,18 @@ $(document).ready(async function () {
     });
 
     $('*').on('click focus blur change', function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#multiple-animals-container').children().length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
+      if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#type').find('.aa-select-option-selected').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#f4a261' });
       } else {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input')) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
       }
     });
+    
+    if($('#multiple-animals-container').children().length > 0 ) {
+      $('.ar-selected-animals-block').show();
+      $('.ar-selected-animals-block').css('opacity', '1');
+      $('#multiple-animals-container').children().css('pointer-events', 'none')
+    } 
 
     let inputMarkup = `<div class="aa-input-block aa-triple-date-block reminder">
     <div class="additional-delete-btn"><ion-icon name="close-circle"></ion-icon></div>
@@ -1130,22 +1128,24 @@ $(document).ready(async function () {
     </select>
   </div>`
 
-    let addReminderBtn = `
+  let addReminderBtn = `
+  <div class="aa-add-more-container">
     <div class="aa-add-more" id="add-reminder">
-    <p>Добавить уведомление</p>
-    <ion-icon class="aa-add-more-icon" name="add-circle"></ion-icon>
+      <ion-icon class="aa-add-more-icon" name="calendar-number-outline"></ion-icon>
+      <p>Добавить уведомление</p>
+    </div>
   </div>
-    `
+  `
 
 
     $('#date').on('click change keyup focus blur', function () {
-      if ($(this).val() !== '') {
+      if ($(this).val() !== '' && !document.querySelector('.aa-add-more-container')) {
         $('.ar-add-button').before(addReminderBtn);
       }
     });
 
     $('.main-section').delegate('#add-reminder', 'click', function () {
-      $(this).before(inputMarkup);
+      $(this).parent().before(inputMarkup);
     });
 
     $('.main-section').delegate('.additional-delete-btn', 'click', function () {
@@ -1155,35 +1155,37 @@ $(document).ready(async function () {
     $('input').trigger('click');
 
     $('.ar-add-button').click(async function () {
-      let reminderId = $(this).attr('data-id');
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val() === '' ? undefined : $('#note').val();
-      let module = 'vet';
-      let reminders = [];
-      $('.reminder').each(function () {
-        reminders.push({
-          date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
-        });
-      });
-
-      $(this).append(`<div class="mini-loader"></div>`);
+      $('.ar-add-button').append(`<div class="mini-loader"></div>`);
       $('.mini-loader').css({
         'position': 'absolute',
         'right': '-35px'
       });
+      
+        let id = $(this).attr('data-reminder-id')
+        let name = $('#name').val();
+        let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
+        let note = $('#note').val() === '' ? undefined : $('#note').val();
+        let module = $('#type').attr('data-value');
+        let reminders = [];
+        $('.reminder').each(function () {
+          reminders.push({
+            date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
+          });
+        });
 
-      const response = await editReminder(reminderId, { name, date, note, module, reminders });
+        const response = await editReminder(id, { name, date, note, module, reminders });
+        //console.log({ name, date, note, subId, module, reminders });
 
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
+        if (response) {
+          $('.mini-loader').hide();
+          addConfirmationEmpty($('.animal-results-container'));
+          setTimeout(() => {
+            location.reload(true);
+          }, 1500)
 
-        /* location.assign('/herd/all-animals'); */
-      }
+          /* location.assign('/herd/all-animals'); */
+        }
+
     })
   }
 
@@ -1781,6 +1783,43 @@ $(document).ready(async function () {
       $('.mw-account-block').find('.mw-marquee-text').css('opacity', '1');
 
     });
+  }
+
+  if(document.querySelector('.main-page-herd-block')) {
+    let herdData = []
+    $('.mph-data').each(function() {
+      herdData.push({
+        result: parseFloat($(this).attr('data-result')),
+        date: new Date($(this).attr('data-date')),
+      });
+    });
+
+    herdData.sort((a, b) => a.date - b.date);
+
+    let lastMonthHerdData = [];
+    herdData.forEach((data) => {
+      if(moment(data.date).month() === moment(herdData[herdData.length - 1].date).month() && moment(data.date).year() === moment(herdData[herdData.length - 1].date).year()) {
+        lastMonthHerdData.push(data);
+      }
+    });
+
+    let total = 0;
+    lastMonthHerdData.forEach(data => {
+      total += data.result;
+    });
+
+    /* Adding all the info */
+    $('#mph-average').text(`${(total / lastMonthHerdData.length).toFixed(1)}`)
+    $('#mph-day').text(`${Math.round(total)}`)
+    if(total * 30 > 1000) {
+      $('#mph-month').text(`${((total * 30) / 1000).toFixed(1)}`);
+      $('#mph-month').parent().find('.mph-info-box-text').text('тыс. литров');
+    } else {
+      $('#mph-month').text(`${Math.round(total * 30)}`)
+    }
+
+    console.log(herdData);
+    console.log(lastMonthHerdData);
   }
 
 
