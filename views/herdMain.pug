@@ -5,7 +5,7 @@ block content
 
   section.main-section 
     .main-page-container#mp-herd-container 
-      .mp-info-block
+      .mp-info-box
         each cow in cows
           each result in cow.milkingResults
             .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
@@ -37,85 +37,101 @@ block content
             //-.mp-animal-graphs-legend-item
               .mp-animal-graphs-legend-item-line
               .mp-animal-graphs-legend-item-text Результат ( 26 коров )
-        .mp-two-list-blocks
-          .mpt-list-block
-            .mpt-list-block-header
-              .mpt-list-block-title Ближайший отел
-              .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
-              a.mpt-list-block-more-btn(href="#") Показать больше
-              img(src='/img/images/no-data-image.png')
-            .mpt-list-block-devider
-            .mpt-list-animals#mp-soon-to-calv-list
-              each cow in cows
-                -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
+        .mp-milking-results-block
+          .mp-mr-title Доение
+          .mp-mr-main-line
+            .mp-mr-main-btn -
+            .mp-mr-main-result
+              .mp-mr-main-number 58.6
+              .mp-mr-main-sub-text литров / в среднем
+            .mp-mr-main-btn +
+      .mp-two-list-blocks
+        .mpt-list-block
+          .mpt-list-block-header
+            .mpt-list-block-title Ближайший отел
+            .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
+            a.mpt-list-block-more-btn(href="#") Показать больше
+            img(src='/img/images/no-data-image.png')
+          .mpt-list-block-devider
+          .mpt-list-animals#mp-soon-to-calv-list
+            each cow in cows
+              -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
+                a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
+                  //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
+                  .mpt-list-item-number= `#${cow.number}`
+                  .mpt-list-item-date(data-date=`${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
+                  .mpt-list-item-day
+                    .mpt-list-item-day-text 11 дней
+
+
+        .mpt-list-block
+          .mpt-list-block-header
+            .mpt-list-block-title Ближайшие осеменение
+            .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
+            a.mpt-list-block-more-btn(href="#") Показать больше
+            img(src='/img/images/no-data-image.png')
+          .mpt-list-block-devider
+          .mpt-list-animals#mp-soon-to-insem-list
+            each cow in cows
+              -if(cow.lactations.length === 0 && cow.inseminations.length === 0 || cow.lactations.length === 0 && cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
+                a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
+                  //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
+                  .mpt-list-item-number= `#${cow.number}`
+                  .mpt-list-item-else Пора осеменять
+
+              -if(cow.lactations.length > 0)
+                -if(cow.inseminations.length === 0 || cow.lactations[cow.lactations.length - 1].startDate > cow.inseminations[cow.inseminations.length - 1].date || cow.lactations[cow.lactations.length - 1].startDate < cow.inseminations[cow.inseminations.length - 1].date && !cow.inseminations[cow.inseminations.length - 1].success)
                   a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
                     //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
                     .mpt-list-item-number= `#${cow.number}`
-                    .mpt-list-item-date(data-date=`${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
+                    .mpt-list-item-date(data-date=`${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
                     .mpt-list-item-day
-                      .mpt-list-item-day-text 11 дней
-
-
-          .mpt-list-block
-            .mpt-list-block-header
-              .mpt-list-block-title Ближайшие осеменение
-              .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
-              a.mpt-list-block-more-btn(href="#") Показать больше
-              img(src='/img/images/no-data-image.png')
-            .mpt-list-block-devider
-            .mpt-list-animals#mp-soon-to-insem-list
-              each cow in cows
-                -if(cow.lactations.length === 0 && cow.inseminations.length === 0 || cow.lactations.length === 0 && cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
-                  a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
-                    //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
-                    .mpt-list-item-number= `#${cow.number}`
-                    .mpt-list-item-else Пора осеменять
-
-                -if(cow.lactations.length > 0)
-                  -if(cow.inseminations.length === 0 || cow.lactations[cow.lactations.length - 1].startDate > cow.inseminations[cow.inseminations.length - 1].date || cow.lactations[cow.lactations.length - 1].startDate < cow.inseminations[cow.inseminations.length - 1].date && !cow.inseminations[cow.inseminations.length - 1].success)
-                    a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
-                      //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
-                      .mpt-list-item-number= `#${cow.number}`
-                      .mpt-list-item-date(data-date=`${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
-                      .mpt-list-item-day
-                        -if((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now() > 0 )
-                          .mpt-list-item-day-text.mpt-list-item-day-pos 11 дней
-                        -else 
-                          .mpt-list-item-day-text.mpt-list-item-day-neg 11 дней
+                      -if((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now() > 0 )
+                        .mpt-list-item-day-text.mpt-list-item-day-pos 11 дней
+                      -else 
+                        .mpt-list-item-day-text.mpt-list-item-day-neg 11 дней
 
 
 
-      .mp-fixed-block
-        .mp-main-info-container
-          .mp-quick-info-block
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-1
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в день
-              .mp-mi-data#mp-milk-per-day(data-total='0') 585 л.
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-2
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в месяц
-              .mp-mi-data#mp-milk-per-month 17250 л.
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-3
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в среднем
-              .mp-mi-data#mp-milk-average 22 л.
-        //-.mp-top-cows-block
-          .mp-top-cows-header
-            .mp-tc-title Лучшие результат
-            a.mp-tc-link(href="#") Смотреть еще
-          .mp-top-cows-container
-            //-a.mp-top-cow(href='#')
-              img(src="/img/images/default-cow-image.png")
-              .mp-top-cow-overlay
-                .mp-tc-name Березка
-                .mp-tc-number #5036
+      .mp-main-info-container
+        .mp-main-info-block
+          .mp-main-info-image.mp-main-info-image-color-1
+            img(src="/img/images/milk-icon.png")
+          .mp-mi-content-block
+            .mp-mi-title Молока в день
+            .mp-mi-data#mp-milk-per-day(data-total='0') 585 л.
+        .mp-main-info-block
+          .mp-main-info-image.mp-main-info-image-color-2
+            img(src="/img/images/milk-icon.png")
+          .mp-mi-content-block
+            .mp-mi-title Молока в месяц
+            .mp-mi-data#mp-milk-per-month 17250 л.
+        .mp-main-info-block
+          .mp-main-info-image.mp-main-info-image-color-3
+            img(src="/img/images/milk-icon.png")
+          .mp-mi-content-block
+            .mp-mi-title Молока в среднем
+            .mp-mi-data#mp-milk-average 22 л.
+      //-.mp-top-cows-block
+        .mp-top-cows-header
+          .mp-tc-title Лучшие результат
+          a.mp-tc-link(href="#") Смотреть еще
+        .mp-top-cows-container
+          //-a.mp-top-cow(href='#')
+            img(src="/img/images/default-cow-image.png")
+            .mp-top-cow-overlay
+              .mp-tc-name Березка
+              .mp-tc-number #5036
+
+      .mp-quick-info-block
+        .mp-quick-info-tile
+          img(src="/img/images/cow-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Всего животных
+            .mp-quick-info-title= animals.length 
+          //-.mp-quick-info-text ВСЕГО ЖИВОТНЫХ
+        .mp-quick-info-tile
+        .mp-quick-info-tile
 
     //-.main-page-block-full
       .mp-small-column

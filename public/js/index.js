@@ -1603,7 +1603,7 @@ $(document).ready(async function () {
 
     /* Resizing the graph */
     $(window).resize(function () {
-      $('#mp-graph').attr('width', $('#mp-graph').parent().width()).attr('height', Math.round($('#mp-graph').parent().width() / 1.75));
+      $('#mp-graph').attr('width', $('#mp-graph').parent().width()).attr('height', Math.round($('#mp-graph').parent().height()));
       let graphWidth = parseFloat($('#mp-graph').attr('width'))
       let graphHeight = parseFloat($('#mp-graph').attr('height'))
 
