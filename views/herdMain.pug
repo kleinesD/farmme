@@ -5,6 +5,7 @@ block content
 
   section.main-section 
     .main-page-container#mp-herd-container 
+      .mp-title ЖИВОТНЫЕ
       .mp-info-box
         each cow in cows
           each result in cow.milkingResults
@@ -37,7 +38,7 @@ block content
             //-.mp-animal-graphs-legend-item
               .mp-animal-graphs-legend-item-line
               .mp-animal-graphs-legend-item-text Результат ( 26 коров )
-        .mp-milking-results-block
+        .mp-milking-results-block.shadow
           .mp-mr-title Доение
           .mp-mr-main-line
             .mp-mr-main-btn -
@@ -45,8 +46,53 @@ block content
               .mp-mr-main-number 58.6
               .mp-mr-main-sub-text литров / в среднем
             .mp-mr-main-btn +
+          .mp-mr-secondary-line
+            .mp-mr-seconary-item
+              .mp-mr-seconary-number 518
+              .mp-mr-seconary-sub-text литров / день
+            .mp-mr-seconary-item
+              .mp-mr-seconary-number 15.6
+              .mp-mr-seconary-sub-text тыс. л / месяц
+            .mp-mr-seconary-item
+              .mp-mr-seconary-number 19.2
+              .mp-mr-seconary-sub-text литров / среднее
+
+      .mp-top-results-block.shadow
+        .mp-top-results-left-block
+          .mp-top-results-title Лучшие результаты
+          .mp-top-results-sub-title Последние результаты добавлены Январь 2023
+          .mp-top-results-all-data-line
+            .mp-top-results-all-data-block
+              .mp-top-results-all-data-number 48
+              .mp-top-results-all-data-text Результатов
+            .mp-top-results-all-data-block
+              .mp-top-results-all-data-number 15.7
+              .mp-top-results-all-data-text Средний результат
+        .mp-top-results-right-block 
+          .mp-top-result
+            img(src="/img/images/default-cow-image.png")
+            .mp-top-result-number #50261488
+            .mp-top-result-name Березка
+            .mp-top-result-result.mp-top-result-result-1 24
+          .mp-top-result
+            img(src="/img/images/default-cow-image.png")
+            .mp-top-result-number #50261488
+            .mp-top-result-name Березка
+            .mp-top-result-result.mp-top-result-result-2 22
+          .mp-top-result
+            img(src="/img/images/default-cow-image.png")
+            .mp-top-result-number #50261488
+            .mp-top-result-name Березка
+            .mp-top-result-result.mp-top-result-result-3 19
+          .mp-top-result
+            img(src="/img/images/default-cow-image.png")
+            .mp-top-result-number #50261488
+            .mp-top-result-name Березка
+            .mp-top-result-result 18
+
+
       .mp-two-list-blocks
-        .mpt-list-block
+        .mpt-list-block.shadow
           .mpt-list-block-header
             .mpt-list-block-title Ближайший отел
             .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
@@ -64,7 +110,7 @@ block content
                     .mpt-list-item-day-text 11 дней
 
 
-        .mpt-list-block
+        .mpt-list-block.shadow
           .mpt-list-block-header
             .mpt-list-block-title Ближайшие осеменение
             .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
@@ -93,7 +139,7 @@ block content
 
 
 
-      .mp-main-info-container
+      //-.mp-main-info-container
         .mp-main-info-block
           .mp-main-info-image.mp-main-info-image-color-1
             img(src="/img/images/milk-icon.png")
@@ -124,14 +170,43 @@ block content
               .mp-tc-number #5036
 
       .mp-quick-info-block
-        .mp-quick-info-tile
-          img(src="/img/images/cow-icon.png")
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/cow-icon.png")
           .mp-quick-info-text-box
-            .mp-quick-info-desc Всего животных
+            .mp-quick-info-desc Всего Животных
             .mp-quick-info-title= animals.length 
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/female-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Коровы
+            .mp-quick-info-title= cows.length 
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/male-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Быки
+            .mp-quick-info-title= bulls.length 
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/milking-cow-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Доящиеся коровы
+            .mp-quick-info-title= milkingCows
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/needle-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Осемененные коровы
+            .mp-quick-info-title= inseminatedCows 
+        .mp-quick-info-tile.shadow
+          .mp-quick-info-tile-img
+            img(src="/img/images/butcher-icon.png")
+          .mp-quick-info-text-box
+            .mp-quick-info-desc Готовые Быки
+            .mp-quick-info-title= bullsReady
           //-.mp-quick-info-text ВСЕГО ЖИВОТНЫХ
-        .mp-quick-info-tile
-        .mp-quick-info-tile
 
     //-.main-page-block-full
       .mp-small-column
