@@ -91,7 +91,7 @@ router.get('/vet/edit-scheme/:schemeId', authController.protect, authController.
 
 router.get('/vet/history', authController.protect, authController.isLoggedIn, viewController.renderVetHistory);
 
-router.get('/vet/main', authController.protect, authController.isLoggedIn, viewController.renderVetMain);
+router.get('/vet/', authController.protect, authController.isLoggedIn, viewController.renderVetMain);
 
 ///////////////////////////
 ///////////////////////////

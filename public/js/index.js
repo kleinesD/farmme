@@ -204,7 +204,6 @@ $(document).ready(async function () {
       graph.append(circle); */
     });
 
-    console.log(milkingAverage);
 
 
     const parameters = {
@@ -233,7 +232,7 @@ $(document).ready(async function () {
     };
 
     /* const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart(); */
-    const graph = renderGraph(document.getElementById('login-section'), parameters);
+    //const graph = renderGraph(document.getElementById('login-section'), parameters);
   }
 
   /* ///////////////////////

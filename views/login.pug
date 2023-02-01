@@ -3,7 +3,7 @@ extends baseNoMenu
 block content
 
     section.form-section#login-section
-      //-form.common-form#login-form
+      form.common-form#login-form
         //-.form-title Добро пожаловать,
         img.form-icon(src='/img/logos/farmme-logo-5.png')
         //-.form-sub-title Войдите чтобы продолжить
@@ -26,7 +26,7 @@ block content
           a(href='#') Регистрация
 
       //DELETE AFTER
-      each cow in cows
+      //-each cow in cows
         each result in cow.milkingResults
           .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
       //-svg#test-graph
