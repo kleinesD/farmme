@@ -988,13 +988,17 @@ ion-icon {
 /* ///////////////////////// */
 /* ///////////////////////// */
 .main-page-container {
-  width: calc(100% - 15% - 10px);
+  width: calc(100% - 20px);
   min-height: calc(100vh - 20px);
   padding: 10px;
-  padding-right: 15%;
   position: relative;
+}
+#mp-herd-container {
+  width: calc(100% - 15% - 10px);
+  padding-right: 15%;
 
 }
+
 .mp-title {
   font-size: 400%;
   font-weight: 500;
@@ -1642,6 +1646,235 @@ ion-icon {
 .mp-top-result-result-3 {
   color: #CD7F32
 }
+/* Main Vet Page */
+.mp-calendar-block {
+  width: 70%;
+  display: flex;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+}
+.mp-calendar-day-block {
+  position: relative;
+  width: calc(35% - 40px);
+  height: calc(100% - 40px);
+  padding: 20px;
+  background-color: #5E72E8;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+.mp-calendar-day-number {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1250%;
+  font-weight: 700;
+  color: #ffffff;
+}
+.mp-calendar-day-month {
+  font-size: 200%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+.mp-calendar-add-reminder {
+  position: absolute;
+  bottom: 20px;
+  width: calc(100% - 100px);
+  padding: 15px 30px;
+  background-color: #ffffff;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mp-calendar-add-reminder p{
+  color: #5E72E8;
+  font-size: 125%;
+}
+.mp-calendar-add-reminder ion-icon{
+  font-size: 175%;
+  color: #5E72E8;
+}
+.mp-calendar-day-reminder-block {
+  width: 100%;
+  height: calc(100% - 350px);
+}
+.mp-calendar-day-reminder {
+  color: #ffffff;
+  margin-top: 20px;
+  /* font-size: 125%; */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.mp-calendar-day-reminder-more {
+  color: #ffffff;
+  margin-top: 20px;
+  font-size: 125%;
+  text-align: center;
+  border-bottom: 1.5px solid #ffffff;
+}
+
+.mp-calendar-table {
+  width: calc(65% - 40px);
+  padding: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+.mp-calendar-title-line {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.mp-calendar-title-line p {
+  font-size: 175%;
+  margin-right: 20px;
+}
+.mp-calendar-title-line a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mp-calendar-title-line a:first-of-type {
+  margin-right: 10px;
+}
+.mp-calendar-title-line a ion-icon {
+  font-size: 125%;
+}
+.mp-calendar-main-block {
+  width: 100%;
+}
+.mp-calendar-weekday-line {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+.mp-calendar-dates-block {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.mp-calendar-weekday {
+  font-size: 100%;
+  font-weight: 500;
+  color: #818181;
+  width: 14%;
+  text-align: center;
+}
+.mp-calendar-dates-column {
+  width: 14%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px
+}
+.mp-calendar-date {
+  width: calc(65px - 10px);
+  height: calc(65px - 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 150%;
+  font-weight: 300;
+}
+.mp-calendar-other {
+  color: #b8b8b8;
+}
+.mp-calendar-today {
+  color: #5E72E8;
+}
+.mp-calendar-full {
+  border: 5px solid #5E72E8;
+}
+.mp-history-block {
+  width: calc(30% - 40px);
+  max-height: calc(100% - 40px);
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+}
+.mp-history-block-header {
+  font-size: 175%;
+  margin-bottom: 30px;
+}
+.mph-type-selector {
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  border-bottom: 1.5px solid #000000;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+.mp-history-container {
+  width: 100%;
+  overflow-y: auto;
+  max-height: 490px;
+}
+.mp-history-container::-webkit-scrollbar {
+  display: none;
+}
+.mp-history-item {
+  width: calc(100% - 20px);
+  padding: 0 10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-bottom: 10px;
+  background-color: #5E72E8;
+  border-radius: 10px;
+}
+.mp-history-item-image {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+.mp-history-item-image ion-icon {
+  font-size: 125%;
+  color: #5E72E8;
+}
+.mp-history-item-info-block {
+  width: calc(100% - 70px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.mp-history-item-main-info {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mp-history-item-main-info p {
+  color: #ffffff;
+}
+.mp-schemes-block {
+  width: calc(50% - 40px);
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  padding: 20px;
+}
+.mp-schemes-block-header {
+  font-size: 175%;
+}
+
+
 
 
 /* ///////////////////////// */

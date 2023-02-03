@@ -5,145 +5,103 @@ block content
 
   section.main-section 
 
-    .main-page-block-full#vet-main
-      .mp-small-column
-        //-.small-calendar-container(data-farm-id=`${user.farm}`)
-          //.mp-block-header
-            p Календарь
-          .sc-dates-block
-            .sc-dates-header
-              p August 2023
-              .sc-dates-header-icon.sc-dates-header-btn#prev-month
-                ion-icon(name="chevron-back-outline")
-              .sc-dates-header-icon.sc-dates-header-btn#next-month
-                ion-icon(name="chevron-forward-outline")
+    .main-page-container#mp-vet-container
+      .mp-title ВЕТЕРИНАРИЯ
+      .mp-info-box
+        .mp-calendar-block.shadow
+          .mp-calendar-day-block
+            .mp-calendar-day-number 03
+            .mp-calendar-day-month ФЕВРАЛЬ, 2023
+            .mp-calendar-day-reminder-block
+              .mp-calendar-day-reminder • Сделать укол
+              .mp-calendar-day-reminder • Сделать укол Сделать укол Сделать укол Сделать укол
+              .mp-calendar-day-reminder-more Еще 3 напоминания
+            .mp-calendar-add-reminder
+              p Напоминание
+              ion-icon(name="add")
+          .mp-calendar-table
+            .mp-calendar-title-line 
+              p Февраль 2023
+              a#next-month
+                ion-icon(name="chevron-back")
+              a#prev-month
+                ion-icon(name="chevron-forward")
+            .mp-calendar-main-block
+              .mp-calendar-weekday-line
+                .mp-calendar-weekday ПН
+                .mp-calendar-weekday ВТ
+                .mp-calendar-weekday СР
+                .mp-calendar-weekday ЧТ
+                .mp-calendar-weekday ПТ
+                .mp-calendar-weekday СБ
+                .mp-calendar-weekday ВС
+              .mp-calendar-dates-block
+                .mp-calendar-dates-column#mp-calendar-column-1
+                  .mp-calendar-date.mp-calendar-other 1
+                  .mp-calendar-date.mp-calendar-today 8
+                  .mp-calendar-date.mp-calendar-full 15
+                  .mp-calendar-date 21
+                  .mp-calendar-date 28
+                .mp-calendar-dates-column#mp-calendar-column-2
+                .mp-calendar-dates-column#mp-calendar-column-3
+                .mp-calendar-dates-column#mp-calendar-column-4
+                .mp-calendar-dates-column#mp-calendar-column-5
+                .mp-calendar-dates-column#mp-calendar-column-6
+                .mp-calendar-dates-column#mp-calendar-column-0
 
-            .sc-week-days-line
-              .sc-week-day ПН
-              .sc-week-day ВТ
-              .sc-week-day СР
-              .sc-week-day ЧТ
-              .sc-week-day ПТ
-              .sc-week-day СБ
-              .sc-week-day ВС
-
-            .sc-dates-columns-block 
-              .sc-dates-column#weekday-column-1
-              .sc-dates-column#weekday-column-2
-              .sc-dates-column#weekday-column-3
-              .sc-dates-column#weekday-column-4
-                //-.sc-date.sc-date-past 
-                  .sc-date-number 2
-                //-.sc-date.sc-date-now.sc-date-active
-                  .sc-date-number 9
-                  .sc-date-quick 
-                    .sc-date-quick-title Сделать укол всем животным
-                    .sc-date-quick-time 13:00 - 15:00
-                  .sc-date-more-btn И еще 3
-                //-.sc-date 
-                  .sc-date-number 16
-                //-.sc-date 
-                  .sc-date-number 23
-                //-.sc-date 
-                  .sc-date-number 30
-              .sc-dates-column#weekday-column-5
-              .sc-dates-column#weekday-column-6
-              .sc-dates-column#weekday-column-0
-        //-.mp-stat-block.mp-stat-animal-block
-          .mp-block-header
-            p Напоминания
-          .mp-list-block
-            -if(allRecentActs.length > 0)
-              each act in soonScheduled
-                a.mp-insem-item
-                  .mp-list-icon 
-                    ion-icon(name="calendar")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= act.name
-                    //-.mp-insem-cow-urgent Действие
-                  .mp-insem-details
-                    .mp-insem-day= `${Math.round((act.date.getTime() - Date.now()) / 1000 / 60 / 60 / 24)} дн. назад`
-                    .mp-insem-date= `${new Date(act.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-
-
-        -if(actions.length > 0 && problems.length > 0 && treatments.length > 0 && schemes.length > 0)
-          .mp-stat-block.mp-stat-animal-block
-            .mp-block-header
-              p Ветеринарная история
-            select.aai-type-selector
+        -if(actions.length > 0 || problems.length > 0 || treatments.length > 0 || schemes.length > 0)
+          .mp-history-block#mp-vet-history-block.shadow
+            .mp-history-block-header Ветеринарная история
+            select.mph-type-selector
               option(value="all" selected) Все
               option(value="actions") Действия
               option(value="problems") Проблемы
               option(value="treatments") Лечения
               option(value="schemes") Схемы
-            .aai-container
+            .mp-history-container
               each action in actions
-                a.aai-item(data-type=`actions` data-date=`${action.date}` href=`/vet/edit-action/${action._id}`)
-                  .aai-item-image 
+                a.mp-history-item(data-type=`actions` data-date=`${action.date}` href=`/vet/edit-action/${action._id}`)
+                  .mp-history-item-image 
                     ion-icon(name="medical")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= action.name
-                    .mp-insem-cow-urgent Действие
-                  .mp-insem-details
-                    .mp-insem-day= `${new Date(action.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(action.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(action.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-                    .mp-insem-date= `${Math.round((Date.now() - action.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+                  .mp-history-item-info-block
+                    .mp-history-item-main-info
+                      p= action.name
+                      p= `${Math.round((Date.now() - action.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад` 
 
               each problem in problems
-                a.aai-item(data-type=`problems` data-date=`${problem.date}` href=`/vet/edit-problem/${problem._id}`)
-                  .aai-item-image 
+                a.mp-history-item(data-type=`problems` data-date=`${problem.date}` href=`/vet/edit-problem/${problem._id}`)
+                  .mp-history-item-image 
                     ion-icon(name="thermometer")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= problem.name
-                    .mp-insem-cow-urgent Проблема
-                  .mp-insem-details
-                    .mp-insem-day= `${new Date(problem.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(problem.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(problem.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-                    .mp-insem-date= `${Math.round((Date.now() - problem.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+                  .mp-history-item-info-block
+                    .mp-history-item-main-info
+                      p= problem.name
+                      p= `${Math.round((Date.now() - problem.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
 
               each treatment in treatments
-                a.aai-item(data-type=`treatments` data-date=`${treatment.date}` href=`/vet/edit-treatment/${treatment._id}`)
-                  .aai-item-image 
+                a.mp-history-item(data-type=`treatments` data-date=`${treatment.date}` href=`/vet/edit-treatment/${treatment._id}`)
+                  .mp-history-item-image 
                     ion-icon(name="bandage")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= treatment.name
-                    .mp-insem-cow-urgent Лечение
-                  .mp-insem-details
-                    .mp-insem-day= `${new Date(treatment.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(treatment.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(treatment.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-                    .mp-insem-date= `${Math.round((Date.now() - treatment.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+                  .mp-history-item-info-block
+                    .mp-history-item-main-info
+                      p= treatment.name
+                      p= `${Math.round((Date.now() - treatment.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
 
               each scheme in schemes
-                a.aai-item(data-type=`schemes` data-date=`${scheme.date}` href=`/vet/edit-started-scheme/${scheme._id}`)
-                  .aai-item-image 
+                a.mp-history-item(data-type=`schemes` data-date=`${scheme.date}` href=`/vet/edit-started-scheme/${scheme._id}`)
+                  .mp-history-item-image 
                     ion-icon(name="calendar")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= `${scheme.scheme.name}`
-                    .mp-insem-cow-urgent Начало схемы
-                  .mp-insem-details
-                    .mp-insem-day= `${new Date(scheme.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(scheme.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(scheme.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-                    .mp-insem-date= `${Math.round((Date.now() - scheme.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+                  .mp-history-item-info-block
+                    .mp-history-item-main-info
+                      p= `${scheme.scheme.name}`
+                      p= `${Math.round((Date.now() - scheme.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
 
-              
-
-      .mp-big-column
-        //-.mp-stat-block.mp-stat-animal-block
-          .mp-block-header
-            p Проблемные животные
-          .mp-list-block#soon-calv
-            each problem in problems 
-              -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
-                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
-                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name 
-                      -if(cow.name)
-                        | #{cow.name}
-                      | &nbsp; ##{cow.number}
-                    .mp-insem-cow-urgent= `Осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
-                  .mp-insem-details
-                    .mp-insem-day(class=`${((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
-                    .mp-insem-date= `${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
-
+      .mp-two-list-blocks
         -if(schemes.length > 0)
-          .mp-stat-block.mp-stat-animal-block
+          .mp-schemes-block
+            .mp-schemes-block-header Текущие схемы
+            
+
+          //.mp-stat-block.mp-stat-animal-block
             .mp-block-header
               p Текущие схемы
             .mp-list-block#current-schemes
@@ -176,6 +134,89 @@ block content
                   .mp-scheme-points-more(data-state="to-show") 
                     p Показать еще
                     ion-icon(name="chevron-down")
+      //-.mp-small-column
+        //-.small-calendar-container(data-farm-id=`${user.farm}`)
+        //.mp-block-header
+          p Календарь
+        .sc-dates-block
+          .sc-dates-header
+            p August 2023
+            .sc-dates-header-icon.sc-dates-header-btn#prev-month
+              ion-icon(name="chevron-back-outline")
+            .sc-dates-header-icon.sc-dates-header-btn#next-month
+              ion-icon(name="chevron-forward-outline")
+
+          .sc-week-days-line
+            .sc-week-day ПН
+            .sc-week-day ВТ
+            .sc-week-day СР
+            .sc-week-day ЧТ
+            .sc-week-day ПТ
+            .sc-week-day СБ
+            .sc-week-day ВС
+
+          .sc-dates-columns-block 
+            .sc-dates-column#weekday-column-1
+            .sc-dates-column#weekday-column-2
+            .sc-dates-column#weekday-column-3
+            .sc-dates-column#weekday-column-4
+              //-.sc-date.sc-date-past 
+                .sc-date-number 2
+              //-.sc-date.sc-date-now.sc-date-active
+                .sc-date-number 9
+                .sc-date-quick 
+                  .sc-date-quick-title Сделать укол всем животным
+                  .sc-date-quick-time 13:00 - 15:00
+                .sc-date-more-btn И еще 3
+              //-.sc-date 
+                .sc-date-number 16
+              //-.sc-date 
+                .sc-date-number 23
+              //-.sc-date 
+                .sc-date-number 30
+            .sc-dates-column#weekday-column-5
+            .sc-dates-column#weekday-column-6
+            .sc-dates-column#weekday-column-0
+        //-.mp-stat-block.mp-stat-animal-block
+          .mp-block-header
+            p Напоминания
+          .mp-list-block
+            -if(allRecentActs.length > 0)
+              each act in soonScheduled
+                a.mp-insem-item
+                  .mp-list-icon 
+                    ion-icon(name="calendar")
+                  .mp-insem-cow-info
+                    .mp-insem-cow-name= act.name
+                    //-.mp-insem-cow-urgent Действие
+                  .mp-insem-details
+                    .mp-insem-day= `${Math.round((act.date.getTime() - Date.now()) / 1000 / 60 / 60 / 24)} дн. назад`
+                    .mp-insem-date= `${new Date(act.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {year: 'numeric'})}`
+
+
+
+
+
+
+      .mp-big-column
+        //-.mp-stat-block.mp-stat-animal-block
+          .mp-block-header
+            p Проблемные животные
+          .mp-list-block#soon-calv
+            each problem in problems 
+              -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
+                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
+                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
+                  .mp-insem-cow-info
+                    .mp-insem-cow-name 
+                      -if(cow.name)
+                        | #{cow.name}
+                      | &nbsp; ##{cow.number}
+                    .mp-insem-cow-urgent= `Осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .mp-insem-details
+                    .mp-insem-day(class=`${((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
+                    .mp-insem-date= `${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+
         -if(uncuredProblems.length > 0)
           .mp-stat-block.mp-stat-animal-block
             .mp-block-header
