@@ -41,20 +41,20 @@ block content
         .mp-milking-results-block.shadow
           .mp-mr-title Доение
           .mp-mr-main-line
-            .mp-mr-main-btn -
+            .mp-mr-main-btn#prev-result -
             .mp-mr-main-result
               .mp-mr-main-number 58.6
-              .mp-mr-main-sub-text литров / в среднем
-            .mp-mr-main-btn +
+              .mp-mr-main-sub-text литров / среднее
+            .mp-mr-main-btn#next-result +
           .mp-mr-secondary-line
+            .mp-mr-seconary-item.mp-mr-seconary-item-first
+              .mp-mr-seconary-number#milk-per-day 0
+              .mp-mr-seconary-sub-text#milk-per-day-text литров / день
             .mp-mr-seconary-item
-              .mp-mr-seconary-number 518
-              .mp-mr-seconary-sub-text литров / день
-            .mp-mr-seconary-item
-              .mp-mr-seconary-number 15.6
-              .mp-mr-seconary-sub-text тыс. л / месяц
-            .mp-mr-seconary-item
-              .mp-mr-seconary-number 19.2
+              .mp-mr-seconary-number#milk-per-month 0
+              .mp-mr-seconary-sub-text#milk-per-month-text тыс. л / месяц
+            .mp-mr-seconary-item.mp-mr-seconary-item-last.mp-mr-seconary-item-active
+              .mp-mr-seconary-number#milk-average-cow 0
               .mp-mr-seconary-sub-text литров / среднее
 
       .mp-top-results-block.shadow
@@ -63,32 +63,32 @@ block content
           .mp-top-results-sub-title Последние результаты добавлены Январь 2023
           .mp-top-results-all-data-line
             .mp-top-results-all-data-block
-              .mp-top-results-all-data-number 48
+              .mp-top-results-all-data-number#tc-all-res 0
               .mp-top-results-all-data-text Результатов
             .mp-top-results-all-data-block
-              .mp-top-results-all-data-number 15.7
+              .mp-top-results-all-data-number#tc-avg-res 0
               .mp-top-results-all-data-text Средний результат
         .mp-top-results-right-block 
-          .mp-top-result
+          .mp-top-result#top-0
             img(src="/img/images/default-cow-image.png")
             .mp-top-result-number #50261488
             .mp-top-result-name Березка
-            .mp-top-result-result.mp-top-result-result-1 24
-          .mp-top-result
+            .mp-top-result-result.mp-top-result-result-1 0
+          .mp-top-result#top-1
             img(src="/img/images/default-cow-image.png")
             .mp-top-result-number #50261488
             .mp-top-result-name Березка
-            .mp-top-result-result.mp-top-result-result-2 22
-          .mp-top-result
+            .mp-top-result-result.mp-top-result-result-2 0
+          .mp-top-result#top-2
             img(src="/img/images/default-cow-image.png")
             .mp-top-result-number #50261488
             .mp-top-result-name Березка
-            .mp-top-result-result.mp-top-result-result-3 19
-          .mp-top-result
+            .mp-top-result-result.mp-top-result-result-3 0
+          .mp-top-result#top-3
             img(src="/img/images/default-cow-image.png")
             .mp-top-result-number #50261488
             .mp-top-result-name Березка
-            .mp-top-result-result 18
+            .mp-top-result-result 0
 
 
       .mp-two-list-blocks
@@ -107,7 +107,7 @@ block content
                   .mpt-list-item-number= `#${cow.number}`
                   .mpt-list-item-date(data-date=`${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
                   .mpt-list-item-day
-                    .mpt-list-item-day-text 11 дней
+                    .mpt-list-item-day-text= `${Math.round(((new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000)) - new Date().getTime()) / 1000 / 60 / 60 / 24)} дней`
 
 
         .mpt-list-block.shadow
@@ -133,9 +133,9 @@ block content
                     .mpt-list-item-date(data-date=`${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
                     .mpt-list-item-day
                       -if((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now() > 0 )
-                        .mpt-list-item-day-text.mpt-list-item-day-pos 11 дней
+                        .mpt-list-item-day-text.mpt-list-item-day-pos= `${Math.round(((new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)) - new Date().getTime()) / 1000 / 60 / 60 / 24)} дней`
                       -else 
-                        .mpt-list-item-day-text.mpt-list-item-day-neg 11 дней
+                        .mpt-list-item-day-text.mpt-list-item-day-neg= `${Math.round(((new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)) - new Date().getTime()) / 1000 / 60 / 60 / 24)} дней`
 
 
 

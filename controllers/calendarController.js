@@ -37,8 +37,7 @@ exports.deleteReminder = catchAsync(async(req, res, next) => {
 });
 
 exports.getModuleAndPeriod = catchAsync(async(req, res, next) => {
-  const reminders = await Calendar.find({farm: req.user.farm, module: req.body.module, date: { $gte: req.body.from, $lte: req.body.to }}).populate('animal');
-
+  const reminders = await Calendar.find({farm: req.user.farm, module: req.body.module, date: { $gte: req.body.from, $lte: req.body.to }}).populate('animal').populate('user');
 
   res.status(200).json({
     status: 'success',

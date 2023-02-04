@@ -46,12 +46,12 @@ export const deleteReminder = async (data) => {
   }
 }
 
-export const getModuleAndPeriod = async(moduleName, from, to) => {
+export const getModuleAndPeriod = async(module, from, to) => {
   try {
     const res = await axios({
       method: 'POST',
       url: `/api/calendar/module-and-period/`,
-      data: {module: moduleName, from, to}
+      data: {module, from, to}
     });
 
     if(res.data.status === 'success') {

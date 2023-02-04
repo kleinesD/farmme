@@ -22,9 +22,9 @@ block content
           .mp-calendar-table
             .mp-calendar-title-line 
               p Февраль 2023
-              a#next-month
+              a.mp-calendar-btn#prev-month(data-state="first-click")
                 ion-icon(name="chevron-back")
-              a#prev-month
+              a.mp-calendar-btn#next-month
                 ion-icon(name="chevron-forward")
             .mp-calendar-main-block
               .mp-calendar-weekday-line
@@ -97,155 +97,61 @@ block content
 
       .mp-two-list-blocks
         -if(schemes.length > 0)
-          .mp-schemes-block
+          .mp-schemes-block.shadow
             .mp-schemes-block-header Текущие схемы
-            
-
-          //.mp-stat-block.mp-stat-animal-block
-            .mp-block-header
-              p Текущие схемы
-            .mp-list-block#current-schemes
+            .mp-schemes-container
               each scheme in schemes 
                 .mp-scheme-item
-                  .mp-scheme-item-header 
-                    .mp-scheme-animal-line
-                      img(src='/img/images/default-cow-image.png')
-                      p= `#${scheme.animal.number}`
-                      -if(scheme.animal.name)
-                        p= scheme.animal.name
-                    .mp-scheme-first-line
-                      .mp-scheme-title= scheme.scheme.name 
-                      p= `Шагов: ${scheme.scheme.points.length}`
-                    .mp-scheme-second-line
-                      p= `Дата начала: ${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                  .mp-scheme-item-header
+                    img(src='/img/images/default-cow-image.png')
+                    p= `#${scheme.animal.number}`
+                    ion-icon.mp-scheme-icon(name="chevron-down")
+                    p.mp-scheme-name= scheme.scheme.name  
                   .mp-scheme-points-block
+                    .mp-scheme-points-line
                     .mp-scheme-point(data-date=`${scheme.date}`)
-                      ion-icon.scheme-icon-pos(name="checkmark-circle")
-                      .mp-scheme-point-name= scheme.name
-                      .mp-scheme-point-date= `${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                      .mp-scheme-point-number.mp-scheme-point-done
+                        ion-icon(name="checkmark-sharp")
+                        //p 1
+                      p= scheme.name
+                      p.mp-scheme-point-date= `${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
                     each point in scheme.otherPoints 
                       .mp-scheme-point(data-date=`${point.date}` data-finished=`${new Date(point.date) < new Date()}`)
-                        -if(new Date(point.date) > new Date())
-                          ion-icon.scheme-icon-neg(name="time")
-                        -else
-                          ion-icon.scheme-icon-pos(name="checkmark-circle")
-                        .mp-scheme-point-name= point.name
-                        .mp-scheme-point-date= `${point.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                  .mp-scheme-points-more(data-state="to-show") 
-                    p Показать еще
-                    ion-icon(name="chevron-down")
-      //-.mp-small-column
-        //-.small-calendar-container(data-farm-id=`${user.farm}`)
-        //.mp-block-header
-          p Календарь
-        .sc-dates-block
-          .sc-dates-header
-            p August 2023
-            .sc-dates-header-icon.sc-dates-header-btn#prev-month
-              ion-icon(name="chevron-back-outline")
-            .sc-dates-header-icon.sc-dates-header-btn#next-month
-              ion-icon(name="chevron-forward-outline")
-
-          .sc-week-days-line
-            .sc-week-day ПН
-            .sc-week-day ВТ
-            .sc-week-day СР
-            .sc-week-day ЧТ
-            .sc-week-day ПТ
-            .sc-week-day СБ
-            .sc-week-day ВС
-
-          .sc-dates-columns-block 
-            .sc-dates-column#weekday-column-1
-            .sc-dates-column#weekday-column-2
-            .sc-dates-column#weekday-column-3
-            .sc-dates-column#weekday-column-4
-              //-.sc-date.sc-date-past 
-                .sc-date-number 2
-              //-.sc-date.sc-date-now.sc-date-active
-                .sc-date-number 9
-                .sc-date-quick 
-                  .sc-date-quick-title Сделать укол всем животным
-                  .sc-date-quick-time 13:00 - 15:00
-                .sc-date-more-btn И еще 3
-              //-.sc-date 
-                .sc-date-number 16
-              //-.sc-date 
-                .sc-date-number 23
-              //-.sc-date 
-                .sc-date-number 30
-            .sc-dates-column#weekday-column-5
-            .sc-dates-column#weekday-column-6
-            .sc-dates-column#weekday-column-0
-        //-.mp-stat-block.mp-stat-animal-block
-          .mp-block-header
-            p Напоминания
-          .mp-list-block
-            -if(allRecentActs.length > 0)
-              each act in soonScheduled
-                a.mp-insem-item
-                  .mp-list-icon 
-                    ion-icon(name="calendar")
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name= act.name
-                    //-.mp-insem-cow-urgent Действие
-                  .mp-insem-details
-                    .mp-insem-day= `${Math.round((act.date.getTime() - Date.now()) / 1000 / 60 / 60 / 24)} дн. назад`
-                    .mp-insem-date= `${new Date(act.date).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(act.date).toLocaleString('ru-RU', {year: 'numeric'})}`
-
-
-
-
-
-
-      .mp-big-column
-        //-.mp-stat-block.mp-stat-animal-block
-          .mp-block-header
-            p Проблемные животные
-          .mp-list-block#soon-calv
-            each problem in problems 
-              -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
-                a.mp-insem-item(href=`/herd/animal-card/${cow._id}`)
-                  img.mp-insem-image(src=`/img/images/${cow.mainPhoto}`)
-                  .mp-insem-cow-info
-                    .mp-insem-cow-name 
-                      -if(cow.name)
-                        | #{cow.name}
-                      | &nbsp; ##{cow.number}
-                    .mp-insem-cow-urgent= `Осеменение ${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {day: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {month: '2-digit'})}.${cow.inseminations[cow.inseminations.length - 1].date.toLocaleString('ru-RU', {year: 'numeric'})}`
-                  .mp-insem-details
-                    .mp-insem-day(class=`${((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) < 0 ? 'mp-insem-neg' : 'mp-insem-pos'}`)= `${Math.round(((cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дней`
-                    .mp-insem-date= `${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})}`
+                        .mp-scheme-point-number(class=`${new Date(point.date) < new Date() ? 'mp-scheme-point-done' : ''}`)
+                          -if(new Date(point.date) > new Date())
+                            -if(scheme.otherPoints.indexOf(point) !== scheme.otherPoints.length - 1)
+                              p= `${scheme.otherPoints.indexOf(point) + 2}`
+                            -else
+                              ion-icon(name="flash")
+                          -else
+                            ion-icon(name="checkmark-sharp")
+                        p= point.name
+                        p.mp-scheme-point-date= `${point.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
 
         -if(uncuredProblems.length > 0)
-          .mp-stat-block.mp-stat-animal-block
-            .mp-block-header
-              p Невылеченные проблемы
-            .mp-list-block#current-problems
+          .mp-schemes-block.shadow
+            .mp-schemes-block-header Невылеченные пробемы
+            .mp-schemes-container
               each problem in uncuredProblems
-                .mp-problem-item.mp-uncured
-                  .mp-scheme-item-header 
-                    .mp-scheme-animal-line
-                      img(src='/img/images/default-cow-image.png')
-                      p= `#${problem.animal.number}`
-                      -if(problem.animal.name)
-                        p= problem.animal.name
-                    .mp-scheme-first-line
-                      .mp-scheme-title= problem.name
-                      a.mp-treatment-link(href=`/vet/add-treatment/${problem._id}`) Лечение +
-                    .mp-scheme-second-line
-                      p= `Дата: ${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                  .mp-problem-treatments-block
+                .mp-scheme-item
+                  .mp-scheme-item-header
+                    img(src='/img/images/default-cow-image.png')
+                    p= `#${problem.animal.number}`
+                    ion-icon.mp-scheme-icon(name="chevron-down")
+                    p.mp-scheme-name= problem.name
+                  .mp-scheme-points-block
+                    .mp-scheme-points-line
+                    .mp-scheme-point(data-date=`${problem.date}`)
+                      .mp-scheme-point-number
+                        ion-icon(name="thermometer")
+                      p Проблема добавлена
+                      p.mp-scheme-point-date= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
                     each treatment in problem.treatments 
-                      .mp-problem-treatment(data-date=`${treatment.date}`)
-                        ion-icon.mp-uncured-icon(name="close-circle")
-                        .mp-problem-treatment-name= treatment.name
-                        .mp-problem-treatment-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                  -if(problem.treatments.length > 1)
-                    .mp-problem-treatment-more(data-state="to-show") 
-                      p Показать еще
-                      ion-icon(name="chevron-down")
-
+                      .mp-scheme-point(data-date=`${treatment.date}`)
+                        .mp-scheme-point-number
+                          ion-icon(name="close")
+                        p= treatment.name
+                        p.mp-scheme-point-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
 
 
     -if(actions.length === 0 && problems.length === 0 && treatments.length === 0 && schemes.length === 0, uncuredProblems.length === 0)

@@ -16,17 +16,17 @@ block content
             // <ion-icon name="eye-outline"></ion-icon>
             ion-icon(name='eye-off-outline')
         button.common-form-btn Войти
-        //.alternative-login
+        //-.alternative-login
           ion-icon(name='logo-google')
           p Войти с Google
-        //a.form-forget-pass(href='#') Забыли пароль?
-        //.common-form-or Или
-        //.form-final-text
+        //-a.form-forget-pass(href='#') Забыли пароль?
+        //-.common-form-or Или
+        //-.form-final-text
           p Еще нет аккаунта?
           a(href='#') Регистрация
 
       //DELETE AFTER
-      //-each cow in cows
+      each cow in cows
         each result in cow.milkingResults
           .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
       //-svg#test-graph

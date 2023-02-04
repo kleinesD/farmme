@@ -144,15 +144,6 @@ $(document).ready(async function () {
     milkingData.forEach((result, index, array) => {
       let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(12, 'month')).getTime()) / 1000 / 60 / 60 / 24);
 
-      /* Adding points */
-      /* var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-      circle.classList.add('mp-line-graph-average-circle');
-      circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan));
-      circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (result.result * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-      circle.setAttribute('r', 2);
-      graph.append(circle); */
-
-
       /* Preparing second array for average line */
       if (milkingAverage.length < 1) {
         milkingAverage.push({ date: result.date, results: [result] })
@@ -178,30 +169,6 @@ $(document).ready(async function () {
       let total = 0
       result.results.forEach(el => total += el.number);
       result.number = parseFloat((total / result.results.length).toFixed(1));
-
-      //console.log({ date: result.date, russianDate: moment(result.date).lang('ru').format('MMM') })
-
-      /* if (index === 0) {
-        let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-        path.classList.add('mp-line-graph-average-line');
-        path.setAttribute('d', `M ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-        path.setAttribute('id', `animal-line-average`);
-        graph.append(path);
-      } else {
-        let path = document.getElementById(`animal-line-average`);
-        path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-      } */
-
-      /* Adding points */
-      /* var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-      circle.classList.add(`line-graph-data-circle`);
-      circle.setAttribute('data-average', average);
-      circle.setAttribute('data-date', result.date);
-      circle.setAttribute('data-amount', result.results.length);
-      circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30);
-      circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-      circle.setAttribute('r', 2);
-      graph.append(circle); */
     });
 
 
@@ -214,7 +181,9 @@ $(document).ready(async function () {
         periodMonths: 12,
         min: 0,
         max: 50,
-        showLegend: true
+        showLegend: true,
+        boxHeight: true,
+        /* heightRatio: 0.75 */
       },
       datasets: [
         {
@@ -231,7 +200,7 @@ $(document).ready(async function () {
       ]
     };
 
-    /* const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart(); */
+    //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
     //const graph = renderGraph(document.getElementById('login-section'), parameters);
   }
 
@@ -1191,7 +1160,7 @@ $(document).ready(async function () {
   ///////////////////////
   /* THE MAIN PAGE GRAPH */
   ///////////////////////
-  if (document.querySelector('#mp-herd-container')) {
+  if (document.querySelector('mp-herd-container')) {
     /* Working with graphs */
     const creatingGraph = (graphName, periodMonths) => {
       $('.mp-tooltip-box').remove();
@@ -1832,15 +1801,15 @@ $(document).ready(async function () {
     rusDate = rusDate.charAt(0).toUpperCase() + rusDate.slice(1);
     $('.mph-info-month').text(rusDate)
 
-    
+
 
     /* Adding animation of appearence */
     $(window).on('scroll', function () {
       let itemsBottom = $('.mph-info-box').position().top + ($('.mph-info-box').height() / 2);
-      if($(this).scrollTop() >= 300 ) {
-        $('body').css({'transition': '0.5s', 'background-color': '#0A0908'})
-      } else if($(this).scrollTop() < 300) {
-        $('body').css({'transition': '0.5s', 'background-color': '#ffffff'})
+      if ($(this).scrollTop() >= 300) {
+        $('body').css({ 'transition': '0.5s', 'background-color': '#0A0908' })
+      } else if ($(this).scrollTop() < 300) {
+        $('body').css({ 'transition': '0.5s', 'background-color': '#ffffff' })
       }
       if ($(this).scrollTop() >= itemsBottom) {
         $('#box-1').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1');
@@ -1852,7 +1821,7 @@ $(document).ready(async function () {
   }
 
 
-  if (document.querySelector('#mp-herd-container')) {
+  if (document.querySelector('mp-herd-container')) {
     /* Making navigation work */
     $('.mp-block-changer-item-on').click(function () {
       $('.mp-block-changer-item-off').show(200);
@@ -4076,11 +4045,11 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD MAIN PAGE */
   ///////////////////////
-  if (document.querySelector('.main-page-block-full')) {
+  if (document.querySelector('#mp-herd-container')) {
     /* Main vars */
-    let milkPerDayHH = { value: 0, growth: 0 }
-    let milkPerMonthHH = { value: 0, growth: 0 }
-    let milkAverageHH = { value: 0, growth: 0 }
+    let milkPerDay = { value: 0, growth: 0 }
+    let milkPerMonth = { value: 0, growth: 0 }
+    let milkAverage = { value: 0, growth: 0 }
 
 
     /* Switching between graphs */
@@ -4094,439 +4063,140 @@ $(document).ready(async function () {
 
     $('.mp-graphs-header-item').first().trigger('click');
 
-
-    /* Working with milking results chart */
-    if (document.querySelector('#milking-results-graph-box')) {
-      let myChartMRAvg;
-      const showMilkingChartAverage = (monthsBack) => {
-        if (myChartMRAvg) myChartMRAvg.destroy();
-
-        const backDate = new Date(Date.now() - monthsBack * 30 * 24 * 60 * 60 * 1000)
-
-        let allResults = [];
-        let finalData = [];
-        let averageArr = []
-
-        $('#main-milking-results').parent().find('.mp-graph-result-invis').each(function () {
-          const date = new Date($(this).attr('data-date'));
-          const result = parseFloat($(this).attr('data-result'));
-          const name = $(this).attr('data-name');
-
-          if (date.getTime() >= backDate.getTime()) {
-            allResults.push({ date, result });
-          }
-        });
-        allResults.sort((a, b) => { return a.date - b.date })
-
-        allResults.forEach((result) => {
-          let monthsBack = Math.round((Date.now() - result.date.getTime()) / 1000 / 60 / 60 / 24 / 30);
-
-          if (finalData.length === 0) {
-            finalData.push({ monthsBack, resultArr: [result.result] })
-          } else {
-            let added = false;
-            for (let i = 0; i < finalData.length; i++) {
-              if (finalData[i].monthsBack === monthsBack) {
-                if (!added) {
-                  finalData[i].resultArr.push(result.result)
-                  added = true;
-                }
-              }
-            }
-            if (!added) finalData.push({ monthsBack, resultArr: [result.result] })
-          }
-        });
-
-
-        let graphData = {
-          labels: [],
-          datasets: []
-        }
-
-        for (let i = 0; i < monthsBack; i++) {
-          moment.locale('ru')
-          let month = new Date(moment(Date.now()).set('month', moment(Date.now()).get('month') - (monthsBack - i)))
-          let label = `${moment(month).format('MMMM YYYY')}`
-          graphData.labels.push(label);
-
-          let added = false;
-          finalData.forEach((result) => {
-            if (!added && result.monthsBack === monthsBack - i) {
-              let avg = 0;
-
-              result.resultArr.forEach(el => { avg += el });
-              averageArr.push(Math.round(avg / result.resultArr.length));
-              added = true;
-            }
-          });
-          if (!added) averageArr.push('NaN')
-        }
-
-        /* if array is empty hide header */
-        if (allResults.length === 0) {
-          $('.herd-main-header').hide();
-          $('.main-page-block-full').hide();
-          $('.mp-empty-block ').css('display', 'flex');
-        }
-
-
-        /* Adding data to main vars */
-        milkAverageHH.value = averageArr[averageArr.length - 1];
-        if (averageArr.length > 1) milkAverageHH.growth = parseFloat((100 - (averageArr[averageArr.length - 2] / averageArr[averageArr.length - 1] * 100)).toFixed(1));
-
-        graphData.datasets.push({
-          label: `В среднем (л.)`,
-          data: averageArr,
-          borderColor: 'rgb(41, 112, 69, 0.25)',
-          backgroundColor: 'rgb(41, 112, 69, 0.25)',
-          fill: true,
-          pointBorderColor: 'rgb(0, 0, 0, 1)',
-          pointBorderWidth: 1,
-          borderWidth: 2,
-        });
-
-        myChartMRAvg = mainPageCharts($('#main-milking-results'), 0, 40, false, graphData);
-      }
-
-      $('#milking-results-graph-box').find('.mp-timeline-item').click(function () {
-        if (!$(this).hasClass('mp-timeline-item-active')) {
-          $(this).addClass('mp-timeline-item-active');
-          $(this).siblings().removeClass('mp-timeline-item-active');
-
-          let monthsBack = parseFloat($(this).attr('data-months'));
-
-          showMilkingChartAverage(monthsBack)
-        }
+    /* Getting and working with milking data */
+    let milkingData = [];
+    $('.mp-graph-data').each(function () {
+      milkingData.push({
+        result: parseFloat($(this).attr('data-result')),
+        date: new Date($(this).attr('data-date')),
+        lactation: parseFloat($(this).attr('data-lact')),
+        cowId: $(this).attr('data-cow-id'),
+        cowPhoto: $(this).attr('data-cow-photo'),
+        cowNumber: $(this).attr('data-cow-number'),
+        cowName: $(this).attr('data-cow-name')
       });
-
-      $('#milking-results-graph-box').find('.mp-timeline-item').last().trigger('click')
-    }
-
-    /* Suspended for now */
-    /* Working with weight results chart */
-    if (document.querySelector('#weight-results-graph-box')) {
-      /* let myChartWRAvg;
-       const showMilkingChart = (monthsBack) => {
-         if (myChartWRAvg) myChartWRAvg.destroy();
- 
-         const backDate = new Date(Date.now() - monthsBack * 30 * 24 * 60 * 60 * 1000)
- 
-         let allResultsCows = [];
-         let allResultsBulls = [];
-         let finalDataCows = [];
-         let finalDataBulls = [];
-         let averageArrCows = [];
-         let averageArrBulls = [];
- 
-         $('#main-weight-results').parent().find('.mp-graph-result-cow').each(function () {
-           const date = new Date($(this).attr('data-date'));
-           const result = parseFloat($(this).attr('data-result'));
-           const name = $(this).attr('data-name');
- 
-           if (date.getTime() >= backDate.getTime()) {
-             allResultsCows.push({ date, result });
-           }
-         });
-         $('#main-weight-results').parent().find('.mp-graph-result-bull').each(function () {
-           const date = new Date($(this).attr('data-date'));
-           const result = parseFloat($(this).attr('data-result'));
-           const name = $(this).attr('data-name');
- 
-           if (date.getTime() >= backDate.getTime()) {
-             allResultsBulls.push({ date, result });
-           }
-         });
- 
-         allResultsCows.sort((a, b) => { return a.date - b.date })
-         allResultsBulls.sort((a, b) => { return a.date - b.date })
- 
-         allResultsCows.forEach((result) => {
-           let monthsBack = Math.round((Date.now() - result.date.getTime()) / 1000 / 60 / 60 / 24 / 30);
- 
-           if (finalDataCows.length === 0) {
-             finalDataCows.push({ monthsBack, resultArr: [result.result] })
-           } else {
-             let added = false;
-             for (let i = 0; i < finalDataCows.length; i++) {
-               if (finalDataCows[i].monthsBack === monthsBack) {
-                 if (!added) {
-                   finalDataCows[i].resultArr.push(result.result)
-                   added = true;
-                 }
-               }
-             }
-             if (!added) finalDataCows.push({ monthsBack, resultArr: [result.result] })
-           }
-         });
- 
-         allResultsBulls.forEach((result) => {
-           let monthsBack = Math.round((Date.now() - result.date.getTime()) / 1000 / 60 / 60 / 24 / 30);
- 
-           if (finalDataBulls.length === 0) {
-             finalDataBulls.push({ monthsBack, resultArr: [result.result] })
-           } else {
-             let added = false;
-             for (let i = 0; i < finalDataBulls.length; i++) {
-               if (finalDataBulls[i].monthsBack === monthsBack) {
-                 if (!added) {
-                   finalDataBulls[i].resultArr.push(result.result)
-                   added = true;
-                 }
-               }
-             }
-             if (!added) finalDataBulls.push({ monthsBack, resultArr: [result.result] })
-           }
-         });
- 
- 
-         let graphData = {
-           labels: [],
-           datasets: []
-         }
- 
-         for (let i = 0; i < monthsBack; i++) {
-           moment.locale('ru')
-           let month = new Date(moment(Date.now()).set('month', moment(Date.now()).get('month') - (monthsBack - i)))
-           let label = `${moment(month).format('MMMM YY')}`
-           graphData.labels.push(label);
- 
-           let added = false;
-           finalData.forEach((result) => {
-             if (!added && result.monthsBack === monthsBack - i) {
-               let avg = 0;
- 
-               result.resultArr.forEach(el => { avg += el });
-               averageArr.push(Math.round(avg / result.resultArr.length));
-               added = true;
-             }
-           });
-           if (!added) averageArr.push('NaN')
-         }
- 
-         graphData.datasets.push({
-           label: `В среднем (кг.)`,
-           data: averageArr,
-           borderColor: '#297045',
-           backgroundColor: 'rgb(0, 0, 0, 0)',
-           fill: false,
-           pointBorderColor: 'rgb(0, 0, 0, 0)',
-           pointBorderWidth: 0,
-           borderWidth: 2,
-         });
- 
-         myChartWRAvg = mainPageCharts($('#main-weight-results'), 0, 1000, false, graphData);
-       }
- 
-       $('#milking-results-graph-box').find('.mp-timeline-item').click(function () {
-         if (!$(this).hasClass('mp-timeline-item-active')) {
-           $(this).addClass('mp-timeline-item-active');
-           $(this).siblings().removeClass('mp-timeline-item-active');
- 
-           let monthsBack = parseFloat($(this).attr('data-months'));
- 
-           showMilkingChart(monthsBack)
-         }
-       });
- 
-       $('#milking-results-graph-box').find('.mp-timeline-item').last().trigger('click')*/
-    }
-
-    /* Working with all milk per day */
-    if (document.querySelector('#milk-per-day-graph-box')) {
-      let myChartMRPerDay;
-      const showMilkingChartPerDay = (monthsBack) => {
-        if (myChartMRPerDay) myChartMRPerDay.destroy();
-
-        const backDate = new Date(Date.now() - monthsBack * 30 * 24 * 60 * 60 * 1000)
-
-        let allResults = [];
-        let finalData = [];
-        let totalArr = []
-
-        $('#main-milk-per-day').parent().find('.mp-graph-result-invis').each(function () {
-          const date = new Date($(this).attr('data-date'));
-          const result = parseFloat($(this).attr('data-result'));
-          const name = $(this).attr('data-name');
-
-          if (date.getTime() >= backDate.getTime()) {
-            allResults.push({ date, result });
-          }
-        });
-        allResults.sort((a, b) => { return a.date - b.date })
-
-        allResults.forEach((result) => {
-          let monthsBack = Math.round((Date.now() - result.date.getTime()) / 1000 / 60 / 60 / 24 / 30);
-
-          if (finalData.length === 0) {
-            finalData.push({ monthsBack, resultArr: [result.result] })
-          } else {
-            let added = false;
-            for (let i = 0; i < finalData.length; i++) {
-              if (finalData[i].monthsBack === monthsBack) {
-                if (!added) {
-                  finalData[i].resultArr.push(result.result)
-                  added = true;
-                }
-              }
-            }
-            if (!added) finalData.push({ monthsBack, resultArr: [result.result] })
-          }
-        });
-
-
-        let graphData = {
-          labels: [],
-          datasets: []
-        }
-
-        for (let i = 0; i < monthsBack; i++) {
-          moment.locale('ru')
-          let month = new Date(moment(Date.now()).set('month', moment(Date.now()).get('month') - (monthsBack - i)))
-          let label = `${moment(month).format('MMMM YYYY')}`
-          graphData.labels.push(label);
-
-          let added = false;
-          finalData.forEach((result) => {
-            if (!added && result.monthsBack === monthsBack - i) {
-              let total = 0;
-
-              result.resultArr.forEach(el => { total += el });
-              totalArr.push(Math.round(total));
-              added = true;
-            }
-          });
-          if (!added) totalArr.push('NaN')
-        }
-
-        /* Adding data to main vars */
-        milkPerDayHH.value = totalArr[totalArr.length - 1];
-        milkPerMonthHH.value = Math.round(totalArr[totalArr.length - 1] * 30);
-        if (totalArr.length > 1) {
-          milkPerDayHH.growth = parseFloat((100 - (totalArr[totalArr.length - 2] / totalArr[totalArr.length - 1] * 100)).toFixed(1));
-          milkPerMonthHH.growth = parseFloat((100 - (Math.round(totalArr[totalArr.length - 2] * 30) / Math.round(totalArr[totalArr.length - 1] * 30) * 100)).toFixed(1));
-        }
-
-        graphData.datasets.push({
-          label: `Всего в день (л.)`,
-          data: totalArr,
-          borderColor: 'rgb(41, 112, 69, 0.25)',
-          backgroundColor: 'rgb(41, 112, 69, 0.25)',
-          fill: true,
-          pointBorderColor: 'rgb(0, 0, 0, 1)',
-          pointBorderWidth: 1,
-          borderWidth: 2,
-        });
-
-        myChartMRPerDay = mainPageCharts($('#main-milk-per-day'), 0, 0, false, graphData);
-      }
-
-      $('#milk-per-day-graph-box').find('.mp-timeline-item').click(function () {
-        if (!$(this).hasClass('mp-timeline-item-active')) {
-          $(this).addClass('mp-timeline-item-active');
-          $(this).siblings().removeClass('mp-timeline-item-active');
-
-          let monthsBack = parseFloat($(this).attr('data-months'));
-
-          showMilkingChartPerDay(monthsBack)
-        }
-      });
-
-      $('#milk-per-day-graph-box').find('.mp-timeline-item').last().trigger('click')
-    }
-
-    /* Working with key information */
-
-    /* Milk per day */
-    $('#milk-per-day').find('.hh-item-info').text(`${milkPerDayHH.value} л.`)
-    if (milkPerDayHH.growth !== 0) {
-      $('#milk-per-day').find('.hh-item-growth-numb').text(`${milkPerDayHH.growth}%`);
-      $('#milk-per-day').find('.hh-item-growth-indi').attr('name', `${milkPerDayHH.growth > 0 ? 'caret-up-outline' : 'caret-down-outline'}`).addClass(`${milkPerDayHH.growth > 0 ? 'hh-item-growth-indi-pos' : 'hh-item-growth-indi-neg'}`);
-    }
-
-    /* Milk per month */
-    $('#milk-per-month').find('.hh-item-info').text(`${milkPerMonthHH.value} л.`)
-    if (milkPerMonthHH.growth !== 0) {
-      $('#milk-per-month').find('.hh-item-growth-numb').text(`${milkPerMonthHH.growth}%`);
-      $('#milk-per-month').find('.hh-item-growth-indi').attr('name', `${milkPerMonthHH.growth > 0 ? 'caret-up-outline' : 'caret-down-outline'}`).addClass(`${milkPerMonthHH.growth > 0 ? 'hh-item-growth-indi-pos' : 'hh-item-growth-indi-neg'}`);
-    }
-
-    /* Milk per month */
-    $('#milk-average').find('.hh-item-info').text(`${milkAverageHH.value} л.`)
-    if (milkAverageHH.growth !== 0) {
-      $('#milk-average').find('.hh-item-growth-numb').text(`${milkAverageHH.growth}%`);
-      $('#milk-average').find('.hh-item-growth-indi').attr('name', `${milkAverageHH.growth > 0 ? 'caret-up-outline' : 'caret-down-outline'}`).addClass(`${milkAverageHH.growth > 0 ? 'hh-item-growth-indi-pos' : 'hh-item-growth-indi-neg'}`);
-    }
-
-    /* Sorting lists */
-    let length;
-
-    length = $('#soon-insem').find('.mp-insem-item').length
-    for (let i = 0; i < length; i++) {
-      $('#soon-insem').find('.mp-insem-item').each(function () {
-        let number = parseFloat($(this).find('.mp-insem-day').text().split(' ')[0])
-        let prevNumber = parseFloat($(this).prev().find('.mp-insem-day').text().split(' ')[0]);
-
-        if (number < prevNumber) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-    length = $('#soon-calv').find('.mp-insem-item').length
-    for (let i = 0; i < length; i++) {
-      $('#soon-calv').find('.mp-insem-item').each(function () {
-        let number = parseFloat($(this).find('.mp-insem-day').text().split(' ')[0])
-        let prevNumber = parseFloat($(this).prev().find('.mp-insem-day').text().split(' ')[0]);
-
-        if (number < prevNumber) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-    length = $('#top-milking').find('.mp-insem-item').length
-    for (let i = 0; i < length; i++) {
-      $('#top-milking').find('.mp-insem-item').each(function () {
-        let number = parseFloat($(this).find('.mp-insem-day').text().split(' ')[0])
-        let prevNumber = parseFloat($(this).prev().find('.mp-insem-day').text().split(' ')[0]);
-
-        if (number > prevNumber) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-    /* Adding number to each of the cows */
-    $('#top-milking').find('.mp-insem-item').each(function () {
-      $(this).prepend(`<div class="mp-list-top-number">${$(this).index() + 1}</div>`)
     });
 
-    if ($('#top-milking').find('.mp-insem-item')[0]) {
-      let placeEl = $('#top-milking').find('.mp-insem-item')[0]
-      $(placeEl).find('.mp-insem-date').text('1 Место');
-      $(placeEl).find('.mp-list-top-number').addClass('mp-list-top-number-gold');
+    milkingData.sort((a, b) => a.date - b.date);
+
+    /* Getting the last month data */
+    let lastMonthData = [];
+    milkingData.forEach((data, i, arr) => {
+      let lastElDate = arr[arr.length - 1].date;
+      if (moment(data.date).month() === moment(lastElDate).month() && moment(data.date).year() === moment(lastElDate).year()) {
+        lastMonthData.push(data);
+      }
+    });
+
+    lastMonthData.sort((a, b) => b.result - a.result);
+
+    //Adding data to the milking results block
+    lastMonthData.forEach((data, i, arr) => {
+      milkPerDay.value += data.result;
+    });
+    milkPerMonth.value = milkPerDay.value * 30;
+    milkAverage.value = parseFloat((milkPerDay.value / lastMonthData.length).toFixed(1));
+
+    if (milkPerDay.value > 1000) {
+      $('#milk-per-day').text(parseFloat((milkPerDay.value / 1000).toFixed(1)));
+      $('#milk-per-day-text').text('тыс. л / день');
+    } else {
+      $('#milk-per-day').text(milkPerDay.value);
+      $('#milk-per-day-text').text('литров / день');
     }
-    if ($('#top-milking').find('.mp-insem-item')[1]) {
-      let placeEl = $('#top-milking').find('.mp-insem-item')[1]
-      $(placeEl).find('.mp-insem-date').text('2 Место');
-      $(placeEl).find('.mp-list-top-number').addClass('mp-list-top-number-silver');
+    if (milkPerMonth.value > 1000) {
+      $('#milk-per-month').text(parseFloat((milkPerMonth.value / 1000).toFixed(1)))
+      $('#milk-per-month-text').text('тыс. л / месяц');
+    } else {
+      $('#milk-per-month').text(milkPerMonth.value)
+      $('#milk-per-month-text').text('литров / месяц');
     }
-    if ($('#top-milking').find('.mp-insem-item')[2]) {
-      let placeEl = $('#top-milking').find('.mp-insem-item')[2]
-      $(placeEl).find('.mp-insem-date').text('3 Место');
-      $(placeEl).find('.mp-list-top-number').addClass('mp-list-top-number-bronze');
+
+    $('#milk-average-cow').text(milkAverage.value)
+    $('.mp-mr-main-number').text(milkAverage.value)
+
+    //Adding data to the top cow block
+    $('#tc-all-res').text(lastMonthData.length)
+    $('#tc-avg-res').text(milkAverage.value)
+
+    $('.mp-top-result').each(function () {
+      let index = parseFloat($(this).attr('id').split('-')[1]);
+      $(this).find('.mp-top-result-number').text(`#${lastMonthData[index].cowNumber}`);
+      $(this).find('.mp-top-result-name').text(`${lastMonthData[index].cowName}`);
+      $(this).find('.mp-top-result-result').text(`${lastMonthData[index].result}`);
+      $(this).find('img').attr('src', `/img/images/${lastMonthData[index].cowPhoto}`);
+    });
+
+    let lastRusMonth = moment(lastMonthData[0].date).lang('ru').format('MMMM YYYY');
+    lastRusMonth = lastRusMonth.charAt(0).toUpperCase() + lastRusMonth.slice(1);
+    $('.mp-top-results-sub-title').text(`Последние результаты добавлены ${lastRusMonth}`)
+
+    // Making milk result block work
+    $('.mp-mr-main-btn').on('click', function () {
+      let currentActive = $('.mp-mr-seconary-item-active')
+      if ($(this).attr('id') === 'prev-result') {
+        if (currentActive.prev().length === 0) {
+          currentActive.removeClass('mp-mr-seconary-item-active')
+          $('.mp-mr-seconary-item-last').addClass('mp-mr-seconary-item-active')
+        } else {
+          currentActive.removeClass('mp-mr-seconary-item-active')
+          currentActive.prev().addClass('mp-mr-seconary-item-active')
+        }
+      } else if ($(this).attr('id') === 'next-result') {
+        if (currentActive.next().length === 0) {
+          currentActive.removeClass('mp-mr-seconary-item-active')
+          $('.mp-mr-seconary-item-first').addClass('mp-mr-seconary-item-active')
+        } else {
+          currentActive.removeClass('mp-mr-seconary-item-active')
+          currentActive.next().addClass('mp-mr-seconary-item-active')
+        }
+      }
+
+      $('.mp-mr-main-number').text($('.mp-mr-seconary-item-active').find('.mp-mr-seconary-number').text())
+      $('.mp-mr-main-sub-text').text($('.mp-mr-seconary-item-active').find('.mp-mr-seconary-sub-text').text())
+    });
+
+    // Working with lists
+    $('.mpt-list-item-date').each(function () {
+      let date = $(this).attr('data-date');
+      let rusMonth = moment(date).lang('ru').format('MMMM');
+      rusMonth = rusMonth.charAt(0).toUpperCase() + rusMonth.slice(1);
+      $(this).text(`${moment(date).format('DD')} ${rusMonth}, ${moment(date).format('YYYY')}`)
+    });
+
+
+    let length;
+
+    length = $('#mp-soon-to-calv-list').find('.mpt-list-item').length
+    for (let i = 0; i < length; i++) {
+      $('#mp-soon-to-calv-list').find('.mpt-list-item').each(function () {
+        let number = parseFloat($(this).find('.mpt-list-item-day-text').text().split(' ')[0])
+        let prevNumber = parseFloat($(this).prev().find('.mpt-list-item-day-text').text().split(' ')[0]);
+
+        if (number < prevNumber) {
+          let element = $(this);
+          let prevElement = $(this).prev();
+
+          $(this).detach();
+          prevElement.before(element);
+        }
+      });
+    }
+
+    length = $('#mp-soon-to-insem-list').find('.mpt-list-item').length
+    for (let i = 0; i < length; i++) {
+      $('#mp-soon-to-insem-list').find('.mpt-list-item').each(function () {
+        let number = parseFloat($(this).find('.mpt-list-item-day-text').text().split(' ')[0])
+        let prevNumber = parseFloat($(this).prev().find('.mpt-list-item-day-text').text().split(' ')[0]);
+
+        if (number < prevNumber) {
+          let element = $(this);
+          let prevElement = $(this).prev();
+
+          $(this).detach();
+          prevElement.before(element);
+        }
+      });
     }
 
     /* Handling empty lists */
@@ -5729,11 +5399,103 @@ $(document).ready(async function () {
   ///////////////////////
   /* VET MAIN PAGE*/
   ///////////////////////
-  if (document.querySelector('#vet-main')) {
+  if (document.querySelector('#mp-vet-container')) {
     /* Show empty text if needed*/
     if (document.querySelector('.to-show-empty-block')) {
       $('.mp-empty-block').css('display', 'flex');
     }
+
+    /* Working with a calendar */
+    /* Working with a big calendar */
+    let selectedMonth = moment();
+    $('.mp-calendar-btn').on('click', async function () {
+      if ($(this).attr('data-state') !== 'first-click') {
+        if ($(this).attr('id') === 'prev-month') {
+          selectedMonth = moment(selectedMonth).subtract(1, 'months')
+        } else if ($(this).attr('id') === 'next-month') {
+          selectedMonth = moment(selectedMonth).add(1, 'months')
+        }
+      } else {
+        $(this).attr('data-state', 'not-first-click');
+      }
+
+
+      /* Set current month and year */
+      let curRusMonth = moment(selectedMonth).locale('ru').format('MMMM');
+      let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
+      const curYear = moment(selectedMonth).format('YYYY');
+      $('.mp-calendar-title-line p').text(`${rusMonth} ${curYear}`);
+
+      /* Clearing the calendar from previous month */
+      $('.mp-calendar-dates-column').each(function () { $(this).empty() });
+
+      /* Adding days of the month */
+      let daysInMonth = moment(selectedMonth).daysInMonth();
+      let daysBeforeMonth = moment(selectedMonth).date(1).day() === 0 ? 6 : moment(selectedMonth).date(1).day() - 1;
+      let daysAfterMonth = 7 - moment(selectedMonth).date(daysInMonth).day()
+      let totalDays = daysInMonth + daysBeforeMonth + daysAfterMonth;
+
+      let visCalStart = moment(selectedMonth).date(1 - daysBeforeMonth);
+
+      for (let i = 0; i < totalDays; i++) {
+        let date = moment(visCalStart).add(i, 'days');
+        let monthDay = moment(date).date();
+        let weekDay = moment(date).day();
+
+        let otherMonth = moment(date).month() !== moment(selectedMonth).month() ? 'mp-calendar-other' : '';
+        //let pastDay = moment(date) < moment() ? 'bc-date-past' : '';
+
+        let isToday = date.startOf('day').isSame(moment().startOf('day')) ? 'mp-calendar-today' : '';
+
+        $(`#mp-calendar-column-${weekDay}`).append(`
+        <div class="mp-calendar-date ${otherMonth} ${isToday}" data-date="${new Date(date)}">${monthDay}</div>
+      `)
+      }
+
+      let allDates = $('.mp-calendar-date');
+      let from = new Date(moment($(allDates[0]).attr('data-date')).startOf('day'));
+      let to = new Date(moment($(allDates[allDates.length - 1]).attr('data-date')).endOf('day'));
+
+      const reminders = await getModuleAndPeriod('vet', from, to);
+      console.log(from, to, reminders);
+
+      let allActions = [...reminders];
+      allActions.sort((a, b) => a.date - b.date);
+
+      /* Adding quick info about each day reminders */
+      $('.mp-calendar-date').each(async function () {
+        const date = moment($(this).attr('data-date'));
+
+        let start = new Date(date.startOf('day'));
+        let end = new Date(date.endOf('day'));
+
+        let dayActions = [];
+        allActions.forEach((action) => {
+          let actionDate = new Date(action.date);
+          if (start <= actionDate && actionDate <= end) {
+            dayActions.push(action)
+          }
+        });
+
+
+        if (dayActions.length > 0) {
+          $(this).addClass('mp-calendar-full')
+          dayActions.forEach(action => {
+            $(this).append(`
+            <div class="mp-calendar-quick">
+              <div class="mp-calendar-quick-time">${moment(action.date).format('HH:mm')}</div>
+              <div class="mp-calendar-quick-title">${action.name}</div>
+            </div>
+          `);
+          });
+
+        }
+
+      });
+
+    });
+
+    $('#prev-month').trigger('click');
 
     /* Working with a history block */
     /* Sorting elements by date */
@@ -5767,19 +5529,7 @@ $(document).ready(async function () {
       }
     });
 
-    /* Adding colors to scheme items */
-    $('.mp-scheme-item').each(function () {
-      if ($(this).prev()) {
-        if ($(this).prev().css('background-color') === 'rgba(41, 112, 69, 0.25)') {
-          $(this).css('background-color', 'rgb(133, 199, 242, 0.25)');
-        } else if ($(this).prev().css('background-color') === 'rgba(133, 199, 242, 0.25)') {
-          $(this).css('background-color', 'rgb(246, 185, 29, 0.25)');
-        } else if ($(this).prev().css('background-color') === 'rgba(246, 185, 29, 0.25)') {
-          $(this).css('background-color', 'rgb(41, 112, 69, 0.25)');
-        }
-      }
 
-    });
 
     /* Working with scheme block */
     $('.mp-scheme-points-block').each(function () {
@@ -5800,53 +5550,8 @@ $(document).ready(async function () {
           }
         });
       });
-
-      /* Hiding all elements except one */
-      let foundEl = false;
-      let allPoints = $(this).find('.mp-scheme-point');
-      let lastPoint = allPoints[allPoints.length - 1];
-      $(this).find('.mp-scheme-point').hide();
-      if ($(lastPoint).attr('data-finished') === 'true') {
-        $(lastPoint).css('display', 'flex');
-        $(lastPoint).attr('data-hide', 'false')
-      } else {
-        allPoints.each(function () {
-          if ($(this).attr('data-finished') === 'false') {
-            if (!foundEl) {
-              $(this).css('display', 'flex')
-              $(this).attr('data-hide', 'false')
-              foundEl = true;
-            }
-          }
-        });
-      }
     });
 
-    /* Showing and hiding rest of the points on click */
-    $('.mp-scheme-points-more').click(function () {
-      let pointsBlock = $(this).parent().find('.mp-scheme-points-block');
-      if ($(this).attr('data-state') === 'to-show') {
-        $(this).find('p').text('Скрыть')
-        $(this).find('ion-icon').css('transform', 'rotate(180deg)');
-        $(this).attr('data-state', 'to-hide');
-
-        pointsBlock.find('.mp-scheme-point').each(function () {
-          if ($(this).attr('data-hide') !== 'false') {
-            $(this).css('display', 'flex');
-          }
-        });
-      } else {
-        $(this).find('p').text('Показать еще');
-        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
-        $(this).attr('data-state', 'to-show');
-
-        pointsBlock.find('.mp-scheme-point').each(function () {
-          if ($(this).attr('data-hide') !== 'false') {
-            $(this).hide();
-          }
-        });
-      }
-    });
 
     /* Working with problems and treatments */
     $('.mp-problem-treatments-block').each(function () {
@@ -5868,39 +5573,6 @@ $(document).ready(async function () {
         });
       });
 
-      /* Hiding all elements except one */
-      let foundEl = false;
-      let allPoints = $(this).find('.mp-problem-treatment');
-      let lastPoint = allPoints[allPoints.length - 1];
-      $(this).find('.mp-problem-treatment').hide();
-      $(lastPoint).css('display', 'flex');
-      $(lastPoint).attr('data-hide', 'false')
-    });
-
-    /* Showing and hiding rest of the points on click */
-    $('.mp-problem-treatment-more').click(function () {
-      let pointsBlock = $(this).parent().find('.mp-problem-treatments-block');
-      if ($(this).attr('data-state') === 'to-show') {
-        $(this).find('p').text('Скрыть')
-        $(this).find('ion-icon').css('transform', 'rotate(180deg)');
-        $(this).attr('data-state', 'to-hide');
-
-        pointsBlock.find('.mp-problem-treatment').each(function () {
-          if ($(this).attr('data-hide') !== 'false') {
-            $(this).css('display', 'flex');
-          }
-        });
-      } else {
-        $(this).find('p').text('Показать еще');
-        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
-        $(this).attr('data-state', 'to-show');
-
-        pointsBlock.find('.mp-problem-treatment').each(function () {
-          if ($(this).attr('data-hide') !== 'false') {
-            $(this).hide();
-          }
-        });
-      }
     });
 
 

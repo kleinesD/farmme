@@ -210,173 +210,304 @@ export class multiLinearChart {
 
 export const renderGraph = (container, parameters) => {
   const graph = {};
+  const datasets = parameters.datasets;
 
-  /* Prepare SVG (re-size, add class) */
-  graph.buffContainer = document.createElement('div');
-  graph.buffContainer.classList.add('basic-graph-container')
-  graph.svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-  graph.svg.classList.add('basic-graph');
-  graph.svg.setAttribute('id', 'generated-graph');
+  /* Creating an inside function to re-create graph on re-size */
+  let rendering = () => {
+    $('.basic-graph-container').remove();
 
-  container.append(graph.buffContainer);
-  graph.buffContainer.append(graph.svg);
+    /* Prepare SVG (re-size, add class) */
+    graph.buffContainer = document.createElement('div');
+    graph.buffContainer.classList.add('basic-graph-container')
+    graph.svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+    graph.svg.classList.add('basic-graph');
+    graph.svg.setAttribute('id', 'generated-graph');
 
-  graph.width = graph.buffContainer.parentElement.offsetWidth;
-  graph.height = Math.round(graph.buffContainer.parentElement.offsetWidth / 1.75);
+    container.append(graph.buffContainer);
+    graph.buffContainer.append(graph.svg);
 
-  graph.buffContainer.style.width = graph.width;
-  graph.buffContainer.style.height = graph.height;
+    graph.width = graph.buffContainer.parentElement.offsetWidth;
+    if (parameters.graphSettings.boxHeight) {
+      graph.height = Math.round(graph.buffContainer.parentElement.offsetHeight);
+    } else {
+      graph.height = Math.round(graph.buffContainer.parentElement.offsetWidth / (1 + parameters.graphSettings.heightRatio));
+    }
 
-  graph.svg.style.width = graph.width;
-  graph.svg.style.height = graph.height;
+    graph.buffContainer.style.width = graph.width;
+    graph.buffContainer.style.height = graph.height;
 
-  const daysSpan = Math.round((parameters.graphSettings.finishDate.getTime() - parameters.graphSettings.startDate.getTime()) / 1000 / 60 / 60 / 24);
+    graph.svg.style.width = graph.width;
+    graph.svg.style.height = graph.height;
 
-
-  /* Adding grid lines */
-  let gapX = Math.round(graph.height / 10);
-  let gapY = Math.round(graph.width / 12);
-
-  for (let i = 1; i < 10; i++) {
-    let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-    path.classList.add('line-graph-grid-line');
-    path.setAttribute('d', `M 0 ${i * gapX} L ${graph.width} ${i * gapX}`)
-    graph.svg.append(path);
-  }
-  for (let i = 1; i < 12; i++) {
-    let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-    path.classList.add('line-graph-grid-line');
-    path.setAttribute('d', `M ${i * gapY} 0 L ${i * gapY} ${graph.height}`)
-    graph.svg.append(path);
-  }
+    const daysSpan = Math.round((parameters.graphSettings.finishDate.getTime() - parameters.graphSettings.startDate.getTime()) / 1000 / 60 / 60 / 24);
 
 
-  /* Working with each dataset */
-  parameters.datasets.forEach((dataset, datasetIndex) => {
-    /* If average and allowed adding all results dots */
-    if (dataset.averageGraph && dataset.showAllResults) {
-      dataset.data.forEach(data => {
-        data.results.forEach(result => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
+    /* Adding grid lines */
+    let gapX = Math.round(graph.height / 10);
+    let gapY = Math.round(graph.width / 12);
 
-          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan));
-          circle.setAttribute('cy', graph.height - (result.number * (graph.height / parameters.graphSettings.max)));
-          circle.setAttribute('r', 3);
-          circle.setAttribute('fill', dataset.pointColor);
-          graph.svg.append(circle);
-        });
-      });
+    for (let i = 1; i < 10; i++) {
+      let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+      path.classList.add('line-graph-grid-line');
+      path.setAttribute('d', `M 0 ${i * gapX} L ${graph.width} ${i * gapX}`)
+      graph.svg.append(path);
+    }
+    for (let i = 1; i < 12; i++) {
+      let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+      path.classList.add('line-graph-grid-line');
+      path.setAttribute('d', `M ${i * gapY} 0 L ${i * gapY} ${graph.height}`)
+      graph.svg.append(path);
     }
 
 
+    /* Working with each dataset */
+    datasets.forEach((dataset, datasetIndex) => {
+      /* If average and allowed adding all results dots */
+      if (dataset.averageGraph && dataset.showAllResults) {
+        dataset.data.forEach(data => {
+          data.results.forEach(result => {
+            let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
 
-    dataset.data.forEach((data, index) => {
-      let daysInPeriod = Math.round((new Date(data.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
+            var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan));
+            circle.setAttribute('cy', graph.height - (result.number * (graph.height / parameters.graphSettings.max)));
+            circle.setAttribute('r', 3);
+            circle.setAttribute('fill', dataset.pointColor);
+            graph.svg.append(circle);
+          });
+        });
+      }
 
-      /* Adding line if allowed */
-      if (dataset.showLine) {
-        if (index === 0) {
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          /* path.classList.add('mp-line-graph-average-line'); */
-          path.setAttribute('d', `M ${daysInPeriod * ((graph.width - 60) / daysSpan) + 30} ${graph.height - (data.number * (graph.height / parameters.graphSettings.max))}`)
-          path.setAttribute('id', `graph-line-${datasetIndex}`);
-          path.setAttribute('fill', 'transparent');
-          path.setAttribute('stroke', dataset.lineColor);
-          path.setAttribute('stroke-width', '3px');
-          path.setAttribute('stroke-linejoin', 'round');
-          graph.svg.append(path);
-        } else {
-          let path = document.getElementById(`graph-line-${datasetIndex}`);
-          path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((graph.width - 60) / daysSpan) + 30} ${graph.height - (data.number * (graph.height / parameters.graphSettings.max))}`)
+
+
+      dataset.data.forEach((data, index) => {
+        let daysInPeriod = Math.round((new Date(data.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
+
+        /* Adding line if allowed */
+        if (dataset.showLine) {
+          if (index === 0) {
+            let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+            /* path.classList.add('mp-line-graph-average-line'); */
+            path.setAttribute('d', `M ${daysInPeriod * ((graph.width - 60) / daysSpan) + 30} ${graph.height - (data.number * (graph.height / parameters.graphSettings.max))}`)
+            path.setAttribute('id', `graph-line-${datasetIndex}`);
+            path.setAttribute('fill', 'transparent');
+            path.setAttribute('stroke', dataset.lineColor);
+            path.setAttribute('stroke-width', '3px');
+            path.setAttribute('stroke-linejoin', 'round');
+            graph.svg.append(path);
+          } else {
+            let path = document.getElementById(`graph-line-${datasetIndex}`);
+            path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((graph.width - 60) / daysSpan) + 30} ${graph.height - (data.number * (graph.height / parameters.graphSettings.max))}`)
+          }
         }
-      }
 
-      /* Adding points if allowed */
-      if (dataset.showPoint) {
-        var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-        circle.classList.add(`graph-circle-${datasetIndex}`)
-        circle.setAttribute('data-average', data.number);
-        circle.setAttribute('data-date', data.date);
-        circle.setAttribute('data-amount', data.results.length);
-        circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan) + 30);
-        circle.setAttribute('cy', graph.height - (data.number * (graph.height / parameters.graphSettings.max)));
-        circle.setAttribute('r', 4);
-        circle.setAttribute('fill', '#ffffff');
-        circle.setAttribute('stroke', dataset.pointColor);
-        circle.setAttribute('stroke-width', '2px');
-        graph.svg.append(circle);
-      }
+        /* Adding points if allowed */
+        if (dataset.showPoint) {
+          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+          circle.classList.add(`graph-circle-${datasetIndex}`)
+          circle.setAttribute('data-average', data.number);
+          circle.setAttribute('data-date', data.date);
+          circle.setAttribute('data-amount', data.results.length);
+          circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan) + 30);
+          circle.setAttribute('cy', graph.height - (data.number * (graph.height / parameters.graphSettings.max)));
+          circle.setAttribute('r', 4);
+          circle.setAttribute('fill', '#ffffff');
+          circle.setAttribute('stroke', dataset.pointColor);
+          circle.setAttribute('stroke-width', '2px');
+          graph.svg.append(circle);
+        }
+
+      });
 
     });
 
-  });
+    /* Adding legend */
+    if (parameters.graphSettings.showLegend) {
+      const legendElement = document.createElement('div');
+      legendElement.classList.add('basic-graphs-legend');
+      graph.buffContainer.append(legendElement);
 
-  /* Adding legend */
-  if (parameters.graphSettings.showLegend) {
-    const legendElement = document.createElement('div');
-    legendElement.classList.add('basic-graphs-legend');
-    graph.buffContainer.append(legendElement);
-
-    parameters.datasets.forEach((dataset, datasetIndex) => {
-      const legendItem = document.createElement('div');
-      legendItem.classList.add('basic-graphs-legend-item');
-      legendItem.setAttribute('id', `graph-legend-${datasetIndex}`)
-      legendItem.innerHTML += `
+      datasets.forEach((dataset, datasetIndex) => {
+        const legendItem = document.createElement('div');
+        legendItem.classList.add('basic-graphs-legend-item');
+        legendItem.setAttribute('id', `graph-legend-${datasetIndex}`)
+        legendItem.innerHTML += `
           <div class="basic-graphs-legend-item-line">
             <div class="basic-graphs-legend-item-line-point"></div>
           </div>
           <div class="basic-graphs-legend-item-text">${dataset.legendName}</div>
         `
-      legendElement.append(legendItem);
-      if (dataset.showLine) {
-        legendElement.getElementsByClassName('basic-graphs-legend-item-line')[0].style.borderTop = `2px solid ${dataset.lineColor}`;
-      }
-      if (dataset.showPoint) {
-        legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.borderColor = dataset.pointColor;
-        legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.backgroundColor = '#ffffff';
+        legendElement.append(legendItem);
+        if (dataset.showLine) {
+          legendElement.getElementsByClassName('basic-graphs-legend-item-line')[0].style.borderTop = `2px solid ${dataset.lineColor}`;
+        }
+        if (dataset.showPoint) {
+          legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.borderColor = dataset.pointColor;
+          legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.backgroundColor = '#ffffff';
+        }
+      });
+
+      /* Changing size and position of the legend */
+      /* legendElement.style.width = `${graph.width}px`;
+      legendElement.style.left = `${graph.svg.getBoundingClientRect().left}px`;
+      legendElement.style.top = `${graph.svg.getBoundingClientRect().top + graph.height - legendElement.offsetHeight}px`; */
+
+    }
+
+    /* Making legend works */
+    /* Clean. Preventing double clicks */
+    $('.basic-graphs-legend-item').off('click');
+
+    $('.basic-graphs-legend-item').click(function () {
+      let lineId = $(this).attr('id').replace('legend', 'line');
+      let circleClass = $(this).attr('id').replace('legend', 'circle');
+      if ($(this).attr('data-vis') === 'false') {
+        $(this).attr('data-vis', 'true');
+        $(`#${lineId}`).css('opacity', '1');
+        $(`.${circleClass}`).css('opacity', '1');
+        $(this).removeClass('basic-graphs-legend-item-off');
+      } else {
+        $(this).attr('data-vis', 'false');
+        $(`#${lineId}`).css('opacity', '0');
+        $(`.${circleClass}`).css('opacity', '0');
+        $(this).addClass('basic-graphs-legend-item-off');
       }
     });
 
-    /* Changing size and position of the legend */
-    /* legendElement.style.width = `${graph.width}px`;
-    legendElement.style.left = `${graph.svg.getBoundingClientRect().left}px`;
-    legendElement.style.top = `${graph.svg.getBoundingClientRect().top + graph.height - legendElement.offsetHeight}px`; */
-
+    /* Returning graph container */
+    return graph.buffContainer;
   }
 
-  /* Making legend works */
-  /* Clean. Preventing double clicks */
-  $('.basic-graphs-legend-item').off('click');
-
-  $('.basic-graphs-legend-item').click(function () {
-    let lineId = $(this).attr('id').replace('legend', 'line');
-    let circleClass = $(this).attr('id').replace('legend', 'circle');
-    if ($(this).attr('data-vis') === 'false') {
-      $(this).attr('data-vis', 'true');
-      $(`#${lineId}`).css('opacity', '1');
-      $(`.${circleClass}`).css('opacity', '1');
-      $(this).removeClass('basic-graphs-legend-item-off');
-    } else {
-      $(this).attr('data-vis', 'false');
-      $(`#${lineId}`).css('opacity', '0');
-      $(`.${circleClass}`).css('opacity', '0');
-      $(this).addClass('basic-graphs-legend-item-off');
-    }
-  });
 
   /* Resizing graph on window resize */
   /* Clean. */
   $(window).off('resize');
 
-  $(window).resize(function () {
-    const width = graph.svg.parentElement.offsetWidth;
-    const height = Math.round(graph.parentElement.offsetWidth / 1.75);
+  $(window).on('resize', function () {
+    /* const width = graph.buffContainer.parentElement.offsetWidth;
+    let height;
+    if (parameters.graphSettings.boxHeight) {
+      height = Math.round(graph.buffContainer.parentElement.offsetHeight);
+    } else {
+      height = Math.round(graph.buffContainer.parentElement.offsetWidth / (1 + parameters.graphSettings.heightRatio));
+    }
 
     graph.width = width;
     graph.height = height;
 
     graph.svg.style.width = width;
-    graph.svg.style.height = height;
+    graph.svg.style.height = height; */
+
+    rendering()
   });
+  $(window).trigger('resize');
 }
+
+
+
+
+
+/* TOOLTIPS TO ADD LATER */
+/* Tooltips */
+/* const graphEl = document.querySelector('#mp-graph');
+let prevDataPointDate = new Date();
+graphEl.addEventListener('mousemove', ({ clientX, clientY }) => {
+  let point = graphEl.createSVGPoint();
+  point.x = clientX;
+  point.y = clientY;
+  point = point.matrixTransform(graphEl.getScreenCTM().inverse());
+
+  let currentPoint = { dataPoints: [], diff: 0 };
+
+  $('.line-graph-data-circle').each(function () {
+    if (parseFloat($(this).css('opacity')) !== 0) {
+      const dataPointX = parseFloat($(this).attr('cx'));
+
+      let diff = Math.abs(dataPointX - point.x);
+
+      if (currentPoint.dataPoints.length === 0 || currentPoint.diff > diff) {
+        currentPoint.dataPoints = [];
+        currentPoint.dataPoints.push($(this));
+        currentPoint.diff = diff;
+      } else if (currentPoint.dataPoints.length > 0 && currentPoint.diff === diff) {
+        currentPoint.dataPoints.push($(this));
+      }
+    }
+  });
+
+  if (prevDataPointDate.getTime() !== new Date($(currentPoint.dataPoints[0]).attr('data-date')).getTime()) {
+    prevDataPointDate = new Date($(currentPoint.dataPoints[0]).attr('data-date'))
+
+    //Showing what points being selected
+    $('.line-graph-data-circle').attr('r', 2);
+    currentPoint.dataPoints.forEach(dataPoint => {
+      $(dataPoint).attr('r', 3);
+    });
+
+    //Adding a tooltip box
+    $('.mp-tooltip-box').remove();
+    $('.mp-animal-graph-container').prepend(`
+  <div class="mp-tooltip-box">
+  <div class="mp-tooltip-title">${moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').charAt(0).toUpperCase() + moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').slice(1)}</div>
+  <div class="mp-tooltip-info-line">
+    <div class="mp-tooltip-info">Результатов:</div>
+    <div class="mp-tooltip-info">${$(currentPoint.dataPoints[0]).attr('data-amount') === 'none' ? '&dash;' : $(currentPoint.dataPoints[0]).attr('data-amount')}</div>
+  </div>
+  <div class="mp-tooltip-devider"></div>
+</div>
+  `);
+
+    currentPoint.dataPoints.forEach(dataPoint => {
+      if ($('#mp-graph').attr('data-graph-name') === 'milk-average') {
+        $('.mp-tooltip-box').append(`
+        <div class="mp-tooltip-result-line" >
+          <div class="mp-tooltip-marker" style="background-color: ${$(dataPoint).css('stroke')};"></div>
+          <div class="mp-tooltip-result-info">Сред. результат</div>
+          <div class="mp-tooltip-result">${$(dataPoint).attr('data-average')} л.</div>
+        </div>
+      `);
+      } else if ($('#mp-graph').attr('data-graph-name') === 'milk-total') {
+        $('.mp-tooltip-box').append(`
+        <div class="mp-tooltip-result-line" >
+          <div class="mp-tooltip-marker" style="background-color: ${$(dataPoint).css('stroke')};"></div>
+          <div class="mp-tooltip-result-info">Всего молока</div>
+          <div class="mp-tooltip-result">${$(dataPoint).attr('data-total')} л.</div>
+        </div>
+      `);
+      } else if ($('#mp-graph').attr('data-graph-name') === 'milk-lact') {
+        $('.mp-tooltip-box').append(`
+        <div class="mp-tooltip-result-line" >
+          <div class="mp-tooltip-marker" style="background-color: ${$(dataPoint).css('stroke')};"></div>
+          <div class="mp-tooltip-result-info">Лактация #${$(dataPoint).attr('data-lact')}</div>
+          <div class="mp-tooltip-result">${$(dataPoint).attr('data-average')} л.</div>
+        </div>
+      `);
+      }
+
+    });
+
+    //Changing the position of a tooltip
+    let pointX = parseFloat($(currentPoint.dataPoints[0]).attr('cx'));
+    let pointY = parseFloat($(currentPoint.dataPoints[0]).attr('cy'));
+
+    let posTop = $(currentPoint.dataPoints[0]).position().top;
+    let posLeft = $(currentPoint.dataPoints[0]).position().left - 50;
+    let transform = 'translateY(-50%)';
+
+    if (pointX + $('.mp-tooltip-box').width() > $('#mp-graph').width()) {
+      posLeft = $(currentPoint.dataPoints[0]).position().left - 130 - $('.mp-tooltip-box').width();
+    }
+    if (pointY + $('.mp-tooltip-box').height() / 2 > $('#mp-graph').height()) {
+      transform = 'translateY(-150%)'
+    }
+    if (pointY - $('.mp-tooltip-box').height() / 2 < 0) {
+      transform = 'unset'
+    }
+    $('.mp-tooltip-box').css({
+      'top': posTop,
+      'left': posLeft,
+      'transform': transform
+    });
+  }
+
+}) */
