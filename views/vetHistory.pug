@@ -4,7 +4,7 @@ block content
   .menu-ref(data-block="vet-block" data-page="vet-history" data-sub="")
 
   section.main-section 
-    .all-animals-container
+    .all-animals-container#vet-history-container
       .all-animals-search 
         ion-icon(name="search-outline")
         input#vet-history-search(type="text" placeholder="Поиск по названию")
@@ -18,9 +18,6 @@ block content
         .vh-category.vh-category-treatment.vh-category-active#treatment  
           ion-icon(name="bandage")
           p Лечения
-        .vh-category.vh-category-schedule.vh-category-active#scheduled  
-          ion-icon(name="calendar")
-          p Напоминания
       
       .vet-history-searched
 
@@ -45,13 +42,6 @@ block content
           .vet-history-item.vet-history-treatment(data-date=`${doc.date}`)
             .vet-history-icon
               ion-icon(name="bandage")
-            .vet-history-title= doc.name
-            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
-
-        each doc in scheduled
-          .vet-history-item.vet-history-scheduled(data-date=`${doc.date}`)
-            .vet-history-icon
-              ion-icon(name="calendar")
             .vet-history-title= doc.name
             .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
       

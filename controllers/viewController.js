@@ -435,21 +435,6 @@ exports.renderEditScheme = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderVetHistory = catchAsync(async (req, res, next) => {
-  let actions = await Vet.find({ farm: req.user.farm, category: 'action', scheduled: false });
-  let problems = await Vet.find({ farm: req.user.farm, category: 'problem', scheduled: false });
-  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment', scheduled: false });
-  let scheduled = await Vet.find({ farm: req.user.farm, scheduled: true });
-  
-  
-  res.status(200).render('vetHistory', {
-    actions,
-    problems,
-    treatments,
-    scheduled
-  });
-});
-
 exports.renderVetMain = catchAsync(async (req, res, next) => {
   let actions = await Vet.find({ farm: req.user.farm, category: 'action'});
   let problems = await Vet.find({ farm: req.user.farm, category: 'problem'});
@@ -464,6 +449,19 @@ exports.renderVetMain = catchAsync(async (req, res, next) => {
     treatments,
     schemes,
     uncuredProblems
+  });
+});
+
+exports.renderVetHistory = catchAsync(async (req, res, next) => {
+  let actions = await Vet.find({ farm: req.user.farm, category: 'action', scheduled: false });
+  let problems = await Vet.find({ farm: req.user.farm, category: 'problem', scheduled: false });
+  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment', scheduled: false });
+  
+  
+  res.status(200).render('vetHistory', {
+    actions,
+    problems,
+    treatments
   });
 });
 /////////////////

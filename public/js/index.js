@@ -5457,7 +5457,6 @@ $(document).ready(async function () {
       let to = new Date(moment($(allDates[allDates.length - 1]).attr('data-date')).endOf('day'));
 
       const reminders = await getModuleAndPeriod('vet', from, to);
-      console.log(from, to, reminders);
 
       let allActions = [...reminders];
       allActions.sort((a, b) => a.date - b.date);
@@ -5499,11 +5498,11 @@ $(document).ready(async function () {
 
     /* Working with a history block */
     /* Sorting elements by date */
-    $('.aai-item').each(function () {
+    $('.mp-history-item').each(function () {
       let thisEl = $(this);
       let thisDate = new Date($(this).attr('data-date'));
 
-      $('.aai-item').each(function () {
+      $('.mp-history-item').each(function () {
         let curDate = new Date($(this).attr('data-date'));
 
         if (thisDate < curDate) {
@@ -5514,12 +5513,12 @@ $(document).ready(async function () {
       });
     });
 
-    $('.aai-type-selector').change(function () {
+    $('.mph-type-selector').on('change', function () {
       let value = $(this).val()
       if (value === 'all') {
-        $('.aai-item').css('display', 'flex');
+        $('.mp-history-item').css('display', 'flex');
       } else {
-        $('.aai-item').each(function () {
+        $('.mp-history-item').each(function () {
           if ($(this).attr('data-type') === value) {
             $(this).css('display', 'flex');
           } else {
@@ -5529,11 +5528,53 @@ $(document).ready(async function () {
       }
     });
 
+    $('.mp-scheme-i').each(function () {
+      let thisEl = $(this);
+      let thisDate = new Date($(this).attr('data-date'));
+
+      $('.mp-scheme-i').each(function () {
+        let curDate = new Date($(this).attr('data-date'));
+
+        if (thisDate < curDate) {
+          let moveEl = thisEl;
+          thisEl.detach();
+          $(this).after(moveEl);
+        }
+      });
+    });
+
+    $('.mp-problem-i').each(function () {
+      let thisEl = $(this);
+      let thisDate = new Date($(this).attr('data-date'));
+
+      $('.mp-problem-i').each(function () {
+        let curDate = new Date($(this).attr('data-date'));
+
+        if (thisDate < curDate) {
+          let moveEl = thisEl;
+          thisEl.detach();
+          $(this).after(moveEl);
+        }
+      });
+    });
+
+    $('.mp-scheme-item').on('click', function() {
+      if($(this).find('.mp-scheme-points-block').css('display') === 'none') {
+        $(this).find('.mp-scheme-points-block').show()
+        $(this).find('.mp-scheme-icon').css('transform', 'rotate(180deg)');
+      } else {
+        $(this).find('.mp-scheme-points-block').hide()
+        $(this).find('.mp-scheme-icon').css('transform', 'rotate(0deg)');
+      }
+    });
+
+
+
 
 
     /* Working with scheme block */
-    $('.mp-scheme-points-block').each(function () {
-      /* Sorting elements in scheme points blocks */
+    /* $('.mp-scheme-points-block').each(function () {
+      //Sorting elements in scheme points blocks
       let parentEl = $(this);
 
       $(this).find('.mp-scheme-point').each(function () {
@@ -5550,12 +5591,12 @@ $(document).ready(async function () {
           }
         });
       });
-    });
+    }); */
 
 
     /* Working with problems and treatments */
-    $('.mp-problem-treatments-block').each(function () {
-      /* Sorting elements in scheme points blocks */
+    /* $('.mp-problem-treatments-block').each(function () {
+      //Sorting elements in scheme points blocks
       let parentEl = $(this);
 
       $(this).find('.mp-problem-treatment').each(function () {
@@ -5573,7 +5614,7 @@ $(document).ready(async function () {
         });
       });
 
-    });
+    }); */
 
 
   }

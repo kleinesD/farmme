@@ -89,9 +89,9 @@ router.get('/vet/edit-started-scheme/:firstSchemeAction', authController.protect
 
 router.get('/vet/edit-scheme/:schemeId', authController.protect, authController.isLoggedIn, viewController.renderEditScheme)
 
-router.get('/vet/history', authController.protect, authController.isLoggedIn, viewController.renderVetHistory);
-
 router.get('/vet/', authController.protect, authController.isLoggedIn, viewController.renderVetMain);
+
+router.get('/vet/history', authController.protect, authController.isLoggedIn, viewController.renderVetHistory);
 
 ///////////////////////////
 ///////////////////////////

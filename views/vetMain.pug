@@ -101,7 +101,7 @@ block content
             .mp-schemes-block-header Текущие схемы
             .mp-schemes-container
               each scheme in schemes 
-                .mp-scheme-item
+                .mp-scheme-item.mp-scheme-i(data-date=`${scheme.date}`)
                   .mp-scheme-item-header
                     img(src='/img/images/default-cow-image.png')
                     p= `#${scheme.animal.number}`
@@ -133,7 +133,7 @@ block content
             .mp-schemes-block-header Невылеченные пробемы
             .mp-schemes-container
               each problem in uncuredProblems
-                .mp-scheme-item
+                .mp-scheme-item.mp-problem-i(data-date=`${problem.date}`)
                   .mp-scheme-item-header
                     img(src='/img/images/default-cow-image.png')
                     p= `#${problem.animal.number}`

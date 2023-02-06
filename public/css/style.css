@@ -5575,28 +5575,30 @@ ion-icon {
   cursor: pointer;
   margin: 0 10px;
   background-color: #ffffff;
-  border-color: #297045;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.vh-category-active {
-  background-color: #297045;
+#vet-history-container .vh-category {
+  border-color: #5E72E8;
+}
+#vet-history-container .vh-category-active {
+  background-color: #5E72E8;
 }
 
-.vh-category ion-icon {
+#vet-history-container .vh-category ion-icon {
   margin-right: 10px;
-  color: #297045;
+  color: #5E72E8;
 }
 
-.vh-category p {
+#vet-history-container .vh-category p {
   font-size: 90%;
-  color: #297045;
+  color: #5E72E8;
 }
 
-.vh-category-active ion-icon,
-.vh-category-active p {
+#vet-history-containe .vh-category-active ion-icon,
+#vet-history-containe .vh-category-active p {
   color: #ffffff;
 }
 
