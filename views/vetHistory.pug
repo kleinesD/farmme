@@ -7,44 +7,64 @@ block content
     .all-animals-container#vet-history-container
       .all-animals-search 
         ion-icon(name="search-outline")
-        input#vet-history-search(type="text" placeholder="Поиск по названию")
-      .vet-history-categories-block
-        .vh-category.vh-category-action.vh-category-active#action 
+        input#history-page-search(type="text" placeholder="Поиск по названию")
+      .history-page-categories-block
+        .hp-category.hp-category-action.hp-category-active#action 
           ion-icon(name="medical")
           p Действия
-        .vh-category.vh-category-problem.vh-category-active#problem
+        .hp-category.hp-category-problem.hp-category-active#problem
           ion-icon(name="thermometer")
           p Проблемы
-        .vh-category.vh-category-treatment.vh-category-active#treatment  
+        .hp-category.hp-category-treatment.hp-category-active#treatment  
           ion-icon(name="bandage")
           p Лечения
       
-      .vet-history-searched
+      .history-page-searched
 
-      .vet-history-container
-        //-.vet-history-month Январь, 2022
+      .history-page-container
+        //-.history-page-month Январь, 2022
 
         each doc in actions
-          .vet-history-item.vet-history-action(data-date=`${doc.date}`)
-            .vet-history-icon
-              ion-icon(name="medical")
-            .vet-history-title= doc.name
-            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+          .history-page-item-outter.history-page-action(data-date=`${doc.date}` data-doc-type=`action` data-doc-id=`${doc._id}`)
+            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-action/${doc._id}`)
+              .history-page-icon
+                ion-icon(name="medical")
+              .history-page-title= doc.name
+              .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
 
         each doc in problems
-          .vet-history-item.vet-history-problem(data-date=`${doc.date}`)
-            .vet-history-icon
-              ion-icon(name="thermometer")
-            .vet-history-title= doc.name
-            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+          .history-page-item-outter.history-page-problem(data-date=`${doc.date}` data-doc-type=`problem` data-doc-id=`${doc._id}`)
+            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-problem/${doc._id}`)
+              .history-page-icon
+                ion-icon(name="thermometer")
+              .history-page-title= doc.name
+              .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
 
         each doc in treatments
-          .vet-history-item.vet-history-treatment(data-date=`${doc.date}`)
-            .vet-history-icon
-              ion-icon(name="bandage")
-            .vet-history-title= doc.name
-            .vet-history-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}/${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
-      
+          .history-page-item-outter.history-page-treatment(data-date=`${doc.date}` data-doc-type=`treatment` data-doc-id=`${doc._id}`)
+            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-treatment/${doc._id}`)
+              .history-page-icon
+                ion-icon(name="bandage")
+              .history-page-title= doc.name
+              .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
           
 
 

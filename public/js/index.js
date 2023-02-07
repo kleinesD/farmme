@@ -7,7 +7,7 @@ import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
 import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal } from './animalHandler';
-import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetSchedule, addVetScheme, getSchedulePeriod, startVetScheme, editStartedVetScheme, editVetScheme } from './vetHandler';
+import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteRemninder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout } from './authHandler';
@@ -5202,16 +5202,16 @@ $(document).ready(async function () {
   ///////////////////////
   /* VET HISTORY PAGE */
   ///////////////////////
-  if (document.querySelector('.vet-history-container')) {
+  if (document.querySelector('#vet-history-container')) {
     const defineMonthsText = () => {
-      $('.vh-month-before-el').removeClass('vh-month-before-el');
-      $('.vet-history-month').remove();
+      $('.hp-month-before-el').removeClass('hp-month-before-el');
+      $('.history-page-month').remove();
 
-      $('.vet-history-item').each(function () {
+      $('.history-page-item-outter').each(function () {
         let date = new Date($(this).attr('data-date'));
         let el = $(this);
 
-        $('.vet-history-item').each(function () {
+        $('.history-page-item-outter').each(function () {
           let elDate = new Date($(this).attr('data-date'));
 
           if (date < elDate) {
@@ -5220,60 +5220,89 @@ $(document).ready(async function () {
         });
       });
 
-      $('.vet-history-item').each(function () {
+      $('.history-page-item-outter').each(function () {
+        let date = $(this).attr('data-date');
+        let curRusMonth = moment(date).locale('ru').format('MMMM');
+        let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
+        let curDay = moment(date).format('DD');
+        $(this).find('.history-page-date').text(`${rusMonth}, ${curDay}`)
         if ($(this).css('display') !== 'none') {
           if (!$(this).prev() || $(this).prev().css('display') === 'none' || moment(new Date($(this).attr('data-date'))).month() !== moment(new Date($(this).prev().attr('data-date'))).month()) {
-            $(this).addClass('vh-month-before-el');
+            $(this).addClass('hp-month-before-el');
           }
         }
       });
 
-      $('.vh-month-before-el').each(function () {
+      $('.hp-month-before-el').each(function () {
         let date = new Date($(this).attr('data-date'));
         let curRusMonth = moment(date).locale('ru').format('MMMM');
         let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
         let curYear = moment(date).format('YYYY');
-        $(this).before(`<div class="vet-history-month">${rusMonth} ${curYear}</div>`)
+        $(this).before(`<div class="history-page-month">${rusMonth} ${curYear}</div>`)
       });
     };
 
     defineMonthsText();
 
-    $('.vh-category').click(function () {
-      if ($(this).hasClass('vh-category-active')) {
-        $(this).removeClass('vh-category-active');
-        $(`.vet-history-${$(this).attr('id')}`).hide();
+    $('.hp-category').on('click', function () {
+      if ($(this).hasClass('hp-category-active')) {
+        $(this).removeClass('hp-category-active');
+        $(`.history-page-${$(this).attr('id')}`).hide();
 
         defineMonthsText();
       } else {
-        $(this).addClass('vh-category-active');
-        $(`.vet-history-${$(this).attr('id')}`).css('display', 'flex');
+        $(this).addClass('hp-category-active');
+        $(`.history-page-${$(this).attr('id')}`).css('display', 'flex');
 
         defineMonthsText();
       }
     });
 
-    $('#vet-history-search').on('keyup change focus blur', function () {
-      $('.vet-history-searched').empty();
+    $('#history-page-search').on('keyup change focus blur', function () {
+      $('.history-page-searched').empty();
       let searchValue = $(this).val().toLowerCase();
       let showSearched = false;
 
       if (searchValue.length > 0) {
-        $('.vet-history-item').each(function () {
-          let itemName = $(this).find('.vet-history-title').text().toLowerCase();
+        $('.history-page-item-outter').each(function () {
+          let itemName = $(this).find('.history-page-title').text().toLowerCase();
           if (itemName.includes(searchValue)) {
-            $(this).clone().appendTo('.vet-history-searched')
+            $(this).clone().appendTo('.history-page-searched')
             showSearched = true;
           }
         });
       }
 
       if (showSearched) {
-        $('.vet-history-searched').show();
+        $('.history-page-searched').show();
       } else {
-        $('.vet-history-searched').hide();
+        $('.history-page-searched').hide();
       }
 
+    });
+
+    /* Making delete button work */
+    $('.history-page-delete').on('click', function(e) {
+      e.preventDefault();
+
+      $(this).parent().hide();
+      $(this).parent().parent().find('.hp-delete-block').css({'display': 'flex', 'opacity': '1'});
+    });
+    
+    $('.hp-delete-block-btn-keep').on('click', function(e) {
+      e.preventDefault();
+      
+      $(this).parent().parent().find('.history-page-item').css({'display': 'flex'});
+      $(this).parent().css({'display': 'none', 'opacity': '0'});
+    }); 
+
+    $('.hp-delete-block-btn-delete').on('click', async function() {
+      let type = $(this).parent().parent().attr('data-doc-type');
+      let id = $(this).parent().parent().attr('data-doc-id');
+
+      let result = await deleteVetDoc(type, id);
+
+      if(result) $(this).parent().parent().remove();
     });
   }
 

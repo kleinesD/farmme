@@ -193,3 +193,18 @@ export const editVetScheme = async(schemeId, data) => {
     console.log(err);
   }
 }
+
+export const deleteVetDoc = async (type, docId) => {
+  try {
+    const res = await axios({
+      method: 'DELETE',
+      url: `/api/vet/${type}/${docId}`
+    });
+
+    if (res.data.status === 'success') {
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}

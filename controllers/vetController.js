@@ -54,6 +54,14 @@ exports.editVetAction = catchAsync(async (req, res, next) => {
   })
 });
 
+exports.deleteVetAction = catchAsync(async (req, res, next) => {
+  const action = await Vet.findByIdAndDelete(req.params.actionId);
+
+  res.status(203).json({
+    status: 'success',
+  })
+});
+
 exports.createVetProblem = catchAsync(async (req, res, next) => {
   req.body.animal = req.params.animalId;
   req.body.user = req.user._id;
@@ -81,6 +89,14 @@ exports.editVetProblem = catchAsync(async (req, res, next) => {
     data: {
       problem
     }
+  })
+});
+
+exports.deleteVetProblem = catchAsync(async (req, res, next) => {
+  const problem = await Vet.findByIdAndDelete(req.params.problemId);
+
+  res.status(203).json({
+    status: 'success'
   })
 });
 
@@ -131,6 +147,14 @@ exports.editVetTreatment = catchAsync(async (req, res, next) => {
     data: {
       treatment
     }
+  })
+});
+
+exports.deleteVetTreatment = catchAsync(async (req, res, next) => {
+  const treatment = await Vet.findByIdAndUpdate(req.params.treatmentId);
+
+  res.status(203).json({
+    status: 'success'
   })
 });
 
@@ -279,18 +303,6 @@ exports.editScheme = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       scheme
-    }
-  });
-});
-
-exports.getSchedulePeriod = catchAsync(async (req, res, next) => {
-  /* const actions = await Vet.find({ farm: req.body.farmId, date: { $gte: req.body.from, $lte: req.body.to } }).populate({path: 'inseminations', populate: {path: 'bull', model: 'Animal'}}); */
-  const actions = await Vet.find({ farm: req.body.farmId, date: { $gte: req.body.from, $lte: req.body.to } }).populate('animal');
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      actions
     }
   });
 });

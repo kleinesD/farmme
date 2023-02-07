@@ -51,12 +51,12 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/herd/add-milking-result/628d0862aca019349b20c6c8');
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-treatment/62f14e90d51a806f924b0298');
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
-  contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/login');
+  contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/vet/history');
   /* contentWindow.loadURL('http://127.0.0.1:604/calendar?sort=vet');
   contentWindow.loadURL('http://127.0.0.1:604/vet/'); */
- // contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/63be548d9358c2910cb5d847');
+  //contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/63be548d9358c2910cb5d847');
 
 
   contentWindow.maximize();
