@@ -1,0 +1,106 @@
+extends base
+
+block content
+
+  section.main-section 
+    .all-animals-container#herd-history-container
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#history-page-search(type="text" placeholder="Поиск по названию")
+      .history-page-categories-block
+        .hp-category.hp-category-action.hp-category-active#milking-result 
+          ion-icon(name="medical")
+          p Доение
+        .hp-category.hp-category-problem.hp-category-active#weight-result
+          ion-icon(name="thermometer")
+          p Взвешивание
+        .hp-category.hp-category-treatment.hp-category-active#insemination 
+          ion-icon(name="bandage")
+          p Осеменение
+        .hp-category.hp-category-treatment.hp-category-active#lactation 
+          ion-icon(name="bandage")
+          p Лактация
+      
+      .history-page-searched
+
+      .history-page-container
+        //-.history-page-month Январь, 2022
+
+        each animal in animals 
+
+          each doc in animal.milkingResults
+            .history-page-item-outter.history-page-milking-result(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`milking-results` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.indexOf(doc)}`)
+                .history-page-icon
+                  ion-icon(name="medical")
+                .history-page-title= `#${animal.number} | Результат доения: ${doc.result} л.`
+                -if(!doc.addingDate)
+                  .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -else
+                  .history-page-date= `${doc.addingDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .history-page-delete  
+                  ion-icon(name="close")
+              .hp-delete-block
+                  p Вы уверенны?
+                  .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                  .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+          each doc in animal.weightResults
+            .history-page-item-outter.history-page-weight-result(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`weight` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-weight-result/${animal._id}/${animal.weightResults.indexOf(doc)}`)
+                .history-page-icon
+                  ion-icon(name="barbell")
+                .history-page-title= `#${animal.number} | Результат взвешивания: ${doc.result} кг.`
+                -if(!doc.addingDate)
+                  .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -else
+                  .history-page-date= `${doc.addingDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .history-page-delete  
+                  ion-icon(name="close")
+              .hp-delete-block
+                  p Вы уверенны?
+                  .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                  .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+          each doc in animal.inseminations
+            .history-page-item-outter.history-page-insemination(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`insemination` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)
+                .history-page-icon
+                  ion-icon(name="add")
+                -if(doc.success !== undefined)
+                  .history-page-title= `#${animal.number} | Осеменение: ${doc.success === true ? 'успешно' : 'не успешно'}`
+                -else
+                  .history-page-title= `#${animal.number} | Осеменение: не подтверждено`
+                -if(!doc.addingDate)
+                  .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -else
+                  .history-page-date= `${doc.addingDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .history-page-delete  
+                  ion-icon(name="close")
+              .hp-delete-block
+                  p Вы уверенны?
+                  .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                  .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+          each doc in animal.lactations
+            .history-page-item-outter.history-page-lactation(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.startDate}` data-doc-type=`lactation` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(doc)}`)
+                .history-page-icon
+                  ion-icon(name="glasses")
+                .history-page-title= `#${animal.number} | Лактация #${doc.number}`
+                -if(!doc.addingDate)
+                  .history-page-date= `${doc.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.startDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -else
+                  .history-page-date= `${doc.addingDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.addingDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                .history-page-delete  
+                  ion-icon(name="close")
+              .hp-delete-block
+                  p Вы уверенны?
+                  .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                  .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+          
+
+
+      
+

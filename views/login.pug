@@ -2,31 +2,48 @@ extends baseNoMenu
 
 block content
 
-    section.form-section#login-section
-      form.common-form#login-form
-        //-.form-title Добро пожаловать,
-        img.form-icon(src='/img/logos/farmme-logo-5.png')
-        //-.form-sub-title Войдите чтобы продолжить
-        .input-box
-          input#email.common-form-input(type='email' placeholder=`Электронная почта`)
-          //.input-warning-text Введи существующий адрес
-        .input-box
-          input#password.common-form-input(type='password' placeholder=`Пароль`)
-          .pass-visivility-btn
-            // <ion-icon name="eye-outline"></ion-icon>
-            ion-icon(name='eye-off-outline')
-        button.common-form-btn Войти
-        //-.alternative-login
-          ion-icon(name='logo-google')
-          p Войти с Google
-        //-a.form-forget-pass(href='#') Забыли пароль?
-        //-.common-form-or Или
-        //-.form-final-text
-          p Еще нет аккаунта?
-          a(href='#') Регистрация
+  section.form-section#login-section
+    //-form.common-form#login-form
+    //-.form-title Добро пожаловать,
+    img.form-icon(src='/img/logos/farmme-logo-5.png')
+    //-.form-sub-title Войдите чтобы продолжить
+    .input-box
+      input#email.common-form-input(type='email' placeholder=`Электронная почта`)
+      //.input-warning-text Введи существующий адрес
+    .input-box
+      input#password.common-form-input(type='password' placeholder=`Пароль`)
+      .pass-visivility-btn
+        // <ion-icon name="eye-outline"></ion-icon>
+        ion-icon(name='eye-off-outline')
+    button.common-form-btn Войти
+    //-.alternative-login
+      ion-icon(name='logo-google')
+      p Войти с Google
+    //-a.form-forget-pass(href='#') Забыли пароль?
+    //-.common-form-or Или
+    //-.form-final-text
+      p Еще нет аккаунта?
+      a(href='#') Регистрация
 
-      //DELETE AFTER
-      each cow in cows
-        each result in cow.milkingResults
-          .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
-      //-svg#test-graph
+    //DELETE AFTER
+    //-.basic-graph-tooltip
+      .bgt-header-line
+        img(src="/img/images/default-cow-image.png")
+        .bgt-header-line-info
+          .bgt-number= `#5026`
+          //-if(animal.name)
+          .bgt-name= `Березка`
+      .bgt-result-line#date-line
+        p Дата:
+        p#tooltip-date 26.01.2001
+      .bgt-result-line.bgt-result-line-color#result-line
+        p Результат:
+        p#tooltip-result 25 л.
+      //-.bgt-result-line#lactation-line
+        p Лактация:
+        p#tooltip-lactation #3
+      a.bgt-edit-btn(href="#") Редактировать 
+    each cow in cows
+      each result in cow.milkingResults
+        .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
+    //-svg#test-graph

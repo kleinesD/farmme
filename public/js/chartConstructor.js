@@ -304,10 +304,12 @@ export const renderGraph = (container, parameters) => {
         /* Adding points if allowed */
         if (dataset.showPoint) {
           var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+          circle.classList.add(`graph-point`)
           circle.classList.add(`graph-circle-${datasetIndex}`)
-          circle.setAttribute('data-average', data.number);
+          circle.setAttribute('data-number', data.number);
           circle.setAttribute('data-date', data.date);
           circle.setAttribute('data-amount', data.results.length);
+          circle.setAttribute('data-line', `graph-line-${datasetIndex}`);
           circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan) + 30);
           circle.setAttribute('cy', graph.height - (data.number * (graph.height / parameters.graphSettings.max)));
           circle.setAttribute('r', 4);
@@ -374,33 +376,150 @@ export const renderGraph = (container, parameters) => {
       }
     });
 
-    /* Returning graph container */
-    return graph.buffContainer;
+    /* Adding the tooltips */
+    let simpleTooltip = `
+      <div class="basic-graph-tooltip">
+        <div class="bgt-result-line" id="date-line">
+          <p>Дата:</p>
+          <p id="tooltip-date">26.01.2001</p>
+        </div>
+        <div class="bgt-result-line bgt-result-line-color">
+          <div class="bgt-result-line-color-el"></div>
+          <p>Результат:</p>
+          <p id="tooltip-result">25 л.</p>
+        </div>
+      </div>
+    `;
+
+    let detailedTooltip = `
+      <div class="basic-graph-tooltip">
+        <div class="bgt-header-line"><img src="/img/images/default-cow-image.png"/>
+          <div class="bgt-header-line-info">
+            <div class="bgt-number">#5026</div>
+            <div class="bgt-name">Березка</div>
+          </div>
+        </div>
+        <div class="bgt-result-line" id="date-line">
+          <div class="bgt-result-line-color-el"></div>
+          <p>Дата:</p>
+          <p id="tooltip-date">26.01.2001</p>
+        </div>
+        <a class="bgt-edit-btn" href="#">Редактировать </a>
+      </div>
+    `
+    $('.basic-graph-container').append(parameters.tooltips.type === 'simple' ? simpleTooltip : detailedTooltip);
+
+    /* Tooltips */
+
+    let prevDataPointDate = new Date();
+    graph.svg.addEventListener('mousemove', ({ clientX, clientY }) => {
+      let point = graph.svg.createSVGPoint();
+      point.x = clientX;
+      point.y = clientY;
+      point = point.matrixTransform(graph.svg.getScreenCTM().inverse());
+
+      let currentPoint = { dataPoints: [], diff: 0 };
+
+      $('.graph-point').each(function () {
+        if (parseFloat($(this).css('opacity')) !== 0) {
+          const dataPointX = parseFloat($(this).attr('cx'));
+
+          let diff = Math.abs(dataPointX - point.x);
+
+          if (currentPoint.dataPoints.length === 0 || currentPoint.diff > diff) {
+            currentPoint.dataPoints = [];
+            currentPoint.dataPoints.push($(this));
+            currentPoint.diff = diff;
+          } else if (currentPoint.dataPoints.length > 0 && currentPoint.diff === diff) {
+            currentPoint.dataPoints.push($(this));
+          }
+        }
+      });
+
+      if (prevDataPointDate.getTime() !== new Date($(currentPoint.dataPoints[0]).attr('data-date')).getTime()) {
+        prevDataPointDate = new Date($(currentPoint.dataPoints[0]).attr('data-date'))
+
+        //Showing what points being selected
+        $('.graph-point').attr('r', 2);
+        currentPoint.dataPoints.forEach(dataPoint => {
+          $(dataPoint).attr('r', 3);
+        });
+
+        //Adding a tooltip box
+        /* $('.mp-tooltip-box').remove();
+        $('.mp-animal-graph-container').prepend(`
+      <div class="mp-tooltip-box">
+      <div class="mp-tooltip-title">${moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').charAt(0).toUpperCase() + moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').slice(1)}</div>
+      <div class="mp-tooltip-info-line">
+        <div class="mp-tooltip-info">Результатов:</div>
+        <div class="mp-tooltip-info">${$(currentPoint.dataPoints[0]).attr('data-amount') === 'none' ? '&dash;' : $(currentPoint.dataPoints[0]).attr('data-amount')}</div>
+      </div>
+      <div class="mp-tooltip-devider"></div>
+    </div>
+      `); */
+
+        currentPoint.dataPoints.forEach((dataPoint, index) => {
+          if(index === 0) {
+            if(parameters.tooltips.dateUnit === 'month') {
+              $('#tooltip-date').text(moment($(dataPoint).attr('data-date')).lang('ru').format('MMMM YYYY').charAt(0).toUpperCase() + moment($(dataPoint).attr('data-date')).lang('ru').format('MMMM YYYY').slice(1))
+            } if(parameters.tooltips.dateUnit === 'day') {
+              $('#tooltip-date').text(moment($(dataPoint).attr('data-date')).format('DD.MM.YYYY'))
+            }
+          }
+
+          $('.bgt-result-line-color').remove();
+          let textEl = $('.basic-graph-tooltip').append(`
+            <div class="bgt-result-line bgt-result-line-color" data-line="${$(this).attr('data-line')}">
+              <div class="bgt-result-line-color-el"></div>
+              <p>${parameters.tooltips.description}:</p>
+              <p id="tooltip-result">${$(dataPoint).attr('data-number')} ${parameters.tooltips.unitText}</p>
+            </div>
+          `) //.find('.bgt-result-line-color-el').css('background-color', `${$(`#${$(this).attr('data-line')}`).css('stroke')}`);
+
+          $('.bgt-result-line-color').each(function() {
+            $(this).find('.bgt-result-line-color-el').css('background-color', $(`#${$(this).parent().attr('data-line')}`).attr('stroke'))
+            console.log($(`#${$(this).attr('data-line')}`).attr('stroke'))
+          });
+        });
+
+    //Changing the position of a tooltip
+    let pointX = parseFloat($(currentPoint.dataPoints[0]).attr('cx'));
+    let pointY = parseFloat($(currentPoint.dataPoints[0]).attr('cy'));
+
+    let posTop = $(currentPoint.dataPoints[0]).position().top;
+    let posLeft = $(currentPoint.dataPoints[0]).position().left - 50;
+    let transform = 'translateY(-50%)';
+
+    if (pointX + $('.basic-graph-tooltip').width() > $('#generated-graph').width()) {
+      posLeft = $(currentPoint.dataPoints[0]).position().left - 130 - $('.basic-graph-tooltip').width();
+    }
+    if (pointY + $('.basic-graph-tooltip').height() / 2 > $('#generated-graph').height()) {
+      transform = 'translateY(-150%)'
+    }
+    if (pointY - $('.basic-graph-tooltip').height() / 2 < 0) {
+      transform = 'unset'
+    }
+    $('.basic-graph-tooltip').css({
+      'top': posTop,
+      'left': posLeft,
+      'transform': transform
+    });
+  }
+
+})
+
   }
 
 
-  /* Resizing graph on window resize */
-  /* Clean. */
-  $(window).off('resize');
+/* Resizing graph on window resize */
+/* Clean. */
+$(window).off('resize');
 
-  $(window).on('resize', function () {
-    /* const width = graph.buffContainer.parentElement.offsetWidth;
-    let height;
-    if (parameters.graphSettings.boxHeight) {
-      height = Math.round(graph.buffContainer.parentElement.offsetHeight);
-    } else {
-      height = Math.round(graph.buffContainer.parentElement.offsetWidth / (1 + parameters.graphSettings.heightRatio));
-    }
+$(window).on('resize', function () {
+  rendering()
+});
 
-    graph.width = width;
-    graph.height = height;
-
-    graph.svg.style.width = width;
-    graph.svg.style.height = height; */
-
-    rendering()
-  });
-  $(window).trigger('resize');
+$(window).trigger('resize');
 }
 
 

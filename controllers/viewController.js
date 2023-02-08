@@ -300,6 +300,15 @@ exports.renderWriteOffAnimal = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderHerdHistory = catchAsync(async (req, res, next) => {
+  let animals = await Animal.find({farm: req.user.farm});
+  
+  
+  res.status(200).render('herdHistory', {
+    animals
+  });
+});
+
 
 /////////////////
 /////////////////

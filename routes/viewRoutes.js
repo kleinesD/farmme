@@ -62,6 +62,8 @@ router.get('/herd/list-inseminations', authController.protect, authController.is
 
 router.get('/herd/write-off-animal/:animalId', authController.protect, authController.isLoggedIn, viewController.renderWriteOffAnimal);
 
+router.get('/herd/history', authController.protect, authController.isLoggedIn, viewController.renderHerdHistory);
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////

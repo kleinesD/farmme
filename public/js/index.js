@@ -185,6 +185,12 @@ $(document).ready(async function () {
         boxHeight: true,
         /* heightRatio: 0.75 */
       },
+      tooltips: {
+        type: 'simple', // Detailed or simple
+        description: 'Сред. результат',
+        unitText: 'л.',
+        dateUnit: 'month'
+      },
       datasets: [
         {
           showPoint: true,
@@ -201,7 +207,7 @@ $(document).ready(async function () {
     };
 
     //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
-    //const graph = renderGraph(document.getElementById('login-section'), parameters);
+    const graph = renderGraph(document.getElementById('login-section'), parameters);
   }
 
   /* ///////////////////////
@@ -1937,6 +1943,126 @@ $(document).ready(async function () {
     }
 
 
+  }
+
+  ///////////////////////
+  /* ALL HISTORY PAGES */
+  ///////////////////////
+  if (document.querySelector('.history-page-container')) {
+    const defineMonthsText = () => {
+      $('.hp-month-before-el').removeClass('hp-month-before-el');
+      $('.history-page-month').remove();
+
+      $('.history-page-item-outter').each(function () {
+        let date = new Date($(this).attr('data-date'));
+        let el = $(this);
+
+        $('.history-page-item-outter').each(function () {
+          let elDate = new Date($(this).attr('data-date'));
+
+          if (date < elDate) {
+            $(this).after(el);
+          }
+        });
+      });
+
+      $('.history-page-item-outter').each(function () {
+        let date = $(this).attr('data-date');
+        let curRusMonth = moment(date).locale('ru').format('MMMM');
+        let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
+        let curDay = moment(date).format('DD');
+        $(this).find('.history-page-date').text(`${rusMonth}, ${curDay}`)
+        if ($(this).css('display') !== 'none') {
+          if (!$(this).prev() || $(this).prev().css('display') === 'none' || moment(new Date($(this).attr('data-date'))).month() !== moment(new Date($(this).prev().attr('data-date'))).month()) {
+            $(this).addClass('hp-month-before-el');
+          }
+        }
+      });
+
+      $('.hp-month-before-el').each(function () {
+        let date = new Date($(this).attr('data-date'));
+        let curRusMonth = moment(date).locale('ru').format('MMMM');
+        let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
+        let curYear = moment(date).format('YYYY');
+        $(this).before(`<div class="history-page-month">${rusMonth} ${curYear}</div>`)
+      });
+    };
+
+    defineMonthsText();
+
+    $('.hp-category').on('click', function () {
+      if ($(this).hasClass('hp-category-active')) {
+        $(this).removeClass('hp-category-active');
+        $(`.history-page-${$(this).attr('id')}`).hide();
+
+        defineMonthsText();
+      } else {
+        $(this).addClass('hp-category-active');
+        $(`.history-page-${$(this).attr('id')}`).css('display', 'flex');
+
+        defineMonthsText();
+      }
+    });
+
+    $('#history-page-search').on('keyup change focus blur', function () {
+      $('.history-page-searched').empty();
+      let searchValue = $(this).val().toLowerCase();
+      let showSearched = false;
+
+      if (searchValue.length > 0) {
+        $('.history-page-item-outter').each(function () {
+          let itemName = $(this).find('.history-page-title').text().toLowerCase();
+          if (itemName.includes(searchValue)) {
+            $(this).clone().appendTo('.history-page-searched')
+            showSearched = true;
+          }
+        });
+      }
+
+      if (showSearched) {
+        $('.history-page-searched').show();
+      } else {
+        $('.history-page-searched').hide();
+      }
+
+    });
+
+    /* Making delete button work */
+    $('.history-page-delete').on('click', function (e) {
+      e.preventDefault();
+
+      $(this).parent().hide();
+      $(this).parent().parent().find('.hp-delete-block').css({ 'display': 'flex', 'opacity': '1' });
+    });
+
+    $('.hp-delete-block-btn-keep').on('click', function (e) {
+      e.preventDefault();
+
+      $(this).parent().parent().find('.history-page-item').css({ 'display': 'flex' });
+      $(this).parent().css({ 'display': 'none', 'opacity': '0' });
+    });
+
+    $('.hp-delete-block-btn-delete').on('click', async function () {
+      if (document.querySelector('#vet-history-container')) {
+        let type = $(this).parent().parent().attr('data-doc-type');
+        let id = $(this).parent().parent().attr('data-doc-id');
+
+        let result = await deleteVetDoc(type, id);
+
+        if (result) $(this).parent().parent().remove();
+      }
+
+      if(document.querySelector('#herd-history-container')) {
+        let type = $(this).parent().parent().attr('data-doc-type');
+        let animalId = $(this).parent().parent().attr('data-animal-id');
+        let id = $(this).parent().parent().attr('data-doc-id');
+
+        let result = await deleteAnimalResults(type, animalId, id);
+
+        if (result) $(this).parent().parent().remove();
+      }
+
+    });
   }
 
 
@@ -5200,113 +5326,6 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* VET HISTORY PAGE */
-  ///////////////////////
-  if (document.querySelector('#vet-history-container')) {
-    const defineMonthsText = () => {
-      $('.hp-month-before-el').removeClass('hp-month-before-el');
-      $('.history-page-month').remove();
-
-      $('.history-page-item-outter').each(function () {
-        let date = new Date($(this).attr('data-date'));
-        let el = $(this);
-
-        $('.history-page-item-outter').each(function () {
-          let elDate = new Date($(this).attr('data-date'));
-
-          if (date < elDate) {
-            $(this).after(el);
-          }
-        });
-      });
-
-      $('.history-page-item-outter').each(function () {
-        let date = $(this).attr('data-date');
-        let curRusMonth = moment(date).locale('ru').format('MMMM');
-        let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
-        let curDay = moment(date).format('DD');
-        $(this).find('.history-page-date').text(`${rusMonth}, ${curDay}`)
-        if ($(this).css('display') !== 'none') {
-          if (!$(this).prev() || $(this).prev().css('display') === 'none' || moment(new Date($(this).attr('data-date'))).month() !== moment(new Date($(this).prev().attr('data-date'))).month()) {
-            $(this).addClass('hp-month-before-el');
-          }
-        }
-      });
-
-      $('.hp-month-before-el').each(function () {
-        let date = new Date($(this).attr('data-date'));
-        let curRusMonth = moment(date).locale('ru').format('MMMM');
-        let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
-        let curYear = moment(date).format('YYYY');
-        $(this).before(`<div class="history-page-month">${rusMonth} ${curYear}</div>`)
-      });
-    };
-
-    defineMonthsText();
-
-    $('.hp-category').on('click', function () {
-      if ($(this).hasClass('hp-category-active')) {
-        $(this).removeClass('hp-category-active');
-        $(`.history-page-${$(this).attr('id')}`).hide();
-
-        defineMonthsText();
-      } else {
-        $(this).addClass('hp-category-active');
-        $(`.history-page-${$(this).attr('id')}`).css('display', 'flex');
-
-        defineMonthsText();
-      }
-    });
-
-    $('#history-page-search').on('keyup change focus blur', function () {
-      $('.history-page-searched').empty();
-      let searchValue = $(this).val().toLowerCase();
-      let showSearched = false;
-
-      if (searchValue.length > 0) {
-        $('.history-page-item-outter').each(function () {
-          let itemName = $(this).find('.history-page-title').text().toLowerCase();
-          if (itemName.includes(searchValue)) {
-            $(this).clone().appendTo('.history-page-searched')
-            showSearched = true;
-          }
-        });
-      }
-
-      if (showSearched) {
-        $('.history-page-searched').show();
-      } else {
-        $('.history-page-searched').hide();
-      }
-
-    });
-
-    /* Making delete button work */
-    $('.history-page-delete').on('click', function(e) {
-      e.preventDefault();
-
-      $(this).parent().hide();
-      $(this).parent().parent().find('.hp-delete-block').css({'display': 'flex', 'opacity': '1'});
-    });
-    
-    $('.hp-delete-block-btn-keep').on('click', function(e) {
-      e.preventDefault();
-      
-      $(this).parent().parent().find('.history-page-item').css({'display': 'flex'});
-      $(this).parent().css({'display': 'none', 'opacity': '0'});
-    }); 
-
-    $('.hp-delete-block-btn-delete').on('click', async function() {
-      let type = $(this).parent().parent().attr('data-doc-type');
-      let id = $(this).parent().parent().attr('data-doc-id');
-
-      let result = await deleteVetDoc(type, id);
-
-      if(result) $(this).parent().parent().remove();
-    });
-  }
-
-  ///////////////////////
   /* START A SCHEME */
   ///////////////////////
   if (document.querySelector('#vet-start-scheme-container')) {
@@ -5587,8 +5606,8 @@ $(document).ready(async function () {
       });
     });
 
-    $('.mp-scheme-item').on('click', function() {
-      if($(this).find('.mp-scheme-points-block').css('display') === 'none') {
+    $('.mp-scheme-item').on('click', function () {
+      if ($(this).find('.mp-scheme-points-block').css('display') === 'none') {
         $(this).find('.mp-scheme-points-block').show()
         $(this).find('.mp-scheme-icon').css('transform', 'rotate(180deg)');
       } else {
