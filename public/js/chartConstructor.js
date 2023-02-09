@@ -465,11 +465,17 @@ export const renderGraph = (container, parameters) => {
             } if(parameters.tooltips.dateUnit === 'day') {
               $('#tooltip-date').text(moment($(dataPoint).attr('data-date')).format('DD.MM.YYYY'))
             }
+
+            if(parameters.tooltips.type === 'detailed') {
+              $('.bgt-header-line img').attr('src', `/img/images/${$(dataPoint).attr('data-animal-image')}`);
+              $('.bgt-number').text(`#${$(dataPoint).attr('data-animal-number')}`);
+              $('.bgt-name').text(`${$(dataPoint).attr('data-animal-name')}`);
+            }
           }
 
           $('.bgt-result-line-color').remove();
           let textEl = $('.basic-graph-tooltip').append(`
-            <div class="bgt-result-line bgt-result-line-color" data-line="${$(this).attr('data-line')}">
+            <div class="bgt-result-line bgt-result-line-color" data-line="${$(dataPoint).attr('data-line')}">
               <div class="bgt-result-line-color-el"></div>
               <p>${parameters.tooltips.description}:</p>
               <p id="tooltip-result">${$(dataPoint).attr('data-number')} ${parameters.tooltips.unitText}</p>
@@ -477,8 +483,7 @@ export const renderGraph = (container, parameters) => {
           `) //.find('.bgt-result-line-color-el').css('background-color', `${$(`#${$(this).attr('data-line')}`).css('stroke')}`);
 
           $('.bgt-result-line-color').each(function() {
-            $(this).find('.bgt-result-line-color-el').css('background-color', $(`#${$(this).parent().attr('data-line')}`).attr('stroke'))
-            console.log($(`#${$(this).attr('data-line')}`).attr('stroke'))
+            $(this).find('.bgt-result-line-color-el').css('background-color', $(`#${$(this).attr('data-line')}`).attr('stroke'))
           });
         });
 
