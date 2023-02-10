@@ -12,7 +12,7 @@ import { addReminder, editReminder, deleteRemninder, getModuleAndPeriod, getFarm
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
-import { multiLinearChart, renderGraph } from './chartConstructor';
+import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 
 
 
@@ -128,6 +128,67 @@ $(document).ready(async function () {
     /* Getting all the data */
     let milkingData = [];
     $('.mp-graph-data').each(function () {
+      milkingData.push({
+        number: parseFloat($(this).attr('data-result')),
+        lactationNumber: parseFloat($(this).attr('data-lact')),
+        date: new Date($(this).attr('data-date'))
+      });
+    });
+
+    milkingData.sort((a, b) => a.date - b.date);
+
+
+    let milkingByLact = [];
+
+    milkingData.forEach((result, index, array) => {
+
+      /* Preparing second array for average line */
+      if (milkingByLact.length < 1) {
+        milkingByLact.push({ lactationNumber: result.lactationNumber, results: 1 })
+      } else {
+        let toPush = true;
+        for (let i = 0; i < milkingByLact.length; i++) {
+          if (milkingByLact[i].lactationNumber === result.lactationNumber) {
+            milkingByLact[i].results++;
+            toPush = false;
+          }
+        }
+
+        if (toPush) {
+          milkingByLact.push({ lactationNumber: result.lactationNumber, results: 1 });
+        }
+      }
+    });
+
+    console.log(milkingData)
+    console.log(milkingByLact)
+
+
+    const parameters = {
+      graphSettings: {
+        showLegend: true,
+      },
+      tooltips: {
+        type: 'simple', // Detailed or simple
+        description: 'Результатов',
+        unitText: ''
+      },
+      datasets: []
+    };
+
+    milkingByLact.forEach((data) => {
+      parameters.datasets.push({legendName: `Лактация #${data.lactationNumber}`, data: data.results});
+    });
+
+    //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
+
+    console.log(parameters)
+    const graph = renderProgressChart(document.getElementById('login-section'), parameters);
+
+
+
+    /* let milkingData = [];
+    $('.mp-graph-data').each(function () {
       if (new Date($(this).attr('data-date')) > new Date(moment().subtract(12, 'month'))) {
         milkingData.push({
           number: parseFloat($(this).attr('data-result')),
@@ -144,7 +205,7 @@ $(document).ready(async function () {
     milkingData.forEach((result, index, array) => {
       let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(12, 'month')).getTime()) / 1000 / 60 / 60 / 24);
 
-      /* Preparing second array for average line */
+      // Preparing second array for average line
       if (milkingAverage.length < 1) {
         milkingAverage.push({ date: result.date, results: [result] })
       } else {
@@ -163,7 +224,7 @@ $(document).ready(async function () {
     });
 
 
-    /* Counting averages and adding lines */
+    //Counting averages and adding lines
     milkingAverage.forEach((result, index, array) => {
       let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(12, 'month')).getTime()) / 1000 / 60 / 60 / 24);
       let total = 0
@@ -183,7 +244,7 @@ $(document).ready(async function () {
         max: 50,
         showLegend: true,
         boxHeight: true,
-        /* heightRatio: 0.75 */
+        //heightRatio: 0.75
       },
       tooltips: {
         type: 'simple', // Detailed or simple
@@ -207,7 +268,7 @@ $(document).ready(async function () {
     };
 
     //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
-    const graph = renderGraph(document.getElementById('login-section'), parameters);
+    const graph = renderLineGraph(document.getElementById('login-section'), parameters); */
   }
 
   /* ///////////////////////
@@ -2052,7 +2113,7 @@ $(document).ready(async function () {
         if (result) $(this).parent().parent().remove();
       }
 
-      if(document.querySelector('#herd-history-container')) {
+      if (document.querySelector('#herd-history-container')) {
         let type = $(this).parent().parent().attr('data-doc-type');
         let animalId = $(this).parent().parent().attr('data-animal-id');
         let id = $(this).parent().parent().attr('data-doc-id');

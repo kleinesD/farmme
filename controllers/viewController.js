@@ -7,7 +7,7 @@ const Calendar = require('../models/calendarModel');
 const Inventory = require('../models/inventoryModel');
 
 exports.renderLogin = catchAsync(async (req, res, next) => {
-  const cows = await Animal.find({farm: '622da2b5d88fab5154edd623', gender: 'female'});
+  const cows = await Animal.find({farm: '628c8bc53108dae81ddad028', gender: 'female'});
   res.status(200).render('login', {
     cows
   });

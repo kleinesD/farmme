@@ -393,6 +393,10 @@ ion-icon {
 .basic-graph-container {
   position: relative;
 }
+.basic-progress-container {
+  width: 100%;
+  min-height: 150px;
+}
 
 .basic-graph {
   background-color: #f0f0f0;
@@ -717,7 +721,13 @@ ion-icon {
 .basic-graphs-legend-item-off .basic-graphs-legend-item-text {
   text-decoration: line-through;
 }
-
+.basic-graphs-legend-color {
+  width: calc(17px - 4px);
+  height: calc(17px - 4px);
+  border: 2px solid #0A0908;
+  border-radius: 50%;
+  margin-right: 10px;
+}
 .basic-graphs-legend-item-line {
   width: 25px;
   margin-right: 10px;
@@ -740,6 +750,41 @@ ion-icon {
 
 .basic-graphs-legend-item-text {
   font-size: 80%;
+}
+
+.generated-progress-line {
+  width: calc(100% - 4px);
+  min-height: calc(35px - 4px);
+  border: 2px solid #0A0908;
+  border-radius: 50px;
+  display: flex;
+  overflow: hidden;
+}
+.progress-line-data {
+  /* height: 100%; */
+}
+.progress-line-data-gray {
+  background-color: #a2a2a2;
+}
+
+.progress-line-data-0 {
+  background-color: #2a9d8f;
+}
+
+.progress-line-data-1 {
+  background-color: #264653;
+}
+
+.progress-line-data-2 {
+  background-color: #e9c46a;
+}
+
+.progress-line-data-3 {
+  background-color: #f4a261;
+}
+
+.progress-line-data-4 {
+  background-color: #e76f51;
 }
 
 
