@@ -160,10 +160,6 @@ $(document).ready(async function () {
       }
     });
 
-    console.log(milkingData)
-    console.log(milkingByLact)
-
-
     const parameters = {
       graphSettings: {
         showLegend: true,
@@ -182,7 +178,6 @@ $(document).ready(async function () {
 
     //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
 
-    console.log(parameters)
     const graph = renderProgressChart(document.getElementById('login-section'), parameters);
 
 

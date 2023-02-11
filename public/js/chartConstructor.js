@@ -555,9 +555,9 @@ export const renderProgressChart = (container, parameters) => {
     });
     datasets.forEach((dataset, datasetIndex) => {
       if(!dataset.backgroundColor) {
-        $('#generated-graph').append(`<div class="progress-line-data progress-line-data-${datasetIndex}" id="progress-${datasetIndex}" style="width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
+        $('#generated-graph').append(`<div class="progress-line-data progress-line-data-${datasetIndex}" id="graph-progress-${datasetIndex}" style="width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
       } else {
-        $('#generated-graph').append(`<div class="progress-line-data" id="progress-${datasetIndex}" style="background-color=${dataset.backgroundColor} width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
+        $('#generated-graph').append(`<div class="progress-line-data" id="graph-progress-${datasetIndex}" style="background-color=${dataset.backgroundColor} width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
       }
     });
 
@@ -579,29 +579,21 @@ export const renderProgressChart = (container, parameters) => {
         $(`#graph-legend-${datasetIndex}`).find('.basic-graphs-legend-color').css('background-color', $(`#progress-${datasetIndex}`).css('background-color'));
       });
 
-      /* Changing size and position of the legend */
-      /* legendElement.style.width = `${graph.width}px`;
-      legendElement.style.left = `${graph.svg.getBoundingClientRect().left}px`;
-      legendElement.style.top = `${graph.svg.getBoundingClientRect().top + graph.height - legendElement.offsetHeight}px`; */
-
     }
 
     /* Making legend works */
     /* Clean. Preventing double clicks */
     $('.basic-graphs-legend-item').off('click');
 
-    $('.basic-graphs-legend-item').click(function () {
-      let lineId = $(this).attr('id').replace('legend', 'line');
-      let circleClass = $(this).attr('id').replace('legend', 'circle');
+    $('.basic-graphs-legend-item').on('click', function () {
+      let progressId = $(this).attr('id').replace('legend', 'progress');
       if ($(this).attr('data-vis') === 'false') {
         $(this).attr('data-vis', 'true');
-        $(`#${lineId}`).css('opacity', '1');
-        $(`.${circleClass}`).css('opacity', '1');
+        $(`#${progressId}`).css('opacity', '1');
         $(this).removeClass('basic-graphs-legend-item-off');
       } else {
         $(this).attr('data-vis', 'false');
-        $(`#${lineId}`).css('opacity', '0');
-        $(`.${circleClass}`).css('opacity', '0');
+        $(`#${progressId}`).css('opacity', '0');
         $(this).addClass('basic-graphs-legend-item-off');
       }
     });
