@@ -533,6 +533,7 @@ ion-icon {
   transform: translateY(-50%);
   z-index: 1000;
   transition: 0.1s;
+  box-sizing: border-box;
 }
 
 .bgt-header-line {
@@ -762,6 +763,7 @@ ion-icon {
 }
 .progress-line-data {
   /* height: 100%; */
+  transition: 0.1s;
 }
 .progress-line-data-gray {
   background-color: #a2a2a2;

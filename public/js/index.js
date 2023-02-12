@@ -165,8 +165,7 @@ $(document).ready(async function () {
         showLegend: true,
       },
       tooltips: {
-        type: 'simple', // Detailed or simple
-        description: 'Результатов',
+        description: 'Результатов:',
         unitText: ''
       },
       datasets: []
