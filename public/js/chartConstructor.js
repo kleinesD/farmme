@@ -224,7 +224,7 @@ export const renderLineGraph = (container, parameters) => {
     graph.el.setAttribute('id', 'generated-graph');
 
     container.append(graph.buffContainer);
-    graph.buffContainer.append(graph.svg);
+    graph.buffContainer.append(graph.el);
 
     graph.width = graph.buffContainer.parentElement.offsetWidth;
     if (parameters.graphSettings.boxHeight) {
@@ -273,6 +273,7 @@ export const renderLineGraph = (container, parameters) => {
             circle.setAttribute('cy', graph.height - (result.number * (graph.height / parameters.graphSettings.max)));
             circle.setAttribute('r', 3);
             circle.setAttribute('fill', dataset.pointColor);
+            circle.style.opacity = 0.5;
             graph.el.append(circle);
           });
         });
@@ -282,7 +283,6 @@ export const renderLineGraph = (container, parameters) => {
 
       dataset.data.forEach((data, index) => {
         let daysInPeriod = Math.round((new Date(data.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-
         /* Adding line if allowed */
         if (dataset.showLine) {
           if (index === 0) {
@@ -308,12 +308,13 @@ export const renderLineGraph = (container, parameters) => {
           circle.classList.add(`graph-circle-${datasetIndex}`)
           circle.setAttribute('data-number', data.number);
           circle.setAttribute('data-date', data.date);
-          circle.setAttribute('data-amount', data.results.length);
+          circle.setAttribute('data-tooltip-name', dataset.tooltipName);
+          if (data.results) circle.setAttribute('data-amount', data.results.length);
           circle.setAttribute('data-line', `graph-line-${datasetIndex}`);
           circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan) + 30);
           circle.setAttribute('cy', graph.height - (data.number * (graph.height / parameters.graphSettings.max)));
           circle.setAttribute('r', 4);
-          circle.setAttribute('fill', '#ffffff');
+          circle.setAttribute('fill', '#f0f0f0');
           circle.setAttribute('stroke', dataset.pointColor);
           circle.setAttribute('stroke-width', '2px');
           graph.el.append(circle);
@@ -341,18 +342,18 @@ export const renderLineGraph = (container, parameters) => {
         `
         legendElement.append(legendItem);
         if (dataset.showLine) {
-          legendElement.getElementsByClassName('basic-graphs-legend-item-line')[0].style.borderTop = `2px solid ${dataset.lineColor}`;
+          legendItem.getElementsByClassName('basic-graphs-legend-item-line')[0].style.borderTop = `2px solid ${dataset.lineColor}`;
         }
         if (dataset.showPoint) {
-          legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.borderColor = dataset.pointColor;
-          legendElement.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.backgroundColor = '#ffffff';
+          legendItem.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.borderColor = dataset.pointColor;
+          legendItem.getElementsByClassName('basic-graphs-legend-item-line-point')[0].style.backgroundColor = '#ffffff';
         }
       });
 
       /* Changing size and position of the legend */
       /* legendElement.style.width = `${graph.width}px`;
-      legendElement.style.left = `${graph.svg.getBoundingClientRect().left}px`;
-      legendElement.style.top = `${graph.svg.getBoundingClientRect().top + graph.height - legendElement.offsetHeight}px`; */
+      legendElement.style.left = `${graph.el.getBoundingClientRect().left}px`;
+      legendElement.style.top = `${graph.el.getBoundingClientRect().top + graph.height - legendElement.offsetHeight}px`; */
 
     }
 
@@ -360,7 +361,7 @@ export const renderLineGraph = (container, parameters) => {
     /* Clean. Preventing double clicks */
     $('.basic-graphs-legend-item').off('click');
 
-    $('.basic-graphs-legend-item').click(function () {
+    $('.basic-graphs-legend-item').on('click', function () {
       let lineId = $(this).attr('id').replace('legend', 'line');
       let circleClass = $(this).attr('id').replace('legend', 'circle');
       if ($(this).attr('data-vis') === 'false') {
@@ -416,7 +417,7 @@ export const renderLineGraph = (container, parameters) => {
       let point = graph.el.createSVGPoint();
       point.x = clientX;
       point.y = clientY;
-      point = point.matrixTransform(graph.svg.getScreenCTM().inverse());
+      point = point.matrixTransform(graph.el.getScreenCTM().inverse());
 
       let currentPoint = { dataPoints: [], diff: 0 };
 
@@ -440,9 +441,9 @@ export const renderLineGraph = (container, parameters) => {
         prevDataPointDate = new Date($(currentPoint.dataPoints[0]).attr('data-date'))
 
         //Showing what points being selected
-        $('.graph-point').attr('r', 2);
+        $('.graph-point').attr('r', 4);
         currentPoint.dataPoints.forEach(dataPoint => {
-          $(dataPoint).attr('r', 3);
+          $(dataPoint).attr('r', 6);
         });
 
         //Adding a tooltip box
@@ -458,6 +459,7 @@ export const renderLineGraph = (container, parameters) => {
     </div>
       `); */
 
+        $('.bgt-result-line-color').remove();
         currentPoint.dataPoints.forEach((dataPoint, index) => {
           if (index === 0) {
             if (parameters.tooltips.dateUnit === 'month') {
@@ -473,11 +475,10 @@ export const renderLineGraph = (container, parameters) => {
             }
           }
 
-          $('.bgt-result-line-color').remove();
           let textEl = $('.basic-graph-tooltip').append(`
             <div class="bgt-result-line bgt-result-line-color" data-line="${$(dataPoint).attr('data-line')}">
               <div class="bgt-result-line-color-el"></div>
-              <p>${parameters.tooltips.description}:</p>
+              <p>${$(dataPoint).attr('data-tooltip-name')}:</p>
               <p id="tooltip-result">${$(dataPoint).attr('data-number')} ${parameters.tooltips.unitText}</p>
             </div>
           `) //.find('.bgt-result-line-color-el').css('background-color', `${$(`#${$(this).attr('data-line')}`).css('stroke')}`);
@@ -554,7 +555,7 @@ export const renderProgressChart = (container, parameters) => {
       total += dataset.data
     });
     datasets.forEach((dataset, datasetIndex) => {
-      if(!dataset.backgroundColor) {
+      if (!dataset.backgroundColor) {
         $('#generated-graph').append(`<div class="progress-line-data progress-line-data-${datasetIndex}" id="graph-progress-${datasetIndex}" data-data="${dataset.data}" style="width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
       } else {
         $('#generated-graph').append(`<div class="progress-line-data" id="graph-progress-${datasetIndex}" data-data="${dataset.data}" style="background-color=${dataset.backgroundColor} width: ${Math.round(dataset.data / total * 100)}%;"></div>`)
@@ -601,19 +602,19 @@ export const renderProgressChart = (container, parameters) => {
 
     $('.basic-graph-container').append(simpleTooltip);
     $('.basic-graph-tooltip').hide();
-    
+
     /* Tooltips */
-    $('.progress-line-data').on('mouseenter', function() {
+    $('.progress-line-data').on('mouseenter', function () {
       $('#tooltip-result').text(`${$(this).attr('data-data')}`)
       $('#tooltip-percent').text(`${Math.round(parseFloat($(this).attr('data-data')) / total * 100)} %`);
       $('.bgt-result-line-color-el').css('background-color', $(this).css('background-color'));
 
       $(this).siblings().css('filter', 'brightness(0.25)');
-      $('.basic-graph-tooltip').css({'top': $(this).position().top - $('.basic-graph-tooltip').height() * 2, 'left': $(this).position().left + $(this).width() / 2 - $('.basic-graph-tooltip').width() / 2});
+      $('.basic-graph-tooltip').css({ 'top': $(this).position().top - $('.basic-graph-tooltip').height() * 2, 'left': $(this).position().left + $(this).width() / 2 - $('.basic-graph-tooltip').width() / 2 });
       $('.basic-graph-tooltip').css('display', 'flex');
     });
-    
-    $('.progress-line-data').on('mouseleave', function() {
+
+    $('.progress-line-data').on('mouseleave', function () {
       $(this).siblings().css('filter', 'brightness(1)');
       $('.basic-graph-tooltip').hide();
     });

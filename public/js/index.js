@@ -172,12 +172,12 @@ $(document).ready(async function () {
     };
 
     milkingByLact.forEach((data) => {
-      parameters.datasets.push({legendName: `Лактация #${data.lactationNumber}`, data: data.results});
+      parameters.datasets.push({ legendName: `Лактация #${data.lactationNumber}`, data: data.results });
     });
 
     //const graph = new multiLinearChart(document.getElementById('login-section'), parameters).createChart();
 
-    const graph = renderProgressChart(document.getElementById('login-section'), parameters);
+    //const graph = renderProgressChart(document.getElementById('login-section'), parameters);
 
 
 
@@ -1243,391 +1243,7 @@ $(document).ready(async function () {
       }
 
 
-      /* Creating the milk average graph */
-      if (graphName === 'milk-average') {
-        /* Getting all the data */
-        let milkingData = [];
-        $('.mp-graph-data').each(function () {
-          if (periodMonths === 'all' || new Date($(this).attr('data-date')).getTime() <= Date.now() && new Date($(this).attr('data-date')).getTime() >= new Date(moment().subtract(periodMonths, 'month')).getTime()) {
-            milkingData.push({
-              result: parseFloat($(this).attr('data-result')),
-              lactationNumber: parseFloat($(this).attr('data-lact')),
-              date: new Date($(this).attr('data-date'))
-            });
 
-            if (parseFloat($(this).attr('data-result')) > maxResult) maxResult = parseFloat($(this).attr('data-result'));
-          }
-
-
-        });
-
-        milkingData.sort((a, b) => a.date - b.date);
-
-        /* Creating the grid */
-        /* X grid lines */
-        maxResult = Math.round((maxResult + 10) / 10) * 10;
-        const linesStepX = maxResult >= 50 ? 10 : 5;
-        const linesAmountX = maxResult / linesStepX;
-        const xGap = Math.round($('#mp-graph').height() / linesAmountX);
-
-        for (let i = 1; i < linesAmountX; i++) {
-          let text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-          text.classList.add('line-graph-grid-text');
-          text.setAttribute('x', `5`)
-          text.setAttribute('y', `${parseFloat($('#mp-graph').attr('height')) - (i * xGap - 5)}`)
-          text.textContent = `${i * linesStepX}`
-          graph.append(text);
-
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M 0 ${i * xGap} L ${parseFloat($('#mp-graph').attr('width'))} ${i * xGap}`)
-          graph.append(path);
-        }
-
-        /* Y grid lines */
-        const linesAmountY = Math.round(parseFloat($('#mp-graph').attr('width')) / xGap);
-        for (let i = 1; i < linesAmountY; i++) {
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M ${i * xGap} 0 L ${i * xGap} ${parseFloat($('#mp-graph').attr('height'))}`)
-          graph.append(path);
-        }
-
-        /* Adding average line and dots */
-        let daysSpan = Math.round((Date.now() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-        let milkingAverage = [];
-
-        milkingData.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-
-          /* Adding points */
-          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.classList.add('mp-line-graph-average-circle');
-          circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan));
-          circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (result.result * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-          circle.setAttribute('r', 2);
-          graph.append(circle);
-
-
-          /* Preparing second array for average line */
-          if (milkingAverage.length < 1) {
-            milkingAverage.push({ date: result.date, results: [result.result] })
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingAverage.length; i++) {
-              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year()) {
-                milkingAverage[i].results.push(result.result);
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingAverage.push({ date: result.date, results: [result.result] });
-            }
-          }
-        });
-
-        /* Counting averages and adding lines */
-        milkingAverage.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-          let total = 0
-          result.results.forEach(el => total += el);
-          let average = parseFloat((total / result.results.length).toFixed(1));
-
-          //console.log({ date: result.date, russianDate: moment(result.date).lang('ru').format('MMM') })
-
-          if (index === 0) {
-            let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-            path.classList.add('mp-line-graph-average-line');
-            path.setAttribute('d', `M ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-            path.setAttribute('id', `animal-line-average`);
-            graph.append(path);
-          } else {
-            let path = document.getElementById(`animal-line-average`);
-            path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-          }
-
-          /* Adding points */
-          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.classList.add(`line-graph-data-circle`);
-          circle.setAttribute('data-average', average);
-          circle.setAttribute('data-date', result.date);
-          circle.setAttribute('data-amount', result.results.length);
-          circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30);
-          circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-          circle.setAttribute('r', 2);
-          graph.append(circle);
-        });
-
-
-        /* Adding legend */
-        $('.mp-animal-graphs-legend').append(`
-          <div class="mp-animal-graphs-legend-item">
-            <div class="mp-animal-graphs-legend-item-line"></div>
-            <div class="mp-animal-graphs-legend-item-text">Средний результат</div>
-          </div>
-        `);
-
-        $('.mp-animal-graphs-legend-item-line').css('border-top', `2px solid ${$('.mp-line-graph-average-line').css('stroke')}`);
-
-        /* Showing the milk total graph */
-      } else if (graphName === 'milk-total') {
-        /* Getting all the data */
-        let milkingData = [];
-        $('.mp-graph-data').each(function () {
-          if (periodMonths === 'all' || new Date($(this).attr('data-date')).getTime() <= Date.now() && new Date($(this).attr('data-date')).getTime() >= new Date(moment().subtract(periodMonths, 'month')).getTime()) {
-            milkingData.push({
-              result: parseFloat($(this).attr('data-result')),
-              lactationNumber: parseFloat($(this).attr('data-lact')),
-              date: new Date($(this).attr('data-date'))
-            });
-
-            //if (parseFloat($(this).attr('data-result')) > maxResult) maxResult = parseFloat($(this).attr('data-result'));
-          }
-
-
-        });
-
-        milkingData.sort((a, b) => a.date - b.date);
-
-        /* Couting totals */
-        let daysSpan = Math.round((Date.now() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-        let milkingTotal = [];
-
-        milkingData.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-
-          /* Preparing second array for total line */
-          if (milkingTotal.length < 1) {
-            milkingTotal.push({ date: result.date, total: result.result })
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingTotal.length; i++) {
-              if (moment(milkingTotal[i].date).month() === moment(result.date).month() && moment(milkingTotal[i].date).year() === moment(result.date).year()) {
-                milkingTotal[i].total += result.result;
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingTotal.push({ date: result.date, total: result.result });
-            }
-          }
-        });
-
-        /* Adding max result */
-        milkingTotal.forEach(total => {
-          total.total = total.total * 30;
-          if (total.total > maxResult) maxResult = total.total
-        });
-
-
-        /* Creating the grid */
-        /* X grid lines */
-        maxResult = Math.round((maxResult + 100) / 100) * 100;
-        const linesStepX = maxResult / 10;
-        const linesAmountX = maxResult / linesStepX;
-        const xGap = Math.round($('#mp-graph').height() / linesAmountX);
-
-        for (let i = 1; i < linesAmountX; i++) {
-          let text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-          text.classList.add('line-graph-grid-text');
-          text.setAttribute('x', `5`)
-          text.setAttribute('y', `${parseFloat($('#mp-graph').attr('height')) - (i * xGap - 5)}`)
-          text.textContent = `${i * linesStepX}`
-          graph.append(text);
-
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M 0 ${i * xGap} L ${parseFloat($('#mp-graph').attr('width'))} ${i * xGap}`)
-          graph.append(path);
-        }
-
-        /* Y grid lines */
-        const linesAmountY = Math.round(parseFloat($('#mp-graph').attr('width')) / xGap);
-        for (let i = 1; i < linesAmountY; i++) {
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M ${i * xGap} 0 L ${i * xGap} ${parseFloat($('#mp-graph').attr('height'))}`)
-          graph.append(path);
-        }
-
-        /* Adding line */
-        milkingTotal.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-
-
-          if (index === 0) {
-            let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-            path.classList.add('mp-line-graph-average-line');
-            path.classList.add('line-graph-data-line-4');
-            path.setAttribute('d', `M ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (result.total * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-            path.setAttribute('id', `animal-line-total`);
-            graph.append(path);
-          } else {
-            let path = document.getElementById(`animal-line-total`);
-            path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (result.total * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-          }
-
-          /* Adding points */
-          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.classList.add(`line-graph-data-circle`);
-          circle.classList.add(`line-graph-data-circle-4`);
-          circle.setAttribute('data-total', result.total);
-          circle.setAttribute('data-date', result.date);
-          circle.setAttribute('data-amount', 'none');
-          circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30);
-          circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (result.total * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-          circle.setAttribute('r', 2);
-          graph.append(circle);
-        });
-
-        /* Adding legend */
-        $('.mp-animal-graphs-legend').append(`
-          <div class="mp-animal-graphs-legend-item">
-            <div class="mp-animal-graphs-legend-item-line"></div>
-            <div class="mp-animal-graphs-legend-item-text">Всего молока за месяц</div>
-          </div>
-        `);
-
-        $('.mp-animal-graphs-legend-item-line').css('border-top', `2px solid ${$('#animal-line-total').css('stroke')}`);
-
-        /* Milk averages by lactations */
-      } else if (graphName === 'milk-lact') {
-        /* Getting all the data */
-        let milkingData = [];
-        $('.mp-graph-data').each(function () {
-
-          if (periodMonths === 'all' || new Date($(this).attr('data-date')).getTime() <= Date.now() && new Date($(this).attr('data-date')).getTime() >= new Date(moment().subtract(periodMonths, 'month')).getTime() && $(this).attr('data-lact') !== 'undefined') {
-            milkingData.push({
-              result: parseFloat($(this).attr('data-result')),
-              lactationNumber: parseFloat($(this).attr('data-lact')),
-              date: new Date($(this).attr('data-date'))
-            });
-
-            if (parseFloat($(this).attr('data-result')) > maxResult) maxResult = parseFloat($(this).attr('data-result'));
-          }
-
-
-        });
-
-        milkingData.sort((a, b) => a.date - b.date);
-
-        /* Creating the grid */
-        /* X grid lines */
-        maxResult = Math.round((maxResult + 10) / 10) * 10;
-        const linesStepX = maxResult >= 50 ? 10 : 5;
-        const linesAmountX = maxResult / linesStepX;
-        const xGap = Math.round($('#mp-graph').height() / linesAmountX);
-
-        for (let i = 1; i < linesAmountX; i++) {
-          let text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-          text.classList.add('line-graph-grid-text');
-          text.setAttribute('x', `5`)
-          text.setAttribute('y', `${parseFloat($('#mp-graph').attr('height')) - (i * xGap - 5)}`)
-          text.textContent = `${i * linesStepX}`
-          graph.append(text);
-
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M 0 ${i * xGap} L ${parseFloat($('#mp-graph').attr('width'))} ${i * xGap}`)
-          graph.append(path);
-        }
-
-        /* Y grid lines */
-        const linesAmountY = Math.round(parseFloat($('#mp-graph').attr('width')) / xGap);
-        for (let i = 1; i < linesAmountY; i++) {
-          let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-          path.classList.add('line-graph-grid-line');
-          path.setAttribute('d', `M ${i * xGap} 0 L ${i * xGap} ${parseFloat($('#mp-graph').attr('height'))}`)
-          graph.append(path);
-        }
-
-        /* Adding average line and dots */
-        let daysSpan = Math.round((Date.now() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-        let milkingAverage = [];
-
-        milkingData.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-
-          /* Adding points */
-          /* var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.classList.add('mp-line-graph-average-circle');
-          circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan));
-          circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (result.result * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-          circle.setAttribute('r', 2);
-          graph.append(circle); */
-
-
-          /* Preparing second array for average line */
-          if (milkingAverage.length < 1) {
-            milkingAverage.push({ date: result.date, results: [result.result], lactationNumber: result.lactationNumber });
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingAverage.length; i++) {
-              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year() && milkingAverage[i].lactationNumber === result.lactationNumber) {
-                milkingAverage[i].results.push(result.result);
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingAverage.push({ date: result.date, results: [result.result], lactationNumber: result.lactationNumber });
-            }
-          }
-        });
-
-        /* Counting averages and adding lines */
-        milkingAverage.sort((a, b) => a.lactationNumber - b.lactationNumber);
-
-        milkingAverage.forEach((result, index, array) => {
-          let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
-          let total = 0
-          result.results.forEach(el => total += el);
-          let average = parseFloat((total / result.results.length).toFixed(1));
-
-
-          if (!document.getElementById(`animal-line-average-${result.lactationNumber}`)) {
-            let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-            path.classList.add(`line-graph-data-line`);
-            path.classList.add(`line-graph-data-line-${result.lactationNumber}`);
-            path.setAttribute('data-lact', `${result.lactationNumber}`)
-            path.setAttribute('d', `M ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-            path.setAttribute('id', `animal-line-average-${result.lactationNumber}`);
-            graph.append(path);
-          } else {
-            let path = document.getElementById(`animal-line-average-${result.lactationNumber}`);
-            path.setAttribute('d', `${path.getAttribute('d')} L ${daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30} ${parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult))}`)
-          }
-
-          /* Adding points */
-          var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-          circle.classList.add(`line-graph-data-circle`);
-          circle.classList.add(`line-graph-data-circle-${result.lactationNumber}`);
-          circle.setAttribute('data-average', average);
-          circle.setAttribute('data-date', result.date);
-          circle.setAttribute('data-amount', 'none');
-          circle.setAttribute('data-lact', result.lactationNumber);
-          circle.setAttribute('cx', daysInPeriod * ((parseFloat($('#mp-graph').attr('width')) - 60) / daysSpan) + 30);
-          circle.setAttribute('cy', parseFloat($('#mp-graph').attr('height')) - (average * (parseFloat($('#mp-graph').attr('height')) / maxResult)));
-          circle.setAttribute('r', 2);
-          graph.append(circle);
-        });
-
-        /* Adding legend */
-        $('.line-graph-data-line').each(function () {
-          let dataPointsEls = $(this).attr('id').split('-');
-          $('.mp-animal-graphs-legend').append(`
-            <div class="mp-animal-graphs-legend-item" id='${$(this).attr('id')}-legend' data-linked-el='${$(this).attr('id')}' data-linked-points='line-graph-data-circle-${dataPointsEls[dataPointsEls.length - 1]}' data-hidden="false"> 
-              <div class="mp-animal-graphs-legend-item-line"></div>
-              <div class="mp-animal-graphs-legend-item-text">Молоко сред. лактация #${$(this).attr('data-lact')}</div>
-            </div>
-          `);
-
-          $(`#${$(this).attr('id')}-legend`).find('.mp-animal-graphs-legend-item-line').css('border-top', `2px solid ${$(this).css('stroke')}`);
-        });
-
-      }
     }
 
     /* Resizing the graph */
@@ -4232,18 +3848,6 @@ $(document).ready(async function () {
     let milkPerMonth = { value: 0, growth: 0 }
     let milkAverage = { value: 0, growth: 0 }
 
-
-    /* Switching between graphs */
-    $('.mp-graphs-header-item').click(function () {
-      let graphBoxName = $(this).attr('id').replace('btn', 'box')
-      $(this).addClass('mp-graphs-header-item-active').siblings().removeClass('mp-graphs-header-item-active');
-
-      $('.mp-graph-box').hide();
-      $(`#${graphBoxName}`).show();
-    });
-
-    $('.mp-graphs-header-item').first().trigger('click');
-
     /* Getting and working with milking data */
     let milkingData = [];
     $('.mp-graph-data').each(function () {
@@ -4388,6 +3992,267 @@ $(document).ready(async function () {
       }
     });
 
+
+    /////////////////////
+    // MAIN PAGE GRAPH
+    /////////////////////
+    /* Switching among graphs */
+    $('.mp-animal-graphs-period-btn').on('click', function () {
+      $(this).addClass('mp-animal-graphs-period-btn-active');
+      $(this).siblings().removeClass('mp-animal-graphs-period-btn-active');
+
+      $('.mp-animal-graphs-switch-btn-active').trigger('click');
+    });
+    $('.mp-animal-graphs-switch-btn').on('click', function () {
+      $(this).addClass('mp-animal-graphs-switch-btn-active');
+      $(this).siblings().removeClass('mp-animal-graphs-switch-btn-active');
+
+      let period = 0;
+      if ($('.mp-animal-graphs-period-btn-active').attr('data-period') === 'all-time') {
+        period = Math.round((Date.now() - milkingData[0].date.getTime()) / 1000 / 60 / 60 / 24 / 30)
+      } else {
+        period = parseFloat($('.mp-animal-graphs-period-btn-active').attr('data-period'));
+      }
+
+      let milkingDataPeriod = milkingData.filter(data => data.date.getTime() > Date.now() - period * 1000 * 60 * 60 * 24 * 30);
+
+
+      /* Creating the milk average graph */
+      if ($(this).attr('id') === 'milk-average') {
+
+        /* Adding average */
+        let milkingAverage = [];
+
+        milkingDataPeriod.forEach((result, index, array) => {
+          /* Preparing second array */
+          if (milkingAverage.length < 1) {
+            milkingAverage.push({ date: result.date, results: [{ number: result.result, date: result.date }] })
+          } else {
+            let toPush = true;
+            for (let i = 0; i < milkingAverage.length; i++) {
+              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year()) {
+                milkingAverage[i].results.push({ number: result.result, date: result.date });
+                toPush = false;
+              }
+            }
+
+            if (toPush) {
+              milkingAverage.push({ date: result.date, results: [{ number: result.result, date: result.date }] });
+            }
+          }
+        });
+
+        /* Counting averages */
+        milkingAverage.forEach((result, index, array) => {
+          let total = 0;
+          result.results.forEach(el => total += el.number);
+          result.number = parseFloat((total / result.results.length).toFixed(1));
+        });
+
+        const parameters = {
+          graphSettings: {
+            timelineType: 'date',
+            startDate: new Date(moment().subtract(period, 'month')),
+            finishDate: new Date(),
+            periodMonths: period,
+            min: 0,
+            max: 50,
+            showLegend: true,
+            boxHeight: true,
+            //heightRatio: 0.75
+          },
+          tooltips: {
+            type: 'simple', // Detailed or simple
+            description: 'Сред. результат',
+            unitText: 'л.',
+            dateUnit: 'month'
+          },
+          datasets: [
+            {
+              showPoint: true,
+              pointColor: '#f4a261',
+              showLine: true,
+              lineColor: '#264653',
+              averageGraph: true,
+              showAllResults: true,
+              breakLactations: false,
+              legendName: 'Молока в среднем',
+              tooltipName: 'Молока в среднем',
+              data: milkingAverage
+            }
+          ]
+        };
+        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
+
+
+        /* Showing the milk total graph */
+      } else if ($(this).attr('id') === 'milk-total') {
+        /* Couting totals */
+        let milkingTotal = [];
+
+        milkingData.forEach((result, index, array) => {
+          /* Preparing second array for total line */
+          if (milkingTotal.length < 1) {
+            milkingTotal.push({ date: result.date, number: result.result })
+          } else {
+            let toPush = true;
+            for (let i = 0; i < milkingTotal.length; i++) {
+              if (moment(milkingTotal[i].date).month() === moment(result.date).month() && moment(milkingTotal[i].date).year() === moment(result.date).year()) {
+                milkingTotal[i].number += result.result;
+                toPush = false;
+              }
+            }
+
+            if (toPush) {
+              milkingTotal.push({ date: result.date, number: result.result });
+            }
+          }
+        });
+
+        /* Adding max result */
+        let maxResult = 0;
+        milkingTotal.forEach(total => {
+          total.number = total.number * 30;
+          if (total.number > maxResult) maxResult = total.number
+        });
+        maxResult = Math.round((maxResult + 100) / 100) * 100;
+
+
+        const parameters = {
+          graphSettings: {
+            timelineType: 'date',
+            startDate: new Date(moment().subtract(period, 'month')),
+            finishDate: new Date(),
+            periodMonths: period,
+            min: 0,
+            max: maxResult,
+            showLegend: true,
+            boxHeight: true,
+            //heightRatio: 0.75
+          },
+          tooltips: {
+            type: 'simple', // Detailed or simple
+            description: 'Молока в месяц',
+            unitText: 'л.',
+            dateUnit: 'month'
+          },
+          datasets: [
+            {
+              showPoint: true,
+              pointColor: '#f4a261',
+              showLine: true,
+              lineColor: '#264653',
+              averageGraph: false,
+              showAllResults: false,
+              breakLactations: false,
+              legendName: 'Молока в месяц',
+              tooltipName: 'Молока в месяц',
+              data: milkingTotal
+            }
+          ]
+        };
+        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
+
+
+        /* Milk averages by lactations */
+      } else if ($(this).attr('id') === 'milk-lact') {
+        /* Adding average line and dots */
+        let milkingAverage = [];
+
+        milkingData.forEach((result, index, array) => {
+          /* Preparing second array for average line */
+          if (milkingAverage.length < 1) {
+            milkingAverage.push({ date: result.date, results: [{ date: result.date, number: result.result }], lactation: result.lactation });
+          } else {
+            let toPush = true;
+            for (let i = 0; i < milkingAverage.length; i++) {
+              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year() && milkingAverage[i].lactation === result.lactation) {
+                milkingAverage[i].results.push({ date: result.date, number: result.result });
+                toPush = false;
+              }
+            }
+
+            if (toPush) {
+              milkingAverage.push({ date: result.date, results: [{ date: result.date, number: result.result }], lactation: result.lactation });
+            }
+          }
+        });
+
+        /* Counting averages and adding lines */
+        milkingAverage.sort((a, b) => a.lactation - b.lactation);
+
+        milkingAverage.forEach((result, index, array) => {
+          let total = 0
+          result.results.forEach(el => total += el.number);
+          result.number = parseFloat((total / result.results.length).toFixed(1));
+        });
+
+        let milkAverageByLactation = [];
+        milkingAverage.forEach(data => {
+          if (!isNaN(data.lactation)) {
+            if (milkAverageByLactation.length < 1) {
+              milkAverageByLactation.push({ lactation: data.lactation, data: [data] });
+            } else {
+              let toPush = true;
+              for (let i = 0; i < milkAverageByLactation.length; i++) {
+                if (milkAverageByLactation[i].lactation === data.lactation) {
+                  milkAverageByLactation[i].data.push(data);
+                  toPush = false;
+                }
+              }
+
+              if (toPush) {
+                milkAverageByLactation.push({ lactation: data.lactation, data: [data] });
+              }
+            }
+          }
+        });
+
+
+        const parameters = {
+          graphSettings: {
+            timelineType: 'date',
+            startDate: new Date(moment().subtract(period, 'month')),
+            finishDate: new Date(),
+            periodMonths: period,
+            min: 0,
+            max: 50,
+            showLegend: true,
+            boxHeight: true,
+            //heightRatio: 0.75
+          },
+          tooltips: {
+            type: 'simple', // Detailed or simple
+            description: 'Сред. результат',
+            unitText: 'л.',
+            dateUnit: 'month'
+          },
+          datasets: []
+        };
+
+        let colors = ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'];
+        milkAverageByLactation.forEach((el, index) => {
+          parameters.datasets.push({
+            showPoint: true,
+            pointColor: colors[index],
+            showLine: true,
+            lineColor: colors[index],
+            averageGraph: true,
+            showAllResults: false,
+            breakLactations: true,
+            legendName: `Лактация #${el.lactation}`,
+            tooltipName: `Лактация #${el.lactation}`,
+            data: el.data
+          });
+        });
+
+        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
+
+      }
+
+    });
+
+    $('.mp-animal-graphs-switch-btn-active').trigger('click');
 
   }
 

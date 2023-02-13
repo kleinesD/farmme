@@ -520,7 +520,7 @@ ion-icon {
 
 .basic-graph-tooltip {
   /* border-radius: 5px; */
-  width: calc(200px - 40px);
+  max-width: calc(500px - 40px);
   border-radius: 10px;
   padding: 20px;
   background-color: rgb(0, 0, 0, 0.75);
@@ -599,6 +599,9 @@ ion-icon {
 .bgt-result-line p {
   font-size: 80%;
   color: #ffffff
+}
+.bgt-result-line p:last-of-type {
+  margin-left: 20px;
 }
 
 .bgt-edit-btn {
