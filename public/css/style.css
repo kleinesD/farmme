@@ -528,7 +528,7 @@ ion-icon {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  /* display: none; */
+  display: none;
   position: absolute;
   transform: translateY(-50%);
   z-index: 1000;

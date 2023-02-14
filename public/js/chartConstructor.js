@@ -269,6 +269,7 @@ export const renderLineGraph = (container, parameters) => {
             let daysInPeriod = Math.round((new Date(result.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
 
             var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.classList.add('all-result-point')
             circle.setAttribute('cx', daysInPeriod * ((graph.width - 60) / daysSpan));
             circle.setAttribute('cy', graph.height - (result.number * (graph.height / parameters.graphSettings.max)));
             circle.setAttribute('r', 3);
@@ -446,19 +447,6 @@ export const renderLineGraph = (container, parameters) => {
           $(dataPoint).attr('r', 6);
         });
 
-        //Adding a tooltip box
-        /* $('.mp-tooltip-box').remove();
-        $('.mp-animal-graph-container').prepend(`
-      <div class="mp-tooltip-box">
-      <div class="mp-tooltip-title">${moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').charAt(0).toUpperCase() + moment($(currentPoint.dataPoints[0]).attr('data-date')).lang('ru').format('MMMM YYYY').slice(1)}</div>
-      <div class="mp-tooltip-info-line">
-        <div class="mp-tooltip-info">Результатов:</div>
-        <div class="mp-tooltip-info">${$(currentPoint.dataPoints[0]).attr('data-amount') === 'none' ? '&dash;' : $(currentPoint.dataPoints[0]).attr('data-amount')}</div>
-      </div>
-      <div class="mp-tooltip-devider"></div>
-    </div>
-      `); */
-
         $('.bgt-result-line-color').remove();
         currentPoint.dataPoints.forEach((dataPoint, index) => {
           if (index === 0) {
@@ -508,11 +496,22 @@ export const renderLineGraph = (container, parameters) => {
         $('.basic-graph-tooltip').css({
           'top': posTop,
           'left': posLeft,
-          'transform': transform
+          'transform': transform,
+          'display': 'flex'
         });
       }
 
     })
+
+    $(container).on('mouseleave', function() {
+      $('.basic-graph-tooltip').hide()
+      $('.basic-graphs-legend').css('opacity', '0');
+      $('.all-result-point').css('opacity', '0');
+    }); 
+    $(container).on('mouseenter', function() {
+      $('.basic-graphs-legend').css('opacity', '1');
+      $('.all-result-point').css('opacity', '0.5');
+    }); 
 
   }
 
