@@ -3,7 +3,7 @@ extends base
 block content
   .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
 
-  section.main-section 
+  section.main-section(data-animal-id=`${animal._id}`)
     -if(animal.status !== 'alive')
       .ami-write-off-disclaimer
         ion-icon(name="warning")
@@ -40,12 +40,17 @@ block content
               ion-icon(name="chevron-down-outline")
 
       .ami-info-block
+        .ami-title-line
+          p ИНФОРМАЦИЯ
+          a(href=`/herd/edit-animal/${animal._id}`)
+            ion-icon(name="settings")
+            
         -if(animal.birthDate)
           .ami-info-item
             .ami-info-icon 
               ion-icon(name="calendar-number")
             .ami-info
-              .ami-label Дата Рождения
+              //-.ami-label Дата Рождения
               .ami-info-text= `${animal.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}`
 
         -if(animal.gender)
@@ -53,7 +58,7 @@ block content
             .ami-info-icon 
               ion-icon(name="male-female")
             .ami-info
-              .ami-label Пол
+              //-.ami-label Пол
               .ami-info-text= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
 
         -if(animal.buyCost)
@@ -61,7 +66,7 @@ block content
             .ami-info-icon 
               ion-icon(name="pricetag")
             .ami-info
-              .ami-label Стоимость Покупки
+              //-.ami-label Стоимость Покупки
               .ami-info-text= `${animal.buyCost}₽`
 
         -if(animal.breedRussian)
@@ -69,7 +74,7 @@ block content
             .ami-info-icon 
               ion-icon(name="paw")
             .ami-info
-              .ami-label Порода
+              //-.ami-label Порода
               .ami-info-text= `${animal.breedRussian}`
 
         -if(animal.colors)
@@ -77,7 +82,7 @@ block content
             .ami-info-icon 
               ion-icon(name="color-filter")
             .ami-info
-              .ami-label Окрас
+              //-.ami-label Окрас
               .ami-info-text
                 each color in animal.colors
                   -if(color === 'black')
@@ -87,55 +92,66 @@ block content
                   -if(color === 'red')
                     | • Красный 
 
-          //-.ami-devider
+        .ami-devider
 
+        .ami-title-line
+          p КАТЕГОРИИ
+        .ami-categories-container
+          .ami-category#ami-category-herd РЕЗУЛЬТАТЫ
+          .ami-category#ami-category-vet.ami-category-unselected ВЕТЕРИНАРИЯ
 
-      a.ami-edit-animal(href=`/herd/edit-animal/${animal._id}`)
-        ion-icon(name="settings-outline")
-        p Изменить данные
       -if(animal.status === 'alive')
         .ami-action-btns-container
           .ami-action-btns-block
             -if(user.accessBlocks.includes('vet'))
               a.ami-action-btn(href=`/vet/add-action/${animal._id}`) 
+                .ami-action-module-color.ami-action-module-color-vet
                 p Вет. действие
                 img(src="/img/images/med-cross-icon.png")
               a.ami-action-btn(href=`/vet/add-problem/${animal._id}`) 
+                .ami-action-module-color.ami-action-module-color-vet
                 p Вет. проблема
                 img(src="/img/images/thermometer-icon.png")
               a.ami-action-btn(href=`#`) 
+                .ami-action-module-color.ami-action-module-color-vet
                 p Вет. лечение
                 img(src="/img/images/bandage-icon.png")
               a.ami-action-btn(href=`/vet/start-scheme/${animal._id}`) 
+                .ami-action-module-color.ami-action-module-color-vet
                 p Начать схему
                 img(src="/img/images/vet-scheme-icon.png")
             -if(animal.gender === 'female')
               a.ami-action-btn(href=`/herd/add-lactation/${animal._id}`)
+                .ami-action-module-color.ami-action-module-color-herd
                 p Лактация
                 img(src="/img/images/milking-cow-icon.png")
               -if(animal.lactations.length > 0)
                 a.ami-action-btn(href=`/herd/add-milking-result/${animal._id}`) 
+                  .ami-action-module-color.ami-action-module-color-herd
                   p Результат доения
                   img(src="/img/images/milk-icon.png")
               a.ami-action-btn(href=`/herd/add-insemination/${animal._id}`)
+                .ami-action-module-color.ami-action-module-color-herd
                 p Осеменение
                 img(src="/img/images/needle-icon.png")
             a.ami-action-btn(href=`/herd/add-weight-result/${animal._id}`) 
+              .ami-action-module-color.ami-action-module-color-herd
               p Взвешивание
               img(src="/img/images/weight-icon.png")
             //-a.ami-action-btn(href="") Конец лактации
             //-a.ami-action-btn.ami-action-btn-hidden(href=`/herd/write-off-animal/${animal._id}`) 
             a.ami-action-btn(href=`/herd/write-off-animal/${animal._id}`) 
+              .ami-action-module-color.ami-action-module-color-herd
               p Списать животное
               img(src="/img/images/butcher-icon.png")
           .ami-action-btn-openner 
-            p Добавить
+            p ДОБАВИТЬ
             ion-icon(name="add")
       
 
     .animal-card-body
 
-      -if(lastLact)
+      //-if(lastLact)
         -if(!lastLact.finishDate)
           -if(Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24) > 305)
             a.acb-important-info-block.acb-important-info-block-neg(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(lastLact)}`)
@@ -148,9 +164,11 @@ block content
               .acb-important-body-title= `Окончить текущую лактацию?`
               .acb-important-body-sub-title= `Длительность лактация: ${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24)} дн.`
 
+
+
       -if(animal.milkingResults.length > 0)
         .acb-graph-block
-          .acb-graph-header
+          //-.acb-graph-header
             p Результаты доения
             //.acb-graph-header-btn.acb-edit-info-btn
               ion-icon(name="menu-outline")
@@ -159,7 +177,7 @@ block content
               a.edit-blur-item(href=`/herd/edit/milking-results/${animal._id}`) Изменить результат доения
             //a.acb-graph-header-btn.acb-graph-header-btn-highlight(href=`/herd/add-milking-result/${animal._id}`)
               ion-icon(name="add-outline")
-          .acb-summary.acb-summary-less#acb-milking-summary
+          //-.acb-summary.acb-summary-less#acb-milking-summary
             .acb-summary-item.acb-summary-item-1#last-month-growth
               .acb-item-icon
                 img(src="/img/images/chart-icon.png")
@@ -178,45 +196,47 @@ block content
             .graph-empty-text Нет данных для этой лактации
 
           .acb-graph-container
-            .acb-graph-left
-              .acb-mini-header
-                p Сравнение лактаций
-                select#lactation-change
+            .acb-graph-line
+              .acb-graph-box
+                .acb-mini-header
+                  p Сравнение лактаций
+                  select#lactation-change
+                    -if(animal.lactations.length > 0)
+                      each lact in animal.lactations
+                        -if(lact.number === animal.lactations[animal.lactations.length - 1].number)
+                          option(value=`${lact.number}` selected data-number=`${lact.number}` data-start=`${lact.startDate}` data-finish=`${lact.endDate !== null ? lact.finishDate : Date.now()}`)= `Лактация #${lact.number}`
+                        -else
+                          option(value=`${lact.number}` data-number=`${lact.number}` data-start=`${lact.startDate}` data-finish=`${lact.endDate !== null ? lact.finishDate : Date.now()}`)= `Лактация #${lact.number}`
+                //-.acb-graph-btn-block
                   -if(animal.lactations.length > 0)
-                    each lact in animal.lactations
-                      -if(lact.number === animal.lactations[animal.lactations.length - 1].number)
-                        option(value=`${lact.number}` selected data-number=`${lact.number}` data-start=`${lact.startDate}` data-finish=`${lact.endDate !== null ? lact.finishDate : Date.now()}`)= `Лактация #${lact.number}`
-                      -else
-                        option(value=`${lact.number}` data-number=`${lact.number}` data-start=`${lact.startDate}` data-finish=`${lact.endDate !== null ? lact.finishDate : Date.now()}`)= `Лактация #${lact.number}`
-              //-.acb-graph-btn-block
-                -if(animal.lactations.length > 0)
-                  each lactation in animal.lactations
-                    .acb-graph-btn.acb-graph-btn-clickable(data-number=`${lactation.number}` data-start-date=`${lactation.startDate}` data-finish-date=`${lactation.finishDate !== null ? lactation.finishDate : new Date()}`)
-                      .acb-graph-btn-text= `Лактация: # ${lactation.number}`
-                      -if(lactation.finishDate)
-                        .acb-graph-btn-sub= `${lactation.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {year: 'numeric'})} - ${lactation.finishDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.finishDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.finishDate.toLocaleString('ru-RU', {year: 'numeric'})}`
-                      -else
-                        .acb-graph-btn-sub= `${lactation.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {year: 'numeric'})} - ...`
-              .acb-graph
-                each result in animal.milkingResults
-                  .acb-graph-invisible.acb-graph-animal(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
-                each anim in allFarmAnimals 
-                  -if(anim.milkingResults.length > 0)
-                    each result in anim.milkingResults
-                      .acb-graph-invisible.acb-graph-average(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
-                canvas#acb-milking-results-chart
+                    each lactation in animal.lactations
+                      .acb-graph-btn.acb-graph-btn-clickable(data-number=`${lactation.number}` data-start-date=`${lactation.startDate}` data-finish-date=`${lactation.finishDate !== null ? lactation.finishDate : new Date()}`)
+                        .acb-graph-btn-text= `Лактация: # ${lactation.number}`
+                        -if(lactation.finishDate)
+                          .acb-graph-btn-sub= `${lactation.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {year: 'numeric'})} - ${lactation.finishDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.finishDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.finishDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                        -else
+                          .acb-graph-btn-sub= `${lactation.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${lactation.startDate.toLocaleString('ru-RU', {year: 'numeric'})} - ...`
+                .acb-graph
+                  each result in animal.milkingResults
+                    .acb-graph-invisible.acb-graph-animal(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${animal._id}` data-cow-photo=`${animal.mainPhoto}` data-cow-name=`${animal.name}` data-cow-number=`${animal.number}`)
+                  each anim in allFarmAnimals 
+                    -if(anim.milkingResults.length > 0)
+                      each result in anim.milkingResults
+                        .acb-graph-invisible.acb-graph-average(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
+                  canvas#acb-milking-results-chart
 
-              .acb-mini-header
-                p Лактации по дням
-              .acb-graph
-                //-.acb-graph-title Сравнение лактаций
-                each lactation in animal.lactations 
-                  .acb-graph-invisible.acb-graph-lactations(data-start-date=`${lactation.startDate}` data-finish-date=`${lactation.finishDate}` data-number=`${lactation.number}`)
-                each result in animal.milkingResults
-                  .acb-graph-invisible.acb-graph-results(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
-                canvas#acb-lactations-result-chart
+              .acb-graph-box
+                .acb-mini-header
+                  p Лактации по дням
+                .acb-graph
+                  //-.acb-graph-title Сравнение лактаций
+                  each lactation in animal.lactations 
+                    .acb-graph-invisible.acb-graph-lactations(data-start-date=`${lactation.startDate}` data-finish-date=`${lactation.finishDate}` data-number=`${lactation.number}`)
+                  each result in animal.milkingResults
+                    .acb-graph-invisible.acb-graph-results(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
+                  canvas#acb-lactations-result-chart
 
-            .acb-graph-right
+            //-.acb-graph-right
               .acb-history-title История
               .acb-history-header
                 .acb-history-header-item Лакт.
@@ -230,7 +250,7 @@ block content
                     .acb-history-item-info= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
 
 
-      .acb-column-block
+      //-.acb-column-block
         .acb-column.acb-column-left
           -if(animal.weightResults.length > 0)
             .acb-graph-block

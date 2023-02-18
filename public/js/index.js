@@ -13,6 +13,7 @@ import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
+import { getMilkingProjection } from './milkingProjection';
 
 
 
@@ -2934,119 +2935,59 @@ $(document).ready(async function () {
         $('.ami-action-btns-container').animate({ 'height': '100%' }, 0);
         $(this).find('ion-icon').css({ 'transform': 'rotate(45deg)' });
         $('.ami-action-btns-block').addClass('animate__animated').addClass('animate__fadeIn').css('display', 'flex');
-        $('.ami-action-btn-openner p').text('Скрыть');
+        $('.ami-action-btn-openner p').text('СКРЫТЬ');
       } else {
         $(this).find('ion-icon').css({ 'transform': 'rotate(0deg)' });
         $('.ami-action-btns-block').addClass('animate__animated').addClass('animate__fadeOut').addClass('animate__slow').css('display', 'none');
         $('.ami-action-btns-container').animate({ 'height': '50px' }, 0);
-        $('.ami-action-btn-openner p').text('Добавить');
+        $('.ami-action-btn-openner p').text('ДОБАВИТЬ');
       }
 
       $(this).toggleClass('action-openned');
     });
 
     /* Multiple lactations graph */
+    let projectionData = getMilkingProjection($('.main-section').attr('data-animal-id'));
+
     if (document.querySelector('#acb-lactations-result-chart')) {
-      let dataArr = [];
-      let graphColors = ['rgb(41, 112, 69, 0.25)', 'rgb(133, 199, 242, 0.25)', 'rgb(246, 185, 29, 0.25)', 'rgb(249, 110, 70, 0.25)', 'rgb(240, 135, 0, 0.25)', 'rgb(239, 111, 108, 0.25)'];
-      let biggestArr = 0;
-
-
-      $('#acb-lactations-result-chart').parent().find('.acb-graph-lactations').each(function () {
-        let results = [];
-        let number = parseFloat($(this).attr('data-number'));
-
-        $('#acb-lactations-result-chart').parent().find('.acb-graph-results').each(function () {
-          if (number === parseFloat($(this).attr('data-lactation-number'))) {
-            results.push({ result: parseFloat($(this).attr('data-result')), date: new Date($(this).attr('data-date')) })
-          }
-        });
-
-        results.sort((a, b) => { return a.date - b.date });
-
-        dataArr.push({
-          number,
-          results,
-          resultsByDay: [],
-          startDate: new Date($(this).attr('data-start-date')),
-          finishDate: $(this).attr('data-finish-date') === 'null' ? new Date(Date.now()) : new Date($(this).attr('data-finish-date'))
+      let milkingData = [];
+      $('.acb-graph-animal').each(function () {
+        milkingData.push({
+          result: parseFloat($(this).attr('data-result')),
+          date: new Date($(this).attr('data-date')),
+          lactation: parseFloat($(this).attr('data-lact')),
+          cowId: $(this).attr('data-cow-id'),
+          cowPhoto: $(this).attr('data-cow-photo'),
+          cowNumber: $(this).attr('data-cow-number'),
+          cowName: $(this).attr('data-cow-name')
         });
       });
 
-      let graphData = {
-        labels: [],
-        datasets: []
-      }
+      milkingData.sort((a, b) => a.date - b.date);
 
-      dataArr.forEach((lact, index, array) => {
-        let daysIntoLactation = Math.round((lact.finishDate.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24);
+      let milkingByLact = []
 
-        for (let i = 0; i <= daysIntoLactation; i++) {
-          let day = lact.startDate.getTime() + i * 24 * 60 * 60 * 1000;
-
-          lact.results.forEach((result, inx, arr) => {
-            if (result.date.getTime() > day && inx === 0) {
-              let daysPeriod = Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24);
-              if (arr[inx + 1]) {
-                let addNumber = parseFloat(((arr[inx + 1].result - result.result) / daysPeriod).toFixed(2))
-                if (lact.resultsByDay.length > 0) {
-
-                  if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                    lact.resultsByDay.push(result.result);
-                  } else {
-                    lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
-                  }
-                } else {
-                  lact.resultsByDay.push(parseFloat((result.result - (arr[inx + 1].result - result.result) + addNumber).toFixed(2)));
-                }
-              } else {
-                lact.resultsByDay.push(result.result);
-              }
-
-            } else if (result.date.getTime() > day && arr[inx - 1].date.getTime() <= day) {
-              let daysPeriod = Math.round((result.date.getTime() - arr[inx - 1].date.getTime()) / 1000 / 60 / 60 / 24);
-              let addNumber = parseFloat(((result.result - arr[inx - 1].result) / daysPeriod).toFixed(2))
-
-              if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                lact.resultsByDay.push(result.result);
-              } else {
-                lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
-              }
-
-            } else if (result.date.getTime() <= day && arr.length > 1 && inx === arr.length - 1) {
-              let daysPeriod = Math.round((result.date.getTime() - arr[inx - 1].date.getTime()) / 1000 / 60 / 60 / 24);
-              let addNumber = parseFloat(((result.result - arr[inx - 1].result) / daysPeriod).toFixed(2))
-
-              if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                lact.resultsByDay.push(result.result);
-              } else {
-                lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
+      milkingData.forEach(data => {
+        if (!isNaN(data.lactation)) {
+          if (milkingByLact.length < 1) {
+            milkingByLact.push({ lactation: data.lactation, data: [data] });
+          } else {
+            let toPush = true;
+            for (let i = 0; i < milkingByLact.length; i++) {
+              if (milkingByLact[i].lactation === data.lactation) {
+                milkingByLact[i].data.push(data);
+                toPush = false;
               }
             }
-          });
 
+            if (toPush) {
+              milkingByLact.push({ lactation: data.lactation, data: [data] });
+            }
+          }
         }
-
-
-        if (lact.resultsByDay.length > biggestArr) biggestArr = lact.resultsByDay.length;
-
-        graphData.datasets.push({
-          label: `Лактация # ${lact.number}`,
-          data: lact.resultsByDay,
-          borderColor: graphColors[lact.number - 1],
-          backgroundColor: 'rgb(0, 0, 0, 0)',
-          fill: false,
-          pointBorderColor: 'rgb(0, 0, 0, 0)',
-          pointBorderWidth: 0,
-          borderWidth: 1.5,
-        });
       });
 
-      for (let i = 1; i <= biggestArr; i++) {
-        graphData.labels.push(`${i} День`);
-      }
-
-      multipleLinesChart($('#acb-lactations-result-chart'), 0, 0, graphData, false);
+      let milkingByLactByDay = []
     }
 
     /* One lactation and average graph */
