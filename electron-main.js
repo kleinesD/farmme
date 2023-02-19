@@ -78,7 +78,7 @@ const createWindow = () => {
     contentWindow.removeBrowserView(preloadView);
   });
 
-  //if (isDev) contentWindow.webContents.openDevTools();
+  if (isDev) contentWindow.webContents.openDevTools();
 
 
 
