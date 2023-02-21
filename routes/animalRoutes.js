@@ -41,7 +41,4 @@ router.patch('/write-off/multiple-animals', authController.protect, animalContro
 
 router.patch('/bring-back-animal/:animalId', authController.protect, animalController.bringBackAnimal);
 
-router.get('/milking-projection/:animalId', authController.protect, animalController.milkingProjectionData);
-
-
 module.exports = router;

@@ -55,7 +55,6 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/');
   contentWindow.loadURL('http://127.0.0.1:604/login');
   contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/62a1a778479a86453629a60d');
 
 
   contentWindow.maximize();
@@ -79,7 +78,7 @@ const createWindow = () => {
     contentWindow.removeBrowserView(preloadView);
   });
 
-  if (isDev) contentWindow.webContents.openDevTools();
+  //if (isDev) contentWindow.webContents.openDevTools();
 
 
 

@@ -4407,6 +4407,8 @@ ion-icon {
   width: 100%;
   display: flex;
   position: relative;
+  flex-direction: column;
+  gap: 30px;
 }
 .acb-graph-line {
   width: 100%;
@@ -4422,7 +4424,12 @@ ion-icon {
   padding: 20px;
   background-color: #f0f0f0;
 }
-
+.acb-tile-graph-box {
+  width: calc(70% - 40px);
+  border-radius: 20px;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
 .acb-graph-container-columns {
   display: flex;
   align-items: center;
@@ -4843,6 +4850,55 @@ ion-icon {
 .bla {
   color: rgb(240, 135, 0, 0.25);
   color: rgb(239, 111, 108, 0.25)
+}
+
+/* TILE GRAPH */
+.acb-tile-graph {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+.acb-tile-graph-line {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.acb-tile-graph-line p {
+  font-size: 80%;
+  font-weight: 500;
+  text-align: right;
+  width: 85px;
+  margin-right: 10px;
+}
+.acb-tile {
+  width: 60px;
+  height: 40px;
+  border-radius: 3px;
+  background-color: #FFB038;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.acb-tile-projected {
+  background-color: none;
+  background: repeating-linear-gradient(
+  135deg,
+  #FFB038,
+  #FFB038 4px,
+  #ffffff 4px,
+  #ffffff 8px
+);
+}
+.acb-tile-title {
+  color: #555555;
+  font-size: 70%;
+  font-weight: 500;
+}
+.acb-tile-result {
+  font-size: 80%;
+  font-weight: 500;
 }
 
 
