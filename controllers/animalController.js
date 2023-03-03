@@ -353,4 +353,18 @@ exports.bringBackAnimal = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.milkingProjectionData = catchAsync(async (req, res, next) => {
+  let animal = await Animal.findById(req.params.animalId);
+  let farmAnimals = await Animal.find({farm: animal.farm, gender: 'female'});
+  let allAnimals = await Animal.find({gender: 'female'})
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      animal,
+      farmAnimals,
+      allAnimals
+    }
+  });
+});
 

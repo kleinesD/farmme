@@ -13,6 +13,7 @@ import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
+import { getMilkingProjection } from './milkingProjection';
 
 
 
@@ -2945,12 +2946,88 @@ $(document).ready(async function () {
       $(this).toggleClass('action-openned');
     });
 
+    /* Projection milking tile graph */
+    let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
+    let milkingProjectionSorted = [];
+
+    milkingProjection.forEach(data => {
+      if (milkingProjectionSorted.find(el => el.lactation === data.lactation)) {
+        milkingProjectionSorted.find(el => el.lactation === data.lactation).results.push(data);
+      } else {
+        milkingProjectionSorted.push({
+          lactation: data.lactation,
+          results: [data]
+        });
+      }
+    });
+
+    $('.acb-tile-graph').empty();
+    milkingProjectionSorted.forEach(lact => {
+      $('.acb-tile-graph').append(`
+        <div class="acb-tile-graph-line" id="tile-graph-line-${lact.lactation}">
+          <p>Лактация #${lact.lactation}</p>
+          <div class="acb-tile-line-res-box"></div>
+        </div>
+      `)
+
+      lact.results.forEach((res, inx) => {
+        $(`#tile-graph-line-${lact.lactation}`).find('.acb-tile-line-res-box').append(`
+          <div class="acb-tile acb-tile-visible ${res.type === 'projected' ? 'acb-tile-projected' : ''}" data-number="${res.monthIn}" data-result="${res.average}">
+            <div class="acb-tile-title">#${res.monthIn}</div>
+            <div class="acb-tile-result">${res.average.toFixed(1)}</div>
+          </div>
+        `)
+      });
+    });
+
+    $('.acb-tile-line-res-box').each(function () {
+      let lastNumber = $(this).find('.acb-tile').last().attr('data-number');
+
+      if ($(this).find('.acb-tile').first().attr('data-number') != 0) {
+        $(this).prepend(`
+          <div class="acb-tile acb-tile-invis" data-number="0">
+            <div class="acb-tile-title">#0</div>
+            <div class="acb-tile-result">0.0</div>
+          </div>
+        `)
+      }
+
+      $('.acb-tile').each(function () {
+        if ($(this).next().length !== 0 && parseFloat($(this).next().attr('data-number')) !== parseFloat($(this).attr('data-number')) + 1) {
+          $(this).after(`
+          <div class="acb-tile acb-tile-invis" data-number="${parseFloat($(this).attr('data-number')) + 1}" data-result="0">
+            <div class="acb-tile-title">#${parseFloat($(this).attr('data-number')) + 1}</div>
+            <div class="acb-tile-result">0.0</div>
+          </div>
+        `)
+        }
+      });
+    });
+
+    $('.acb-tile-visible').mouseenter(function() {
+      $('.acb-tile-visible').css('opacity', '0.5');
+      $(this).css('opacity', '1');
+      $('#result').find('.acb-item-info').text(`${parseFloat($(this).attr('data-result')).toFixed(1)} л.`)
+
+      if($(this).prev().length !== 0 && parseFloat($(this).prev().attr('data-result')) !== 0) {
+        $('#growth').find('.acb-item-info').text(`${(((parseFloat($(this).attr('data-result')) / parseFloat($(this).prev().attr('data-result'))) - 1 ) * 100).toFixed(1)} %`)
+      }
+    });
+    $('.acb-tile-visible').mouseleave(function() {
+      $('.acb-tile-visible').css('opacity', '1');
+      $('#result').find('.acb-item-info').text(`-`)
+      $('#growth').find('.acb-item-info').text(`-`)
+    });
+
+
+    /////////////////////////////////////
+    /* TO IMPLEMENT IN THE NEXT UPDATE */
+    /////////////////////////////////////
     /* Multiple lactations graph */
     if (document.querySelector('#acb-lactations-result-chart')) {
       let dataArr = [];
-      let graphColors = ['rgb(41, 112, 69, 0.25)', 'rgb(133, 199, 242, 0.25)', 'rgb(246, 185, 29, 0.25)', 'rgb(249, 110, 70, 0.25)', 'rgb(240, 135, 0, 0.25)', 'rgb(239, 111, 108, 0.25)'];
+      let graphColors = ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'];
       let biggestArr = 0;
-
 
       $('#acb-lactations-result-chart').parent().find('.acb-graph-lactations').each(function () {
         let results = [];
@@ -3051,275 +3128,123 @@ $(document).ready(async function () {
 
     /* One lactation and average graph */
     if (document.querySelector('#acb-milking-results-chart')) {
-      /* Initializing chart var */
-      let myChart;
 
       /* Function to change graphs between lactations */
       const changeMilkingResultsGraph = (lactationNumber, startDate, finishDate) => {
-        /* Destroying previous chart */
-        if (myChart) myChart.destroy();
 
-        /* Adding animal data related to selected tipe period */
-        let animalData = [];
-        let avgBufData = [];
+        
+        let milkingData = [];
         let averageData = [];
-        let projectedData = {};
-        $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function () {
-          let timeByMonths = Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30);
-          let result = parseFloat($(this).attr('data-result'));
-          let date = new Date($(this).attr('data-date'))
-          if (parseFloat($(this).attr('data-lactation-number')) === lactationNumber) {
-            animalData.push({ timeByMonths, result, date })
-          }
 
-          animalData.sort((a, b) => { return a.date - b.date });
+        $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function() {
+          if($(this).attr('data-lact') == lactationNumber) {
+            milkingData.push({
+              number: parseFloat($(this).attr('data-result')),
+              date: new Date($(this).attr('data-date')),
+              lactation: lactationNumber,
+              monthIn: Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30)
+            });
+          }
         });
 
-        /* Do not show a graph if there is no info */
-        if (animalData.length < 1) {
-          $('#acb-milking-summary').find('.acb-item-info').each(function () { $(this).text('-') });
-          $('#acb-milking-summary').find('.graph-empty-text').show();
-          return false;
-        } else {
-          $('#acb-milking-summary').find('.graph-empty-text').hide();
-        }
+        milkingData.sort((a, b) => a.monthIn - b.monthIn);
 
-        $('#acb-milking-results-chart').parent().find('.acb-graph-average').each(function () {
-          let timeByMonths = Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30);
-          let result = parseFloat($(this).attr('data-result'));
-          let date = new Date($(this).attr('data-date'))
-          if (parseFloat($(this).attr('data-lactation-number')) === lactationNumber) {
-            avgBufData.push({ timeByMonths, result })
+        /* $('#acb-milking-results-chart').parent().find('.acb-graph-average').each(function() {
+          if($(this).attr('data-lact') == lactationNumber) {
+            averageData.push({
+              number: parseFloat($(this).attr('data-result')),
+              date: new Date($(this).attr('data-date')),
+              lactation: lactationNumber,
+              monthIn: Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30)
+            });
           }
-
-          avgBufData.sort((a, b) => { return a.timeByMonths - b.timeByMonths });
         });
 
+        averageData.sort((a, b) => a.monthIn - b.monthIn);
 
-        avgBufData.forEach((el) => {
-          if (averageData.length < 1) {
-            averageData.push({ timeByMonths: el.timeByMonths, results: [el.result] })
+        let averageDataSorted = [];
+
+        averageData.forEach(data => {
+          if(averageDataSorted.length === 0 || averageDataSorted.find(el => el.monthIn === data.monthIn) === undefined) {
+            averageDataSorted.push({
+              monthIn: data.monthIn,
+              total: data.number,
+              results: [data],
+              average: 0
+            });
           } else {
-            let toPush = 0;
-            for (let i = 0; i < averageData.length; i++) {
-              if (averageData[i].timeByMonths === el.timeByMonths) {
-                averageData[i].results.push(el.result);
-                toPush++;
-              }
-            }
-
-            if (toPush === 0) {
-              averageData.push({ timeByMonths: el.timeByMonths, results: [el.result] });
-            }
+            averageDataSorted.find(el => el.monthIn === data.monthIn).total += data.number;
+            averageDataSorted.find(el => el.monthIn === data.monthIn).results.push(data);
           }
-        });
-        averageData.forEach(el => {
-          let total = 0;
-          el.results.forEach(result => { total += result });
-          el.averageResult = total / el.results.length;
-        });
+        }); */
+        const parameters = {
+          graphSettings: {
+            timelineType: 'date',
+            startDate: startDate,
+            finishDate: finishDate,
+            periodMonths: Math.round((finishDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30),
+            min: 0,
+            max: 50,
+            showLegend: true,
+            boxHeight: false,
+            heightRatio: 0.75
+          },
+          tooltips: {
+            type: 'simple', // Detailed or simple
+            description: 'Результат',
+            unitText: 'л.',
+            dateUnit: 'month'
+          },
+          datasets: [
+            {
+              showPoint: true,
+              pointColor: '#f4a261',
+              showLine: true,
+              lineColor: '#264653',
+              averageGraph: false,
+              showAllResults: false,
+              breakLactations: false,
+              legendName: 'Результат',
+              tooltipName: `Лактация #${lactationNumber}`,
+              data: milkingData
+            }
 
-        let graphData = {
-          labels: [],
-          datasets: []
+            /* showPoint: true,
+            pointColor: colors[index],
+            showLine: true,
+            lineColor: colors[index],
+            averageGraph: true,
+            showAllResults: false,
+            breakLactations: true,
+            legendName: `Лактация #${el.lactation}`,
+            tooltipName: `Лактация #${el.lactation}`,
+            data: el.data */
+          ]
         };
-
-        animalData.forEach(el => {
-          graphData.labels.push(`${moment(el.date).format('DD.MM.YYYY')}`)
-        });
-
-        let tempData = []
-        animalData.forEach(el => {
-          tempData.push(el.result);
-        });
-
-        graphData.datasets.push({
-          label: `Результат животного (л.)`,
-          data: tempData,
-          borderColor: 'rgba(41, 112, 69, 0.25)',
-          backgroundColor: 'rgba(41, 112, 69, 0)',
-          fill: false,
-          pointBorderColor: 'rgb(0, 0, 0, 1)',
-          borderWidth: 1.5,
-        });
-
-        tempData = [];
-        animalData.forEach(animEl => {
-          let added = false;
-          averageData.forEach(el => {
-            if (animEl.timeByMonths === el.timeByMonths) {
-              tempData.push(el.averageResult);
-              added = true;
-            }
-          });
-          if (!added) tempData.push('NaN')
-        });
-
-        graphData.datasets.push({
-          label: `Средний результат (л.)`,
-          data: tempData,
-          borderColor: '#c8c8c8',
-          backgroundColor: 'rgb(0, 0, 0, 0)',
-          fill: false,
-          pointBorderColor: 'rgb(0, 0, 0, 0)',
-          pointBorderWidth: 0,
-          borderWidth: 1.5,
-        });
-
-        myChart = multipleLinesChartOneActive($('#acb-milking-results-chart'), 0, 40, 10, graphData, false);
-
-
-
-
-        /* Projecting data for the unfinished lactation based on lactation month */
-        /* if (animalData.length >= 1 && startDate && !finishDate) {
-          projectedData.push(animalData[animalData.length - 1]);
-
-          let monthIntoLactation = Math.round((new Date(animalData[animalData.length - 1].x).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30);
-
-          for (let i = monthIntoLactation; i < 12; i++) {
-            let lastProjectEl = projectedData[projectedData.length - 1];
-            if (i < 2) {
-              projectedData.push({ x: new Date(moment().set('year', moment(lastProjectEl.x).year()).set('month', moment(lastProjectEl.x).month() + 1).set('date', moment(lastProjectEl.x).date())), y: Math.round(lastProjectEl.y * 1.5) })
-            } else {
-              projectedData.push({ x: new Date(moment().set('year', moment(lastProjectEl.x).year()).set('month', moment(lastProjectEl.x).month() + 1).set('date', moment(lastProjectEl.x).date())), y: Math.round(lastProjectEl.y * 0.9) })
-            }
-          }
-        }*/
-
-
-        /* Adding key summary information */
-        if (animalData.length > 1) {
-          let avgDiff = parseFloat((100 - (averageData[averageData.length - 1].averageResult / animalData[animalData.length - 1].result * 100)).toFixed(2));
-          $('#diff-avg').find('.acb-item-info').text(`${avgDiff}%`).addClass(`${avgDiff > 0 ? 'acb-item-info-pos' : 'acb-item-info-neg'}`).removeClass(`${avgDiff < 0 ? 'acb-item-info-pos' : 'acb-item-info-neg'}`);
-
-          let monthGrowth = parseFloat((100 - (animalData[animalData.length - 2].result / animalData[animalData.length - 1].result * 100)).toFixed(2));
-          $('#last-month-growth').find('.acb-item-info').text(`${monthGrowth}%`).addClass(`${monthGrowth > 0 ? 'acb-item-info-pos' : 'acb-item-info-neg'}`).removeClass(`${monthGrowth < 0 ? 'acb-item-info-pos' : 'acb-item-info-neg'}`)
-
-
-          let totalMilk = 0
-          let daysIntoLactation = Math.round((finishDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24);
-
-          let daysCounter = 0;
-
-          animalData.forEach((el, index, array) => {
-            if (array.length > 1 && index === 0) {
-              let daysInPeriod = Math.round((el.date.getTime() - startDate.getTime()) / 24 / 60 / 60 / 1000);
-
-              for (let i = 0; i < daysInPeriod; i++) {
-                totalMilk += el.result;
-                daysCounter++;
-              }
-              daysInPeriod = Math.round((array[index + 1].date.getTime() - el.date.getTime()) / 24 / 60 / 60 / 1000);
-
-              for (let i = 0; i < daysInPeriod; i++) {
-                totalMilk += el.result;
-                daysCounter++;
-              }
-            } else if (array.length > 1 && index > 0 && index < array.length - 1) {
-              let daysInPeriod = Math.round((array[index + 1].date.getTime() - el.date.getTime()) / 24 / 60 / 60 / 1000);
-
-              for (let i = 0; i < daysInPeriod; i++) {
-                totalMilk += (array[index + 1].result + el.result) / 2;
-                daysCounter++;
-              }
-            } else if (array.length > 1 && index === array.length - 1) {
-              let daysInPeriod;
-              if (!finishDate) {
-                daysInPeriod = Math.round((Date.now() - el.date.getTime()) / 24 / 60 / 60 / 1000);
-              } else {
-                daysInPeriod = Math.round((finishDate.getTime() - el.date.getTime()) / 24 / 60 / 60 / 1000);
-              }
-
-              for (let i = 0; i < daysInPeriod; i++) {
-                totalMilk += el.result;
-                daysCounter++;
-              }
-            } else if (array.length === 1) {
-              let daysInPeriod;
-              if (!finishDate) {
-                daysInPeriod = Math.round((Date.now() - startDate.getTime()) / 24 / 60 / 60 / 1000);
-              } else {
-                daysInPeriod = Math.round((finishDate.getTime() - startDate.getTime()) / 24 / 60 / 60 / 1000);
-              }
-
-              for (let i = 0; i < daysInPeriod; i++) {
-                totalMilk += el.result;
-                daysCounter++;
-              }
-            }
-          });
-          $('#amount-milk-lact').find('.acb-item-info').text(`${totalMilk}`);
-
-
-        } else {
-          $('#diff-avg').find('.acb-item-info').text(`-`).removeClass('acb-item-info-neg').removeClass('acb-item-info-pos')
-          $('#last-month-growth').find('.acb-item-info').text(`-`).removeClass('acb-item-info-neg').removeClass('acb-item-info-pos')
-          $('#amount-milk-lact').find('.acb-item-info').text(`-`).removeClass('acb-item-info-neg').removeClass('acb-item-info-pos')
-        }
-
+    
+        const graph = renderLineGraph(document.getElementById('acb-milking-results-chart'), parameters);
 
 
       }
 
 
       /* Changing graph on buttons click */
-      $('.acb-graph-btn-clickable').click(function () {
-        $(this).addClass('acb-graph-btn-selected').siblings().removeClass('acb-graph-btn-selected');
-        let startDate = new Date($(this).attr('data-start-date'));
-        let finishDate = new Date($(this).attr('data-finish-date'));
-        let number = parseFloat($(this).attr('data-number'));
-
-        changeMilkingResultsGraph(number, startDate, finishDate);
-
-      });
-
       $('#lactation-change').on('click change focus', function () {
         let startDate = new Date($('#lactation-change option:selected').attr('data-start'));
-        let finishDate = new Date($('#lactation-change option:selected').attr('data-finish'));
+        let finishDate;
+        if($('#lactation-change option:selected').attr('data-finish') != 'null') {
+          finishDate = new Date($('#lactation-change option:selected').attr('data-finish'));
+        } else {
+          finishDate = new Date();
+        }
         let number = parseFloat($('#lactation-change option:selected').attr('data-number'));
 
         changeMilkingResultsGraph(number, startDate, finishDate);
       });
 
-      let stopCounting = false;
+      $('#lactation-change').find('option').last().prev().attr('selected', 'true');
 
-      $('#lactation-change').find('option').each(function () {
-        if (!stopCounting) {
-          let number = parseFloat($(this).val());
-          let found = false;
-          $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function () {
-            if (parseFloat($(this).attr('data-lactation-number')) === number) {
-              found = true;
-            }
-          });
-
-          if (found) {
-            $(this).attr('selected', 'selected')
-            $(this).trigger('click');
-          }
-        }
-      });
-
-      /* Showing graph for the last element */
-      $('#lactation-change').trigger('click');
-
-      /* Sort history milking results */
-      $('.acb-history-item').each(function () {
-        let thisEl = $(this);
-        let thisDate = new Date($(this).attr('data-date'));
-
-        $('.acb-history-item').each(function () {
-          let curDate = new Date($(this).attr('data-date'));
-
-          if (thisDate < curDate) {
-            let moveEl = thisEl;
-            thisEl.detach();
-            $(this).after(moveEl);
-          }
-        });
-      });
-
+      $('#lactation-change').click();
 
     }
 
@@ -3425,6 +3350,14 @@ $(document).ready(async function () {
 
     }
 
+    /* Sitching insemination graphs */
+    $('.mp-animal-graphs-switch-btn').on('click', function() {
+      $(this).siblings().removeClass('mp-animal-graphs-switch-btn-active');
+      $(this).addClass('mp-animal-graphs-switch-btn-active');
+
+      $('.acb-graph-container-columns').hide();
+      $(`#${$(this).attr('id').replace('-btn', '')}`).show();
+    });
     /* Working with insemination successful rate graph */
     if (document.querySelector('#acb-insemination-success-rate-chart')) {
       let successful = 0;
@@ -3444,7 +3377,7 @@ $(document).ready(async function () {
           {
             label: 'Успешно',
             data: [parseFloat((successful / (successful + failure) * 100).toFixed(1)), parseFloat((failure / (successful + failure) * 100).toFixed(1))],
-            backgroundColor: ['rgb(41, 112, 69, 0.25)', '#ebebeb'],
+            backgroundColor: ['#0EAD69', '#D44D5C'],
             weight: 0.5
           }
         ]
@@ -3508,7 +3441,7 @@ $(document).ready(async function () {
         datasets: [
           {
             data: finalData,
-            backgroundColor: ['rgb(41, 112, 69, 0.25)', 'rgb(133, 199, 242, 0.25)', 'rgb(246, 185, 29, 0.25)', 'rgb(249, 110, 70, 0.25)', 'rgb(240, 135, 0, 0.25)', 'rgb(239, 111, 108, 0.25)'],
+            backgroundColor: ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'],
             weight: 0.5
           }
         ]
@@ -3588,6 +3521,17 @@ $(document).ready(async function () {
 
 
     }
+
+    /* Showing all treatments block */
+    $('.mp-scheme-item-header').on('click', function () {
+      if ($(this).parent().find('.mp-scheme-points-block').css('display') === 'none') {
+        $(this).parent().find('.mp-scheme-points-block').show()
+        $(this).parent().find('.mp-scheme-icon').css('transform', 'rotate(180deg)');
+      } else {
+        $(this).parent().find('.mp-scheme-points-block').hide()
+        $(this).parent().find('.mp-scheme-icon').css('transform', 'rotate(0deg)');
+      }
+    });
   }
 
   ///////////////////////

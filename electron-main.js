@@ -54,6 +54,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/');
   contentWindow.loadURL('http://127.0.0.1:604/login');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628a0f09a85ecbb47e0983d8');
   contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
 
 
@@ -78,7 +79,7 @@ const createWindow = () => {
     contentWindow.removeBrowserView(preloadView);
   });
 
-  //if (isDev) contentWindow.webContents.openDevTools();
+  if (isDev) contentWindow.webContents.openDevTools();
 
 
 

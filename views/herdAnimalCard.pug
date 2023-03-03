@@ -44,7 +44,7 @@ block content
           p ИНФОРМАЦИЯ
           a(href=`/herd/edit-animal/${animal._id}`)
             ion-icon(name="settings")
-            
+
         -if(animal.birthDate)
           .ami-info-item
             .ami-info-icon 
@@ -98,7 +98,8 @@ block content
           p КАТЕГОРИИ
         .ami-categories-container
           .ami-category#ami-category-herd РЕЗУЛЬТАТЫ
-          .ami-category#ami-category-vet.ami-category-unselected ВЕТЕРИНАРИЯ
+          .ami-category#ami-category-vet ВЕТЕРИНАРИЯ
+          //-.ami-category#ami-category-vet.ami-category-unselected ВЕТЕРИНАРИЯ
 
       -if(animal.status === 'alive')
         .ami-action-btns-container
@@ -147,7 +148,7 @@ block content
           .ami-action-btn-openner 
             p ДОБАВИТЬ
             ion-icon(name="add")
-      
+
 
     .animal-card-body
 
@@ -177,27 +178,10 @@ block content
               a.edit-blur-item(href=`/herd/edit/milking-results/${animal._id}`) Изменить результат доения
             //a.acb-graph-header-btn.acb-graph-header-btn-highlight(href=`/herd/add-milking-result/${animal._id}`)
               ion-icon(name="add-outline")
-          //-.acb-summary.acb-summary-less#acb-milking-summary
-            .acb-summary-item.acb-summary-item-1#last-month-growth
-              .acb-item-icon
-                img(src="/img/images/chart-icon.png")
-              .acb-item-info -
-              .acb-item-title За последний месяц
-            .acb-summary-item.acb-summary-item-2#diff-avg
-              .acb-item-icon
-                img(src="/img/images/chart-icon-2.png")
-              .acb-item-info -
-              .acb-item-title Разница от среднего (последний мес.)
-            .acb-summary-item.acb-summary-item-3#amount-milk-lact
-              .acb-item-icon
-                img(src="/img/images/milk-icon.png")
-              .acb-item-info -
-              .acb-item-title Всего получено молока за лактацию (л.)
-            .graph-empty-text Нет данных для этой лактации
 
           .acb-graph-container
             .acb-graph-line
-              .acb-graph-box
+              .acb-graph-box.shadow
                 .acb-mini-header
                   p Сравнение лактаций
                   select#lactation-change
@@ -222,10 +206,10 @@ block content
                   each anim in allFarmAnimals 
                     -if(anim.milkingResults.length > 0)
                       each result in anim.milkingResults
-                        .acb-graph-invisible.acb-graph-average(data-date=`${result.date}` data-result=`${result.result}` data-lactation-number=`${result.lactationNumber}`)
-                  canvas#acb-milking-results-chart
+                        .acb-graph-invisible.acb-graph-average(data-date=`${result.date}` data-result=`${result.result}` data-lact=`${result.lactationNumber}`)
+                  .acb-graph-outter#acb-milking-results-chart
 
-              .acb-graph-box
+              .acb-graph-box.shadow
                 .acb-mini-header
                   p Лактации по дням
                 .acb-graph
@@ -237,7 +221,7 @@ block content
                   canvas#acb-lactations-result-chart
 
             .acb-graph-line
-              .acb-tile-graph-box
+              .acb-tile-graph-box.shadow
                 .acb-mini-header
                   p Прогноз доения
                 .acb-tile-graph
@@ -250,6 +234,35 @@ block content
                     .acb-tile.acb-tile.acb-tile-projected
                       .acb-tile-title #1
                       .acb-tile-result 16.4
+
+              .acb-summary.acb-summary-less#acb-milking-summary
+                -if(lastLact)
+                  -if(!lastLact.finishDate)
+                    -if(Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24) > 305)
+                      a.acb-important-info-block.acb-summary-item-1.acb-important-info-block-neg.shadow(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(lastLact)}`)
+                        img(src="/img/images/milking-cow-icon.png")
+                        .acb-important-body-title= `Окончить текущую лактацию?`
+                        .acb-important-body-sub-title= `Длительность лактация: ${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24)} дн.`
+                    -else 
+                      a.acb-important-info-block.acb-summary-item-1.acb-important-info-block-pos.shadow(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(lastLact)}`)
+                        img(src="/img/images/milking-cow-icon.png")
+                        .acb-important-body-title= `Окончить текущую лактацию?`
+                        .acb-important-body-sub-title= `Длительность лактация: ${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24)} дн.`
+                //-.acb-summary-item.acb-summary-item-1#last-month-growth
+                  .acb-item-icon
+                    img(src="/img/images/chart-icon.png")
+                  .acb-item-info -
+                  .acb-item-title За последний месяц
+                .acb-summary-item.acb-summary-item-2.shadow#result
+                  .acb-item-icon
+                    img(src="/img/images/chart-icon-2.png")
+                  .acb-item-title РЕЗУЛЬТАТ
+                  .acb-item-info -
+                .acb-summary-item.acb-summary-item-3.shadow#growth
+                  .acb-item-icon
+                    img(src="/img/images/milk-icon.png")
+                  .acb-item-title МЕСЯЧНЫЙ РОСТ
+                  .acb-item-info -%
 
             //-.acb-graph-right
               .acb-history-title История
@@ -265,10 +278,12 @@ block content
                     .acb-history-item-info= `${result.date.toLocaleString('ru-RU', {day: '2-digit'})}.${result.date.toLocaleString('ru-RU', {month: '2-digit'})}.${result.date.toLocaleString('ru-RU', {year: 'numeric'})}`
 
 
-      //-.acb-column-block
+      .acb-column-block
         .acb-column.acb-column-left
-          -if(animal.weightResults.length > 0)
-            .acb-graph-block
+
+          //- ADD LATER
+          //-if(animal.weightResults.length > 0)
+            .acb-graph-block-small
               .acb-graph-header
                 p История веса
               .acb-half-summary
@@ -288,7 +303,8 @@ block content
                         .acb-graph-invisible.acb-graph-average(data-date=`${result.date}` data-result=`${result.result}` data-birth-date=`${anim.birthDate}`)
                   canvas#acb-weight-history-chart
 
-          .animal-all-items-block
+          //- MAYBE TO REMOVE
+          //-.animal-all-items-block
             .acb-graph-header
               p История данных
             select.aai-type-selector
@@ -352,109 +368,124 @@ block content
             .aai-tip * нажмите на результат для изменения
 
           -if(problems.length > 0)
-            .mp-stat-block.mp-stat-animal-block
-              .mp-block-header
-                p Проблемы и болезни
-              .mp-list-block#current-problems
+            .mp-schemes-block.acb-schemes-block.shadow
+              .mp-schemes-block-header Проблемы и болезни
+              .mp-schemes-container
                 each problem in problems
-                  -if(problem.cured === true)
-                    .mp-problem-item.mp-cured
-                      .mp-scheme-item-header
-                        .mp-scheme-first-line
-                          .mp-scheme-title= problem.name
-                          p Вылечено
-                        .mp-scheme-second-line
-                          p= `Дата: ${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                      .mp-problem-treatments-block
-                        each treatment in problem.treatments 
-                          .mp-problem-treatment(data-date=`${treatment.date}`)
-                            -if(treatment.cured === true)
-                              ion-icon.mp-cured-icon(name="checkmark-circle")
+                  .mp-scheme-item.mp-problem-i(data-date=`${problem.date}` class=`${problem.cured ? 'mp-problem-cured' : 'mp-problem-not-cured'}`)
+                    .mp-scheme-item-header
+                      img(src='/img/images/default-cow-image.png')
+                      p= `#${animal.number}`
+                      ion-icon.mp-scheme-icon(name="chevron-down")
+                      p.mp-scheme-name= problem.name
+                    .mp-scheme-points-block
+                      .mp-scheme-points-line
+                      .mp-scheme-point(data-date=`${problem.date}`)
+                        .mp-scheme-point-number
+                          ion-icon(name="thermometer")
+                        p Проблема добавлена
+                        p.mp-scheme-point-date= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                      each treatment in problem.treatments 
+                        .mp-scheme-point(data-date=`${treatment.date}`)
+                          -if(treatment.cured)
+                            .mp-scheme-point-number
+                              ion-icon(name="checkmark")
+                          -else
+                            .mp-scheme-point-number
+                              ion-icon(name="close")
+                          p= treatment.name
+                          p.mp-scheme-point-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+          -if(scheme)
+            
+
+            .mp-schemes-block.acb-schemes-block.shadow
+              .mp-schemes-block-header Текущая схема
+              .mp-schemes-container
+                .mp-scheme-item.mp-scheme-i(data-date=`${scheme.date}`)
+                  .mp-scheme-item-header
+                    img(src='/img/images/default-cow-image.png')
+                    p= `#${scheme.animal.number}`
+                    //ion-icon.mp-scheme-icon(name="chevron-down")
+                    p.mp-scheme-name= scheme.scheme.name  
+                  .mp-scheme-points-block.acb-scheme-points-block
+                    .mp-scheme-points-line
+                    .mp-scheme-point(data-date=`${scheme.date}`)
+                      .mp-scheme-point-number.mp-scheme-point-done
+                        ion-icon(name="checkmark-sharp")
+                        //p 1
+                      p= scheme.name
+                      p.mp-scheme-point-date= `${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                    each point in scheme.otherPoints 
+                      .mp-scheme-point(data-date=`${point.date}` data-finished=`${new Date(point.date) < new Date()}`)
+                        .mp-scheme-point-number(class=`${new Date(point.date) < new Date() ? 'mp-scheme-point-done' : ''}`)
+                          -if(new Date(point.date) > new Date())
+                            -if(scheme.otherPoints.indexOf(point) !== scheme.otherPoints.length - 1)
+                              p= `${scheme.otherPoints.indexOf(point) + 2}`
                             -else
-                              ion-icon.mp-uncured-icon(name="close-circle")
-                            .mp-problem-treatment-name= treatment.name
-                            .mp-problem-treatment-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                      -if(problem.treatments.length > 1)
-                        .mp-problem-treatment-more(data-state="to-show") 
-                          p Показать еще
-                          ion-icon(name="chevron-down")
-                  -if(problem.cured === false)
-                    .mp-problem-item.mp-uncured
-                      .mp-scheme-item-header
-                        .mp-scheme-first-line
-                          .mp-scheme-title= problem.name
-                          a.mp-treatment-link(href=`/vet/add-treatment/${problem._id}`) Лечение +
-                        .mp-scheme-second-line
-                          p= `Дата: ${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                      .mp-problem-treatments-block
-                        each treatment in problem.treatments 
-                          .mp-problem-treatment(data-date=`${treatment.date}`)
-                            ion-icon.mp-uncured-icon(name="close-circle")
-                            .mp-problem-treatment-name= treatment.name
-                            .mp-problem-treatment-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                      -if(problem.treatments.length > 1)
-                        .mp-problem-treatment-more(data-state="to-show") 
-                          p Показать еще
-                          ion-icon(name="chevron-down")
+                              ion-icon(name="flash")
+                          -else
+                            ion-icon(name="checkmark-sharp")
+                        p= point.name
+                        p.mp-scheme-point-date= `${point.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
 
         .acb-column.acb-column-right
           -if(animal.inseminations.length > 0)
             .acb-double-block
               -if(!lastLact && Date.now() > animal.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000 )
-                .acb-double-box.acb-double-left.acb-double-pos
+                .acb-double-box.acb-double-left.acb-double-pos.shadow
                   .acb-icon
                     ion-icon(name="happy-outline")
                   img.acb-double-img(src="/img/images/cow-icon.png")
-                  .acb-double-title Готова к осеменению
+                  .acb-double-title ГОТОВА К ОСЕМЕНЕНИЮ
               -if(!lastLact && Date.now() < animal.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000 )
-                .acb-double-box.acb-double-left.acb-double-neg
+                .acb-double-box.acb-double-left.acb-double-neg.shadow
                   .acb-icon
                     ion-icon(name="sad-outline")
                   img.acb-double-img(src="/img/images/cow-icon.png")
-                  .acb-double-title Еще не готова к осеменению
+                  .acb-double-title ЕЩЕ НЕ ГОТОВА К ОСЕМЕНЕНИЮ
               -if(lastLact && (Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24 < 60 && lastLact.startDate.getTime() > lastInsem.date.getTime())
-                .acb-double-box.acb-double-left.acb-double-pos
+                .acb-double-box.acb-double-left.acb-double-pos.shadow
                   .acb-icon
                     ion-icon(name="alert-circle")
                   img.acb-double-img(src="/img/images/cow-icon.png")
                   .acb-double-title= `${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24)} дн.`
-                  .acb-double-sub На осеменение
+                  .acb-double-sub НА ОСЕМЕНЕНИЕ
               -if(lastLact && (Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24 > 60 && lastLact.startDate.getTime() > lastInsem.date.getTime() || lastLact && (Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24 > 60 && lastLact.startDate.getTime() < lastInsem.date.getTime() && !lastInsem.success)
-                .acb-double-box.acb-double-left.acb-double-neg
+                .acb-double-box.acb-double-left.acb-double-neg.shadow
                   .acb-icon
                     ion-icon(name="alert-circle")
                   img.acb-double-img(src="/img/images/cow-icon.png")
                   .acb-double-title= `${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24) - 60} дн.`
-                  .acb-double-sub Перестой
+                  .acb-double-sub ПЕРЕСТОЙ
               -if(lastLact && lastLact.startDate.getTime() < lastInsem.date.getTime() && lastInsem.success)
-                .acb-double-box.acb-double-left.acb-double-pos
+                .acb-double-box.acb-double-left.acb-double-pos.shadow
                   .acb-icon
                     ion-icon(name="alert-circle")
                   img.acb-double-img(src="/img/images/cow-icon.png")
                   .acb-double-title= `${new Date(lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {day: '2-digit'})}.${new Date(lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {month: '2-digit'})}.${new Date(lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000).toLocaleString('ru-RU', {year: 'numeric'})} ∼ ${Math.round(((lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`
-                  .acb-double-sub Ожидаемый отел
+                  .acb-double-sub ОЖИДАЕМЫЙ ОТЕЛ
 
               -if(lastLact && lastInsem.success && lastInsem.date.getTime() > lastLact.startDate.getTime())
-                .acb-double-box.acb-double-right.acb-double-pos
+                .acb-double-box.acb-double-right.acb-double-pos.shadow
                   .acb-icon
                     ion-icon(name="checkmark-circle")
                   img.acb-double-img(src="/img/images/needle-icon.png")
-                  .acb-double-title= `Успешно - ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
-                  .acb-double-sub= `Последнее осеменение`
+                  .acb-double-title= `УСПЕШНО - ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .acb-double-sub= `ПОСЛЕДНЕЕ ОСЕМЕНЕНИЕ`
               -if(lastLact && lastInsem.success === false && lastInsem.date.getTime() > lastLact.startDate.getTime())
-                .acb-double-box.acb-double-right.acb-double-neg
+                .acb-double-box.acb-double-right.acb-double-neg.shadow
                   .acb-icon
                     ion-icon(name="close-circle")
                   img.acb-double-img(src="/img/images/needle-icon.png")
-                  .acb-double-title= `Не успешно - ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
-                  .acb-double-sub= `Последнее осеменение`
+                  .acb-double-title= `НЕ УСПЕШНО - ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .acb-double-sub= `ПОСЛЕДНЕЕ ОСЕМЕНЕНИЕ`
               -if(lastLact && lastInsem.success === undefined && lastInsem.date.getTime() > lastLact.startDate.getTime()) 
-                .acb-double-box.acb-double-right.acb-double-pos
+                .acb-double-box.acb-double-right.acb-double-pos.shadow
                   .acb-icon
                     ion-icon(name="checkmark-circle")
                   img.acb-double-img(src="/img/images/needle-icon.png")
                   .acb-double-title Результат?
-                  .acb-double-sub= `Осеменение ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  .acb-double-sub= `ОСЕМЕНЕНИЕ ${lastInsem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${lastInsem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
                   .acb-double-btn-block#insemination-results-block(data-date=`${lastInsem.date}` data-animal-id=`${animal._id}` data-index=`${animal.inseminations.indexOf(lastInsem)}`)
                     .acb-double-btn#insem-false
                       ion-icon(name="close-outline")
@@ -465,14 +496,17 @@ block content
 
 
 
-            .acb-graph-block
+            .acb-graph-block-small.shadow
               .acb-graph-header
-                p Успешность осеменения
-                //.acb-graph-header-btn.acb-edit-info-btn 
+                p Осеменение
+              .mp-animal-graphs-switch.acb-graph-switch
+                .mp-animal-graphs-switch-btn.mp-animal-graphs-switch-btn-active#acb-success-rate-btn Успешность %
+                .mp-animal-graphs-switch-btn#acb-attemps-count-btn Количество попыток
+                //-.acb-graph-header-btn.acb-edit-info-btn 
                   ion-icon(name="menu-outline")
-                //.edit-blur-block
+                //-.edit-blur-block
                   a.edit-blur-item(href=`/herd/edit/inseminations/${animal._id}`) Изменить данные осеменения
-                //a.acb-graph-header-btn.acb-graph-header-btn-highlight(href=`/herd/add-insemination/${animal._id}`)
+                //-a.acb-graph-header-btn.acb-graph-header-btn-highlight(href=`/herd/add-insemination/${animal._id}`)
                   ion-icon(name="add-outline")
 
               //-.acb-graph-history-box
@@ -492,56 +526,19 @@ block content
                         p= `#${animal.inseminations.indexOf(insem) + 1}: ${insem.date.toLocaleString('ru-RU', {day: '2-digit'})}.${insem.date.toLocaleString('ru-RU', {month: '2-digit'})}.${insem.date.toLocaleString('ru-RU', {year: 'numeric'})}`
                         ion-icon(name="radio-button-off")
 
-              .acb-graph-container.acb-graph-container-columns
+              .acb-graph-container.acb-graph-container-columns#acb-success-rate
                 .acb-graph
                   each insem in animal.inseminations
                     .acb-graph-invisible.acb-graph-animal(data-date=`${insem.date}` data-success=`${insem.success}`)
                   canvas#acb-insemination-success-rate-chart
 
-            .acb-graph-block
-              .acb-graph-header
-                p Количество попыток
-              .acb-graph-container.acb-graph-container-columns
+              .acb-graph-container.acb-graph-container-columns#acb-attemps-count
                 .acb-graph
                   each insem in animal.inseminations
                     .acb-graph-invisible.acb-graph-animal(data-date=`${insem.date}` data-success=`${insem.success}`)
                   canvas#acb-insemination-try-rate-chart
 
-          -if(scheme)
-            .mp-stat-block.mp-stat-animal-block
-              .mp-block-header
-                p Текущая схема
-              .mp-list-block#current-schemes
-                .mp-scheme-item
-                  .mp-scheme-item-header 
-                    //-.mp-scheme-animal-line
-                      img(src='/img/images/default-cow-image.png')
-                      p= `#${scheme.animal.number}`
-                      -if(scheme.animal.name)
-                        p= scheme.animal.name
-                    .mp-scheme-first-line
-                      .mp-scheme-title= scheme.scheme.name 
-                      p= `Шагов: ${scheme.scheme.points.length}`
-                    .mp-scheme-second-line
-                      p= `Дата начала: ${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                  .mp-scheme-points-block
-                    .mp-scheme-point(data-date=`${scheme.date}`)
-                      ion-icon.scheme-icon-pos(name="checkmark-circle")
-                      .mp-scheme-point-name= scheme.name
-                      .mp-scheme-point-date= `${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                    each point in scheme.otherPoints 
-                      .mp-scheme-point(data-date=`${point.date}` data-finished=`${new Date(point.date) < new Date()}`)
-                        -if(new Date(point.date) > new Date())
-                          ion-icon.scheme-icon-neg(name="time")
-                        -else
-                          ion-icon.scheme-icon-pos(name="checkmark-circle")
-                        .mp-scheme-point-name= point.name
-                        .mp-scheme-point-date= `${point.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                  .mp-scheme-points-more(data-state="to-show") 
-                    p Показать еще
-                    ion-icon(name="chevron-down")  
 
-      
 
       -if(animal.inseminations.length === 0 && animal.weightResults.length === 0 && animal.milkingResults.length === 0)
         .acb-no-info-text Нет данных об этом животном
