@@ -11,6 +11,7 @@ block content
 
       .animal-results-container#vet-action-container(class=`${forOne === true ? 'animal-results-big' : 'animal-results-full'}`)
         img.ar-image-back(src="/img/images/med-cross-icon.png")
+        .ar-block-sub-title ДОБАВИТЬ
         .ar-block-title Ветеринарное действие
         
 
@@ -49,9 +50,10 @@ block content
               option(value="ml") Мл.
               option(value="g") Гм.
 
-        .aa-add-more#add-dose-input
-          p Добавить дозировку
-          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-add-more-container
+          .aa-add-more#add-dose-input
+            p Добавить дозировку
+            ion-icon.aa-add-more-icon(name="add-circle")
         .aa-input-block
           lable.aa-label(for="note") 
             p Описание
@@ -159,7 +161,8 @@ block content
 
       .animal-results-container#edit-vet-action-container(class='animal-results-big')
         img.ar-image-back(src="/img/images/med-cross-icon.png")
-        .ar-block-title Редактировать ветеринарное действие
+        .ar-block-sub-title РЕДАКТИРОВАТЬ
+        .ar-block-title Ветеринарное действие
         
 
         .aa-input-block
@@ -194,9 +197,10 @@ block content
                 option(value="ml") Мл.
                 option(value="g") Гм.
 
-          .aa-add-more#add-dose-input
-            p Добавить дозировку
-            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-add-more-container
+            .aa-add-more#add-dose-input
+              p Добавить дозировку
+              ion-icon.aa-add-more-icon(name="add-circle")
         .aa-input-block
           lable.aa-label(for="note") 
             p Описание

@@ -7,7 +7,7 @@ block content
     include _animalHeader
     .animal-results-window
 
-      .animal-results-history
+      //-.animal-results-history
         .ar-block-title.ar-block-title-chart История результатов
         -if(animal.weightResults.length > 2)
           .animal-results-data-box  
@@ -45,6 +45,7 @@ block content
       -if(!forEdit)
         .animal-results-container.animal-results-big#weight-results-container
           img.ar-image-back(src="/img/images/weight-icon.png")
+          .ar-block-sub-title ДОБАВИТЬ
           .ar-block-title Изменение веса
           .ar-one-line-result
             .aa-input-block.aa-input-block-half
@@ -63,7 +64,8 @@ block content
       -if(forEdit)
         .animal-results-container.animal-results-big#edit-weight-results-container
           img.ar-image-back(src="/img/images/weight-icon.png")
-          .ar-block-title Редактировать изменение веса
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title Изменение веса
           .ar-one-line-result
             .aa-input-block.aa-input-block-half
               lable.aa-label(for="result")

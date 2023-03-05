@@ -13,6 +13,7 @@ block content
 
       .animal-results-container#vet-problem-container(class=`${forOne === true ? 'animal-results-big' : 'animal-results-full'}`)
         img.ar-image-back(src="/img/images/thermometer-icon.png")
+        .ar-block-sub-title ДОБАВИТЬ
         .ar-block-title Ветеринарная проблема
 
         -if(!forOne)
@@ -148,7 +149,8 @@ block content
 
       .animal-results-container#edit-vet-problem-container(class='animal-results-big')
         img.ar-image-back(src="/img/images/thermometer-icon.png")
-        .ar-block-title Редактировать ветеринарную проблема
+        .ar-block-sub-title РЕДАКТИРОВАТЬ
+        .ar-block-title Ветеринарная проблема
 
         .aa-input-block
           lable.aa-label(for="name") 

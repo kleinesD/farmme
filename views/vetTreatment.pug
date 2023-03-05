@@ -10,6 +10,7 @@ block content
     -if(!forEdit)
       .animal-results-container.animal-results-big#vet-treatment-container
 
+        .ar-block-sub-title ДОБАВИТЬ
         .ar-block-title Лечение
 
         .aa-input-block
@@ -39,9 +40,10 @@ block content
               option(value="ml") Мл.
               option(value="g") Гм.
 
-        .aa-add-more#add-dose-input
-          p Добавить дозировку
-          ion-icon.aa-add-more-icon(name="add-circle")
+        .aa-add-more-container
+          .aa-add-more#add-dose-input
+            p Добавить дозировку
+            ion-icon.aa-add-more-icon(name="add-circle")
         .aa-input-block
           lable.aa-label(for="note") 
             p Описание
@@ -150,7 +152,8 @@ block content
     -if(forEdit)    
       .animal-results-container.animal-results-big#edit-vet-treatment-container
 
-        .ar-block-title Редактировать лечение
+        .ar-block-sub-title РЕДАКТИРОВАТЬ
+        .ar-block-title Лечение
 
         .aa-input-block
           lable.aa-label
@@ -195,9 +198,10 @@ block content
                 option(value="mg" selected) Мг.
                 option(value="ml") Мл.
                 option(value="g") Гм.
-          .aa-add-more#add-dose-input
-            p Добавить дозировку
-            ion-icon.aa-add-more-icon(name="add-circle")
+          .aa-add-more-container
+            .aa-add-more#add-dose-input
+              p Добавить дозировку
+              ion-icon.aa-add-more-icon(name="add-circle")
         .aa-input-block
           lable.aa-label(for="note") 
             p Описание

@@ -91,7 +91,7 @@ export const renderLineGraph = (container, parameters) => {
 
         let timeUnitIn;
         if (parameters.graphSettings.timelineType === 'date') {
-          timeUnitIn = Math.round((new Date(data.date).getTime() - new Date(moment().subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
+          timeUnitIn = Math.round((new Date(data.date).getTime() - new Date(moment(parameters.graphSettings.finishDate).subtract(parameters.graphSettings.periodMonths, 'month')).getTime()) / 1000 / 60 / 60 / 24);
         } else if (parameters.graphSettings.timelineType === 'day') {
           timeUnitIn = data.day;
         }

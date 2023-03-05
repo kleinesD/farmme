@@ -8,7 +8,7 @@ block content
     include _animalHeader
     .animal-results-window
 
-      .animal-results-history
+      //-.animal-results-history
         .ar-block-title.ar-block-title-chart История результатов
         -if(animal.milkingResults.length > 3)
           .animal-results-data-box  
@@ -49,6 +49,8 @@ block content
       -if(!forEdit)
         .animal-results-container.animal-results-big#milking-results-container
           img.ar-image-back(src="/img/images/milk-icon.png")
+
+          .ar-block-sub-title ДОБАВИТЬ
           .ar-block-title Контрольное доение
           .ar-one-line-result
             .aa-input-block.aa-input-block-half
@@ -75,7 +77,8 @@ block content
       -if(forEdit)
         .animal-results-container.animal-results-big#edit-milking-results-container
           img.ar-image-back(src="/img/images/milk-icon.png")
-          .ar-block-title Редактировать контрольное доение
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title Контрольное доение
           .ar-one-line-result
             .aa-input-block.aa-input-block-half
               lable.aa-label(for="result")

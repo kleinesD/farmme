@@ -113,7 +113,7 @@ block content
                 .ami-action-module-color.ami-action-module-color-vet
                 p Вет. проблема
                 img(src="/img/images/thermometer-icon.png")
-              a.ami-action-btn(href=`#`) 
+              //-a.ami-action-btn(href=`#`) 
                 .ami-action-module-color.ami-action-module-color-vet
                 p Вет. лечение
                 img(src="/img/images/bandage-icon.png")
@@ -376,6 +376,8 @@ block content
                     .mp-scheme-item-header
                       img(src='/img/images/default-cow-image.png')
                       p= `#${animal.number}`
+                      -if(!problem.cured)
+                        a.mp-treatment-btn(href=`/vet/add-treatment/${problem._id}`) ЛЕЧЕНИЕ +
                       ion-icon.mp-scheme-icon(name="chevron-down")
                       p.mp-scheme-name= problem.name
                     .mp-scheme-points-block
