@@ -32,3 +32,19 @@ export const logout = async () => {
     console.log(err);
   }
 }
+
+export const editFarm = async (farmId, data) => {
+  try {
+    const res = await axios({
+      method: 'PATCH',
+      url: `/api/farms/edit-farm/${farmId}`,
+      data
+    });
+
+    if (res.data.status === 'success') {
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}

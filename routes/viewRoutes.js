@@ -21,6 +21,8 @@ router.get('/add-reminder', authController.protect, authController.isLoggedIn, v
 
 router.get('/edit-reminder/:reminderId', authController.protect, authController.isLoggedIn, viewController.renderEditReminder);
 
+router.get('/edit-farm', authController.protect, authController.isLoggedIn, viewController.renderEditFarm);
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////

@@ -55,7 +55,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-problem/628c8e193108dae81ddad038');
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme');
   contentWindow.loadURL('http://127.0.0.1:604/herd/history');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
+  contentWindow.loadURL('http://127.0.0.1:604/edit-farm');
   
   
 

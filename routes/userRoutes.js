@@ -10,5 +10,9 @@ router.post('/login', authController.login);
 
 router.post('/logout', authController.logout);
 
+router.patch('/edit-user/id', authController.protect, userController.editUser);
+
+router.post('/create-user-link', authController.protect, authController.createUserLink);
+
 
 module.exports = router;

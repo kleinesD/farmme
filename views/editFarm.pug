@@ -1,0 +1,47 @@
+extends base
+
+block content
+  section.main-section 
+
+    .animal-results-container.animal-results-full#edit-farm-container
+      img.ar-image-back(src="/img/images/milking-cow-icon.png")
+      .ar-block-sub-title НАСТРОЙКА
+      .ar-block-title Ферма
+      .aa-input-block 
+        .detailed-info-block
+          .detailed-info-icon 
+            ion-icon(name="alert")
+          .detailed-info-text aowidgoiawugd oawiudgoiawugdoiwaugodi nwago diugaowidgoiwano idgaowidgn oiwaudniua gnwodiugawoin dgoaiwdngaiwundgoianwgdoiugaodnigawodigaiudgoaw
+            .detailed-info-text-triangle
+        label.aa-label(for="name")
+          p Название
+        -if(!farm.name)
+          input.aa-text-input#name(type="text")
+        -else
+          input.aa-text-input#name(type="text" value=`${farm.name}`)
+      .aa-input-block 
+        label.aa-label(for="type")
+          p Ед. измерения жидкости
+        .aa-pick-box.aa-pick-box-one#liquid-unit(data=`${farm.liquidUnit}`)
+          -if(farm.liquidUnit === 'l')
+            .aa-pick.aa-pick-picked#l Литр
+            .aa-pick#gl Галон
+          -if(farm.liquidUnit === 'gl')
+            .aa-pick#l Литр
+            .aa-pick.aa-pick-picked#gl Галон
+      .aa-input-block 
+        label.aa-label(for="type")
+          p Ед. измерения веса
+        .aa-pick-box.aa-pick-box-one#weight-unit
+          -if(farm.weightUnit === 'kg')
+            .aa-pick.aa-pick-picked#kg Килограмм
+            .aa-pick#lb Фунт
+          -if(farm.weightUnit === 'lb')
+            .aa-pick#kg Килограмм
+            .aa-pick.aa-pick-picked#lb Фунт
+      .ar-btn-box  
+        a.ar-add-button(data-farm-id=`${farm._id}`) Сохранить
+
+
+
+

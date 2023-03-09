@@ -10,7 +10,7 @@ import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnima
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteRemninder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
-import { login, logout } from './authHandler';
+import { login, logout, editFarm } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
@@ -1737,6 +1737,51 @@ $(document).ready(async function () {
     });
   }
 
+  /* EDIT FARM PAGE */
+  if (document.querySelector('#edit-farm-container')) {
+    /* Working with form */
+    $('input').on('click keyup change', function () {
+      if ($(this).val() !== '') {
+        $(this).addClass('ar-valid-input');
+      } else {
+        $(this).removeClass('ar-valid-input');
+      }
+    });
+    
+    $('*').on('click change keyup', function () {
+      if ($('#liquid-unit').find('.aa-pick-picked').length > 0 && $('#weight-unit').find('.aa-pick-picked').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+    $('input').trigger('click');
+
+    $('.ar-add-button').click(async function () {
+      const farmId = $(this).attr('data-farm-id');
+      const name = $('#name').val().length > 0 ? $('#name').val() : undefined;
+      const liquidUnit = $('#liquid-unit').find('.aa-pick-picked').attr('id');
+      const weightUnit = $('#weight-unit').find('.aa-pick-picked').attr('id');
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      const response = await editFarm(farmId, { name, liquidUnit, weightUnit });
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        /* location.assign('/herd/all-animals'); */
+      }
+    });
+  }
 
 
   /////////////////////////

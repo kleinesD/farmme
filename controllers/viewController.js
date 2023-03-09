@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Animal = require('../models/animalModel');
+const Farm = require('../models/farmModel');
 const Vet = require('../models/vetModel');
 const Scheme = require('../models/schemeModel');
 const Calendar = require('../models/calendarModel');
@@ -51,6 +52,14 @@ exports.renderEditReminder = catchAsync(async (req, res, next) => {
     reminder,
     animal,
     forEdit
+  });
+});
+
+exports.renderEditFarm = catchAsync(async(req, res, next) => {
+  const farm = await Farm.findOne({owner: req.user._id});
+
+  res.status(200).render('editFarm', {
+    farm
   });
 });
 

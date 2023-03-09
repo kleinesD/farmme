@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const farmSchema = new mongoose.Schema({
+  name: {
+    type: String
+  },
   creationDate: {
     type: Date,
     default: Date.now(),
