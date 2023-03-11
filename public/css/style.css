@@ -2550,10 +2550,10 @@ ion-icon {
   border-radius: 5px;
   background-color: #a2a2a2;
   max-width: 200px;
-  word-break: break-all;
   margin-right: 20px;
   position: relative;
   color: #ffffff;
+  display: none;
 }
 
 .detailed-info-text-triangle {
@@ -2579,6 +2579,9 @@ ion-icon {
   font-size: 100%;
   font-weight: 500;
   color: #f4a261;
+}
+.aa-input-ps-warning {
+  color: #D44D5C;
 }
 
 .ar-one-line-result {
@@ -2956,6 +2959,45 @@ ion-icon {
 
 .aa-pick-picked .aa-pick-small {
   color: #ffffff
+}
+.aa-check-box-line {
+  width: calc(100% - 40px);
+  padding: 0 20px;
+  height: 51px;
+  display: flex;
+  align-items: center;
+}
+.aa-check-box {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: 1px solid #000000;
+  overflow: hidden;
+  cursor: pointer;
+  margin-right: 20px;
+}
+.aa-check-box-inner {
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  border-radius: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+.aa-check-box-checked {
+  opacity: 1;
+}
+.aa-check-box-inner ion-icon {
+  font-size: 150%;
+  color: #ffffff;
+}
+.aa-check-box-text {
+  font-weight: 500;
 }
 
 .aa-input-hider {

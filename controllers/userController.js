@@ -24,3 +24,15 @@ exports.editUser = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.checkEmail = catchAsync(async(req, res, next) => {
+  let response = true;
+  if(await User.findOne({email: req.params.email})) response = false;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      response
+    }
+  });
+});

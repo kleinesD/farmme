@@ -1,0 +1,44 @@
+extends base
+
+block content
+  section.main-section 
+
+    .animal-results-container.animal-results-full#edit-user-container
+      img.ar-image-back(src="/img/images/milking-cow-icon.png")
+      .ar-block-sub-title НАСТРОЙКА
+      .ar-block-title Ферма
+      .aa-input-block 
+        label.aa-label(for="first-name")
+          p Имя
+        -if(!user.firstName)
+          input.aa-text-input#first-name(type="text")
+        -else
+          input.aa-text-input#first-name(type="text" value=`${user.firstName}`)
+      .aa-input-block 
+        label.aa-label(for="last-name")
+          p Фамилия
+        -if(!user.lastName)
+          input.aa-text-input#last-name(type="text")
+        -else
+          input.aa-text-input#last-name(type="text" value=`${user.lastName}`)
+      .aa-input-block 
+        label.aa-label(for="email")
+          p Электронная почта
+        -if(!user.email)
+          input.aa-text-input#email(type="email" data-email=`${user.email}`)
+        -else
+          input.aa-text-input#email(type="email" data-email=`${user.email}` value=`${user.email}`)
+        .aa-input-block.aa-input-block-half
+          label.aa-label(for="birth-date")
+            p Дата рождения
+          -if(!user.birthDate)
+            input.aa-text-input.aa-date-input#birth-date(type="date")
+          -else
+            input.aa-text-input.aa-date-input#birth-date(type="date" data-value=`${user.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}-${user.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}-${user.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+      .ar-btn-box  
+        a.ar-add-button(data-user-id=`${user._id}`) Сохранить
+
+
+
+

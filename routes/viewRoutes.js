@@ -23,6 +23,10 @@ router.get('/edit-reminder/:reminderId', authController.protect, authController.
 
 router.get('/edit-farm', authController.protect, authController.isLoggedIn, viewController.renderEditFarm);
 
+router.get('/edit-user', authController.protect, authController.isLoggedIn, viewController.renderEditUser);
+
+router.get('/change-restrictions/:userId', authController.protect, authController.isLoggedIn, viewController.renderChangeRestrictions);
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////

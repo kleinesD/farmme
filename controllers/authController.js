@@ -42,7 +42,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
-    accessBlocks: req.body.accessBlocks
+    accessBlocks: req.body.accessBlocks,
+    farm: req.body.farm
   });
 
   createSignToken(newUser, 201, req, res);

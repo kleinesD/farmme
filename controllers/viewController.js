@@ -2,6 +2,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Animal = require('../models/animalModel');
 const Farm = require('../models/farmModel');
+const User = require('../models/userModel');
 const Vet = require('../models/vetModel');
 const Scheme = require('../models/schemeModel');
 const Calendar = require('../models/calendarModel');
@@ -60,6 +61,22 @@ exports.renderEditFarm = catchAsync(async(req, res, next) => {
 
   res.status(200).render('editFarm', {
     farm
+  });
+});
+
+exports.renderEditUser = catchAsync(async(req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.user._id, req.body);
+
+  res.status(200).render('editUser', {
+    user
+  })
+});
+
+exports.renderChangeRestrictions = catchAsync(async(req, res, next) => {
+  const user = await User.findById(req.params.userId);
+
+  res.status(200).render('changeRestrictions', {
+    user
   });
 });
 

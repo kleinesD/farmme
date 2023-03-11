@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  birthDate: {
+    type: Date
+  },
   role: {
     type: String,
     required: true
@@ -25,6 +28,10 @@ const userSchema = new mongoose.Schema({
     enum: ['herd', 'vet', 'warehouse', 'hr']
   },
   editOther: {
+    type: Boolean,
+    default: false
+  },
+  editData: {
     type: Boolean,
     default: false
   },
