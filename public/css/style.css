@@ -226,7 +226,8 @@ ion-icon {
   align-items: center;
   border-radius: 50px;
   /* background-color: #f0f0f0; */
-  display: none;
+  /* display: none; */
+  opacity: 0;
 }
 
 .header-search-block-icon {
@@ -257,7 +258,7 @@ ion-icon {
 .header-user-block {
   display: flex;
   align-items: center;
-  display: none;
+  /* display: none; */
 }
 
 .header-user-notifications {
@@ -3678,6 +3679,7 @@ ion-icon {
   height: 80%;
   width: auto;
   border-radius: 5px;
+  background-color: #f0f0f0;
 }
 
 .al-item-info {
@@ -6717,4 +6719,110 @@ ion-icon {
   border-radius: 50%;
   height: 80%;
   width: auto;
+}
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ALL EMPLOYEES PAGE */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+.users-list-block {
+  width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  padding: 100px 0;
+}
+.users-list-container {
+  border-radius: 20px;
+  width: calc(100% - 40px);
+  padding: 20px;
+}
+.users-list-container-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.ulh-item {
+  font-size: 80%;
+  font-weight: 400;
+  color: #afafaf;
+  text-align: center;
+}
+.ulh-item.ulh-item-photo {width: 5%}
+.ulh-item.ulh-item-name {width: 25%}
+.ulh-item.ulh-item-email {width: 25%}
+.ulh-item.ulh-item-title {width: 15%}
+.ulh-item.ulh-item-restrictions {width: 15%}
+.ulh-item.ulh-item-action {width: 15%}
+
+.users-list-user-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  margin: 10px 0;
+  
+}
+.ului-photo {
+  height: 100%;
+  width: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ului-photo img {
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1;
+  border-radius: 5px;
+}
+.ului-name,
+.ului-email {
+  font-weight: 500;
+  width: 25%;
+  text-align: center;
+  font-size: 90%;
+}
+.ului-title {
+  width: 15%;
+  text-align: center;
+  font-weight: 500;
+  font-size: 90%;
+}
+.ului-restrictions {
+  width: 15%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.ului-herd {
+  color: #FFB038;
+}
+.ului-vet {
+  color: #5E72E8;
+}
+.ului-warehouse {
+  color: #FE928F;
+}
+.ului-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15%;
+}
+.ului-action a {
+  padding: 7.5px 15px;
+  font-weight: 500;
+  border-radius: 5px;
+  background-color: #0A0908;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 80%;
 }

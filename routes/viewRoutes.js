@@ -27,6 +27,8 @@ router.get('/edit-user', authController.protect, authController.isLoggedIn, view
 
 router.get('/change-restrictions/:userId', authController.protect, authController.isLoggedIn, viewController.renderChangeRestrictions);
 
+router.get('/all-employees/:farmId', authController.protect, authController.isLoggedIn, viewController.renderAllEmployees);
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////

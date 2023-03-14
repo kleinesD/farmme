@@ -9,14 +9,14 @@ const Calendar = require('../models/calendarModel');
 const Inventory = require('../models/inventoryModel');
 
 exports.renderLogin = catchAsync(async (req, res, next) => {
-  const cows = await Animal.find({farm: '628c8bc53108dae81ddad028', gender: 'female'});
+  const cows = await Animal.find({ farm: '628c8bc53108dae81ddad028', gender: 'female' });
   res.status(200).render('login', {
     cows
   });
 });
 
 exports.renderMain = catchAsync(async (req, res, next) => {
-  const cows = await Animal.find({gender: 'female', farm: req.user.farm});
+  const cows = await Animal.find({ gender: 'female', farm: req.user.farm });
 
   res.status(200).render('main', {
     cows
@@ -34,7 +34,7 @@ exports.renderCalendar = catchAsync(async (req, res, next) => {
 exports.renderAddReminder = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animals = await Animal.find({ farm: req.user.farm });
-  
+
   res.status(200).render('generalReminder', {
     animals,
     forEdit
@@ -45,7 +45,7 @@ exports.renderEditReminder = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const reminder = await Calendar.findById(req.params.reminderId);
   let animal;
-  if(reminder.animal) {
+  if (reminder.animal) {
     animal = await Animal.findById(reminder.animal);
   }
 
@@ -56,15 +56,15 @@ exports.renderEditReminder = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderEditFarm = catchAsync(async(req, res, next) => {
-  const farm = await Farm.findOne({owner: req.user._id});
+exports.renderEditFarm = catchAsync(async (req, res, next) => {
+  const farm = await Farm.findOne({ owner: req.user._id });
 
   res.status(200).render('editFarm', {
     farm
   });
 });
 
-exports.renderEditUser = catchAsync(async(req, res, next) => {
+exports.renderEditUser = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.user._id, req.body);
 
   res.status(200).render('editUser', {
@@ -72,11 +72,20 @@ exports.renderEditUser = catchAsync(async(req, res, next) => {
   })
 });
 
-exports.renderChangeRestrictions = catchAsync(async(req, res, next) => {
+exports.renderChangeRestrictions = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.userId);
 
   res.status(200).render('changeRestrictions', {
     user
+  });
+});
+
+exports.renderAllEmployees = catchAsync(async (req, res, next) => {
+  const farm = await Farm.findById(req.params.farmId);
+  const users = await User.find({ farm: farm._id, _id: { $ne: farm.owner } });
+
+  res.status(200).render('allEmployees', {
+    users
   });
 });
 
@@ -128,7 +137,7 @@ exports.renderHerdAddAnimal = catchAsync(async (req, res, next) => {
 exports.renderAddMilkingResults = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
-  const animals = await Animal.find({farm: req.user.farm});
+  const animals = await Animal.find({ farm: req.user.farm });
 
   res.status(200).render('herdMilkingResults', {
     animal,
@@ -140,7 +149,7 @@ exports.renderAddMilkingResults = catchAsync(async (req, res, next) => {
 exports.renderAddWeightResults = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
-  const animals = await Animal.find({farm: req.user.farm});
+  const animals = await Animal.find({ farm: req.user.farm });
 
   res.status(200).render('herdWeightResults', {
     animal,
@@ -152,7 +161,7 @@ exports.renderAddWeightResults = catchAsync(async (req, res, next) => {
 exports.renderAddLactation = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
-  const animals = await Animal.find({farm: req.user.farm});
+  const animals = await Animal.find({ farm: req.user.farm });
 
   res.status(200).render('herdLactation', {
     animal,
@@ -213,7 +222,7 @@ exports.renderEditPage = catchAsync(async (req, res, next) => {
 exports.renderEditMilkingResults = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const animal = await Animal.findById(req.params.animalId);
-  const animals = await Animal.find({farm: req.user.farm});
+  const animals = await Animal.find({ farm: req.user.farm });
 
   const result = animal.milkingResults[req.params.index];
 
@@ -231,7 +240,7 @@ exports.renderEditMilkingResults = catchAsync(async (req, res, next) => {
 exports.renderEditWeightResults = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const animal = await Animal.findById(req.params.animalId);
-  const animals = await Animal.find({farm: req.user.farm});
+  const animals = await Animal.find({ farm: req.user.farm });
 
   const result = animal.weightResults[req.params.index];
 
@@ -313,8 +322,8 @@ exports.renderListInseminations = catchAsync(async (req, res, next) => {
 exports.renderWriteOffAnimal = catchAsync(async (req, res, next) => {
   let forOne = req.params.animalId !== 'multiple';
   let animal, animals;
-  if(req.params.animalId === 'multiple') {
-    animals = await Animal.find({farm: req.user.farm, status: 'alive'});
+  if (req.params.animalId === 'multiple') {
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive' });
   } else {
     animal = await Animal.findById(req.params.animalId);
   }
@@ -327,9 +336,9 @@ exports.renderWriteOffAnimal = catchAsync(async (req, res, next) => {
 });
 
 exports.renderHerdHistory = catchAsync(async (req, res, next) => {
-  let animals = await Animal.find({farm: req.user.farm});
-  
-  
+  let animals = await Animal.find({ farm: req.user.farm });
+
+
   res.status(200).render('herdHistory', {
     animals
   });
@@ -362,7 +371,7 @@ exports.renderAddVetAction = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderEditVetAction = catchAsync(async(req, res, next) => {
+exports.renderEditVetAction = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const action = await Vet.findById(req.params.actionId);
   const animal = await Animal.findById(action.animal);
@@ -393,7 +402,7 @@ exports.renderAddVetProblem = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderEditVetProblem = catchAsync(async(req, res, next) => {
+exports.renderEditVetProblem = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const problem = await Vet.findById(req.params.problemId);
   const animal = await Animal.findById(problem.animal);
@@ -418,7 +427,7 @@ exports.renderAddVetTreatment = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderEditVetTreatment = catchAsync(async(req, res, next) => {
+exports.renderEditVetTreatment = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const treatment = await Vet.findById(req.params.treatmentId).populate('disease');
   const animal = await Animal.findById(treatment.disease.animal);
@@ -431,8 +440,8 @@ exports.renderEditVetTreatment = catchAsync(async(req, res, next) => {
 });
 
 exports.renderAddVetScheme = catchAsync(async (req, res, next) => {
-  
-  
+
+
   res.status(200).render('vetAddScheme', {
 
   });
@@ -441,7 +450,7 @@ exports.renderAddVetScheme = catchAsync(async (req, res, next) => {
 exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
   const animal = await Animal.findById(req.params.animalId);
   const schemes = await Scheme.find({ farm: req.user.farm });
-  
+
   res.status(200).render('vetStartScheme', {
     animal,
     schemes
@@ -450,7 +459,7 @@ exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
 
 exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
   const firstSchemeAction = await Vet.findById(req.params.firstSchemeAction).populate('scheme');
-  
+
   const schemes = await Scheme.find({ farm: req.user.farm });
 
   const animal = await Animal.findById(firstSchemeAction.animal);
@@ -464,20 +473,20 @@ exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
 
 exports.renderEditScheme = catchAsync(async (req, res, next) => {
   const scheme = await Scheme.findById(req.params.schemeId);
-  
+
   res.status(200).render('vetEditScheme', {
     scheme
   });
 });
 
 exports.renderVetMain = catchAsync(async (req, res, next) => {
-  let actions = await Vet.find({ farm: req.user.farm, category: 'action'});
-  let problems = await Vet.find({ farm: req.user.farm, category: 'problem'});
-  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment'});
-  
+  let actions = await Vet.find({ farm: req.user.farm, category: 'action' });
+  let problems = await Vet.find({ farm: req.user.farm, category: 'problem' });
+  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment' });
+
   let schemes = await Vet.find({ farm: req.user.farm, schemeStarter: true }).populate('otherPoints').populate('animal').populate('scheme');
   let uncuredProblems = await Vet.find({ farm: req.user.farm, category: 'problem', cured: false }).populate('treatments').populate('animal');
-  
+
   res.status(200).render('vetMain', {
     actions,
     problems,
@@ -491,8 +500,8 @@ exports.renderVetHistory = catchAsync(async (req, res, next) => {
   let actions = await Vet.find({ farm: req.user.farm, category: 'action', scheduled: false });
   let problems = await Vet.find({ farm: req.user.farm, category: 'problem', scheduled: false });
   let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment', scheduled: false });
-  
-  
+
+
   res.status(200).render('vetHistory', {
     actions,
     problems,

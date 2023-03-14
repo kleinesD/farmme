@@ -118,7 +118,7 @@ $(document).ready(async function () {
 
         const result = await login({ email, password });
 
-        if (result) location.assign('/herd');
+        if (result) location.assign('/');
 
         $('.mini-loader').remove();
       }
