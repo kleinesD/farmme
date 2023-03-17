@@ -49,13 +49,21 @@ const createWindow = () => {
 
 
   contentWindow.loadURL('http://127.0.0.1:604/herd/add-milking-result/628d0862aca019349b20c6c8');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/add-treatment/62f14e90d51a806f924b0298');
-  contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
-  contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/');
   contentWindow.loadURL('http://127.0.0.1:604/login');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628a0f09a85ecbb47e0983d8');
+  contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/add-problem/628c8e193108dae81ddad038');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/history');
   contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
+  contentWindow.loadURL('http://127.0.0.1:604/');
+  
+  
+
+  /* Always load main page in production */
+  if(process.env.NODE_ENV === 'production') {
+    contentWindow.loadURL('http://127.0.0.1:604/');
+  }
 
 
   contentWindow.maximize();

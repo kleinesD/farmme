@@ -3004,16 +3004,16 @@ $(document).ready(async function () {
       });
     });
 
-    $('.acb-tile-visible').mouseenter(function() {
+    $('.acb-tile-visible').mouseenter(function () {
       $('.acb-tile-visible').css('opacity', '0.5');
       $(this).css('opacity', '1');
       $('#result').find('.acb-item-info').text(`${parseFloat($(this).attr('data-result')).toFixed(1)} л.`)
 
-      if($(this).prev().length !== 0 && parseFloat($(this).prev().attr('data-result')) !== 0) {
-        $('#growth').find('.acb-item-info').text(`${(((parseFloat($(this).attr('data-result')) / parseFloat($(this).prev().attr('data-result'))) - 1 ) * 100).toFixed(1)} %`)
+      if ($(this).prev().length !== 0 && parseFloat($(this).prev().attr('data-result')) !== 0) {
+        $('#growth').find('.acb-item-info').text(`${(((parseFloat($(this).attr('data-result')) / parseFloat($(this).prev().attr('data-result'))) - 1) * 100).toFixed(1)} %`)
       }
     });
-    $('.acb-tile-visible').mouseleave(function() {
+    $('.acb-tile-visible').mouseleave(function () {
       $('.acb-tile-visible').css('opacity', '1');
       $('#result').find('.acb-item-info').text(`-`)
       $('#growth').find('.acb-item-info').text(`-`)
@@ -3132,12 +3132,12 @@ $(document).ready(async function () {
       /* Function to change graphs between lactations */
       const changeMilkingResultsGraph = (lactationNumber, startDate, finishDate) => {
 
-        
+
         let milkingData = [];
         let averageData = [];
 
-        $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function() {
-          if($(this).attr('data-lact') == lactationNumber) {
+        $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function () {
+          if ($(this).attr('data-lact') == lactationNumber) {
             milkingData.push({
               number: parseFloat($(this).attr('data-result')),
               date: new Date($(this).attr('data-date')),
@@ -3221,7 +3221,7 @@ $(document).ready(async function () {
             data: el.data */
           ]
         };
-    
+
         const graph = renderLineGraph(document.getElementById('acb-milking-results-chart'), parameters);
 
 
@@ -3232,7 +3232,7 @@ $(document).ready(async function () {
       $('#lactation-change').on('click change focus', function () {
         let startDate = new Date($('#lactation-change option:selected').attr('data-start'));
         let finishDate;
-        if($('#lactation-change option:selected').attr('data-finish') != 'null') {
+        if ($('#lactation-change option:selected').attr('data-finish') != 'null') {
           finishDate = new Date($('#lactation-change option:selected').attr('data-finish'));
         } else {
           finishDate = new Date();
@@ -3351,7 +3351,7 @@ $(document).ready(async function () {
     }
 
     /* Sitching insemination graphs */
-    $('.mp-animal-graphs-switch-btn').on('click', function() {
+    $('.mp-animal-graphs-switch-btn').on('click', function () {
       $(this).siblings().removeClass('mp-animal-graphs-switch-btn-active');
       $(this).addClass('mp-animal-graphs-switch-btn-active');
 
@@ -4479,7 +4479,7 @@ $(document).ready(async function () {
   if (document.querySelector('#vet-action-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
-      $(this).hide();
+      $(this).parent().hide();
       $('#dose-input').show()
       $('#dose-input').find('.aa-double-input-block').trigger('click');
     });
@@ -4606,7 +4606,7 @@ $(document).ready(async function () {
   if (document.querySelector('#edit-vet-action-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
-      $(this).hide();
+      $(this).parent().hide();
       $('#dose-input').show()
       $('#dose-input').find('.aa-double-input-block').trigger('click');
     });
@@ -4863,7 +4863,7 @@ $(document).ready(async function () {
   if (document.querySelector('#vet-treatment-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
-      $(this).hide();
+      $(this).parent().hide();
       $('#dose-input').show()
       $('#dose-input').find('.aa-double-input-block').trigger('click');
     });
@@ -4955,7 +4955,7 @@ $(document).ready(async function () {
   if (document.querySelector('#edit-vet-treatment-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
-      $(this).hide();
+      $(this).parent().hide();
       $('#dose-input').show()
       $('#dose-input').find('.aa-double-input-block').trigger('click');
     });
@@ -5407,6 +5407,15 @@ $(document).ready(async function () {
     });
 
     $('#prev-month').trigger('click');
+
+    $('.mp-calendar-dates-column').on('click', '.mp-calendar-date', function () {
+
+      $('.mp-calendar-date-active').removeClass('mp-calendar-date-active');
+      $(this).addClass('mp-calendar-date-active');
+
+      $('.mp-calendar-day-number').text(moment($(this).attr('data-date')).format('DD'));
+      $('.mp-calendar-day-month').text(moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase());
+    });
 
     /* Working with a history block */
     /* Sorting elements by date */

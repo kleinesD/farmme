@@ -7,6 +7,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  photo: {
+    type: String,
+    default: 'user-default.png'
+  },
   firstName: {
     type: String,
     required: true
