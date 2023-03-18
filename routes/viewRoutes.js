@@ -21,6 +21,14 @@ router.get('/add-reminder', authController.protect, authController.isLoggedIn, v
 
 router.get('/edit-reminder/:reminderId', authController.protect, authController.isLoggedIn, viewController.renderEditReminder);
 
+router.get('/edit-farm', authController.protect, authController.isLoggedIn, viewController.renderEditFarm);
+
+router.get('/edit-user', authController.protect, authController.isLoggedIn, viewController.renderEditUser);
+
+router.get('/change-restrictions/:userId', authController.protect, authController.isLoggedIn, viewController.renderChangeRestrictions);
+
+router.get('/all-employees/:farmId', authController.protect, authController.isLoggedIn, viewController.renderAllEmployees);
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////
@@ -106,5 +114,17 @@ router.get('/vet/history', authController.protect, authController.isLoggedIn, vi
 router.get('/warehouse/add-inventory/', authController.protect, authController.isLoggedIn, viewController.renderAddInventory);
 
 router.get('/warehouse/edit-inventory/:inventoryId', authController.protect, authController.isLoggedIn, viewController.renderEditInventory);
+
+///////////////////////////
+///////////////////////////
+///////////////////////////
+/* DISTRIBUTION MODULE ROUTES */
+///////////////////////////
+///////////////////////////
+///////////////////////////
+
+router.get('/distribution/add-client', authController.protect, authController.isLoggedIn, viewController.renderAddClient);
+
+router.get('/distribution/edit-client/:id', authController.protect, authController.isLoggedIn, viewController.renderEditClient);
 
 module.exports = router;

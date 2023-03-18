@@ -25,3 +25,14 @@ exports.createFarm = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.editFarm = catchAsync(async(req, res, next) => {
+  const farm = await Farm.findByIdAndUpdate(req.params.farmId, req.body);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      farm
+    }
+  });
+});

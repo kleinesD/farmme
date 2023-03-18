@@ -42,7 +42,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
-    accessBlocks: req.body.accessBlocks
+    accessBlocks: req.body.accessBlocks,
+    farm: req.body.farm
   });
 
   createSignToken(newUser, 201, req, res);
@@ -134,4 +135,27 @@ exports.restrictBlocks = (block) => (req, res, next) => {
   if (!req.user.accessBlocks.includes(block)) return next(new AppError('Unauthorized access!', 401));
   next();
 }
+
+exports.createUserLink = catchAsync(async (req, res, next) => {
+  let newUserSettings = {
+    role: req.body.role,
+    restrictions: req.body.restrictions,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    farm: req.user.farm,
+    editOther: req.body.editOther
+  }
+
+  const token = jwt.sign(newUserSettings, 'it-really-fucking-annoys-me', { expiresIn: '7d' })
+  //const decoded = await promisify(jwt.verify)(token, 'it-really-fucking-annoys-me');
+  let link = `${req.protocol}://${req.get('host')}/create-user-link/${token}`
+  res.status(200).json({
+    status: 'success',
+    data: {
+      token,
+      link
+    }
+  });
+});
 

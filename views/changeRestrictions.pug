@@ -1,0 +1,53 @@
+extends base
+
+block content
+  section.main-section 
+
+    .animal-results-container.animal-results-full#change-rest-container
+      img.ar-image-back(src="/img/images/milking-cow-icon.png")
+      .ar-block-sub-title ИЗМЕНИТЬ
+      .ar-block-title Допуск сотрудника
+      .aa-input-block 
+        .detailed-info-block
+          .detailed-info-icon 
+            ion-icon(name="help")
+          .detailed-info-text Пользователь будет иметь доступ к информации связанной с выбранными модулями.
+            .detailed-info-text-triangle
+        label.aa-label(for="modules")
+          p Модули
+        .aa-pick-box.aa-pick-box-few#modules
+          .aa-pick#herd(class=`${user.accessBlocks.includes('herd') ? 'aa-pick-picked' : ''}`) Животные
+          .aa-pick#vet(class=`${user.accessBlocks.includes('vet') ? 'aa-pick-picked' : ''}`) Ветеренария
+          .aa-pick#warehouse(class=`${user.accessBlocks.includes('warehouse') ? 'aa-pick-picked' : ''}`) Склад
+
+      .aa-input-block 
+        .detailed-info-block
+          .detailed-info-icon 
+            ion-icon(name="help")
+          .detailed-info-text Пользователь сможет добавлять данные связанные с выбранными модулями.
+            .detailed-info-text-triangle
+        .aa-check-box-line
+          .aa-check-box#edit-data
+            .aa-check-box-inner(class=`${user.editData === true ? 'aa-check-box-checked' : ''}`)
+              ion-icon(name="checkmark")
+          .aa-check-box-text Вносить данные
+
+      .aa-input-block 
+        .detailed-info-block
+          .detailed-info-icon 
+            ion-icon(name="help")
+          .detailed-info-text Пользователь сможет редактировать информацию добавленную другими пользователями.
+            .detailed-info-text-triangle
+        .aa-check-box-line
+          .aa-check-box#edit-other
+            .aa-check-box-inner(class=`${user.editOther === true ? 'aa-check-box-checked' : ''}`)
+              ion-icon(name="checkmark")
+          .aa-check-box-text Изменять чужие данные
+
+
+      .ar-btn-box  
+        a.ar-add-button(data-user-id=`${user._id}`) Сохранить
+
+
+
+

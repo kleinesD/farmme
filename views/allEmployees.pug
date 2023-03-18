@@ -1,0 +1,97 @@
+extends base
+
+block content
+
+  section.main-section 
+    .users-list-block
+      .users-list-container.shadow
+        .users-list-container-header
+          .ulh-item.ulh-item-photo Фото
+          .ulh-item.ulh-item-name Имя
+          .ulh-item.ulh-item-email Почта
+          .ulh-item.ulh-item-title Должность
+          .ulh-item.ulh-item-restrictions Доступ
+          .ulh-item.ulh-item-action
+        each user in users 
+          .users-list-user-item
+            .ului-photo
+              img(src="/img/images/cows-login-2.jpg")
+            .ului-name= `${user.firstName} ${user.lastName}`
+            .ului-email= user.email
+            .ului-title= user.role
+            .ului-restrictions
+              -if(user.accessBlocks.includes('herd'))
+                ion-icon.ului-herd(name="paw")
+              -if(user.accessBlocks.includes('vet'))
+                ion-icon.ului-vet(name="medical")
+              -if(user.accessBlocks.includes('warehouse'))
+                ion-icon.ului-warehouse(name="cube")
+            .ului-action
+              a(href=`/change-restrictions/${user._id}`) Изменить
+        
+          
+
+    //-.all-animals-container
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#all-animals-search(type="text" placeholder="Найти животное")
+      .all-animals-page-info
+        .all-animals-counter= `Всего животных: ${animals.length}` 
+        .all-former-animals(data-state="show")
+          .af-checkbox
+            ion-icon(name="checkmark")
+          p Показывать прошлых животных
+        //-select.all-animals-sort 
+          option(selected hidden disabled) Сортировать
+          option(value="calving") Отел
+          option(value="calving") Осеменение
+          options(value="age") Возраст
+      .animal-list-header
+        .alh-item.alh-item-photo Фото 
+        .alh-item # 
+        .alh-item Возраст 
+        .alh-item Пол
+        .alh-item.alh-item-info Важная информация
+        .alh-item Кличка 
+      .animals-list-block
+        each animal in animals
+          -if(animal.status === 'alive')
+            a.al-animal(href=`/herd/animal-card/${animal._id}`)
+              .al-item.al-item-photo 
+                img(src=`/img/images/${animal.mainPhoto}`)
+              .al-item.al-item-number= animal.number
+              -if([1, 21].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
+                .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} год`
+              -if([2, 3, 4, 22, 23, 24].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
+                .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} года`
+              -if(![1, 21, 2, 3, 4, 22, 23, 24].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
+                .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} лет`
+              .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
+              .al-item.al-item-info(class=`current-info-${animal.currentInfoAB.status}`)
+                -if(animal.currentInfoAB && animal.currentInfoAB.status !== undefined && animal.currentInfoAB.message !== '')
+                  .ar-outter-circle
+                  .ar-important-text= animal.currentInfoAB.message
+              .al-item.al-item-name= animal.name
+          -else
+            a.al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}`)
+              .al-former-icon 
+                ion-icon(name="close")
+              .al-item.al-item-photo 
+                img(src=`/img/images/${animal.mainPhoto}`)
+              .al-item.al-item-number= animal.number
+              .al-item &dash;
+              .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
+              .al-item.al-item-info
+                -if(animal.writeOffReason === 'slaughtered')
+                  .ar-important-text= `Забой: ${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -if(animal.writeOffReason === 'sold')
+                  .ar-important-text= `Продажа: ${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                -if(animal.writeOffReason === 'sickness')
+                  .ar-important-text= `Болезнь: ${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  
+              .al-item.al-item-name= animal.name
+          
+
+
+      
+

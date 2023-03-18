@@ -14,20 +14,25 @@
       input.header-search-input(type="text" placeholder="Поиск")
 
     .header-user-block
-      .header-user-notifications
+      //-.header-user-notifications
         ion-icon.hun-bell-icon(name="notifications-outline")
         .header-user-notif-number 12
         ion-icon.hun-arrow-icon(name="caret-down")
       a.header-user-link(href="#")
         .header-user-info
-          .huf-name Даниил Коробко
-          .huf-title Создатель
-        img(src="/img/images/cows-login-2.jpg")
+          .huf-name= `${user.firstName} ${user.lastName}`
+          .huf-title Босс
+        img(src="/img/images/user-default.png")
   
   .main-menu-items-container
     //-.menu-item-box.menu-item-box-openned
     .menu-item-box
-      .menu-item-title ЖИВОТНЫЕ
+      .menu-item-title ФЕРМА
+      a.menu-item-link(href=`/all-employees/${user.farm}`) СОТРУДНИКИ
+      a.menu-item-link(href=`/edit-farm`) НАСТРОЙКИ ФЕРМЫ
+      a.menu-item-link(href=`/edit-user`) НАСТРОЙКИ АККАУНТА
+    .menu-item-box
+      .menu-item-title СТАДО
       a.menu-item-link(href="/herd") ГЛАВНАЯ
       a.menu-item-link(href="/herd/all-animals") ВСЕ ЖИВОТНЫЕ
       a.menu-item-link(href="/herd/add-animal") ДОБАВИТЬ ЖИВОТНОЕ
@@ -40,15 +45,13 @@
       a.menu-item-link(href="/vet") ГЛАВНАЯ
       a.menu-item-link(href="/vet/add-action/multiple") ДОБАВИТЬ ДЕЙСТВИЕ
       a.menu-item-link(href="/vet/add-problem/multiple") ДОБАВИТЬ ПРОБЛЕМУ
-      a.menu-item-link(href="/vet/history") ИСТОРИЯ ИЗМЕНЕНИЙ
+    .menu-item-box
+      .menu-item-title СКЛАД
     .menu-item-box.menu-item-box-soon
       .menu-item-title СКЛАД
         .menu-title-soon-tag Скоро
     .menu-item-box.menu-item-box-soon
       .menu-item-title КОРМЛЕНИЕ
-        .menu-title-soon-tag Скоро
-    .menu-item-box.menu-item-box-soon
-      .menu-item-title МОЛОКО
         .menu-title-soon-tag Скоро
 
 //.main-menu

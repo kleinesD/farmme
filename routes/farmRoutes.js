@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post('/', authController.protect, farmController.createFarm);
 
+router.patch('/edit-farm/:farmId', authController.protect, farmController.editFarm);
+
 
 
 

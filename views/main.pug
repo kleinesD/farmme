@@ -7,13 +7,13 @@ block content
     .main-welcome-block
       .mw-title-block
         .mw-title FARMME
-      a.mw-account-block.mw-link-block(href="#")
+      a.mw-account-block.mw-link-block(href="/edit-user")
         .mw-marquee-container
-          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы. 
-          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы. 
+          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
+          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
         .mw-block-line
-          .mw-account-name Даниил Коробко
-          img.mw-account-image(src="/img/images/cows-login-2.jpg")
+          .mw-account-name= `${user.firstName} ${user.lastName}`
+          img.mw-account-image(src="/img/images/user-default.png")
         .mw-block-line
           .mw-block-name.mw-white Мой Аккаунт
           ion-icon.mw-block-icon.mw-white(name="arrow-forward")
@@ -27,22 +27,22 @@ block content
 
       a.mw-link-herd-block.mw-link-block.mw-small-link-block#herd-main-block(href="/herd/")
         .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы. 
-          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы. 
+          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
+          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
         .mw-block-line
-          .mw-block-name Стадо
+          .mw-block-name Животные
           ion-icon.mw-block-icon(name="paw")
       a.mw-link-vet-block.mw-link-block.mw-small-link-block#vet-main-block(href="/vet/")
         .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий. 
-          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий. 
+          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
+          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
         .mw-block-line
           .mw-block-name Ветеринария
           ion-icon.mw-block-icon(name="thermometer")
       a.mw-link-warehouse-block.mw-link-block.mw-small-link-block#warehouse-main-block(href="/warehouse/")
         .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря.
-          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря.
+          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря. 
+          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря. 
         .mw-block-line
           .mw-block-name Склад
           ion-icon.mw-block-icon(name="cube")

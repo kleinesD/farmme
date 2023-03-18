@@ -10,7 +10,7 @@ import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnima
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteRemninder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
-import { login, logout } from './authHandler';
+import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
@@ -118,7 +118,7 @@ $(document).ready(async function () {
 
         const result = await login({ email, password });
 
-        if (result) location.assign('/herd');
+        if (result) location.assign('/');
 
         $('.mini-loader').remove();
       }
@@ -431,6 +431,23 @@ $(document).ready(async function () {
       $(this).addClass('aa-select-option-selected');
       $(this).parent().parent().attr('data-value', $(this).attr('id'));
       $(this).parent().parent().find('.aa-select-text').text($(this).text());
+    });
+
+    /* Detailed info show */
+    $('.detailed-info-icon').on('mouseenter', function () {
+      $(this).parent().find('.detailed-info-text').show();
+    });
+    $('.detailed-info-icon').on('mouseleave', function () {
+      $(this).parent().find('.detailed-info-text').hide();
+    });
+
+    /* Check boxes */
+    $('.aa-check-box').on('click', function() {
+      if(!$(this).find('.aa-check-box-inner').hasClass('aa-check-box-checked')) {
+        $(this).find('.aa-check-box-inner').addClass('aa-check-box-checked')
+      } else {
+        $(this).find('.aa-check-box-inner').removeClass('aa-check-box-checked')
+      }
     });
 
   }
@@ -1737,6 +1754,161 @@ $(document).ready(async function () {
     });
   }
 
+  ///////////////////////
+  /* EDIT FARM PAGE */
+  ///////////////////////
+  if (document.querySelector('#edit-farm-container')) {
+    /* Working with form */
+    $('input').on('click keyup change', function () {
+      if ($(this).val() !== '') {
+        $(this).addClass('ar-valid-input');
+      } else {
+        $(this).removeClass('ar-valid-input');
+      }
+    });
+
+    $('*').on('click change keyup', function () {
+      if ($('#liquid-unit').find('.aa-pick-picked').length > 0 && $('#weight-unit').find('.aa-pick-picked').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+    $('input').trigger('click');
+
+    $('.ar-add-button').click(async function () {
+      const farmId = $(this).attr('data-farm-id');
+      const name = $('#name').val().length > 0 ? $('#name').val() : undefined;
+      const liquidUnit = $('#liquid-unit').find('.aa-pick-picked').attr('id');
+      const weightUnit = $('#weight-unit').find('.aa-pick-picked').attr('id');
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      const response = await editFarm(farmId, { name, liquidUnit, weightUnit });
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        /* location.assign('/herd/all-animals'); */
+      }
+    });
+  }
+
+  ///////////////////////
+  /* EDIT USER PAGE */
+  ///////////////////////
+  if (document.querySelector('#edit-user-container')) {
+    /* Working with form */
+    $('input').on('click keyup change', function () {
+      if ($(this).val() !== '') {
+        $(this).addClass('ar-valid-input');
+      } else {
+        $(this).removeClass('ar-valid-input');
+      }
+    });
+
+    $('#email').on('click change keyup focus', async function () {
+      if($(this).val().length > 0) {
+        $(this).addClass('ar-valid-input');
+      } else {
+        $(this).removeClass('ar-valid-input');
+      }
+      if ($(this).val().length > 0 && $(this).val() !== $(this).attr('data-email')) {
+        if (!validator.isEmail($(this).val())) {
+          $(this).removeClass('ar-valid-input');
+
+        }
+        if (!await checkEmail($('#email').val())) {
+          $(this).removeClass('ar-valid-input');
+          $('body').trigger('click');
+          $(this).parent().find('.aa-input-ps').remove();
+          $(this).after(`<div class="aa-input-ps aa-input-ps-warning">Эта электронная почта уже занята</div>`)
+        } else {
+          $(this).parent().find('.aa-input-ps').remove();
+        }
+      }
+
+      
+    })
+
+    $('*').on('click change keyup', async function () {
+      if ($('#first-name').hasClass('ar-valid-input') && $('#last-name').hasClass('ar-valid-input') && $('#email').hasClass('ar-valid-input')) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+    $('input').trigger('click');
+
+    $('.ar-add-button').click(async function () {
+      const userId = $(this).attr('data-user-id');
+      const firstName = $('#first-name').val();
+      const lastName = $('#last-name').val();
+      const email = $('#email').val();
+      const birthDate = new Date($('#birth-date').val());
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      const response = await editUser(userId, { firstName, lastName, email, birthDate });
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        /* location.assign('/herd/all-animals'); */
+      }
+    });
+  }
+
+  ///////////////////////
+  /* CHANGE RESTRICTIONS */
+  ///////////////////////
+  if (document.querySelector('#change-rest-container')) {
+    $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+
+    $('.ar-add-button').click(async function () {
+      const userId = $(this).attr('data-user-id');
+      const accessBlocks = [];
+      $('#modules').find('.aa-pick-picked').each(function() {
+        accessBlocks.push($(this).attr('id'));
+      });
+      const editData = $('#edit-data').find('.aa-check-box-checked').length > 0;
+      const editOther = $('#edit-other').find('.aa-check-box-checked').length > 0;
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      const response = await editUser(userId, { accessBlocks, editData, editOther });
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        /* location.assign('/herd/all-animals'); */
+      }
+    });
+  }
 
 
   /////////////////////////

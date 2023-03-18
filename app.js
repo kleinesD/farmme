@@ -8,6 +8,7 @@ const animalRouter = require('./routes/animalRoutes');
 const vetRouter = require('./routes/vetRoutes');
 const calendarRouter = require('./routes/calendarRoutes');
 const inventoryRouter = require('./routes/inventoryRoutes');
+const distributionRouter = require('./routes/distributionRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const errorController = require('./controllers/errorController')
 
@@ -29,6 +30,7 @@ app.use('/api/animals', animalRouter);
 app.use('/api/vet', vetRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/inventory', inventoryRouter);
+app.use('/api/distribution', distributionRouter);
 app.use('/', viewRouter);
 
 app.all('*', (req, res, next) => {

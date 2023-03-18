@@ -19,15 +19,25 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  birthDate: {
+    type: Date
+  },
   role: {
     type: String,
-    required: true,
-    enum: ['ceo', 'owner', 'manager', 'employee', 'veterenerian', 'milker']
+    required: true
   },
   accessBlocks: {
     type: [String],
     required: true,
-    enum: ['herd', 'vet']
+    enum: ['herd', 'vet', 'warehouse', 'hr']
+  },
+  editOther: {
+    type: Boolean,
+    default: false
+  },
+  editData: {
+    type: Boolean,
+    default: false
   },
   password: {
     type: String,
@@ -39,7 +49,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validator: {
-      validate: function(val) {
+      validate: function (val) {
         return val === this.password;
       }
     },
@@ -54,11 +64,12 @@ const userSchema = new mongoose.Schema({
   creationDate: {
     type: Date,
     default: Date.now()
-  }
+  },
+  pendingUserLinks: [String]
 });
 
-userSchema.pre('save', async function(next) {
-  if(this.isNew || this.isModified('password')) {
+userSchema.pre('save', async function (next) {
+  if (this.isNew || this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 12);
 
     this.passwordConfirm = undefined;
@@ -70,8 +81,8 @@ userSchema.methods.comparePasswords = async function (userPass, candidatePass) {
   return await bcrypt.compare(candidatePass, userPass)
 }
 
-userSchema.methods.changedPasswordAfter = function(date)  {
-  if(this.passwordChangedAt) {
+userSchema.methods.changedPasswordAfter = function (date) {
+  if (this.passwordChangedAt) {
     const timeStamp = this.passwordChangedAt.getTime() / 1000;
 
     return timeStamp > date;

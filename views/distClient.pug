@@ -1,0 +1,51 @@
+extends base
+
+block content
+
+  section.main-section 
+
+    .animal-results-window
+
+      -if(!forEdit)
+        .animal-results-container.animal-results-big#milking-results-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+
+          .ar-block-sub-title ДОБАВИТЬ
+          .ar-block-title Клиент
+          .aa-input-block
+            lable.aa-label(for="name") 
+              p Имя | Наименование
+            input.aa-text-input#name(type="text")
+          .aa-input-block
+            lable.aa-label(for="adress") 
+              p Адрес
+            input.aa-text-input#adress(type="text")
+          .aa-input-block.aa-input-block-phone-number
+            lable.aa-label(for="") 
+              p Номер телефона
+            select.aa-phone-code-input
+              option(selected value='7') +7
+            input.aa-phone-number(type="number")
+          .aa-input-block
+            lable.aa-label(for="email") 
+              p Электронная почта
+            input.aa-text-input#email(type="text")
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")
+          
+          .ar-btn-box          
+            a.ar-add-button(data-animal-id=``) Сохранить
+
+      -if(forEdit)
+        .animal-results-container.animal-results-big#edit-milking-results-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title Клиент
+          
+          .ar-btn-box          
+            a.ar-add-button(data-animal-id=``) Сохранить
+
+
+ 
