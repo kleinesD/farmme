@@ -7,7 +7,7 @@ block content
     .animal-results-window
 
       -if(!forEdit)
-        .animal-results-container.animal-results-big#milking-results-container
+        .animal-results-container.animal-results-big#add-client-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
@@ -23,18 +23,47 @@ block content
           .aa-input-block.aa-input-block-phone-number
             lable.aa-label(for="") 
               p Номер телефона
-            select.aa-phone-code-input
+            select.aa-phone-code-input#phone-number-code
               option(selected value='7') +7
-            input.aa-phone-number(type="number")
+            input.aa-phone-number#phone-number(type="number" maxlength="10")
           .aa-input-block
             lable.aa-label(for="email") 
               p Электронная почта
             input.aa-text-input#email(type="text")
-          
+
+          //-.aa-input-united-block  
+            .aa-input-block 
+              label.aa-label(for="type")
+                p Наименование продукта
+              .aa-select-box.aa-select-box-one
+                .aa-select-text Выберите продукт
+                ion-icon(name="chevron-down")
+                .aa-select-options-box
+                  .aa-select-option.aa-select-option-taken Молоко
+                  .aa-select-option Мясо
+                  .aa-select-option Творог
+                  .aa-select-option Масло 
+                  .aa-select-option Сыворотка 
+                  .aa-select-option Сливки 
+                  .aa-select-option Сметана 
+            .aa-input-block
+              lable.aa-label(for="price") 
+                p Цена
+              .aa-double-input-block
+                input.aa-double-input(type="number")
+                select.aa-double-input
+                  option(value="l" selected) Л.
+                  option(value="kg") Кг.  
           .aa-add-more-container
+            .detailed-info-block
+              .detailed-info-icon 
+                ion-icon(name="help")
+              .detailed-info-text Добавьте продукты которые покупает данный клиент.
+                .detailed-info-text-triangle
             .aa-add-more#add-product-input
               p Добавить продукт
               ion-icon.aa-add-more-icon(name="add")
+
           .aa-input-block
             lable.aa-label(for="note") 
               p Заметка
@@ -44,13 +73,84 @@ block content
             a.ar-add-button(data-animal-id=``) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-milking-results-container
+        .animal-results-container.animal-results-big#edit-client-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
           .ar-block-sub-title РЕДАКТИРОВАТЬ
           .ar-block-title Клиент
+          .aa-input-block
+            lable.aa-label(for="name") 
+              p Имя | Наименование
+            input.aa-text-input#name(type="text" value=`${client.name}`)
+          .aa-input-block
+            lable.aa-label(for="adress") 
+              p Адрес
+            -if(client.adress)
+              input.aa-text-input#adress(type="text" value=`${client.adress}`)
+            -else
+              input.aa-text-input#adress(type="text")
+          .aa-input-block.aa-input-block-phone-number
+            lable.aa-label(for="") 
+              p Номер телефона
+            select.aa-phone-code-input#phone-number-code
+              option(selected value='7') +7
+            -if(client.phoneNumber)
+              input.aa-phone-number#phone-number(type="number" maxlength="10" value=`${client.phoneNumber}`)
+            -else
+              input.aa-phone-number#phone-number(type="number" maxlength="10")
+          .aa-input-block
+            lable.aa-label(for="email") 
+              p Электронная почта
+            -if(client.email)
+              input.aa-text-input#email(type="text" value=`${client.email}`)
+            -else
+              input.aa-text-input#email(type="text")
+            
+          each product in client.products
+            .aa-input-united-block  
+              .aa-input-block 
+                label.aa-label(for="type")
+                  p Наименование продукта
+                .aa-select-box.aa-select-box-one
+                  .aa-select-text Выберите продукт
+                  ion-icon(name="chevron-down")
+                  .aa-select-options-box
+                    .aa-select-option(class=`${product.productName === 'milk' ? 'aa-select-option-selected' : ''}` data-val="milk") Молоко
+                    .aa-select-option(class=`${product.productName === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо
+                    .aa-select-option(class=`${product.productName === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
+                    .aa-select-option(class=`${product.productName === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
+                    .aa-select-option(class=`${product.productName === 'milk-serum' ? 'aa-select-option-selected' : ''}`  data-val="milk-serum") Сыворотка 
+                    .aa-select-option(class=`${product.productName === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
+                    .aa-select-option(class=`${product.productName === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
+              .aa-input-block
+                lable.aa-label(for="price") 
+                  p Цена
+                .aa-double-input-block
+                  input.aa-double-input.price-input(type="number" value=`${product.pricePer}`)
+                  select.aa-double-input.unit-input
+                    -if(product.unit === 'l')
+                      option(value="l" selected hidden) Л.
+                    -if(product.unit === 'kg')
+                      option(value="kg" selected hidden) Кг.  
+                    option(value="l") Л.
+                    option(value="kg") Кг.  
+
+          .aa-add-more-container
+            .detailed-info-block
+              .detailed-info-icon 
+                ion-icon(name="help")
+              .detailed-info-text Добавьте продукты которые покупает данный клиент.
+                .detailed-info-text-triangle
+            .aa-add-more#add-product-input
+              p Добавить продукт
+              ion-icon.aa-add-more-icon(name="add")
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text" value=``)= `${client.note}`
           
           .ar-btn-box          
-            a.ar-add-button(data-animal-id=``) Сохранить
+            a.ar-add-button(data-client-id=`${client._id}`) Сохранить
 
 
  

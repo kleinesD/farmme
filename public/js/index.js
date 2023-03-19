@@ -14,6 +14,7 @@ import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
+import { addClient, editClient } from './distributionHandler';
 
 
 
@@ -416,7 +417,7 @@ $(document).ready(async function () {
     });
 
     /* Advanced select block */
-    $('.aa-select-box').on('click', function () {
+    $('body').on('click', '.aa-select-box', function () {
       if ($(this).find('ion-icon').attr('name') === 'chevron-down') {
         $(this).find('.aa-select-options-box').show();
         $(this).find('ion-icon').attr('name', 'chevron-up');
@@ -426,7 +427,7 @@ $(document).ready(async function () {
       }
     });
 
-    $('.aa-select-option').on('click', function () {
+    $('body').on('click', '.aa-select-option', function () {
       $(this).siblings().removeClass('aa-select-option-selected');
       $(this).addClass('aa-select-option-selected');
       $(this).parent().parent().attr('data-value', $(this).attr('id'));
@@ -442,8 +443,8 @@ $(document).ready(async function () {
     });
 
     /* Check boxes */
-    $('.aa-check-box').on('click', function() {
-      if(!$(this).find('.aa-check-box-inner').hasClass('aa-check-box-checked')) {
+    $('.aa-check-box').on('click', function () {
+      if (!$(this).find('.aa-check-box-inner').hasClass('aa-check-box-checked')) {
         $(this).find('.aa-check-box-inner').addClass('aa-check-box-checked')
       } else {
         $(this).find('.aa-check-box-inner').removeClass('aa-check-box-checked')
@@ -1816,7 +1817,7 @@ $(document).ready(async function () {
     });
 
     $('#email').on('click change keyup focus', async function () {
-      if($(this).val().length > 0) {
+      if ($(this).val().length > 0) {
         $(this).addClass('ar-valid-input');
       } else {
         $(this).removeClass('ar-valid-input');
@@ -1836,7 +1837,7 @@ $(document).ready(async function () {
         }
       }
 
-      
+
     })
 
     $('*').on('click change keyup', async function () {
@@ -1884,7 +1885,7 @@ $(document).ready(async function () {
     $('.ar-add-button').click(async function () {
       const userId = $(this).attr('data-user-id');
       const accessBlocks = [];
-      $('#modules').find('.aa-pick-picked').each(function() {
+      $('#modules').find('.aa-pick-picked').each(function () {
         accessBlocks.push($(this).attr('id'));
       });
       const editData = $('#edit-data').find('.aa-check-box-checked').length > 0;
@@ -5806,6 +5807,194 @@ $(document).ready(async function () {
     });
 
   }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* DISTRIBUTION MODULE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+
+  ///////////////////////
+  /* BOTH ADD/EDIT CLIENT PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-client-container') || document.querySelector('#edit-client-container')) {
+    /* Validating form */
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    /* Preventing double selection */
+    $('body').on('click', '.aa-select-option', function () {
+      let selectedOption = $(this);
+      $('.aa-select-option').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
+          $(this).addClass('aa-select-option-taken');
+        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
+          $(this).removeClass('aa-select-option-taken');
+        }
+      });
+      $(this).parent().attr('data-val', $(this).attr('data-val'))
+    });
+
+    /* Adding new product inputs */
+    $('#add-product-input').on('click', function () {
+      $(this).parent().before(`
+      <div class="aa-input-united-block"> 
+      <div class="aa-input-block"> 
+        <label class="aa-label" for="type">
+          <p>Наименование продукта</p>
+        </label>
+        <div class="aa-select-box aa-select-box-one" data-default-text="Выберите продукт">
+          <div class="aa-select-text">Выберите продукт</div>
+          <ion-icon name="chevron-down"></ion-icon>
+          <div class="aa-select-options-box">
+            <div class="aa-select-option" data-val="milk">Молоко</div>
+            <div class="aa-select-option" data-val="meat">Мясо</div>
+            <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
+            <div class="aa-select-option" data-val="butter">Масло </div>
+            <div class="aa-select-option" data-val="milk-serum">Сыворотка </div>
+            <div class="aa-select-option" data-val="cream">Сливки </div>
+            <div class="aa-select-option" data-val="sour-cream">Сметана </div>
+          </div>
+        </div>
+      </div>
+      <div class="aa-input-block">
+        <lable class="aa-label" for="price"> 
+          <p>Цена продукта</p>
+        </lable>
+        <div class="aa-double-input-block">
+          <input class="aa-double-input price-input" type="number"/>
+          <select class="aa-double-input unit-input">
+            <option value="l" selected="selected">Л.</option>
+            <option value="kg">Кг. </option>
+          </select>
+        </div>
+      </div>
+    </div>
+      `)
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    });
+
+    /* Validating the phone number */
+    $('#phone-number').on('keyup', function () {
+      if ($(this).val().length === 0 || $(this).val().length === 10) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#phone-number').on('blur', function () {
+      if ($(this).val().length > 0 && $(this).val().length !== 10) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильный номер телефона</div>`);
+      }
+    });
+
+    /* Validating the email */
+    $('#email').on('keyup', function () {
+      if ($(this).val().length === 0 || validator.isEmail($(this).val())) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#email').on('blur', function () {
+      if ($(this).val().length > 0 && !validator.isEmail($(this).val())) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную электронную почту</div>`);
+      }
+    });
+
+    $('*').on('click focus blur change', function () {
+      if ($('#name').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    if (document.querySelector('#edit-client-container')) {
+      $('input').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    }
+
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
+      const name = $('#name').val();
+      let adress, phoneNumber, phoneNumberCode, email, note = undefined;
+      let products = [];
+
+      if ($('#adress').val() !== '') {
+        adress = $('#adress').val();
+      }
+      if ($('#phone-number').val() !== '') {
+        phoneNumber = $('#phone-number').val();
+        phoneNumberCode = $('#phone-number-code').val();
+      }
+      if ($('#email').val() !== '') {
+        email = $('#email').val();
+      }
+      if ($('#note').val() !== '') {
+        note = $('#note').val();
+      }
+
+      $('.aa-input-united-block').each(function () {
+        if ($(this).find('.aa-select-option-selected') && $(this).find('.price-input').val().length > 0) {
+          products.push({
+            productName: $(this).find('.aa-select-option-selected').attr('data-val'),
+            pricePer: parseFloat($(this).find('.price-input').val()),
+            unit: $(this).find('.unit-input').val()
+          });
+        }
+      });
+
+
+      let response;
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      /* Submiting data to ADD inventory */
+      if (document.querySelector('#add-client-container')) {
+        response = await addClient({ name, adress, phoneNumber, phoneNumberCode, email, note, products })
+      }
+
+      /* Submiting data to EDIT inventory */
+      if (document.querySelector('#edit-client-container')) {
+        response = await editClient($(this).attr('data-client-id'), { name, adress, phoneNumber, phoneNumberCode, email, note, products })
+      }
+
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        //location.assign('/herd/all-animals');
+      }
+    });
+
+  }
+
 
 
 
