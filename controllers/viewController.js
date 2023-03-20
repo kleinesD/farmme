@@ -549,6 +549,7 @@ exports.renderAddClient = catchAsync(async (req, res, next) => {
     forEdit
   });
 });
+
 exports.renderEditClient = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const client = await Client.findById(req.params.id);
@@ -556,6 +557,24 @@ exports.renderEditClient = catchAsync(async (req, res, next) => {
   res.status(200).render('distClient', {
     forEdit,
     client
+  });
+});
+
+exports.renderAddProduct = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+
+  res.status(200).render('distProduct', {
+    forEdit
+  });
+});
+
+exports.renderEditProduct = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const product = await Product.findById(req.params.id);
+
+  res.status(200).render('distProduct', {
+    forEdit,
+    product
   });
 });
 

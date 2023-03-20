@@ -1,0 +1,42 @@
+extends base
+
+block content
+
+  section.main-section 
+
+    .animal-results-window
+
+      -if(!forEdit)
+        .animal-results-container.animal-results-big#add-product-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+
+          .ar-block-sub-title ДОБАВИТЬ
+          .ar-block-title Продукт
+          .ar-switch-btn-box
+            .ar-switch-btn.ar-switch-btn-active Молоко
+            .ar-switch-btn Мясо
+          .aa-input-block
+            lable.aa-label(for="price") 
+              p Вес | Объем
+            .aa-double-input-block
+              input.aa-double-input(type="number")
+              select.aa-double-input
+                option(value="l" selected) Л.
+                option(value="kg") Кг.  
+
+
+          .ar-btn-box          
+            a.ar-add-button(data-product-id=``) Сохранить
+
+      -if(forEdit)
+        .animal-results-container.animal-results-big#edit-product-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title Продукт
+
+
+          .ar-btn-box          
+            a.ar-add-button(data-product-id=`${client._id}`) Сохранить
+
+
+

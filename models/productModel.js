@@ -6,6 +6,9 @@ const productScheme = new mongoose.Schema({
         required: true,
         enum: ['milk', 'meat']
     },
+    weight: {
+        type: Number
+    },
     price: {
         type: Number
     },

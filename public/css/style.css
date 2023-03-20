@@ -3152,6 +3152,27 @@ ion-icon {
   opacity: 0.5;
   pointer-events: none;
 }
+.ar-switch-btn-box {
+  width: 500px;
+  background-color: #e4e4e4;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.ar-switch-btn {
+  width: calc(50% - 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  margin: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ar-switch-btn-active {
+  box-shadow: 0 0 10px rgb(0 0 0 / 25%);
+  background-color: #f0f0f0;
+}
 
 /* ///////////////////////// */
 /* ///////////////////////// */
