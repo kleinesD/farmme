@@ -22,7 +22,11 @@ const clientScheme = new mongoose.Schema({
             unit: String
         }
     ],
-    note: String
+    note: String,
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }
 });
 
 const Client = mongoose.model('Client', clientScheme);

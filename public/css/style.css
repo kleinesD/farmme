@@ -2519,6 +2519,7 @@ ion-icon {
   width: 100%;
   border-radius: 5px;
   display: flex;
+  align-items: center;
 }
 
 .aa-double-input {
@@ -2535,14 +2536,37 @@ ion-icon {
   background-color: #f0f0f0;
 }
 
+.aa-double-price-input {
+  /* width: calc(90% - 30px); */
+  min-width: 120px;
+  padding: 15px;
+  font-size: 100%;
+  font-weight: 500;
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  margin-right: 20px;
+  opacity: 1;
+  border: 1px solid #a2a2a2;
+  background-color: #f0f0f0;
+}
+.aa-double-price-text {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100%;
+  font-weight: 500;
+}
+
 .scheme-step-count {
   margin-right: unset;
 }
 
-.aa-double-input-block input {
+/* .aa-double-input-block input {
   width: 50px;
   min-width: none;
-}
+} */
 
 .aa-input-block {
   position: relative;

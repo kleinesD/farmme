@@ -7,15 +7,15 @@ block content
     .animal-results-window
 
       -if(!forEdit)
-        .animal-results-container.animal-results-big#add-product-container
+        .animal-results-container.animal-results-big#add-raw-product-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
           .ar-block-title Продукт
           .ar-switch-btn-box
-            .ar-switch-btn.ar-switch-btn-active Молоко
-            .ar-switch-btn Мясо
-          .aa-input-block
+            .ar-switch-btn.ar-switch-btn-active#milk Молоко
+            .ar-switch-btn#meat Мясо
+          //-.aa-input-block
             lable.aa-label(for="price") 
               p Вес | Объем
             .aa-double-input-block
@@ -23,20 +23,88 @@ block content
               select.aa-double-input
                 option(value="l" selected) Л.
                 option(value="kg") Кг.  
+          .aa-input-block
+            lable.aa-label(for="size") 
+              p Объем
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)")
+              p.aa-double-price-text л.
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date")
+
+          .aa-input-block
+            .detailed-info-block
+              .detailed-info-icon 
+                ion-icon(name="help")
+              .detailed-info-text После окончания срока годности этот продукт будет записан как просроченный.
+                .detailed-info-text-triangle
+            lable.aa-label(for="price") 
+              p Срок годности
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)")
+              p.aa-double-price-text дней 
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")
+
+          //-.aa-input-block
+            lable.aa-label(for="price") 
+              p Цена
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input(type="number")
+              p.aa-double-price-text / 1 Кг. 
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input(type="number")
+              p.aa-double-price-text / 256 Кг. 
 
 
           .ar-btn-box          
             a.ar-add-button(data-product-id=``) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-product-container
+        .animal-results-container.animal-results-big#edit-raw-product-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
           .ar-block-sub-title РЕДАКТИРОВАТЬ
           .ar-block-title Продукт
 
+          .ar-switch-btn-box
+            .ar-switch-btn#milk(class=`${product.rawProduct === 'milk' ? 'ar-switch-btn-active' : ''}`) Молоко
+            .ar-switch-btn#meat(class=`${product.rawProduct === 'meat' ? 'ar-switch-btn-active' : ''}`) Мясо
+          .aa-input-block
+            lable.aa-label(for="size") 
+              p= `${product.rawProduct === 'milk' ? 'Объем' : 'Вес'}`
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)" value=`${product.size}`)
+              p.aa-double-price-text= `${product.rawProduct === 'milk' ? 'л.' : 'кг.'}`
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date"  value=`${product.date.toLocaleString('ru-RU', {year: 'numeric'})}-${product.date.toLocaleString('ru-RU', {month: '2-digit'})}-${product.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+          .aa-input-block
+            .detailed-info-block
+              .detailed-info-icon 
+                ion-icon(name="help")
+              .detailed-info-text После окончания срока годности этот продукт будет записан как просроченный.
+                .detailed-info-text-triangle
+            lable.aa-label(for="price") 
+              p Срок годности
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)" value=`${Math.round((product.expDate.getTime() - product.date.getTime()) / 24 / 60 / 60 / 1000)}`)
+              p.aa-double-price-text дней 
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")= `${product.note !== undefined ? product.note : ''}`
+
 
           .ar-btn-box          
-            a.ar-add-button(data-product-id=`${client._id}`) Сохранить
+            a.ar-add-button(data-product-id=`${product._id}`) Сохранить
 
 
 

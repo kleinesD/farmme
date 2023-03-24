@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const productScheme = new mongoose.Schema({
-    type: {
+    rawProduct: {
         type: String,
         required: true,
         enum: ['milk', 'meat']
     },
-    weight: {
+    size: {
         type: Number
     },
     price: {
@@ -48,6 +48,11 @@ const productScheme = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Animal'
     },
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
+    note: String
 });
 
 const Product = mongoose.model('Product', productScheme);

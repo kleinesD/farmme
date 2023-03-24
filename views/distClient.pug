@@ -147,7 +147,7 @@ block content
           .aa-input-block
             lable.aa-label(for="note") 
               p Заметка
-            textarea.aa-textarea-input#note(type="text" value=``)= `${client.note}`
+            textarea.aa-textarea-input#note(type="text" value=``)= `${client.note !== undefined ? product.note : ''}`
           
           .ar-btn-box          
             a.ar-add-button(data-client-id=`${client._id}`) Сохранить

@@ -14,7 +14,7 @@ import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
-import { addClient, editClient } from './distributionHandler';
+import { addClient, editClient, addProduct, editProduct } from './distributionHandler';
 
 
 
@@ -5995,6 +5995,138 @@ $(document).ready(async function () {
 
   }
 
+  ///////////////////////
+  /* BOTH ADD/EDIT RAW PRODUCT PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-raw-product-container') || document.querySelector('#edit-raw-product-container')) {
+    /* Switch between types */
+    $('.ar-switch-btn').on('click', function() {
+      if(!$(this).hasClass('ar-switch-btn-active')) {
+        $('.ar-switch-btn-active').removeClass('ar-switch-btn-active');
+        $(this).addClass('ar-switch-btn-active');
+
+        $('#size').parent().parent().find('.aa-label p').text($(this).attr('id') === 'milk' ? 'Объем' : 'Вес')
+        $('#size').parent().find('.aa-double-price-text').text($(this).attr('id') === 'milk' ? 'л.' : 'кг.')
+        $('#size').attr('data-unit', $(this).attr('id') === 'milk' ? 'l' : 'kg')
+      }
+    });
+
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    /* Validating the size */
+    $('#size').on('keyup', function () {
+      if (parseFloat($(this).val()) !== 0) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#size').on('blur', function () {
+      if (parseFloat($(this).val()) === 0) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите число больше 0</div>`);
+      }
+    });
+
+    /* Validating the exp date */
+    $('#exp-date').on('keyup', function () {
+      if (parseFloat($(this).val()) !== 0) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#exp-date').on('blur', function () {
+      if (parseFloat($(this).val()) === 0) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите число больше 0</div>`);
+      }
+    });
+
+    /* Validating the date */
+    $('#date').on('keyup click change', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) <= new Date()) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#date').on('blur', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) >= new Date()) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную дату</div>`);
+      }
+    });
+
+    $('*').on('click focus blur change', function () {
+      if ($('#size').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#exp-date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    if (document.querySelector('#edit-raw-product-container')) {
+      $('input').trigger('click');
+    }
+
+     /* Submiting data */
+     $('.ar-add-button').click(async function () {
+      const rawProduct = $('.ar-switch-btn-active').attr('id');
+      const size = $('#size').val();
+      const unit =  $('#size').attr('data-unit')
+      const date = new Date($('#date').val());
+      const expDate = new Date(moment($('#date').val()).add(parseFloat($('#exp-date').val()), 'days'));
+      let note = undefined;
+      if ($('#note').val().length > 0) {
+        note = $('#note').val();
+      }
+
+      let response;
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      /* Submiting data to ADD raw product */
+      if (document.querySelector('#add-raw-product-container')) {
+        response = await addProduct({rawProduct, size, unit, date, expDate, note})
+      }
+
+      /* Submiting data to EDIT raw product */
+      if (document.querySelector('#edit-raw-product-container')) {
+        response = await editProduct($(this).attr('data-product-id'), {rawProduct, size, unit, date, expDate, note})
+      }
+
+
+      if (response) {
+        $('.mini-loader').hide();
+        addConfirmationEmpty($('.animal-results-container'));
+        setTimeout(() => {
+          location.reload(true);
+        }, 1500)
+
+        //location.assign('/herd/all-animals');
+      }
+    });
+
+
+  }
 
 
 
