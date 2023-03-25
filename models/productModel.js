@@ -1,10 +1,15 @@
 const mongoose = require('mongoose');
 
 const productScheme = new mongoose.Schema({
-    rawProduct: {
+    product: {
         type: String,
         required: true,
-        enum: ['milk', 'meat']
+        enum: ['milk', 'meat', 'cream', 'cheese', 'sour-cream', 'butter', 'whey', 'cottage-cheese']
+    },
+    type: {
+        type: String,
+        default: 'increase',
+        enum: ['increase', 'decrease']
     },
     size: {
         type: Number
@@ -22,7 +27,7 @@ const productScheme = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Client'
     },
-    finalProduct: {
+    rawProduct: {
         type: mongoose.Schema.ObjectId,
         ref: 'Product'
     },
@@ -51,6 +56,10 @@ const productScheme = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    farm: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Farm'
     },
     note: String
 });

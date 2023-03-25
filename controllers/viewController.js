@@ -562,6 +562,7 @@ exports.renderEditClient = catchAsync(async (req, res, next) => {
 
 exports.renderAddProduct = catchAsync(async (req, res, next) => {
   const forEdit = false;
+  const milkInventory = await Product.find({farm: req.user.farm, product: 'milk'})
 
   res.status(200).render('distProduct', {
     forEdit
@@ -576,25 +577,5 @@ exports.renderEditProduct = catchAsync(async (req, res, next) => {
     forEdit,
     product
   });
-});
-
-exports.renderAddFinalProduct = catchAsync(async(req, res, next) => {
-  const forEdit = false;
-  const rawProduct = await Product.findById(req.params.rawId);
-
-  res.status(200).render('finalProduct', {
-    rawProduct,
-    forEdit
-  })
-});
-
-exports.renderEditFinalProduct = catchAsync(async(req, res, next) => {
-  const forEdit = true;
-  const product = await Product.findById(req.params.id);
-
-  res.status(200).render('finalProduct', {
-    product,
-    forEdit
-  })
 });
 

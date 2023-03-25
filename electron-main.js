@@ -53,8 +53,8 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/edit-client/641754d18f2b378e17b8e069');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-final-product/641deb3b314dfe43042b2776');
+  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-client');
+  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-product');
 
 
   contentWindow.maximize();

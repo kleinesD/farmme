@@ -6085,7 +6085,7 @@ $(document).ready(async function () {
 
      /* Submiting data */
      $('.ar-add-button').click(async function () {
-      const rawProduct = $('.ar-switch-btn-active').attr('id');
+      const product = $('.ar-switch-btn-active').attr('id');
       const size = $('#size').val();
       const unit =  $('#size').attr('data-unit')
       const date = new Date($('#date').val());
@@ -6105,12 +6105,12 @@ $(document).ready(async function () {
 
       /* Submiting data to ADD raw product */
       if (document.querySelector('#add-raw-product-container')) {
-        response = await addProduct({rawProduct, size, unit, date, expDate, note})
+        response = await addProduct({product, size, unit, date, expDate, note})
       }
 
       /* Submiting data to EDIT raw product */
       if (document.querySelector('#edit-raw-product-container')) {
-        response = await editProduct($(this).attr('data-product-id'), {rawProduct, size, unit, date, expDate, note})
+        response = await editProduct($(this).attr('data-product-id'), {product, size, unit, date, expDate, note})
       }
 
 

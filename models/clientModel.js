@@ -26,6 +26,10 @@ const clientScheme = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    farm: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Farm'
     }
 });
 
