@@ -131,4 +131,8 @@ router.get('/distribution/add-raw-product', authController.protect, authControll
 
 router.get('/distribution/edit-raw-product/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProduct);
 
+router.get('/distribution/add-final-product/:rawId', authController.protect, authController.isLoggedIn, viewController.renderAddFinalProduct);
+
+router.get('/distribution/edit-final-product/:id', authController.protect, authController.isLoggedIn, viewController.renderEditFinalProduct);
+
 module.exports = router;

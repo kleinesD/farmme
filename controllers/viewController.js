@@ -578,3 +578,23 @@ exports.renderEditProduct = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderAddFinalProduct = catchAsync(async(req, res, next) => {
+  const forEdit = false;
+  const rawProduct = await Product.findById(req.params.rawId);
+
+  res.status(200).render('finalProduct', {
+    rawProduct,
+    forEdit
+  })
+});
+
+exports.renderEditFinalProduct = catchAsync(async(req, res, next) => {
+  const forEdit = true;
+  const product = await Product.findById(req.params.id);
+
+  res.status(200).render('finalProduct', {
+    product,
+    forEdit
+  })
+});
+
