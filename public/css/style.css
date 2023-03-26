@@ -3217,7 +3217,7 @@ ion-icon {
   top: 0px;
   left: 0px;
   /* background: repeating-linear-gradient(135deg, rgb(244, 162, 97, 0.5), rgb(244, 162, 97, 0.5) 4px, rgb(240, 240, 240, 0.5) 4px, rgb(240, 240, 240, 0.5) 8px); */
-  background-color: rgb(244, 162, 97, 0.5);
+  background-color: #f4a26180;
   border-radius: 50px;
   width: 0%;
   height: 100%;

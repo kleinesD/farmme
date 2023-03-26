@@ -5859,8 +5859,9 @@ $(document).ready(async function () {
             <div class="aa-select-option" data-val="meat">Мясо</div>
             <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
             <div class="aa-select-option" data-val="butter">Масло </div>
-            <div class="aa-select-option" data-val="milk-serum">Сыворотка </div>
             <div class="aa-select-option" data-val="cream">Сливки </div>
+            <div class="aa-select-option" data-val="cheese">Сыр</div>
+            <div class="aa-select-option" data-val="milk-serum">Сыворотка </div>
             <div class="aa-select-option" data-val="sour-cream">Сметана </div>
           </div>
         </div>
@@ -6001,8 +6002,8 @@ $(document).ready(async function () {
 
   if (document.querySelector('#add-raw-product-container') || document.querySelector('#edit-raw-product-container')) {
     /* Switch between types */
-    $('.ar-switch-btn').on('click', function() {
-      if(!$(this).hasClass('ar-switch-btn-active')) {
+    $('.ar-switch-btn').on('click', function () {
+      if (!$(this).hasClass('ar-switch-btn-active')) {
         $('.ar-switch-btn-active').removeClass('ar-switch-btn-active');
         $(this).addClass('ar-switch-btn-active');
 
@@ -6083,11 +6084,11 @@ $(document).ready(async function () {
       $('input').trigger('click');
     }
 
-     /* Submiting data */
-     $('.ar-add-button').click(async function () {
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
       const product = $('.ar-switch-btn-active').attr('id');
       const size = $('#size').val();
-      const unit =  $('#size').attr('data-unit')
+      const unit = $('#size').attr('data-unit')
       const date = new Date($('#date').val());
       const expDate = new Date(moment($('#date').val()).add(parseFloat($('#exp-date').val()), 'days'));
       let note = undefined;
@@ -6105,12 +6106,12 @@ $(document).ready(async function () {
 
       /* Submiting data to ADD raw product */
       if (document.querySelector('#add-raw-product-container')) {
-        response = await addProduct({product, size, unit, date, expDate, note})
+        response = await addProduct({ product, size, unit, date, expDate, note })
       }
 
       /* Submiting data to EDIT raw product */
       if (document.querySelector('#edit-raw-product-container')) {
-        response = await editProduct($(this).attr('data-product-id'), {product, size, unit, date, expDate, note})
+        response = await editProduct($(this).attr('data-product-id'), { product, size, unit, date, expDate, note })
       }
 
 
@@ -6134,19 +6135,85 @@ $(document).ready(async function () {
 
   if (document.querySelector('#add-process-container') || document.querySelector('#edit-process-container')) {
     /* Validating size */
-    $('#size').on('keyup', function() {
+    $('#size').on('keyup', function () {
       let percent = Math.round(parseFloat($(this).val()) / (parseFloat($('.aa-total-milk-line-inner').attr('data-total')) / 100));
 
       $('.aa-total-milk-line-inner').stop();
-      $('.aa-total-milk-line-inner').animate({'width': `${percent}%`}, 500);
+      $('.aa-total-milk-line-inner').animate({ 'width': `${percent}%` }, 250);
 
-      if(parseFloat($(this).val()) > parseFloat($('.aa-total-milk-line-inner').attr('data-total'))) {
+      if (parseFloat($(this).val()) > parseFloat($('.aa-total-milk-line-inner').attr('data-total'))) {
         $('.aa-total-milk-line-inner').css('background-color', '#D44D5C');
-        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите число больше 0</div>`);
-
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Количество не должно превышать общее количество молока</div>`);
+      } else {
         $(`#${$(this).attr('id')}-warning`).remove();
+        $('.aa-total-milk-line-inner').css('background-color', '#f4a26180');
+
       }
     });
+
+    /* Preventing double selection */
+    $('body').on('click', '.aa-select-option', function () {
+      let selectedOption = $(this);
+      $('.aa-select-option').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
+          $(this).addClass('aa-select-option-taken');
+        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
+          $(this).removeClass('aa-select-option-taken');
+        }
+      });
+      $(this).parent().attr('data-val', $(this).attr('data-val'))
+    });
+
+    $('#add-product-input').on('click', function () {
+      $(this).parent().before(`
+        <div class="aa-input-united-block"> 
+        <div class="aa-input-block"> 
+          <label class="aa-label" for="type">
+            <p>Продукт</p>
+          </label>
+          <div class="aa-select-box aa-select-box-one">
+            <div class="aa-select-text">Выберите продукт</div>
+            <ion-icon name="chevron-down"></ion-icon>
+            <div class="aa-select-options-box">
+              <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
+              <div class="aa-select-option" data-val="butter">Масло </div>
+              <div class="aa-select-option" data-val="cream">Сливки </div>
+              <div class="aa-select-option" data-val="cheese">Сыр  </div>
+              <div class="aa-select-option" data-val="whey">Сыворотка </div>
+              <div class="aa-select-option" data-val="sour-cream">Сметана  </div>
+            </div>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="price"> 
+            <p>Вес | Объем</p>
+          </lable>
+          <div class="aa-double-input-block">
+            <input class="aa-double-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <select class="aa-double-input">
+              <option value="l" selected="selected">Л.</option>
+              <option value="kg">Кг.  </option>
+            </select>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="price"> 
+            <p>Срок годности</p>
+          </lable>
+          <div class="aa-double-input-block aa-double-price-block">
+            <input class="aa-double-price-input" id="exp-date" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <p class="aa-double-price-text">дней </p>
+          </div>
+        </div>
+      </div>
+      `);
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    });
+
+
+
   }
 
 
