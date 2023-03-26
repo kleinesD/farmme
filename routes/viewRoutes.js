@@ -127,8 +127,14 @@ router.get('/distribution/add-client', authController.protect, authController.is
 
 router.get('/distribution/edit-client/:id', authController.protect, authController.isLoggedIn, viewController.renderEditClient);
 
+router.get('/distribution/add-product-decide', authController.protect, authController.isLoggedIn, viewController.renderAddProductDecide);
+
 router.get('/distribution/add-product', authController.protect, authController.isLoggedIn, viewController.renderAddProduct);
 
 router.get('/distribution/edit-product/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProduct);
+
+router.get('/distribution/add-process', authController.protect, authController.isLoggedIn, viewController.renderAddProcess);
+
+router.get('/distribution/edit-process/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProcess);
 
 module.exports = router;

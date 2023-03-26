@@ -6128,6 +6128,27 @@ $(document).ready(async function () {
 
   }
 
+  ///////////////////////
+  /* BOTH ADD/EDIT PROCESS PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-process-container') || document.querySelector('#edit-process-container')) {
+    /* Validating size */
+    $('#size').on('keyup', function() {
+      let percent = Math.round(parseFloat($(this).val()) / (parseFloat($('.aa-total-milk-line-inner').attr('data-total')) / 100));
+
+      $('.aa-total-milk-line-inner').stop();
+      $('.aa-total-milk-line-inner').animate({'width': `${percent}%`}, 500);
+
+      if(parseFloat($(this).val()) > parseFloat($('.aa-total-milk-line-inner').attr('data-total'))) {
+        $('.aa-total-milk-line-inner').css('background-color', '#D44D5C');
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите число больше 0</div>`);
+
+        $(`#${$(this).attr('id')}-warning`).remove();
+      }
+    });
+  }
+
 
 
 

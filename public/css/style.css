@@ -3209,6 +3209,8 @@ ion-icon {
   border-radius: 50px;
   border: 1px solid #a2a2a2;
   position: relative;
+  overflow: hidden;
+  color: #D44D5C
 }
 .aa-total-milk-line-inner {
   position: absolute;

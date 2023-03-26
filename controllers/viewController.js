@@ -542,6 +542,16 @@ exports.renderEditInventory = catchAsync(async (req, res, next) => {
 /////////////////
 /////////////////
 
+const countInventoryTotal = (arr) => {
+  let total = 0;
+  arr.forEach(el  => {
+    if(el.type === 'increase') total += el.size;
+    if(el.type === 'decrease') total -= el.size;
+  });
+
+  return total;
+}
+
 exports.renderAddClient = catchAsync(async (req, res, next) => {
   const forEdit = false;
 
@@ -560,9 +570,15 @@ exports.renderEditClient = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderAddProductDecide = catchAsync(async(req, res, next) => {
+
+  res.status(200).render('distProductDecide', {
+
+  });
+});
+
 exports.renderAddProduct = catchAsync(async (req, res, next) => {
   const forEdit = false;
-  const milkInventory = await Product.find({farm: req.user.farm, product: 'milk'})
 
   res.status(200).render('distProduct', {
     forEdit
@@ -574,6 +590,27 @@ exports.renderEditProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
   res.status(200).render('distProduct', {
+    forEdit,
+    product
+  });
+});
+
+exports.renderAddProcess = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+  const milkInventory = await Product.find({farm: req.user.farm, product: 'milk'})
+  const totalMilk = countInventoryTotal(milkInventory);
+
+  res.status(200).render('distProcess', {
+    forEdit,
+    totalMilk
+  });
+});
+
+exports.renderEditProcess = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const product = await Product.findById(req.params.id);
+
+  res.status(200).render('distProcess', {
     forEdit,
     product
   });
