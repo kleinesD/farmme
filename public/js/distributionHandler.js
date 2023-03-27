@@ -47,6 +47,22 @@ export const addProduct = async (data) => {
     }
 }
 
+export const addProductReturn = async (data) => {
+    try {
+        const res = await axios({
+            method: 'POST',
+            url: `/api/distribution/product`,
+            data
+        });
+
+        if(res.data.status === 'success') {
+            return res.data.data.product
+        }
+    } catch(err) {
+        console.log(err);
+    }
+}
+
 export const editProduct = async (id, data) => {
     try {
         const res = await axios({

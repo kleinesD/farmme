@@ -42,8 +42,8 @@ block content
               lable.aa-label(for="price") 
                 p Вес | Объем
               .aa-double-input-block
-                input.aa-double-input(type="number" oninput="this.value = Math.abs(this.value)")
-                select.aa-double-input
+                input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)")
+                select.aa-double-input.unit-input
                   option(value="l" selected) Л.
                   option(value="kg") Кг.  
             .aa-input-block
@@ -55,7 +55,7 @@ block content
               lable.aa-label(for="price") 
                 p Срок годности
               .aa-double-input-block.aa-double-price-block
-                input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-price-input.exp-date-input(type="number" oninput="this.value = Math.abs(this.value)")
                 p.aa-double-price-text дней 
           .aa-add-more-container
             .aa-add-more#add-product-input

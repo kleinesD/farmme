@@ -14,7 +14,7 @@ import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
-import { addClient, editClient, addProduct, editProduct } from './distributionHandler';
+import { addClient, editClient, addProduct, addProductReturn, editProduct } from './distributionHandler';
 
 
 
@@ -6134,6 +6134,14 @@ $(document).ready(async function () {
   ///////////////////////
 
   if (document.querySelector('#add-process-container') || document.querySelector('#edit-process-container')) {
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
     /* Validating size */
     $('#size').on('keyup', function () {
       let percent = Math.round(parseFloat($(this).val()) / (parseFloat($('.aa-total-milk-line-inner').attr('data-total')) / 100));
@@ -6189,8 +6197,8 @@ $(document).ready(async function () {
             <p>Вес | Объем</p>
           </lable>
           <div class="aa-double-input-block">
-            <input class="aa-double-input" type="number" oninput="this.value = Math.abs(this.value)"/>
-            <select class="aa-double-input">
+            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <select class="aa-double-input unit-input">
               <option value="l" selected="selected">Л.</option>
               <option value="kg">Кг.  </option>
             </select>
@@ -6201,7 +6209,7 @@ $(document).ready(async function () {
             <p>Срок годности</p>
           </lable>
           <div class="aa-double-input-block aa-double-price-block">
-            <input class="aa-double-price-input" id="exp-date" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-price-input exp-date-input" type="number" oninput="this.value = Math.abs(this.value)"/>
             <p class="aa-double-price-text">дней </p>
           </div>
         </div>
@@ -6210,6 +6218,82 @@ $(document).ready(async function () {
 
       $('.aa-select-option-selected').trigger('click');
       $('.aa-select-option-selected').trigger('click');
+    });
+
+    $('*').on('click focus blur change keyup', function () {
+      $('.aa-input-united-block ').each(function () {
+        if ($(this).find('.aa-select-option-selected').length > 0 && parseFloat($(this).find('.size-input').val()) > 0 && $(this).find('.exp-date-input').length > 0) {
+          $(this).addClass('aa-input-united-block-valid')
+        } else {
+          $(this).removeClass('aa-input-united-block-valid')
+        }
+      });
+
+      if ($('#size').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
+      const size = parseFloat($('#size').val());
+      const date = new Date($('#date').val());
+      const type = 'decrease';
+      const distributionResult = 'processed';
+      const unit = 'l';
+      const product = 'milk';
+      let note = undefined;
+      if ($('#note').val().length > 0) {
+        note = $('#note').val();
+      }
+
+
+      let prod;
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+      /* Submiting data to ADD inventory */
+      if (document.querySelector('#add-process-container')) {
+        prod = await addProductReturn({ size, date, type, distributionResult, unit, product, note });
+
+        if (prod) {
+          let counter = 0;
+          $('.aa-input-united-block-valid').each(async function () {
+            let response = await addProduct({
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              expDate: new Date(moment($('#date').val()).add(parseFloat($(this).find('.exp-date-input').val()), 'days'))
+            });
+
+            if (response) counter++;
+            if (counter === $('.aa-input-united-block-valid').length) {
+              $('.mini-loader').hide();
+              addConfirmationEmpty($('.animal-results-container'));
+              setTimeout(() => {
+                location.reload(true);
+              }, 1500)
+  
+              //location.assign('/herd/all-animals');
+            }
+            
+          });
+
+          
+        }
+      }
+
+      /* Submiting data to EDIT inventory */
+      /* if (document.querySelector('#edit-client-container')) {
+        response = await editClient($(this).attr('data-client-id'), { name, adress, phoneNumber, phoneNumberCode, email, note, products })
+      } */
     });
 
 
