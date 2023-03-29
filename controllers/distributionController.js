@@ -49,3 +49,11 @@ exports.editClient = catchAsync(async(req, res, next) => {
     }
   });
 })
+
+exports.deleteProduct = catchAsync(async(req, res, next) => {
+  const product = await Product.findByIdAndRemove((req.params.id));
+
+  res.status(203).json({
+    status: 'success'
+  });
+});

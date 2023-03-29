@@ -91,8 +91,70 @@ block content
           .ar-block-sub-title РЕДАКТИРОВАТЬ
           .ar-block-title Продукт
 
+          .aa-input-block
+            lable.aa-label(for="size") 
+              p Молока переработано
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)" value=`${rawProduct.size}`)
+              p.aa-double-price-text л.
+          .aa-total-milk-box
+            .aa-total-milk-line
+              .aa-total-milk-line-inner(data-total=`${totalMilk + rawProduct.size}`)
+            .aa-total-milk-text= `${totalMilk + rawProduct.size} л.`
+
+          each product in products
+            .aa-input-united-block.aa-input-united-block-valid(data-id=`${product._id}` data-new="false")
+              .aa-input-block 
+                label.aa-label(for="type")
+                  p Продукт
+                .aa-select-box.aa-select-box-one
+                  .aa-select-text Выберите продукт
+                  ion-icon(name="chevron-down")
+                  .aa-select-options-box
+                    .aa-select-option(class=`${product.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
+                    .aa-select-option(class=`${product.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
+                    .aa-select-option(class=`${product.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
+                    .aa-select-option(class=`${product.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
+                    .aa-select-option(class=`${product.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
+                    .aa-select-option(class=`${product.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
+              .aa-input-block
+                lable.aa-label(for="price") 
+                  p Вес | Объем
+                .aa-double-input-block
+                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${product.size}`)
+                  select.aa-double-input.unit-input
+                    -if(product.unit === 'l')
+                      option(value="l" selected hidden) Л.
+                    -if(product.unit === 'kg')
+                      option(value="kg" selected hidden) Кг.  
+                    option(value="l" selected) Л.
+                    option(value="kg") Кг.  
+              .aa-input-block
+                lable.aa-label(for="price") 
+                  p Срок годности
+                .aa-double-input-block.aa-double-price-block
+                  input.aa-double-price-input.exp-date-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${Math.round((product.expDate.getTime() - rawProduct.date.getTime()) / 24 / 60 / 60 / 1000)}`)
+                  p.aa-double-price-text дней 
+              .aa-iu-remove   
+                ion-icon(name="close")
+          
+          
+          .aa-add-more-container
+            .aa-add-more#add-product-input
+              p Добавить продукт
+              ion-icon.aa-add-more-icon(name="add")
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date" value=`${rawProduct.date.toLocaleString('ru-RU', {year: 'numeric'})}-${rawProduct.date.toLocaleString('ru-RU', {month: '2-digit'})}-${rawProduct.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")= `${rawProduct.note !== undefined ? rawProduct.note : ''}`
+
           .ar-btn-box          
-            a.ar-add-button(data-product-id=`${product._id}`) Сохранить
+            a.ar-add-button(data-product-id=`${rawProduct._id}`) Сохранить
 
 
 

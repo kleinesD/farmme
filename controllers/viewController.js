@@ -608,11 +608,86 @@ exports.renderAddProcess = catchAsync(async (req, res, next) => {
 
 exports.renderEditProcess = catchAsync(async (req, res, next) => {
   const forEdit = true;
-  const product = await Product.findById(req.params.id);
+  const milkInventory = await Product.find({farm: req.user.farm, product: 'milk'})
+  const totalMilk = countInventoryTotal(milkInventory);
+
+  const rawProduct = await Product.findById(req.params.id);
+
+  const products = await Product.find({rawProduct: req.params.id});
 
   res.status(200).render('distProcess', {
     forEdit,
-    product
+    rawProduct,
+    products,
+    totalMilk
+  });
+});
+
+exports.renderAddOrder = catchAsync(async(req, res, next) => {
+  const forEdit = false;
+  const clients = await Client.find({farm: req.user.farm});
+
+  res.status(200).render('distOrder', {
+    forEdit,
+    clients
+  });
+});
+
+exports.renderEditOrder = catchAsync(async(req, res, next) => {
+  const forEdit = true;
+  const clients = await Client.find({farm: req.user.farm});
+  const orders = await Calendar.find({subId: req.params.id}).populate('client');
+
+  res.status(200).render('distOrder', {
+    forEdit,
+    orders,
+    clients
+  });
+});
+
+exports.renderAddSale = catchAsync(async(req, res, next) => {
+  const forEdit = false;
+  const clients = await Client.find({farm: req.user.farm});
+
+  const milkTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'milk'}))
+  const cottageCheeseTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cottage-cheese'}))
+  const creamTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cream'}))
+  const butterTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'butter'}))
+  const wheyTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'whey'}))
+  const cheeseTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cheese'}))
+
+  res.status(200).render('distSale', {
+    forEdit,
+    clients,
+    milkTotal, 
+    cottageCheeseTotal,
+    creamTotal,
+    butterTotal,
+    wheyTotal,
+    cheeseTotal
+  });
+});
+
+exports.renderEditSale = catchAsync(async(req, res, next) => {
+  const forEdit = true;
+  const clients = await Client.find({farm: req.user.farm});
+
+  const milkTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'milk'}))
+  const cottageCheeseTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cottage-cheese'}))
+  const creamTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cream'}))
+  const butterTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'butter'}))
+  const wheyTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'whey'}))
+  const cheeseTotal = countInventoryTotal(await Product.find({farm: req.user.farm, product: 'cheese'}))
+
+  res.status(200).render('distSale', {
+    forEdit,
+    clients,
+    milkTotal, 
+    cottageCheeseTotal,
+    creamTotal,
+    butterTotal,
+    wheyTotal,
+    cheeseTotal
   });
 });
 

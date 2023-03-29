@@ -137,4 +137,12 @@ router.get('/distribution/add-process', authController.protect, authController.i
 
 router.get('/distribution/edit-process/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProcess);
 
+router.get('/distribution/add-order', authController.protect, authController.isLoggedIn, viewController.renderAddOrder);
+
+router.get('/distribution/edit-order/:id', authController.protect, authController.isLoggedIn, viewController.renderEditOrder);
+
+router.get('/distribution/add-sale', authController.protect, authController.isLoggedIn, viewController.renderAddSale);
+
+router.get('/distribution/edit-sale/:id', authController.protect, authController.isLoggedIn, viewController.renderEditSale);
+
 module.exports = router;

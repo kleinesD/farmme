@@ -1,0 +1,164 @@
+extends base
+
+block content
+
+  section.main-section 
+
+    .animal-results-window
+
+      -if(!forEdit)
+
+        .animal-results-container.animal-results-big#add-sale-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+
+          .ar-block-sub-title ДОБАВИТЬ
+          .ar-block-title Продажа
+
+          -if(clients.length > 0)
+            .aa-input-block.info-birth-items
+              lable.aa-label(for="client") 
+                p Клиент
+              input.aa-search-input.aa-animal-search#client(data-id="" data-placeholder="Имя | Наименование")
+              .animal-search-block#client-search-block
+                each client in clients
+                  .animal-search-item(data-id=`${client._id}`)
+                    each product in client.products
+                      .asi-hidden(data-product=`${product.productName}` data-price=`${product.pricePer}`)
+                    img(src=`/img/images/user-default.png`)
+                    .animal-search-name= client.name 
+
+          .aa-input-united-block 
+            .aa-input-block 
+              label.aa-label(for="type")
+                p Продукт
+              .aa-select-box.aa-select-box-one
+                .aa-select-text Выберите продукт
+                ion-icon(name="chevron-down")
+                .aa-select-options-box
+                  .aa-select-option(data-val="milk") Молоко
+                  .aa-select-option(data-val="cottage-cheese") Творог
+                  .aa-select-option(data-val="butter") Масло 
+                  .aa-select-option(data-val="cream") Сливки 
+                  .aa-select-option(data-val="cheese") Сыр
+                  .aa-select-option(data-val="whey") Сыворотка 
+                  .aa-select-option(data-val="sour-cream") Сметана  
+                  .aa-select-option(data-val="meat") Мясо
+            .aa-input-block
+              lable.aa-label(for="price") 
+                p Вес | Объем
+              .aa-double-input-block
+                input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)")
+                select.aa-double-input.unit-input
+                  option(value="l" selected) Л.
+                  option(value="kg") Кг.  
+            .aa-input-block
+              lable.aa-label(for="size") 
+                p Цена / л.
+              .aa-double-input-block.aa-double-price-block
+                input.aa-double-price-input.price-input(type="number" oninput="this.value = Math.abs(this.value)")
+                p.aa-double-price-text ₽ &nbsp; = &nbsp; 0₽
+            .aa-total-milk-box
+              .aa-total-milk-line
+                .aa-total-milk-line-inner(data-total=`${milkTotal}`)
+              .aa-total-milk-text= `${milkTotal} л.`
+          .aa-add-more-container
+            .aa-add-more#add-product-input
+              p Добавить продукт
+              ion-icon.aa-add-more-icon(name="add")
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date")
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")
+          .aa-sale-total 
+            .aa-sale-total-sep
+            .aa-sale-total-sep
+            p Всего:
+            p#total(data-total="0") 0₽
+
+
+          .ar-btn-box          
+            a.ar-add-button Сохранить
+
+      -if(forEdit)
+        .animal-results-container.animal-results-big#edit-sale-container
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title Продажа
+
+          -if(clients.length > 0)
+            -if(orders[0].client)
+              .aa-input-block.info-birth-items
+                lable.aa-label(for="client") 
+                  p Клиент
+                input.aa-search-input.aa-animal-search#client(data-id=`${orders[0].client._id}` value=`${orders[0].client.name}` data-placeholder="Имя | Наименование")
+                .animal-search-block#client-search-block
+                  each client in clients
+                    .animal-search-item(data-id=`${client._id}`)
+                      img(src=`/img/images/user-default.png`)
+                      .animal-search-name= client.name 
+            -else
+              .aa-input-block.info-birth-items
+                lable.aa-label(for="client") 
+                  p Клиент
+                input.aa-search-input.aa-animal-search#client(data-id="" data-placeholder="Имя | Наименование")
+                .animal-search-block#client-search-block
+                  each client in clients
+                    .animal-search-item(data-id=`${client._id}`)
+                      img(src=`/img/images/user-default.png`)
+                      .animal-search-name= client.name 
+
+          each order in orders
+            .aa-input-united-block.aa-input-united-block-valid(data-id=`${order._id}` data-new="false")
+              .aa-input-block 
+                label.aa-label(for="type")
+                  p Продукт
+                .aa-select-box.aa-select-box-one
+                  .aa-select-text Выберите продукт
+                  ion-icon(name="chevron-down")
+                  .aa-select-options-box
+                    .aa-select-option(class=`${order.product === 'milk' ? 'aa-select-option-selected' : ''}`  data-val="milk") Молоко
+                    .aa-select-option(class=`${order.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
+                    .aa-select-option(class=`${order.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
+                    .aa-select-option(class=`${order.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
+                    .aa-select-option(class=`${order.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
+                    .aa-select-option(class=`${order.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
+                    .aa-select-option(class=`${order.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
+                    .aa-select-option(class=`${order.product === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо 
+              .aa-input-block
+                lable.aa-label(for="price") 
+                  p Вес | Объем
+                .aa-double-input-block
+                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${order.size}`)
+                  select.aa-double-input.unit-input
+                    -if(order.unit === 'l')
+                      option(value="l" selected hidden) Л.
+                    -if(order.unit === 'kg')
+                      option(value="kg" selected hidden) Кг.  
+                    option(value="l" selected) Л.
+                    option(value="kg") Кг.  
+              .aa-iu-remove   
+                ion-icon(name="close")
+          .aa-add-more-container
+            .aa-add-more#add-product-input
+              p Добавить продукт
+              ion-icon.aa-add-more-icon(name="add")
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date" value=`${orders[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${orders[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${orders[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")= `${orders[0].note !== undefined ? orders[0].note : ''}`
+
+          .ar-btn-box          
+            a.ar-add-button(data-order-id=`${orders[0].subId}`) Сохранить
+
+
+

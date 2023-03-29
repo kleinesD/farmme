@@ -14,8 +14,7 @@ const calendarScheme = new mongoose.Schema({
     ref: 'Animal'
   },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   note: String,
   date: {
@@ -30,7 +29,7 @@ const calendarScheme = new mongoose.Schema({
   module: {
     type: String,
     required: true,
-    enum: ['general', 'herd', 'vet', 'warehouse']
+    enum: ['general', 'herd', 'vet', 'warehouse', 'distribution', 'order']
   },
   notified: {
     type: Boolean,
@@ -45,6 +44,20 @@ const calendarScheme = new mongoose.Schema({
       }
     }
   ],
+  subId: String,
+  client: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Client'
+  },
+  product: {
+    type: String
+  },
+  size: {
+    type: Number
+  },
+  unit: {
+    type: String
+  },
   subId: String
 });
 

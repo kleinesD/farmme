@@ -8,13 +8,13 @@ import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
 import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal } from './animalHandler';
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
-import { addReminder, editReminder, deleteRemninder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
+import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
-import { addClient, editClient, addProduct, addProductReturn, editProduct } from './distributionHandler';
+import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct } from './distributionHandler';
 
 
 
@@ -290,22 +290,26 @@ $(document).ready(async function () {
     });
 
     /* Search block */
-    $('.aa-search-input').focus(function (e) {
-      $('body').off('click');
+    $('.aa-search-input').on('click', function (e) {
+      /* $('body').off('click'); */
       let currentInput = e.target;
       let currentInputJquery = $(this);
 
       $(this).attr('placeholder', $(this).attr('data-placeholder'));
 
-      $(this).parent().find('.animal-search-block').show().css('display', 'flex');
+      if($(this).parent().find('.animal-search-block').css('display') === 'flex') {
+        $(this).parent().find('.animal-search-block').hide();
+      } else {
+        $(this).parent().find('.animal-search-block').show().css('display', 'flex');
+      }
 
-      $('body').click(function (e) {
+      /* $('body').click(function (e) {
         if (currentInput !== e.target && e.target.parentElement.id !== `${currentInput.id}-search-block`) {
           $('.aa-search-input').attr('placeholder', '');
           $(currentInputJquery).parent().find('.animal-search-block').hide();
         }
 
-      });
+      }); */
     });
 
 
@@ -6143,7 +6147,7 @@ $(document).ready(async function () {
     });
 
     /* Validating size */
-    $('#size').on('keyup', function () {
+    $('#size').on('keyup change', function () {
       let percent = Math.round(parseFloat($(this).val()) / (parseFloat($('.aa-total-milk-line-inner').attr('data-total')) / 100));
 
       $('.aa-total-milk-line-inner').stop();
@@ -6174,7 +6178,7 @@ $(document).ready(async function () {
 
     $('#add-product-input').on('click', function () {
       $(this).parent().before(`
-        <div class="aa-input-united-block"> 
+        <div class="aa-input-united-block" data-new="true"> 
         <div class="aa-input-block"> 
           <label class="aa-label" for="type">
             <p>Продукт</p>
@@ -6213,11 +6217,27 @@ $(document).ready(async function () {
             <p class="aa-double-price-text">дней </p>
           </div>
         </div>
+        <div class="aa-iu-remove">  
+          <ion-icon name="close"></ion-icon>
+        </div>
       </div>
       `);
 
       $('.aa-select-option-selected').trigger('click');
       $('.aa-select-option-selected').trigger('click');
+    });
+
+    $('body').on('click', '.aa-iu-remove', async function () {
+      if ($(this).parent().attr('data-new') === 'false') {
+        $(this).find('ion-icon').remove();
+        $(this).append(`<div class="mini-loader"></div>`);
+
+        let response = await deleteProduct($(this).parent().attr('data-id'));
+        if (response) $(this).parent().remove();
+
+      } else if ($(this).parent().attr('data-new') === 'true') {
+        $(this).parent().remove();
+      }
     });
 
     $('*').on('click focus blur change keyup', function () {
@@ -6235,6 +6255,14 @@ $(document).ready(async function () {
         $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
       }
     });
+
+    if (document.querySelector('#edit-process-container')) {
+      $('input').trigger('click');
+      $('#size').trigger('keyup');
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    }
 
     /* Submiting data */
     $('.ar-add-button').click(async function () {
@@ -6270,7 +6298,8 @@ $(document).ready(async function () {
               date: new Date($('#date').val()),
               unit: $(this).find('.unit-input').val(),
               product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              expDate: new Date(moment($('#date').val()).add(parseFloat($(this).find('.exp-date-input').val()), 'days'))
+              expDate: new Date(moment($('#date').val()).add(parseFloat($(this).find('.exp-date-input').val()), 'days')),
+              rawProduct: prod._id
             });
 
             if (response) counter++;
@@ -6280,20 +6309,560 @@ $(document).ready(async function () {
               setTimeout(() => {
                 location.reload(true);
               }, 1500)
-  
+
               //location.assign('/herd/all-animals');
             }
-            
+
           });
 
-          
+
         }
       }
 
       /* Submiting data to EDIT inventory */
-      /* if (document.querySelector('#edit-client-container')) {
-        response = await editClient($(this).attr('data-client-id'), { name, adress, phoneNumber, phoneNumberCode, email, note, products })
-      } */
+      if (document.querySelector('#edit-process-container')) {
+        prod = await editProductReturn($(this).attr('data-product-id'), { size, date, type, distributionResult, unit, product, note });
+
+        if (prod) {
+          let counter = 0;
+          $('.aa-input-united-block-valid').each(async function () {
+            let response;
+            if ($(this).attr('data-new') === 'false') {
+              response = await editProduct($(this).attr('data-id'), {
+                size: parseFloat($(this).find('.size-input').val()),
+                date: new Date($('#date').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                expDate: new Date(moment($('#date').val()).add(parseFloat($(this).find('.exp-date-input').val()), 'days')),
+                rawProduct: prod._id
+              });
+            } else if ($(this).attr('data-new') === 'true') {
+              response = await addProduct({
+                size: parseFloat($(this).find('.size-input').val()),
+                date: new Date($('#date').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                expDate: new Date(moment($('#date').val()).add(parseFloat($(this).find('.exp-date-input').val()), 'days')),
+                rawProduct: prod._id
+              });
+            }
+
+
+            if (response) counter++;
+            if (counter === $('.aa-input-united-block-valid').length) {
+              $('.mini-loader').hide();
+              addConfirmationEmpty($('.animal-results-container'));
+              setTimeout(() => {
+                location.reload(true);
+              }, 1500)
+
+              //location.assign('/herd/all-animals');
+            }
+
+          });
+
+
+        }
+      }
+    });
+
+
+
+  }
+
+  ///////////////////////
+  /* BOTH ADD/EDIT ORDER PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-order-container') || document.querySelector('#edit-order-container')) {
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    /* Preventing double selection */
+    $('body').on('click', '.aa-select-option', function () {
+      let selectedOption = $(this);
+      $('.aa-select-option').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
+          $(this).addClass('aa-select-option-taken');
+        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
+          $(this).removeClass('aa-select-option-taken');
+        }
+      });
+      $(this).parent().attr('data-val', $(this).attr('data-val'))
+    });
+
+    $('#add-product-input').on('click', function () {
+      $(this).parent().before(`
+        <div class="aa-input-united-block" data-new="true"> 
+        <div class="aa-input-block"> 
+          <label class="aa-label" for="type">
+            <p>Продукт</p>
+          </label>
+          <div class="aa-select-box aa-select-box-one">
+            <div class="aa-select-text">Выберите продукт</div>
+            <ion-icon name="chevron-down"></ion-icon>
+            <div class="aa-select-options-box">
+              <div class="aa-select-option" data-val="milk">Молоко</div>
+              <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
+              <div class="aa-select-option" data-val="butter">Масло </div>
+              <div class="aa-select-option" data-val="cream">Сливки </div>
+              <div class="aa-select-option" data-val="cheese">Сыр  </div>
+              <div class="aa-select-option" data-val="whey">Сыворотка </div>
+              <div class="aa-select-option" data-val="sour-cream">Сметана  </div>
+              <div class="aa-select-option" data-val="meat">Мясо  </div>
+            </div>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="price"> 
+            <p>Вес | Объем</p>
+          </lable>
+          <div class="aa-double-input-block">
+            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <select class="aa-double-input unit-input">
+              <option value="l" selected="selected">Л.</option>
+              <option value="kg">Кг.  </option>
+            </select>
+          </div>
+        </div>
+        <div class="aa-iu-remove">  
+          <ion-icon name="close"></ion-icon>
+        </div>
+      </div>
+      `);
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    });
+
+    $('.main-section').on('click', '.aa-iu-remove', async function () {
+      if ($(this).parent().attr('data-new') === 'false') {
+        $(this).find('ion-icon').remove();
+        $(this).append(`<div class="mini-loader"></div>`);
+
+        let response = await deleteReminder($(this).parent().attr('data-id'));
+        if (response) $(this).parent().remove();
+
+      } else if ($(this).parent().attr('data-new') === 'true') {
+        $(this).parent().remove();
+      }
+    });
+
+    /* Validating the date */
+    $('#date').on('keyup click change', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) > new Date()) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#date').on('blur', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) <= new Date()) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную дату</div>`);
+      }
+    });
+
+    $('*').on('click focus blur change keyup', function () {
+      $('.aa-input-united-block ').each(function () {
+        if ($(this).find('.aa-select-option-selected').length > 0 && parseFloat($(this).find('.size-input').val()) > 0) {
+          $(this).addClass('aa-input-united-block-valid')
+        } else {
+          $(this).removeClass('aa-input-united-block-valid')
+        }
+      });
+
+      if ($('#date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    if (document.querySelector('#edit-order-container')) {
+      $('input').trigger('click');
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    }
+
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
+      let note = undefined;
+      if ($('#note').val().length > 0) {
+        note = $('#note').val();
+      }
+
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+
+
+      /* Submiting data to ADD order */
+      if (document.querySelector('#add-order-container')) {
+        let subId = randomstring.generate(12);
+
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response = await addReminder({
+            size: parseFloat($(this).find('.size-input').val()),
+            date: new Date($('#date').val()),
+            unit: $(this).find('.unit-input').val(),
+            product: $(this).find('.aa-select-option-selected').attr('data-val'),
+            subId: subId,
+            module: 'order',
+            client: $('#client').attr('data-id'),
+            note: note
+          });
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+
+      }
+
+      /* Submiting data to EDIT inventory */
+      if (document.querySelector('#edit-order-container')) {
+        let subId = $(this).attr('data-order-id');
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response;
+          if ($(this).attr('data-new') === 'false') {
+            response = await editReminder($(this).attr('data-id'), {
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              subId: subId,
+              module: 'order',
+              client: $('#client').attr('data-id'),
+              note: note
+            });
+          } else if ($(this).attr('data-new') === 'true') {
+            response = await addReminder({
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              subId: subId,
+              module: 'order',
+              client: $('#client').attr('data-id'),
+              note: note
+            });
+          }
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+      }
+    });
+
+
+
+  }
+
+  ///////////////////////
+  /* BOTH ADD/EDIT SALE PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-sale-container') || document.querySelector('#edit-sale-container')) {
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    /* Preventing double selection */
+    $('body').on('click', '.aa-select-option', function () {
+      let selectedOption = $(this);
+      $('.aa-select-option').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
+          $(this).addClass('aa-select-option-taken');
+        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
+          $(this).removeClass('aa-select-option-taken');
+        }
+      });
+      $(this).parent().attr('data-val', $(this).attr('data-val'))
+    });
+
+    $('#add-product-input').on('click', function () {
+      $(this).parent().before(`
+        <div class="aa-input-united-block" data-new="true"> 
+        <div class="aa-input-block"> 
+          <label class="aa-label" for="type">
+            <p>Продукт</p>
+          </label>
+          <div class="aa-select-box aa-select-box-one">
+            <div class="aa-select-text">Выберите продукт</div>
+            <ion-icon name="chevron-down"></ion-icon>
+            <div class="aa-select-options-box">
+              <div class="aa-select-option" data-val="milk">Молоко</div>
+              <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
+              <div class="aa-select-option" data-val="butter">Масло </div>
+              <div class="aa-select-option" data-val="cream">Сливки </div>
+              <div class="aa-select-option" data-val="cheese">Сыр  </div>
+              <div class="aa-select-option" data-val="whey">Сыворотка </div>
+              <div class="aa-select-option" data-val="sour-cream">Сметана  </div>
+              <div class="aa-select-option" data-val="meat">Мясо  </div>
+            </div>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="price"> 
+            <p>Вес | Объем</p>
+          </lable>
+          <div class="aa-double-input-block">
+            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <select class="aa-double-input unit-input">
+              <option value="l" selected="selected">Л.</option>
+              <option value="kg">Кг.  </option>
+            </select>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="size"> 
+            <p>Цена / л.</p>
+          </lable>
+          <div class="aa-double-input-block aa-double-price-block">
+            <input class="aa-double-price-input price-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <p class="aa-double-price-text">₽ &nbsp; = &nbsp; 0₽</p>
+          </div>
+        </div>
+        <div class="aa-iu-remove">  
+          <ion-icon name="close"></ion-icon>
+        </div>
+      </div>
+      `);
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    });
+
+    $('.main-section').on('click', '.aa-iu-remove', async function () {
+      if ($(this).parent().attr('data-new') === 'false') {
+        $(this).find('ion-icon').remove();
+        $(this).append(`<div class="mini-loader"></div>`);
+
+        let response = await deleteReminder($(this).parent().attr('data-id'));
+        if (response) $(this).parent().remove();
+
+      } else if ($(this).parent().attr('data-new') === 'true') {
+        $(this).parent().remove();
+      }
+    });
+
+    /* Working with prices in each product */
+    $('body').on('click change keyup', '.size-input, .price-input', function() {
+      let parent = $(this).parent().parent().parent();
+      let size = parseFloat(parent.find('.size-input').val().length === 0 ? 0 : parent.find('.size-input').val());
+      let price = parseFloat(parent.find('.price-input').val().length === 0 ? 0 : parent.find('.price-input').val());
+      parent.find('.aa-double-price-text').html(`₽ &nbsp; = &nbsp; ${size * price}₽`)
+      parent.attr('data-total', size * price)
+    });
+
+    $('body').on('click change', '.unit-input', function() {
+      let parent = $(this).parent().parent().parent();
+      parent.find('.price-input').parent().parent().find('.aa-label p').text(`Цена / ${$(this).val() === 'l' ? 'л.' : 'кг.'}`)
+      
+    });
+
+    /* Pre setting price */
+    $('body').on('click', '.aa-select-option', function() {
+      let parent = $(this).parent().parent().parent().parent();
+      let product = $(this).attr('data-val');
+      parent.find('.price-input').val(0)
+
+      if($('#client').val().length > 0 && $('#client').attr('data-id') !== '') {
+        if(parent.find('.price-input').val().length === 0 || parseFloat(parent.find('.price-input').val()) === 0) {
+          $('.animal-search-item').each(function() {
+            if($(this).attr('data-id') === $('#client').attr('data-id')) {
+              $(this).find('.asi-hidden').each(function() {
+                if($(this).attr('data-product') === product) {
+                  parent.find('.price-input').val(parseFloat($(this).attr('data-price')))
+                }
+              });
+            }
+          });
+        }
+      }
+
+      parent.find('.price-input').trigger('change')
+    });
+
+    $('.animal-search-item').on('click', function() {
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    })
+
+    /* Validating the date */
+    /* $('#date').on('keyup click change', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) > new Date()) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#date').on('blur', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) <= new Date()) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную дату</div>`);
+      }
+    }); */
+
+    $('*').on('click focus blur change keyup', function () {
+      $('.aa-input-united-block ').each(function () {
+        if ($(this).find('.aa-select-option-selected').length > 0 && parseFloat($(this).find('.size-input').val()) > 0 && parseFloat($(this).find('.price-input').val()) > 0) {
+          $(this).addClass('aa-input-united-block-valid')
+        } else {
+          $(this).removeClass('aa-input-united-block-valid')
+        }
+      });
+      let total = 0;
+      $('.aa-input-united-block-valid').each(function() {
+        total += parseFloat($(this).attr('data-total'));
+      });
+
+      $('#total').attr('data-total', total)
+      $('#total').text(`${total}₽`)
+
+      if ($('#date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    if (document.querySelector('#edit-order-container')) {
+      $('input').trigger('click');
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    }
+
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
+      let note = undefined;
+      if ($('#note').val().length > 0) {
+        note = $('#note').val();
+      }
+
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+
+
+      /* Submiting data to ADD order */
+      if (document.querySelector('#add-order-container')) {
+        let subId = randomstring.generate(12);
+
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response = await addReminder({
+            size: parseFloat($(this).find('.size-input').val()),
+            date: new Date($('#date').val()),
+            unit: $(this).find('.unit-input').val(),
+            product: $(this).find('.aa-select-option-selected').attr('data-val'),
+            subId: subId,
+            module: 'order',
+            client: $('#client').attr('data-id'),
+            note: note
+          });
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+
+      }
+
+      /* Submiting data to EDIT inventory */
+      if (document.querySelector('#edit-order-container')) {
+        let subId = $(this).attr('data-order-id');
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response;
+          if ($(this).attr('data-new') === 'false') {
+            response = await editReminder($(this).attr('data-id'), {
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              subId: subId,
+              module: 'order',
+              client: $('#client').attr('data-id'),
+              note: note
+            });
+          } else if ($(this).attr('data-new') === 'true') {
+            response = await addReminder({
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              subId: subId,
+              module: 'order',
+              client: $('#client').attr('data-id'),
+              note: note
+            });
+          }
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+      }
     });
 
 

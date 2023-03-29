@@ -30,12 +30,11 @@ export const editReminder = async (id, data) => {
     console.log(err);
   }
 }
-export const deleteReminder = async (data) => {
+export const deleteReminder = async (id) => {
   try {
     const res = await axios({
       method: 'DELETE',
-      url: `/api/calendar/${id}`,
-      data
+      url: `/api/calendar/${id}`
     });
 
     if(res.data.status === 'success') {

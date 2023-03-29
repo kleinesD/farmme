@@ -47,6 +47,37 @@ export const addProduct = async (data) => {
     }
 }
 
+export const editProduct = async (id, data) => {
+    try {
+        const res = await axios({
+            method: 'PATCH',
+            url: `/api/distribution/product/${id}`,
+            data
+        });
+
+        if(res.data.status === 'success') {
+            return true
+        }
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const deleteProduct = async (id) => {
+    try {
+        const res = await axios({
+            method: 'DELETE',
+            url: `/api/distribution/product/${id}`
+        });
+
+        if(res.data.status === 'success') {
+            return true
+        }
+    } catch(err) {
+        console.log(err);
+    }
+}
+
 export const addProductReturn = async (data) => {
     try {
         const res = await axios({
@@ -63,7 +94,7 @@ export const addProductReturn = async (data) => {
     }
 }
 
-export const editProduct = async (id, data) => {
+export const editProductReturn = async (id, data) => {
     try {
         const res = await axios({
             method: 'PATCH',
@@ -72,7 +103,7 @@ export const editProduct = async (id, data) => {
         });
 
         if(res.data.status === 'success') {
-            return true
+            return res.data.data.product
         }
     } catch(err) {
         console.log(err);
