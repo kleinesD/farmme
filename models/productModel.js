@@ -23,7 +23,7 @@ const productScheme = new mongoose.Schema({
     unit: {
         type: String
     },
-    buyer: {
+    client: {
         type: mongoose.Schema.ObjectId,
         ref: 'Client'
     },
@@ -61,7 +61,8 @@ const productScheme = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Farm'
     },
-    note: String
+    note: String,
+    subId: String
 });
 
 const Product = mongoose.model('Product', productScheme);

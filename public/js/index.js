@@ -6603,6 +6603,31 @@ $(document).ready(async function () {
       }
     });
 
+    /* Working with prices in each product */
+    $('body').on('click change keyup', '.size-input, .price-input', function() {
+      if($(this).hasClass('size-input') && parseFloat($(this).val()) > parseFloat($(this).attr('data-max'))) {
+        $(this).val(parseFloat($(this).attr('data-max')));
+      }
+
+      let parent = $(this).parent().parent().parent();
+      let size = parseFloat(parent.find('.size-input').val().length === 0 ? 0 : parent.find('.size-input').val());
+      let price = parseFloat(parent.find('.price-input').val().length === 0 ? 0 : parent.find('.price-input').val());
+      parent.find('.price-text').html(`₽ &nbsp; = &nbsp; ${size * price}₽`)
+      parent.attr('data-total', size * price)
+    });
+
+    /* Hiding elements if quantity is 0 */
+    $('body').on('click', '.aa-select-box', function() {
+      $('.aa-select-option').each(function() {
+        let selectEl = $(this);
+        $('.arc-inventory-data').each(function() {
+          if(selectEl.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') == 0) {
+            selectEl.hide();
+          }
+        });
+      });
+    });
+
     /* Preventing double selection */
     $('body').on('click', '.aa-select-option', function () {
       let selectedOption = $(this);
@@ -6614,6 +6639,14 @@ $(document).ready(async function () {
         }
       });
       $(this).parent().attr('data-val', $(this).attr('data-val'))
+
+      $('.arc-inventory-data').each(function() {
+        if(selectedOption.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') != 0) {
+          selectedOption.parent().parent().parent().parent().find('.range-text').html(`/ &nbsp; ${$(this).attr('data-quantity')}`)
+          selectedOption.parent().parent().parent().parent().find('.size-input').attr('data-max', $(this).attr('data-quantity'))
+          selectedOption.parent().parent().parent().parent().find('.size-input').trigger('change')
+        }
+      });
     });
 
     $('#add-product-input').on('click', function () {
@@ -6644,6 +6677,7 @@ $(document).ready(async function () {
           </lable>
           <div class="aa-double-input-block">
             <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <p class="aa-double-price-text range-text">/ &nbsp;</p>
             <select class="aa-double-input unit-input">
               <option value="l" selected="selected">Л.</option>
               <option value="kg">Кг.  </option>
@@ -6656,7 +6690,7 @@ $(document).ready(async function () {
           </lable>
           <div class="aa-double-input-block aa-double-price-block">
             <input class="aa-double-price-input price-input" type="number" oninput="this.value = Math.abs(this.value)"/>
-            <p class="aa-double-price-text">₽ &nbsp; = &nbsp; 0₽</p>
+            <p class="aa-double-price-text price-text">₽ &nbsp; = &nbsp; 0₽</p>
           </div>
         </div>
         <div class="aa-iu-remove">  
@@ -6682,14 +6716,7 @@ $(document).ready(async function () {
       }
     });
 
-    /* Working with prices in each product */
-    $('body').on('click change keyup', '.size-input, .price-input', function() {
-      let parent = $(this).parent().parent().parent();
-      let size = parseFloat(parent.find('.size-input').val().length === 0 ? 0 : parent.find('.size-input').val());
-      let price = parseFloat(parent.find('.price-input').val().length === 0 ? 0 : parent.find('.price-input').val());
-      parent.find('.aa-double-price-text').html(`₽ &nbsp; = &nbsp; ${size * price}₽`)
-      parent.attr('data-total', size * price)
-    });
+    
 
     $('body').on('click change', '.unit-input', function() {
       let parent = $(this).parent().parent().parent();
@@ -6701,7 +6728,7 @@ $(document).ready(async function () {
     $('body').on('click', '.aa-select-option', function() {
       let parent = $(this).parent().parent().parent().parent();
       let product = $(this).attr('data-val');
-      parent.find('.price-input').val(0)
+      /* parent.find('.price-input').val(0) */
 
       if($('#client').val().length > 0 && $('#client').attr('data-id') !== '') {
         if(parent.find('.price-input').val().length === 0 || parseFloat(parent.find('.price-input').val()) === 0) {
@@ -6717,7 +6744,7 @@ $(document).ready(async function () {
         }
       }
 
-      parent.find('.price-input').trigger('change')
+      parent.find('.price-input').trigger('click')
     });
 
     $('.animal-search-item').on('click', function() {
@@ -6765,11 +6792,12 @@ $(document).ready(async function () {
       }
     });
 
-    if (document.querySelector('#edit-order-container')) {
-      $('input').trigger('click');
+    if (document.querySelector('#edit-sale-container')) {
+      /* $('input').trigger('click');
+      $('input').trigger('click'); */
 
-      $('.aa-select-option-selected').trigger('click');
-      $('.aa-select-option-selected').trigger('click');
+      /* $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click'); */
     }
 
     /* Submiting data */
@@ -6788,21 +6816,23 @@ $(document).ready(async function () {
 
 
 
-      /* Submiting data to ADD order */
-      if (document.querySelector('#add-order-container')) {
+      /* Submiting data to ADD sale */
+      if (document.querySelector('#add-sale-container')) {
         let subId = randomstring.generate(12);
 
         let counter = 0;
         $('.aa-input-united-block-valid').each(async function () {
-          let response = await addReminder({
+          let response = await addProduct({
             size: parseFloat($(this).find('.size-input').val()),
             date: new Date($('#date').val()),
             unit: $(this).find('.unit-input').val(),
             product: $(this).find('.aa-select-option-selected').attr('data-val'),
-            subId: subId,
-            module: 'order',
-            client: $('#client').attr('data-id'),
-            note: note
+            type: 'decrease',
+            distributionResult: 'sold',
+            pricePer: parseFloat($('.price-input').val()),
+            price: parseFloat($(this).attr('data-total')),
+            client: $('#client').attr('data-id') === '' ? undefined : $('#client').attr('data-id'),
+            subId
           });
 
           if (response) counter++;

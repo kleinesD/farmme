@@ -9,6 +9,14 @@ block content
       -if(!forEdit)
 
         .animal-results-container.animal-results-big#add-sale-container
+          .arc-inventory-data(data-product=`milk` data-quantity=`${milkTotal}`)
+          .arc-inventory-data(data-product=`cottage-cheese` data-quantity=`${cottageCheeseTotal}`)
+          .arc-inventory-data(data-product=`butter` data-quantity=`${butterTotal}`)
+          .arc-inventory-data(data-product=`cream` data-quantity=`${creamTotal}`)
+          .arc-inventory-data(data-product=`cheese` data-quantity=`${cheeseTotal}`)
+          .arc-inventory-data(data-product=`whey` data-quantity=`${wheyTotal}`)
+          .arc-inventory-data(data-product=`sour-cream` data-quantity=`${sourCreamTotal}`)
+          .arc-inventory-data(data-product=`meat` data-quantity=`${meatTotal}`)
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
@@ -48,6 +56,7 @@ block content
                 p Вес | Объем
               .aa-double-input-block
                 input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)")
+                p.aa-double-price-text.range-text / &nbsp;
                 select.aa-double-input.unit-input
                   option(value="l" selected) Л.
                   option(value="kg") Кг.  
@@ -56,11 +65,7 @@ block content
                 p Цена / л.
               .aa-double-input-block.aa-double-price-block
                 input.aa-double-price-input.price-input(type="number" oninput="this.value = Math.abs(this.value)")
-                p.aa-double-price-text ₽ &nbsp; = &nbsp; 0₽
-            .aa-total-milk-box
-              .aa-total-milk-line
-                .aa-total-milk-line-inner(data-total=`${milkTotal}`)
-              .aa-total-milk-text= `${milkTotal} л.`
+                p.aa-double-price-text.price-text ₽ &nbsp; = &nbsp; 0₽
           .aa-add-more-container
             .aa-add-more#add-product-input
               p Добавить продукт
@@ -86,16 +91,25 @@ block content
 
       -if(forEdit)
         .animal-results-container.animal-results-big#edit-sale-container
+          .arc-inventory-data(data-product=`milk` data-quantity=`${milkTotal}`)
+          .arc-inventory-data(data-product=`cottage-cheese` data-quantity=`${cottageCheeseTotal}`)
+          .arc-inventory-data(data-product=`butter` data-quantity=`${butterTotal}`)
+          .arc-inventory-data(data-product=`cream` data-quantity=`${creamTotal}`)
+          .arc-inventory-data(data-product=`cheese` data-quantity=`${cheeseTotal}`)
+          .arc-inventory-data(data-product=`whey` data-quantity=`${wheyTotal}`)
+          .arc-inventory-data(data-product=`sour-cream` data-quantity=`${sourCreamTotal}`)
+          .arc-inventory-data(data-product=`meat` data-quantity=`${meatTotal}`)
+
           //-img.ar-image-back(src="/img/images/milk-icon.png")
           .ar-block-sub-title РЕДАКТИРОВАТЬ
           .ar-block-title Продажа
 
           -if(clients.length > 0)
-            -if(orders[0].client)
+            -if(products[0].client)
               .aa-input-block.info-birth-items
                 lable.aa-label(for="client") 
                   p Клиент
-                input.aa-search-input.aa-animal-search#client(data-id=`${orders[0].client._id}` value=`${orders[0].client.name}` data-placeholder="Имя | Наименование")
+                input.aa-search-input.aa-animal-search#client(data-id=`${products[0].client._id}` value=`${products[0].client.name}` data-placeholder="Имя | Наименование")
                 .animal-search-block#client-search-block
                   each client in clients
                     .animal-search-item(data-id=`${client._id}`)
@@ -112,8 +126,8 @@ block content
                       img(src=`/img/images/user-default.png`)
                       .animal-search-name= client.name 
 
-          each order in orders
-            .aa-input-united-block.aa-input-united-block-valid(data-id=`${order._id}` data-new="false")
+          each product in products
+            .aa-input-united-block.aa-input-united-block-valid(data-id=`${product._id}` data-new="false")
               .aa-input-block 
                 label.aa-label(for="type")
                   p Продукт
@@ -121,26 +135,32 @@ block content
                   .aa-select-text Выберите продукт
                   ion-icon(name="chevron-down")
                   .aa-select-options-box
-                    .aa-select-option(class=`${order.product === 'milk' ? 'aa-select-option-selected' : ''}`  data-val="milk") Молоко
-                    .aa-select-option(class=`${order.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
-                    .aa-select-option(class=`${order.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
-                    .aa-select-option(class=`${order.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
-                    .aa-select-option(class=`${order.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
-                    .aa-select-option(class=`${order.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
-                    .aa-select-option(class=`${order.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
-                    .aa-select-option(class=`${order.product === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо 
+                    .aa-select-option(class=`${product.product === 'milk' ? 'aa-select-option-selected' : ''}`  data-val="milk") Молоко
+                    .aa-select-option(class=`${product.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
+                    .aa-select-option(class=`${product.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
+                    .aa-select-option(class=`${product.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
+                    .aa-select-option(class=`${product.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
+                    .aa-select-option(class=`${product.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
+                    .aa-select-option(class=`${product.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
+                    .aa-select-option(class=`${product.product === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо 
               .aa-input-block
                 lable.aa-label(for="price") 
                   p Вес | Объем
                 .aa-double-input-block
-                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${order.size}`)
+                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${product.size}`)
                   select.aa-double-input.unit-input
-                    -if(order.unit === 'l')
+                    -if(product.unit === 'l')
                       option(value="l" selected hidden) Л.
-                    -if(order.unit === 'kg')
+                    -if(product.unit === 'kg')
                       option(value="kg" selected hidden) Кг.  
                     option(value="l" selected) Л.
                     option(value="kg") Кг.  
+              .aa-input-block
+                lable.aa-label(for="size") 
+                  p Цена / л.
+                .aa-double-input-block.aa-double-price-block
+                  input.aa-double-price-input.price-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${product.pricePer}`)
+                  p.aa-double-price-text.price-text ₽ &nbsp; = &nbsp; #{product.price}₽
               .aa-iu-remove   
                 ion-icon(name="close")
           .aa-add-more-container
@@ -150,15 +170,15 @@ block content
           .aa-input-block
             label.aa-label(for="date")
               p Дата
-            input.aa-text-input.aa-date-input#date(type="date" value=`${orders[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${orders[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${orders[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            input.aa-text-input.aa-date-input#date(type="date" value=`${products[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${products[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${products[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
 
           .aa-input-block
             lable.aa-label(for="note") 
               p Заметка
-            textarea.aa-textarea-input#note(type="text")= `${orders[0].note !== undefined ? orders[0].note : ''}`
+            textarea.aa-textarea-input#note(type="text")= `${products[0].note !== undefined ? products[0].note : ''}`
 
           .ar-btn-box          
-            a.ar-add-button(data-order-id=`${orders[0].subId}`) Сохранить
+            a.ar-add-button(data-order-id=`${products[0].subId}`) Сохранить
 
 
 
