@@ -702,3 +702,86 @@ exports.renderEditSale = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderAddConsumption = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+  const milkTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'milk' }))
+  const cottageCheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cottage-cheese' }))
+  const creamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cream' }))
+  const butterTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'butter' }))
+  const wheyTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'whey' }))
+  const cheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cheese' }))
+  const sourCreamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'sour-cream' }))
+  const meatTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'meat' }))
+
+  res.status(200).render('distConsumption', {
+    forEdit,
+    milkTotal,
+    cottageCheeseTotal,
+    creamTotal,
+    butterTotal,
+    wheyTotal,
+    cheeseTotal,
+    sourCreamTotal,
+    meatTotal
+  });
+});
+
+exports.renderEditConsumption = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const products = await Product.find({ subId: req.params.id });
+
+  const milkTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'milk', subId: { $ne: req.params.id } }))
+  const cottageCheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cottage-cheese', subId: { $ne: req.params.id } }))
+  const creamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cream', subId: { $ne: req.params.id } }))
+  const butterTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'butter', subId: { $ne: req.params.id } }))
+  const wheyTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'whey', subId: { $ne: req.params.id } }))
+  const cheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cheese', subId: { $ne: req.params.id } }))
+  const sourCreamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'sour-cream', subId: { $ne: req.params.id } }))
+  const meatTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'meat', subId: { $ne: req.params.id } }))
+
+
+  res.status(200).render('distConsumption', {
+    forEdit,
+    products,
+    milkTotal,
+    cottageCheeseTotal,
+    creamTotal,
+    butterTotal,
+    wheyTotal,
+    cheeseTotal,
+    sourCreamTotal,
+    meatTotal
+  });
+});
+
+exports.renderAddOutgoDecide = catchAsync(async (req, res, next) => {
+
+  res.status(200).render('distOutgoDecide', {
+
+  });
+});
+
+exports.renderAllProducts = catchAsync(async(req, res, next) => {
+  const products = await Product.find({farm: req.user.farm}).populate('client').populate('rawProduct').sort('-date');
+
+  const milkTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'milk' }))
+  const cottageCheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cottage-cheese' }))
+  const creamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cream' }))
+  const butterTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'butter' }))
+  const wheyTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'whey' }))
+  const cheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cheese' }))
+  const sourCreamTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'sour-cream' }))
+  const meatTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'meat' }))
+
+  res.status(200).render('distAllProducts', {
+    products,
+    milkTotal,
+    cottageCheeseTotal,
+    creamTotal,
+    butterTotal,
+    wheyTotal,
+    cheeseTotal,
+    sourCreamTotal,
+    meatTotal
+  });
+});

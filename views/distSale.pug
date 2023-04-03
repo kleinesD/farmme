@@ -55,7 +55,7 @@ block content
               lable.aa-label(for="price") 
                 p Вес | Объем
               .aa-double-input-block
-                input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-input.size-input(type="number" )
                 p.aa-double-price-text.range-text / &nbsp;
                 select.aa-double-input.unit-input
                   option(value="l" selected) Л.
@@ -64,7 +64,7 @@ block content
               lable.aa-label(for="size") 
                 p Цена / л.
               .aa-double-input-block.aa-double-price-block
-                input.aa-double-price-input.price-input(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-price-input.price-input(type="number" )
                 p.aa-double-price-text.price-text ₽ &nbsp; = &nbsp; 0₽
           .aa-add-more-container
             .aa-add-more#add-product-input
@@ -147,7 +147,8 @@ block content
                 lable.aa-label(for="price") 
                   p Вес | Объем
                 .aa-double-input-block
-                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${product.size}`)
+                  input.aa-double-input.size-input(type="number"  value=`${product.size}`)
+                  p.aa-double-price-text.range-text / &nbsp;
                   select.aa-double-input.unit-input
                     -if(product.unit === 'l')
                       option(value="l" selected hidden) Л.
@@ -159,7 +160,7 @@ block content
                 lable.aa-label(for="size") 
                   p Цена / л.
                 .aa-double-input-block.aa-double-price-block
-                  input.aa-double-price-input.price-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${product.pricePer}`)
+                  input.aa-double-price-input.price-input(type="number"  value=`${product.pricePer}`)
                   p.aa-double-price-text.price-text ₽ &nbsp; = &nbsp; #{product.price}₽
               .aa-iu-remove   
                 ion-icon(name="close")
@@ -177,8 +178,14 @@ block content
               p Заметка
             textarea.aa-textarea-input#note(type="text")= `${products[0].note !== undefined ? products[0].note : ''}`
 
+          .aa-sale-total 
+            .aa-sale-total-sep
+            .aa-sale-total-sep
+            p Всего:
+            p#total(data-total="0") 0₽
+
           .ar-btn-box          
-            a.ar-add-button(data-order-id=`${products[0].subId}`) Сохранить
+            a.ar-add-button(data-sale-id=`${products[0].subId}`) Сохранить
 
 
 

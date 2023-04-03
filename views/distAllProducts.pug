@@ -1,0 +1,76 @@
+extends base
+
+block content
+
+  section.main-section 
+    .dist-info-section
+      .dist-info-btns-box
+        .dist-info-btn(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk")
+          p МОЛОКО
+          p #{milkTotal} л.
+        .dist-info-btn(class=`${cottageCheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cottage-cheese")
+          p ТВОРОГ
+          p #{cottageCheeseTotal} кг.
+        .dist-info-btn(class=`${butterTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="butter")
+          p МАСЛО
+          p #{butterTotal} кг.
+        .dist-info-btn(class=`${creamTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cream")
+          p СЛИВКИ
+          p #{creamTotal} кг.
+        .dist-info-btn(class=`${cheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cheese")
+          p СЫР
+          p #{cheeseTotal} кг.
+        .dist-info-btn(class=`${wheyTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="whey")
+          p СЫВОРОТКА
+          p #{wheyTotal} л.
+        //-.dist-info-btn(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk")
+          p СМЕТАНА
+          p #{milkTotal} л.
+
+      .dist-info-data-block
+        .dist-info-general-info-block
+          .dist-info-number 14356
+            .dist-info-number-title продано за месяц
+            .dist-info-number-unit Литров
+          .dist-info-number 39.6
+            .dist-info-number-title средняя цена
+            .dist-info-number-unit Рублей
+          .dist-info-number 568.4
+            .dist-info-number-title доход
+            .dist-info-number-unit Тыс. рублей
+        .dist-info-list-box
+          each product in products 
+            .dist-info-list-item(class=`${product.type === 'decrease' ? '' : 'dist-info-list-item-ingo'}`)
+              .dist-info-list-item-img
+                img(src=`/img/images/${product.type}-icon.png`)
+              -if(product.product === 'milk')
+                .dist-info-list-item-product Молоко
+              -if(product.product === 'cottage-cheese')
+                .dist-info-list-item-product Творог
+              -if(product.product === 'butter')
+                .dist-info-list-item-product Масло
+              -if(product.product === 'cream')
+                .dist-info-list-item-product Сливки
+              -if(product.product === 'cheese')
+                .dist-info-list-item-product Сыр
+              -if(product.product === 'whey')
+                .dist-info-list-item-product Сыворотка
+              
+              -if(product.product === 'milk' || product.product === 'whey')
+                .dist-info-list-item-size #{product.type === 'decrease' ? '-' : ''}#{product.size} л.
+              -else
+                .dist-info-list-item-size #{product.type === 'decrease' ? '-' : ''}#{product.size} кг.
+
+              .dist-info-list-item-date(data-date=`${product.date}`)= `${product.date.toLocaleString('ru-RU', {day: '2-digit'})}.${product.date.toLocaleString('ru-RU', {month: '2-digit'})}.${product.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+
+              -if(product.distributionResult === 'waiting')
+                .dist-info-list-item-result 
+              -if(product.distributionResult === 'sold')
+                .dist-info-list-item-result Продажа
+              -if(product.distributionResult === 'personal-use')
+                .dist-info-list-item-result Личное использование
+              -if(product.distributionResult === 'processed')
+                .dist-info-list-item-result Переработка
+              -if(product.distributionResult === 'calf-feeding')
+                .dist-info-list-item-result Кормление телят
+

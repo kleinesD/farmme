@@ -297,7 +297,7 @@ $(document).ready(async function () {
 
       $(this).attr('placeholder', $(this).attr('data-placeholder'));
 
-      if($(this).parent().find('.animal-search-block').css('display') === 'flex') {
+      if ($(this).parent().find('.animal-search-block').css('display') === 'flex') {
         $(this).parent().find('.animal-search-block').hide();
       } else {
         $(this).parent().find('.animal-search-block').show().css('display', 'flex');
@@ -452,6 +452,13 @@ $(document).ready(async function () {
         $(this).find('.aa-check-box-inner').addClass('aa-check-box-checked')
       } else {
         $(this).find('.aa-check-box-inner').removeClass('aa-check-box-checked')
+      }
+    });
+
+    /* Preventing the number input for inserting the negative number */
+    $('body').on('change keyup', 'input[type=number]', function () {
+      if (parseFloat($(this).val()) < 0) {
+        $(this).val(Math.abs(parseFloat($(this).val())));
       }
     });
 
@@ -6201,7 +6208,7 @@ $(document).ready(async function () {
             <p>Вес | Объем</p>
           </lable>
           <div class="aa-double-input-block">
-            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-input size-input" type="number" />
             <select class="aa-double-input unit-input">
               <option value="l" selected="selected">Л.</option>
               <option value="kg">Кг.  </option>
@@ -6213,7 +6220,7 @@ $(document).ready(async function () {
             <p>Срок годности</p>
           </lable>
           <div class="aa-double-input-block aa-double-price-block">
-            <input class="aa-double-price-input exp-date-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-price-input exp-date-input" type="number" />
             <p class="aa-double-price-text">дней </p>
           </div>
         </div>
@@ -6423,7 +6430,7 @@ $(document).ready(async function () {
             <p>Вес | Объем</p>
           </lable>
           <div class="aa-double-input-block">
-            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-input size-input" type="number" />
             <select class="aa-double-input unit-input">
               <option value="l" selected="selected">Л.</option>
               <option value="kg">Кг.  </option>
@@ -6604,8 +6611,8 @@ $(document).ready(async function () {
     });
 
     /* Working with prices in each product */
-    $('body').on('click change keyup', '.size-input, .price-input', function() {
-      if($(this).hasClass('size-input') && parseFloat($(this).val()) > parseFloat($(this).attr('data-max'))) {
+    $('body').on('click change keyup', '.size-input, .price-input', function () {
+      if ($(this).hasClass('size-input') && parseFloat($(this).val()) > parseFloat($(this).attr('data-max'))) {
         $(this).val(parseFloat($(this).attr('data-max')));
       }
 
@@ -6617,11 +6624,11 @@ $(document).ready(async function () {
     });
 
     /* Hiding elements if quantity is 0 */
-    $('body').on('click', '.aa-select-box', function() {
-      $('.aa-select-option').each(function() {
+    $('body').on('click', '.aa-select-box', function () {
+      $('.aa-select-option').each(function () {
         let selectEl = $(this);
-        $('.arc-inventory-data').each(function() {
-          if(selectEl.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') == 0) {
+        $('.arc-inventory-data').each(function () {
+          if (selectEl.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') == 0) {
             selectEl.hide();
           }
         });
@@ -6640,8 +6647,8 @@ $(document).ready(async function () {
       });
       $(this).parent().attr('data-val', $(this).attr('data-val'))
 
-      $('.arc-inventory-data').each(function() {
-        if(selectedOption.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') != 0) {
+      $('.arc-inventory-data').each(function () {
+        if (selectedOption.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') != 0) {
           selectedOption.parent().parent().parent().parent().find('.range-text').html(`/ &nbsp; ${$(this).attr('data-quantity')}`)
           selectedOption.parent().parent().parent().parent().find('.size-input').attr('data-max', $(this).attr('data-quantity'))
           selectedOption.parent().parent().parent().parent().find('.size-input').trigger('change')
@@ -6676,7 +6683,7 @@ $(document).ready(async function () {
             <p>Вес | Объем</p>
           </lable>
           <div class="aa-double-input-block">
-            <input class="aa-double-input size-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-input size-input" type="number" />
             <p class="aa-double-price-text range-text">/ &nbsp;</p>
             <select class="aa-double-input unit-input">
               <option value="l" selected="selected">Л.</option>
@@ -6689,7 +6696,7 @@ $(document).ready(async function () {
             <p>Цена / л.</p>
           </lable>
           <div class="aa-double-input-block aa-double-price-block">
-            <input class="aa-double-price-input price-input" type="number" oninput="this.value = Math.abs(this.value)"/>
+            <input class="aa-double-price-input price-input" type="number" />
             <p class="aa-double-price-text price-text">₽ &nbsp; = &nbsp; 0₽</p>
           </div>
         </div>
@@ -6703,12 +6710,12 @@ $(document).ready(async function () {
       $('.aa-select-option-selected').trigger('click');
     });
 
-    $('.main-section').on('click', '.aa-iu-remove', async function () {
+    $('body').on('click', '.aa-iu-remove', async function () {
       if ($(this).parent().attr('data-new') === 'false') {
         $(this).find('ion-icon').remove();
         $(this).append(`<div class="mini-loader"></div>`);
 
-        let response = await deleteReminder($(this).parent().attr('data-id'));
+        let response = await deleteProduct($(this).parent().attr('data-id'));
         if (response) $(this).parent().remove();
 
       } else if ($(this).parent().attr('data-new') === 'true') {
@@ -6716,26 +6723,26 @@ $(document).ready(async function () {
       }
     });
 
-    
 
-    $('body').on('click change', '.unit-input', function() {
+
+    $('body').on('click change', '.unit-input', function () {
       let parent = $(this).parent().parent().parent();
       parent.find('.price-input').parent().parent().find('.aa-label p').text(`Цена / ${$(this).val() === 'l' ? 'л.' : 'кг.'}`)
-      
+
     });
 
     /* Pre setting price */
-    $('body').on('click', '.aa-select-option', function() {
+    $('body').on('click', '.aa-select-option', function () {
       let parent = $(this).parent().parent().parent().parent();
       let product = $(this).attr('data-val');
       /* parent.find('.price-input').val(0) */
 
-      if($('#client').val().length > 0 && $('#client').attr('data-id') !== '') {
-        if(parent.find('.price-input').val().length === 0 || parseFloat(parent.find('.price-input').val()) === 0) {
-          $('.animal-search-item').each(function() {
-            if($(this).attr('data-id') === $('#client').attr('data-id')) {
-              $(this).find('.asi-hidden').each(function() {
-                if($(this).attr('data-product') === product) {
+      if ($('#client').val().length > 0 && $('#client').attr('data-id') !== '') {
+        if (parent.find('.price-input').val().length === 0 || parseFloat(parent.find('.price-input').val()) === 0) {
+          $('.animal-search-item').each(function () {
+            if ($(this).attr('data-id') === $('#client').attr('data-id')) {
+              $(this).find('.asi-hidden').each(function () {
+                if ($(this).attr('data-product') === product) {
                   parent.find('.price-input').val(parseFloat($(this).attr('data-price')))
                 }
               });
@@ -6747,7 +6754,7 @@ $(document).ready(async function () {
       parent.find('.price-input').trigger('click')
     });
 
-    $('.animal-search-item').on('click', function() {
+    $('.animal-search-item').on('click', function () {
       $('.aa-select-option-selected').trigger('click');
       $('.aa-select-option-selected').trigger('click');
     })
@@ -6778,7 +6785,7 @@ $(document).ready(async function () {
         }
       });
       let total = 0;
-      $('.aa-input-united-block-valid').each(function() {
+      $('.aa-input-united-block-valid').each(function () {
         total += parseFloat($(this).attr('data-total'));
       });
 
@@ -6793,11 +6800,11 @@ $(document).ready(async function () {
     });
 
     if (document.querySelector('#edit-sale-container')) {
-      /* $('input').trigger('click');
-      $('input').trigger('click'); */
+      $('input').trigger('click');
+      $('input').trigger('click');
 
-      /* $('.aa-select-option-selected').trigger('click');
-      $('.aa-select-option-selected').trigger('click'); */
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
     }
 
     /* Submiting data */
@@ -6829,10 +6836,11 @@ $(document).ready(async function () {
             product: $(this).find('.aa-select-option-selected').attr('data-val'),
             type: 'decrease',
             distributionResult: 'sold',
-            pricePer: parseFloat($('.price-input').val()),
+            pricePer: parseFloat($(this).find('.price-input').val()),
             price: parseFloat($(this).attr('data-total')),
             client: $('#client').attr('data-id') === '' ? undefined : $('#client').attr('data-id'),
-            subId
+            subId,
+            note
           });
 
           if (response) counter++;
@@ -6851,32 +6859,297 @@ $(document).ready(async function () {
       }
 
       /* Submiting data to EDIT inventory */
-      if (document.querySelector('#edit-order-container')) {
-        let subId = $(this).attr('data-order-id');
+      if (document.querySelector('#edit-sale-container')) {
+        let subId = $(this).attr('data-sale-id');
+
         let counter = 0;
         $('.aa-input-united-block-valid').each(async function () {
           let response;
           if ($(this).attr('data-new') === 'false') {
-            response = await editReminder($(this).attr('data-id'), {
+            response = await editProduct($(this).attr('data-id'), {
               size: parseFloat($(this).find('.size-input').val()),
               date: new Date($('#date').val()),
               unit: $(this).find('.unit-input').val(),
               product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
+              type: 'decrease',
+              distributionResult: 'sold',
+              pricePer: parseFloat($(this).find('.price-input').val()),
+              price: parseFloat($(this).attr('data-total')),
+              client: $('#client').attr('data-id') === '' ? undefined : $('#client').attr('data-id'),
+              subId,
+              note
             });
           } else if ($(this).attr('data-new') === 'true') {
-            response = await addReminder({
+            response = await addProduct({
               size: parseFloat($(this).find('.size-input').val()),
               date: new Date($('#date').val()),
               unit: $(this).find('.unit-input').val(),
               product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
+              type: 'decrease',
+              distributionResult: 'sold',
+              pricePer: parseFloat($(this).find('.price-input').val()),
+              price: parseFloat($(this).attr('data-total')),
+              client: $('#client').attr('data-id') === '' ? undefined : $('#client').attr('data-id'),
+              subId,
+              note
+            });
+          }
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+      }
+    });
+
+
+
+  }
+
+  ///////////////////////
+  /* BOTH ADD/EDIT CONSUMPTION PAGE*/
+  ///////////////////////
+
+  if (document.querySelector('#add-consumption-container') || document.querySelector('#edit-consumption-container')) {
+    $('input').on('keyup change blur click', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('valid-aa-input');
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    /* Switch between types */
+    $('.ar-switch-btn').on('click', function () {
+      if (!$(this).hasClass('ar-switch-btn-active')) {
+        $('.ar-switch-btn-active').removeClass('ar-switch-btn-active');
+        $(this).addClass('ar-switch-btn-active');
+      }
+    });
+
+    /* Working with prices in each product */
+    $('body').on('click change keyup', '.size-input', function () {
+      if ($(this).hasClass('size-input') && parseFloat($(this).val()) > parseFloat($(this).attr('data-max'))) {
+        $(this).val(parseFloat($(this).attr('data-max')));
+      }
+    });
+
+    /* Hiding elements if quantity is 0 */
+    $('body').on('click', '.aa-select-box', function () {
+      $('.aa-select-option').each(function () {
+        let selectEl = $(this);
+        $('.arc-inventory-data').each(function () {
+          if (selectEl.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') == 0) {
+            selectEl.hide();
+          }
+        });
+      });
+    });
+
+    /* Preventing double selection */
+    $('body').on('click', '.aa-select-option', function () {
+      let selectedOption = $(this);
+      $('.aa-select-option').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
+          $(this).addClass('aa-select-option-taken');
+        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
+          $(this).removeClass('aa-select-option-taken');
+        }
+      });
+      $(this).parent().attr('data-val', $(this).attr('data-val'))
+
+      $('.arc-inventory-data').each(function () {
+        if (selectedOption.attr('data-val') === $(this).attr('data-product') && $(this).attr('data-quantity') != 0) {
+          selectedOption.parent().parent().parent().parent().find('.range-text').html(`/ &nbsp; ${$(this).attr('data-quantity')}`)
+          selectedOption.parent().parent().parent().parent().find('.size-input').attr('data-max', $(this).attr('data-quantity'))
+          selectedOption.parent().parent().parent().parent().find('.size-input').trigger('change')
+        }
+      });
+    });
+
+    $('#add-product-input').on('click', function () {
+      $(this).parent().before(`
+        <div class="aa-input-united-block" data-new="true"> 
+        <div class="aa-input-block"> 
+          <label class="aa-label" for="type">
+            <p>Продукт</p>
+          </label>
+          <div class="aa-select-box aa-select-box-one">
+            <div class="aa-select-text">Выберите продукт</div>
+            <ion-icon name="chevron-down"></ion-icon>
+            <div class="aa-select-options-box">
+              <div class="aa-select-option" data-val="milk">Молоко</div>
+              <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
+              <div class="aa-select-option" data-val="butter">Масло </div>
+              <div class="aa-select-option" data-val="cream">Сливки </div>
+              <div class="aa-select-option" data-val="cheese">Сыр  </div>
+              <div class="aa-select-option" data-val="whey">Сыворотка </div>
+              <div class="aa-select-option" data-val="sour-cream">Сметана  </div>
+              <div class="aa-select-option" data-val="meat">Мясо  </div>
+            </div>
+          </div>
+        </div>
+        <div class="aa-input-block">
+          <lable class="aa-label" for="price"> 
+            <p>Вес | Объем</p>
+          </lable>
+          <div class="aa-double-input-block">
+            <input class="aa-double-input size-input" type="number" />
+            <p class="aa-double-price-text range-text">/ &nbsp;</p>
+            <select class="aa-double-input unit-input">
+              <option value="l" selected="selected">Л.</option>
+              <option value="kg">Кг.  </option>
+            </select>
+          </div>
+        </div>
+        <div class="aa-iu-remove">  
+          <ion-icon name="close"></ion-icon>
+        </div>
+      </div>
+      `);
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    });
+
+    $('body').on('click', '.aa-iu-remove', async function () {
+      if ($(this).parent().attr('data-new') === 'false') {
+        $(this).find('ion-icon').remove();
+        $(this).append(`<div class="mini-loader"></div>`);
+
+        let response = await deleteProduct($(this).parent().attr('data-id'));
+        if (response) $(this).parent().remove();
+
+      } else if ($(this).parent().attr('data-new') === 'true') {
+        $(this).parent().remove();
+      }
+    });
+
+    /* Validating the date */
+    /* $('#date').on('keyup click change', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) > new Date()) {
+        $(this).addClass('valid-aa-input');
+        $(`#${$(this).attr('id')}-warning`).remove();
+      } else {
+        $(this).removeClass('valid-aa-input');
+      }
+    });
+
+    $('#date').on('blur', function () {
+      if ($(this).val().length !== 0 && new Date($(this).val()) <= new Date()) {
+        $(`#${$(this).attr('id')}-warning`).remove();
+        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную дату</div>`);
+      }
+    }); */
+
+    $('*').on('click focus blur change keyup', function () {
+      $('.aa-input-united-block ').each(function () {
+        if ($(this).find('.aa-select-option-selected').length > 0 && parseFloat($(this).find('.size-input').val()) > 0) {
+          $(this).addClass('aa-input-united-block-valid')
+        } else {
+          $(this).removeClass('aa-input-united-block-valid')
+        }
+      });
+
+      if ($('#date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
+        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      } else {
+        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      }
+    });
+
+    if (document.querySelector('#edit-consumption-container')) {
+      $('input').trigger('click');
+      $('input').trigger('click');
+
+      $('.aa-select-option-selected').trigger('click');
+      $('.aa-select-option-selected').trigger('click');
+    }
+
+    /* Submiting data */
+    $('.ar-add-button').click(async function () {
+      let note = undefined;
+      if ($('#note').val().length > 0) {
+        note = $('#note').val();
+      }
+
+
+      $(this).append(`<div class="mini-loader"></div>`);
+      $('.mini-loader').css({
+        'position': 'absolute',
+        'right': '-35px'
+      });
+
+
+
+      /* Submiting data to ADD consumption */
+      if (document.querySelector('#add-consumption-container')) {
+        let subId = randomstring.generate(12);
+
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response = await addProduct({
+            size: parseFloat($(this).find('.size-input').val()),
+            date: new Date($('#date').val()),
+            unit: $(this).find('.unit-input').val(),
+            product: $(this).find('.aa-select-option-selected').attr('data-val'),
+            type: 'decrease',
+            distributionResult: $('.ar-switch-btn-active').attr('id'),
+            subId,
+            note
+          });
+
+          if (response) counter++;
+          if (counter === $('.aa-input-united-block-valid').length) {
+            $('.mini-loader').hide();
+            addConfirmationEmpty($('.animal-results-container'));
+            setTimeout(() => {
+              location.reload(true);
+            }, 1500)
+
+            //location.assign('/herd/all-animals');
+          }
+
+        });
+
+      }
+
+      /* Submiting data to EDIT consumption */
+      if (document.querySelector('#edit-consumption-container')) {
+        let subId = $(this).attr('data-consumption-id');
+
+        let counter = 0;
+        $('.aa-input-united-block-valid').each(async function () {
+          let response;
+          if ($(this).attr('data-new') === 'false') {
+            response = await editProduct($(this).attr('data-id'), {
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              type: 'decrease',
+              distributionResult: $('.ar-switch-btn-active').attr('id'),
+              subId,
+              note
+            });
+          } else if ($(this).attr('data-new') === 'true') {
+            response = await addProduct({
+              size: parseFloat($(this).find('.size-input').val()),
+              date: new Date($('#date').val()),
+              unit: $(this).find('.unit-input').val(),
+              product: $(this).find('.aa-select-option-selected').attr('data-val'),
+              type: 'decrease',
+              distributionResult: $('.ar-switch-btn-active').attr('id'),
+              subId,
+              note
             });
           }
 

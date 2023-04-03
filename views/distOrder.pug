@@ -45,7 +45,7 @@ block content
               lable.aa-label(for="price") 
                 p Вес | Объем
               .aa-double-input-block
-                input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-input.size-input(type="number" )
                 select.aa-double-input.unit-input
                   option(value="l" selected) Л.
                   option(value="kg") Кг.  
@@ -116,7 +116,7 @@ block content
                 lable.aa-label(for="price") 
                   p Вес | Объем
                 .aa-double-input-block
-                  input.aa-double-input.size-input(type="number" oninput="this.value = Math.abs(this.value)" value=`${order.size}`)
+                  input.aa-double-input.size-input(type="number" value=`${order.size}`)
                   select.aa-double-input.unit-input
                     -if(order.unit === 'l')
                       option(value="l" selected hidden) Л.

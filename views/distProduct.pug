@@ -7,7 +7,7 @@ block content
     .animal-results-window
 
       -if(!forEdit)
-        //.animal-distribution-decide-container
+        //-.animal-distribution-decide-container
           .addc-title ДОБАВИТЬ...
           .addc-item
             img(src="/img/images/milk-bottle-icon.png")
@@ -16,7 +16,7 @@ block content
             img(src="/img/images/cheese-icon.png")
             .addc-item-text Переработка
 
-        //.animal-results-container.animal-results-big#add-raw-product-container
+        .animal-results-container.animal-results-big#add-raw-product-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
@@ -36,7 +36,7 @@ block content
             lable.aa-label(for="size") 
               p Объем
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)")
+              input.aa-double-price-input#size(type="number" data-unit="l" )
               p.aa-double-price-text л.
           .aa-input-block
             label.aa-label(for="date")
@@ -52,7 +52,7 @@ block content
             lable.aa-label(for="price") 
               p Срок годности
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)")
+              input.aa-double-price-input#exp-date(type="number" )
               p.aa-double-price-text дней 
 
           .aa-input-block
@@ -74,7 +74,7 @@ block content
           .ar-btn-box          
             a.ar-add-button(data-product-id=``) Сохранить
 
-        .animal-results-container.animal-results-big#add-processed-product-container
+        //-.animal-results-container.animal-results-big#add-processed-product-container
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
@@ -84,7 +84,7 @@ block content
             lable.aa-label(for="size") 
               p Молока переработано
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)")
+              input.aa-double-price-input#size(type="number" data-unit="l" )
               p.aa-double-price-text л.
           .aa-total-milk-box
             .aa-total-milk-line
@@ -107,7 +107,7 @@ block content
               lable.aa-label(for="price") 
                 p Вес | Объем
               .aa-double-input-block
-                input.aa-double-input(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-input(type="number" )
                 select.aa-double-input
                   option(value="l" selected) Л.
                   option(value="kg") Кг.  
@@ -120,7 +120,7 @@ block content
               lable.aa-label(for="price") 
                 p Срок годности
               .aa-double-input-block.aa-double-price-block
-                input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)")
+                input.aa-double-price-input#exp-date(type="number" )
                 p.aa-double-price-text дней 
           .aa-add-more-container
             .aa-add-more#add-product-input
@@ -163,7 +163,7 @@ block content
             lable.aa-label(for="size") 
               p= `${product.rawProduct === 'milk' ? 'Объем' : 'Вес'}`
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit="l" oninput="this.value = Math.abs(this.value)" value=`${product.size}`)
+              input.aa-double-price-input#size(type="number" data-unit="l"  value=`${product.size}`)
               p.aa-double-price-text= `${product.rawProduct === 'milk' ? 'л.' : 'кг.'}`
           .aa-input-block
             label.aa-label(for="date")
@@ -179,7 +179,7 @@ block content
             lable.aa-label(for="price") 
               p Срок годности
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#exp-date(type="number" oninput="this.value = Math.abs(this.value)" value=`${Math.round((product.expDate.getTime() - product.date.getTime()) / 24 / 60 / 60 / 1000)}`)
+              input.aa-double-price-input#exp-date(type="number"  value=`${Math.round((product.expDate.getTime() - product.date.getTime()) / 24 / 60 / 60 / 1000)}`)
               p.aa-double-price-text дней 
 
           .aa-input-block

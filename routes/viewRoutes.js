@@ -145,4 +145,12 @@ router.get('/distribution/add-sale', authController.protect, authController.isLo
 
 router.get('/distribution/edit-sale/:id', authController.protect, authController.isLoggedIn, viewController.renderEditSale);
 
+router.get('/distribution/add-consumption', authController.protect, authController.isLoggedIn, viewController.renderAddConsumption);
+
+router.get('/distribution/edit-consumption/:id', authController.protect, authController.isLoggedIn, viewController.renderEditConsumption);
+
+router.get('/distribution/add-outgo-decide', authController.protect, authController.isLoggedIn, viewController.renderAddOutgoDecide);
+
+router.get('/distribution/all-products', authController.protect, authController.isLoggedIn, viewController.renderAllProducts);
+
 module.exports = router;
