@@ -7095,12 +7095,11 @@ ion-icon {
   gap: 30px;
 }
 .dist-info-btns-box {
-  height: 50%;
-  overflow: auto;
+  height: 25%;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
   gap: 30px
 }
 .dist-info-btns-box::-webkit-scrollbar {
@@ -7110,6 +7109,7 @@ ion-icon {
   width: calc(100% - 60px);
   padding: 30px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   background-color: #f0f0f0;
@@ -7125,11 +7125,11 @@ ion-icon {
 }
 .dist-info-btn p {
   font-size: 250%;
-  font-weight: 800;
+  font-weight: 500;
 }
 .dist-info-data-block {
   width: 100%;
-  height: 50%;
+  height: 75%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -7144,29 +7144,38 @@ ion-icon {
   display: none;
 }
 .dist-info-list-item {
-  width: 100%;
-  /* background-color: #f0f0f0; */
+  width: calc(100% - 40px);
+  background-color: #f0f0f0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 50px;
+  padding: 20px;
   margin-bottom: 15px;
-  gap: 5px;
-}
-.dist-info-list-item-outgo {
-  background-color: rgba(212, 77, 92, 0.25);
-}
-.dist-info-list-item-ingo {
- /*  background-color: rgba(14, 173, 105, 0.25); */
+  border-radius: 20px;;
 }
 .dist-info-list-item:last-of-type {
   margin-bottom: unset;
 }
+.dist-info-list-item-header {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 .dist-info-list-item-img {
-  width: 5%;
-  height: 100%;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+}
+.dist-info-list-item-ingo .dist-info-list-item-img {
+  background-color: rgba(14, 173, 105, 0.5);
+}
+.dist-info-list-item-outgo .dist-info-list-item-img {
+  background-color: rgba(212, 77, 92, 0.5);
 }
 .dist-info-list-item-img img {
   height: 65%;
@@ -7174,8 +7183,10 @@ ion-icon {
 }
 .dist-info-list-item-product {
   width: 25%;
+  font-size: 125%;
   font-weight: 500;
-  text-align: center;
+  margin-left: 10px;
+  /* text-align: center; */
 }
 .dist-info-list-item-size {
   width: 10%;
@@ -7191,6 +7202,12 @@ ion-icon {
   width: 30%;
   font-weight: 500;
   text-align: center;
+}
+.dist-info-item-body {
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 50px;
+  border-top: 1px solid #dadada;
 }
 .dist-info-general-info-block {
   width: 50%;
