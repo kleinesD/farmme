@@ -3,45 +3,62 @@ extends base
 block content
 
   section.main-section 
-    .dist-info-section
+    .dist-info-section#all-products-page
       .dist-info-btns-box
-        .dist-info-btn.shadow(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk")
+        .dist-info-btn.dist-info-btn-click.shadow(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk" data-unit=`l`)
           p.dist-info-btn-title МОЛОКО
           p.dist-info-btn-number #{milkTotal} л.
-        .dist-info-btn.shadow(class=`${cottageCheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cottage-cheese")
+        .dist-info-btn.shadow(class=`${cottageCheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cottage-cheese" data-unit=`kg`)
           p.dist-info-btn-title ТВОРОГ
           p.dist-info-btn-number #{cottageCheeseTotal} кг.
-        .dist-info-btn.shadow(class=`${butterTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="butter")
+        .dist-info-btn.shadow(class=`${butterTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="butter" data-unit=`kg`)
           p.dist-info-btn-title МАСЛО
           p.dist-info-btn-number #{butterTotal} кг.
-        .dist-info-btn.shadow(class=`${creamTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cream")
+        .dist-info-btn.shadow(class=`${creamTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cream" data-unit=`kg`)
           p.dist-info-btn-title СЛИВКИ
           p.dist-info-btn-number #{creamTotal} кг.
-        .dist-info-btn.shadow(class=`${cheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cheese")
+        .dist-info-btn.shadow(class=`${cheeseTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="cheese" data-unit=`kg`)
           p.dist-info-btn-title СЫР
           p.dist-info-btn-number #{cheeseTotal} кг.
-        .dist-info-btn.shadow(class=`${wheyTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="whey")
+        .dist-info-btn.shadow(class=`${wheyTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="whey" data-unit=`l`)
           p.dist-info-btn-title СЫВОРОТКА
           p.dist-info-btn-number #{wheyTotal} л.
-        //-.dist-info-btn.shadow(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk")
+        //-.dist-info-btn.shadow(class=`${milkTotal <= 0 ? 'dist-info-btn-out' : ''}` data-product="milk" data-unit=`kg`)
           p.dist-info-btn-title СМЕТАНА
           p.dist-info-btn-number #{milkTotal} л.
 
       .dist-info-data-block
         .dist-info-general-info-block
-          .dist-info-number 14356
+          .dist-info-number#sold-month 
+            p 14356
             .dist-info-number-title продано за месяц
             .dist-info-number-unit Литров
-          .dist-info-number 39.6
+          .dist-info-number#avg-month 
+            p 39.6
             .dist-info-number-title средняя цена
             .dist-info-number-unit Рублей
-          .dist-info-number 568.4
+          .dist-info-number#total-month 
+            p 123,000
             .dist-info-number-title доход
             .dist-info-number-unit Тыс. рублей
 
         .dist-info-list-box
           each product in products 
-            .dist-info-list-item(class=`${product.type === 'decrease' ? 'dist-info-list-item-outgo' : 'dist-info-list-item-ingo'}`)
+            .dist-info-list-item(class=`${product.type === 'decrease' ? 'dist-info-list-item-outgo' : 'dist-info-list-item-ingo'}` data-product=`${product.product}` data-size=`${product.size}` data-price=`${product.pricePer}` data-total=`${product.price}` data-unit=`${product.unit}` data-sold=`${product.distributionResult === 'sold'}`)
+              -if(product.subId)  
+                -if(product.distributionResult === 'sold')
+                  a.dist-info-list-item-edit(href=`/distribution/edit-sale/${product.subId}`)
+                    ion-icon(name="pencil")
+                -if(product.distributionResult === 'personal-use' || product.distributionResult === 'calf-feeding')
+                  a.dist-info-list-item-edit(href=`/distribution/edit-consumption/${product.subId}`)
+                    ion-icon(name="pencil")
+              -else
+                -if(product.rawProduct)
+                  a.dist-info-list-item-edit(href=`/distribution/edit-process/${product.rawProduct._id}`)
+                    ion-icon(name="pencil")
+                -else
+                  a.dist-info-list-item-edit(href=`/distribution/edit-product/${product._id}`)
+                    ion-icon(name="pencil")
               .dist-info-list-item-header
                 .dist-info-list-item-img
                   img(src=`/img/images/${product.type}-icon.png`)
@@ -66,7 +83,7 @@ block content
                 .dist-info-list-item-date(data-date=`${product.date}`)= `${product.date.toLocaleString('ru-RU', {day: '2-digit'})}.${product.date.toLocaleString('ru-RU', {month: '2-digit'})}.${product.date.toLocaleString('ru-RU', {year: 'numeric'})}`
 
                 -if(product.distributionResult === 'waiting')
-                  .dist-info-list-item-result 
+                  .dist-info-list-item-result Прибытие
                 -if(product.distributionResult === 'sold')
                   .dist-info-list-item-result Продажа
                 -if(product.distributionResult === 'personal-use')
@@ -78,5 +95,48 @@ block content
 
               .dist-info-item-body
                 -if(product.distributionResult === 'sold')
-                  .dist-info-item-body-sold
+                  .dist-info-item-body-line
+                    .dist-info-item-body-box
+                      .diib-title Количество
+                      -if(product.unit === 'l')
+                        .diib-data-big #{product.size} л.
+                      -if(product.unit === 'kg')
+                        .diib-data-big #{product.size} кг.
+                    .dist-info-item-body-box
+                      .diib-title Цена
+                      .diib-data-big #{product.pricePer} ₽
+                    .dist-info-item-body-box
+                      .diib-title Всего
+                      .diib-data-big.diib-data-big-hl #{product.price} ₽
+                -if(product.distributionResult === 'processed')
+                  each prod in product.produced
+                    .dist-info-item-body-line
+                      .dist-info-item-body-box
+                        .diib-title Продукт
+                        -if(prod.product === 'milk')
+                          .diib-data-big= `${'Молоко'.toUpperCase()}`
+                        -if(prod.product === 'cottage-cheese')
+                          .diib-data-big= `${'Творог'.toUpperCase()}`
+                        -if(prod.product === 'butter')
+                          .diib-data-big= `${'Масло'.toUpperCase()}`
+                        -if(prod.product === 'cream')
+                          .diib-data-big= `${'Сливки'.toUpperCase()}`
+                        -if(prod.product === 'cheese')
+                          .diib-data-big= `${'Сыр'.toUpperCase()}`
+                        -if(prod.product === 'whey')
+                          .diib-data-big= `${'Сыворотка'.toUpperCase()}`
+                      .dist-info-item-body-box
+                        .diib-title Количество
+                        -if(prod.unit === 'l')
+                          .diib-data-big #{prod.size} л.
+                        -if(prod.unit === 'kg')
+                          .diib-data-big #{prod.size} кг.
+                      //.dist-info-item-body-box
+                        .diib-title Всего
+                        .diib-data-big.diib-data-big-hl #{product.price} ₽
+                .diib-footer
+                  .diib-footer-user-block
+                    img(src="/img/images/user-default.png")
+                    p= `${product.user.firstName} ${product.user.lastName}`
+                      
 

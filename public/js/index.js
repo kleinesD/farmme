@@ -7172,6 +7172,58 @@ $(document).ready(async function () {
 
   }
 
+  ///////////////////////
+  /* ALL PRODUCTS PAGE*/
+  ///////////////////////
+  if (document.querySelector('#all-products-page')) {
+    /* Showing detailed info on click */
+    $('.dist-info-list-item').on('click', function () {
+      if (!$(this).hasClass('dist-info-list-item-active')) {
+        $(this).addClass('dist-info-list-item-active');
+      } else {
+        $(this).removeClass('dist-info-list-item-active');
+      }
+    });
+
+    /* Working with categories */
+    $('.dist-info-btn').on('click', function () {
+      $(this).addClass('dist-info-btn-active')
+      $(this).siblings().removeClass('dist-info-btn-active')
+
+      const btn = $(this);
+      let total = 0;
+      let totalAvg = 0;
+      let counterAvg = 0;
+      let totalSize = 0;
+      $('.dist-info-list-item').each(function () {
+        if ($(this).attr('data-product') === btn.attr('data-product')) {
+          $(this).css('display', 'flex')
+        } else {
+          $(this).css('display', 'none')
+        }
+
+        if ($(this).attr('data-product') === btn.attr('data-product') && $(this).attr('data-sold') === 'true') {
+          total += parseFloat($(this).attr('data-total'));
+          totalAvg += parseFloat($(this).attr('data-price'));
+          counterAvg++;
+          totalSize += parseFloat($(this).attr('data-size'));
+        }
+      });
+
+      $('#sold-month p').text(totalSize);
+      $('#sold-month').find('.dist-info-number-unit').text(btn.attr('data-unit') === 'l' ? 'Литров' : 'Килограмм')
+      if (totalSize === 0) $('#sold-month p').text('-');
+
+      $('#avg-month  p').text((totalAvg / counterAvg).toFixed(1));
+      if (isNaN(totalAvg / counterAvg)) $('#avg-month p').text('-');
+
+      $('#total-month  p').text(total < 100000 ? total : total.toFixed(1));
+      $('#total-month').find('.dist-info-number-unit').text(total < 100000 ? 'Рублей' : 'Тыс. рублей')
+      if (total === 0) $('#total-month p').text('-');
+    });
+
+    $('.dist-info-btn-click').trigger('click');
+  }
 
 
 

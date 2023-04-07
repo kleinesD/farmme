@@ -62,8 +62,17 @@ const productScheme = new mongoose.Schema({
         ref: 'Farm'
     },
     note: String,
-    subId: String
+    subId: String,
 });
+
+productScheme.virtual('produced',{
+    ref: 'Product',
+    localField: '_id',
+    foreignField: 'rawProduct'
+});
+
+productScheme.set('toObject', { virtuals: true });
+productScheme.set('toJSON', { virtuals: true });
 
 const Product = mongoose.model('Product', productScheme);
 module.exports = Product;

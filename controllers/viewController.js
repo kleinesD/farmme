@@ -762,7 +762,7 @@ exports.renderAddOutgoDecide = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAllProducts = catchAsync(async(req, res, next) => {
-  const products = await Product.find({farm: req.user.farm}).populate('client').populate('rawProduct').sort('-date');
+  const products = await Product.find({farm: req.user.farm}).populate('client').populate('rawProduct').populate('produced').populate('user').sort('-date');
 
   const milkTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'milk' }))
   const cottageCheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cottage-cheese' }))
