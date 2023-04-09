@@ -1,0 +1,35 @@
+extends base
+
+block content
+
+  section.main-section 
+    .dist-clients-page-section
+      .dist-clients-block
+        .dist-clients-nav-bar
+          .dist-clients-search
+            ion-icon(name="search")
+            input(type="text" placeholder=`Имя или наименование`)
+        .dist-clients-container
+          each client in clients  
+            .dist-client-item
+              img(src="/img/images/user-default.png")
+              .dist-client-item-name= client.name
+              .dist-client-item-adress= client.adress
+              .dist-client-item-result
+                ion-icon(name="cash-outline")
+                .dist-client-item-result-line
+                  .dcir-line-inner.dcir-line-inner-mid
+                p 50%
+
+      .dist-clients-details-block
+        .dist-client-card
+          img(src="/img/images/user-default.png")
+          .dist-client-card-name Октябрьский
+          .dist-client-card-info п. Октябрьский
+          .dist-client-card-info +79186205123
+          .dist-client-card-info.dist-client-card-info-last kleines.is.pro@gmail.com
+          .dist-client-card-product-box
+            .dist-client-card-product Молоко - 45₽
+            .dist-client-card-product Масло - 1500₽
+                      
+

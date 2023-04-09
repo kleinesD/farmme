@@ -153,4 +153,6 @@ router.get('/distribution/add-outgo-decide', authController.protect, authControl
 
 router.get('/distribution/all-products', authController.protect, authController.isLoggedIn, viewController.renderAllProducts);
 
+router.get('/distribution/all-clients', authController.protect, authController.isLoggedIn, viewController.renderAllClients);
+
 module.exports = router;
