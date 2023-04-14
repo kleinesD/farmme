@@ -3,7 +3,9 @@ extends base
 block content
 
   section.main-section 
-    .dist-clients-page-section
+    each product in products
+      .dist-client-info-hidden(data-client=`${product.client}` data-product=`${product.product}` data-size=`${product.size}` data-price=`${product.price}` data-price-per=`${product.pricePer}` data-unit=`${product.unit}` data-date=`${product.date}`)
+    .dist-clients-page-section#all-clients-page
       .dist-clients-block
         .dist-clients-nav-bar
           .dist-clients-search
@@ -11,25 +13,74 @@ block content
             input(type="text" placeholder=`Имя или наименование`)
         .dist-clients-container
           each client in clients  
-            .dist-client-item
+            .dist-client-item(data-id=`${client._id}`)
               img(src="/img/images/user-default.png")
               .dist-client-item-name= client.name
               .dist-client-item-adress= client.adress
               .dist-client-item-result
                 ion-icon(name="cash-outline")
                 .dist-client-item-result-line
-                  .dcir-line-inner.dcir-line-inner-mid
+                  .dcir-line-inner
                 p 50%
 
       .dist-clients-details-block
-        .dist-client-card
-          img(src="/img/images/user-default.png")
-          .dist-client-card-name Октябрьский
-          .dist-client-card-info п. Октябрьский
-          .dist-client-card-info +79186205123
-          .dist-client-card-info.dist-client-card-info-last kleines.is.pro@gmail.com
-          .dist-client-card-product-box
-            .dist-client-card-product Молоко - 45₽
-            .dist-client-card-product Масло - 1500₽
-                      
+        .dist-clients-details-block-columns
+          .dcd-left-side
+            .dist-client-card
+              img(src="/img/images/user-default.png")
+              .dist-client-card-name Октябрьский
+              .dist-client-card-info п. Октябрьский
+              .dist-client-card-info +79186205123
+              .dist-client-card-info.dist-client-card-info-last kleines.is.pro@gmail.com
+              .dist-client-card-product-box
+                .dist-client-card-product Молоко - 45₽
+                .dist-client-card-product Масло - 1500₽
+            .dcd-products-break-box
+              .dcd-break-product
+                .dcd-break-product-title Молоко
+                .dcd-break-product-info-box
+                  .dcd-break-product-info
+                    .dcd-break-product-info-title Кол-во
+                    .dcd-break-product-info-text 1340 л.
+                  .dcd-break-product-info
+                    .dcd-break-product-info-title Цена
+                    .dcd-break-product-info-text 43.9₽
+          .dcd-right-side
+            .dcd-place-block
+              .dcd-place-star
+                .dcd-place-star-outter
+                  .dcd-place-star-inner 
+                    p 1
+              .dcd-place-text место по прибыли среди всех клиентов
+            .dcd-total-block
+              .dcd-total-block-header 
+                ion-icon(name="cash")
+                p 58,826 ₽  
+              .dcd-total-products-box
+                .dcd-total-product
+                  .dcd-total-product-title Молоко
+                  .dcd-total-product-info 85.0%
+                    .dcd-total-product-info-hidden 47.356 ₽
+                .dcd-total-product
+                  .dcd-total-product-title Масло
+                  .dcd-total-product-info 15.0%
+                    .dcd-total-product-info-hidden 11470 ₽
+        .dcd-purchases-block  
+          .dcd-purchases-date 9 апреля         
+          .dcd-purchases-item       
+            .dcd-purchases-item-info      
+              .dcd-purchases-item-title Молоко      
+              .dcd-purchases-item-size 120 л.      
+            .dcd-purchases-item-sum + 5268 ₽    
+          .dcd-purchases-item       
+            .dcd-purchases-item-info      
+              .dcd-purchases-item-title Масло      
+              .dcd-purchases-item-size 2 кг.      
+            .dcd-purchases-item-sum + 2600 ₽    
+          .dcd-purchases-date 8 апреля         
+          .dcd-purchases-item       
+            .dcd-purchases-item-info      
+              .dcd-purchases-item-title Молоко      
+              .dcd-purchases-item-size 120 л.      
+            .dcd-purchases-item-sum + 5268 ₽    
 

@@ -5930,7 +5930,7 @@ $(document).ready(async function () {
       }
     });
 
-    $('*').on('click focus blur change', function () {
+    $('*').on('click keyup focus blur change', function () {
       if ($('#name').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0) {
         $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
       } else {
@@ -6083,7 +6083,7 @@ $(document).ready(async function () {
       }
     });
 
-    $('*').on('click focus blur change', function () {
+    $('*').on('click keyup focus blur change', function () {
       if ($('#size').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#exp-date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0) {
         $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
       } else {
@@ -7225,6 +7225,53 @@ $(document).ready(async function () {
     $('.dist-info-btn-click').trigger('click');
   }
 
+  ///////////////////////
+  /* ALL CLIENTS PAGE*/
+  ///////////////////////
+  if (document.querySelector('#all-clients-page')) {
+    const data = [];
+    $('.dist-client-info-hidden').each(function () {
+      data.push({
+        client: $(this).attr('data-client'),
+        product: $(this).attr('data-product'),
+        size: $(this).attr('data-size'),
+        unit: $(this).attr('data-unit'),
+        price: parseFloat($(this).attr('data-price')),
+        pricePer: parseFloat($(this).attr('data-price-per')),
+      });
+    });
+
+    let generalTotal = 0;
+    data.forEach(el => generalTotal += el.price);
+
+    $('.dist-client-item').each(function () {
+      let clientTotal = 0;
+      data.forEach(el => {
+        if (el.client === $(this).attr('data-id')) {
+          clientTotal += el.price;
+        }
+      });
+
+      let clientPercent = parseFloat((clientTotal / (generalTotal / 100)).toFixed(1));
+      let clientColor;
+
+      if (clientPercent <= 10) {
+        clientColor = '#D44D5C';
+      } else if (clientPercent > 10 && clientPercent <= 40) {
+        clientColor = '#FFD700';
+      } else if (clientPercent > 40) {
+        clientColor = '#0EAD69';
+      }
+      $(this).find('.dcir-line-inner').css({
+        "width": `${clientPercent}%`,
+        "background-color": clientColor
+      });
+      $(this).find('.dist-client-item-result').find('p').text(`${clientPercent}%`)
+
+    });
+
+    console.log(data)
+  }
 
 
 

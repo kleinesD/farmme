@@ -788,7 +788,8 @@ exports.renderAllProducts = catchAsync(async (req, res, next) => {
 
 exports.renderAllClients = catchAsync(async (req, res, next) => {
   const clients = await Client.find({ farm: req.user.farm });
-  const products = await Product.find({ client: { $exists: true } })
+  const products = await Product.find({ client: { $exists: true }, farm: req.user.farm, date: { $gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } });
+
 
   res.status(200).render('distAllClients', {
     clients,
