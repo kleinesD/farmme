@@ -7389,7 +7389,7 @@ ion-icon {
 }
 .dist-clients-container {
   width: 100%;
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 0px);
   display: grid;
   gap: 50px;
   grid-template-columns: 1fr 1fr 1fr;
@@ -7404,6 +7404,10 @@ ion-icon {
   padding: 20px;
   align-items: center;
   position: relative;
+  cursor: pointer;
+}
+.dist-client-item-active {
+  background: rgba(251, 141, 52, 0.25);
 }
 .dist-client-item img {
   width: 100px;
@@ -7473,6 +7477,7 @@ ion-icon {
 .dist-clients-details-block-columns {
   display: flex;
   gap: 30px;
+  width: 100%;
 }
 .dist-clients-details-block::-webkit-scrollbar {
   display: none;
@@ -7488,6 +7493,8 @@ ion-icon {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  position:sticky;
+  align-self: flex-start;
 }
 .dist-client-card {
   background-color: #f0f0f0;
@@ -7526,7 +7533,7 @@ ion-icon {
 .dcd-products-break-box {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 30px;
 }
 .dcd-break-product {
@@ -7671,8 +7678,7 @@ ion-icon {
   position: relative;
   padding: 20px 0;
 }
-.dcd-total-product::after {
-  content: '';
+.dcd-total-product-line {
   width: 85%;
   height: 3px;
   background: linear-gradient(to right, #fb8d34, #ff5230, #9d4b9f, #606ae5, #43d7e5);
@@ -7692,7 +7698,7 @@ ion-icon {
   font-weight: 500;
 }
 .dcd-purchases-block {
-  width: 500px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px

@@ -7228,13 +7228,24 @@ $(document).ready(async function () {
   ///////////////////////
   /* ALL CLIENTS PAGE*/
   ///////////////////////
+  const productsToRus = {
+    milk: 'Молоко',
+    meat: 'Мясо',
+    cottagecheese: 'Творог',
+    cream: 'Сливки',
+    butter: 'Масло',
+    cheese: 'Сыр',
+    whey: 'Сыворотка'
+  }
+
   if (document.querySelector('#all-clients-page')) {
     const data = [];
     $('.dist-client-info-hidden').each(function () {
       data.push({
         client: $(this).attr('data-client'),
         product: $(this).attr('data-product'),
-        size: $(this).attr('data-size'),
+        size: parseFloat($(this).attr('data-size')),
+        date: new Date($(this).attr('data-date')),
         unit: $(this).attr('data-unit'),
         price: parseFloat($(this).attr('data-price')),
         pricePer: parseFloat($(this).attr('data-price-per')),
@@ -7244,6 +7255,8 @@ $(document).ready(async function () {
     let generalTotal = 0;
     data.forEach(el => generalTotal += el.price);
 
+    let clientsData = [];
+
     $('.dist-client-item').each(function () {
       let clientTotal = 0;
       data.forEach(el => {
@@ -7251,6 +7264,8 @@ $(document).ready(async function () {
           clientTotal += el.price;
         }
       });
+
+      $(this).attr('data-client-total', clientTotal);
 
       let clientPercent = parseFloat((clientTotal / (generalTotal / 100)).toFixed(1));
       let clientColor;
@@ -7268,9 +7283,142 @@ $(document).ready(async function () {
       });
       $(this).find('.dist-client-item-result').find('p').text(`${clientPercent}%`)
 
+      clientsData.push({
+        client: $(this).attr('data-id'),
+        total: clientTotal
+      });
+
     });
 
-    console.log(data)
+    clientsData.sort((a, b) => b.total - a.total);
+
+    /* Changing info on click */
+    $('.dist-client-item').on('click', function () {
+      let clientId = $(this).attr('data-id');
+      let clientTotal = $(this).attr('data-client-total');
+
+      $('.dist-client-item-active').removeClass('dist-client-item-active');
+      $(this).addClass('dist-client-item-active');
+
+      /* Adding key info in animal card */
+      $('#name').text($(this).attr('data-name'));
+      $('#adress').text($(this).attr('data-adress') !== 'undefined' ? $(this).attr('data-adress') : '');
+      $('#phone').text($(this).attr('data-phone') !== 'undefined' ? $(this).attr('data-phone') : '');
+      $('#email').text($(this).attr('data-email') !== 'undefined' ? $(this).attr('data-email') : '');
+
+      $('.dist-client-card-product-box').empty();
+      $(this).find('.dist-client-item-hidden').each(function () {
+        let rusName = $(this).attr('data-product');
+        let price = $(this).attr('data-price');
+        $('.dist-client-card-product-box').append(`<div class="dist-client-card-product">${productsToRus[rusName.replace('-', '')]} - ${price}₽</div>`)
+      });
+
+      /* Working with products */
+      clientsData.forEach((el, inx) => {
+        if (el.client === clientId) {
+          $('#place').text(inx + 1)
+        }
+      });
+
+      let selClientData = []
+
+      data.forEach((el) => {
+        if (el.client === clientId) selClientData.push(el);
+      });
+      selClientData.sort((a, b) => b.date - a.date)
+
+      /* Adding historical info */
+      $('.dcd-purchases-block').empty();
+      selClientData.forEach((el, inx, arr) => {
+
+        if (inx === 0 || moment(el.date).dayOfYear() !== moment(arr[inx - 1].date).dayOfYear() || moment(el.date).year() !== moment(arr[inx - 1].date).year()) {
+          if (moment().year() === moment(el.date).year()) {
+            $('.dcd-purchases-block').append(`<div class="dcd-purchases-date">${moment(el.date).lang('ru').format('DD MMMM')}</div>`)
+          } else {
+            $('.dcd-purchases-block').append(`<div class="dcd-purchases-date">${moment(el.date).lang('ru').format('DD MMMM YYYY')}</div>`)
+          }
+        }
+        $('.dcd-purchases-block').append(`
+          <div class="dcd-purchases-item">      
+            <div class="dcd-purchases-item-info">     
+              <div class="dcd-purchases-item-title">${productsToRus[el.product.replace('-', '')]}</div>
+              <div class="dcd-purchases-item-size">${el.size} ${el.unit === 'l' ? 'л.' : 'кг.'}</div>
+            </div>
+            <div class="dcd-purchases-item-sum">+ ${el.price} ₽</div>
+          </div>
+          `)
+
+      });
+
+      let selClientDataSorted = [];
+
+      selClientData.forEach(el => {
+        if (!selClientDataSorted.find(prod => prod.product === el.product)) {
+          selClientDataSorted.push({
+            product: el.product,
+            unit: el.unit,
+            allData: [el]
+          })
+        } else {
+          selClientDataSorted.find(prod => prod.product === el.product).allData.push(el)
+        }
+      });
+
+      let clientTotalStr = clientTotal.split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
+      if (clientTotalStr.startsWith(',')) clientTotalStr = clientTotalStr.split('').slice(1).join('');
+      $('.dcd-total-block-header p').text(`${clientTotalStr} ₽`)
+
+      $('.dcd-products-break-box').empty();
+      $('.dcd-total-products-box').empty();
+      selClientDataSorted.forEach((data, inx) => {
+        let totalSize = 0;
+        let totalPrice = 0;
+        let totalMoney = 0;
+
+        data.allData.forEach(allEl => {
+          totalSize += allEl.size;
+          totalPrice += allEl.pricePer;
+          totalMoney += allEl.price;
+        })
+        $('.dcd-products-break-box').append(`
+            <div class="dcd-break-product" data-inx="${inx}">
+            <div class="dcd-break-product-title">${productsToRus[data.product.replace('-', '')]}</div>
+            <div class="dcd-break-product-info-box">
+            <div class="dcd-break-product-info">
+            <div class="dcd-break-product-info-title">Кол-во</div>
+            <div class="dcd-break-product-info-text">${totalSize} ${data.unit === 'l' ? 'л.' : 'кг.'}</div>
+            </div>
+            <div class="dcd-break-product-info">
+            <div class="dcd-break-product-info-title">Цена</div>
+            <div class="dcd-break-product-info-text">${Math.round(totalPrice / data.allData.length)}₽</div>
+              </div>
+            </div>
+            </div>
+            `);
+
+        $('.dcd-total-products-box').append(`
+          <div class="dcd-total-product" data-percent="${totalMoney / (clientTotal / 100)}">
+            <div class="dcd-total-product-line"></div>
+            <div class="dcd-total-product-title">${productsToRus[data.product.replace('-', '')]}</div>
+            <div class="dcd-total-product-info">${(totalMoney / (clientTotal / 100)).toFixed(1)}%
+              <div class="dcd-total-product-info-hidden">${totalMoney} ₽</div>
+            </div>
+          </div>
+        `);
+      });
+
+      const breakProductColors = ['#fb8d34', '#ff5230', '#9d4b9f', '#606ae5', '#43d7e5']
+      $('.dcd-break-product').each(function () {
+        $(this).find('.dcd-break-product-title').css('color', breakProductColors[parseFloat($(this).attr('data-inx'))]);
+      });
+
+      $('.dcd-total-product').each(function() {
+        $(this).find('.dcd-total-product-line').css('width', `${parseFloat($(this).attr('data-percent'))}%`);
+      });
+
+    });
+
+    $('.dist-client-item-active').trigger('click');
   }
 
 
