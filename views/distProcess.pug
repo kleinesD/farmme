@@ -8,22 +8,22 @@ block content
 
       -if(!forEdit)
 
-        .animal-results-container.animal-results-big#add-process-container
+        .animal-results-container.animal-results-big#add-process-container(data-raw=`${engRaw}` data-unit=`${unitRaw}`)
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
           .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title Переработка
+          .ar-block-title= `Переработка ${rusRaw}`
 
           .aa-input-block
             lable.aa-label(for="size") 
-              p Молока переработано
+              p= `Переработано`
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit="l")
-              p.aa-double-price-text л.
+              input.aa-double-price-input#size(type="number" data-unit=`${unitRaw}`)
+              p.aa-double-price-text= `${unitRaw === 'l' ? 'л.' : 'кг.'}`
           .aa-total-milk-box
             .aa-total-milk-line
-              .aa-total-milk-line-inner(data-total=`${totalMilk}`)
-            .aa-total-milk-text= `${totalMilk} л.`
+              .aa-total-milk-line-inner(data-total=`${totalRaw}`)
+            .aa-total-milk-text= `${totalRaw} ${unitRaw === 'l' ? 'л.' : 'кг.'}`
           .aa-input-united-block 
             .aa-input-block 
               label.aa-label(for="type")
@@ -46,17 +46,6 @@ block content
                 select.aa-double-input.unit-input
                   option(value="l" selected) Л.
                   option(value="kg") Кг.  
-            .aa-input-block
-              //-.detailed-info-block
-                .detailed-info-icon 
-                  ion-icon(name="help")
-                .detailed-info-text После окончания срока годности этот продукт будет записан как просроченный.
-                  .detailed-info-text-triangle
-              lable.aa-label(for="price") 
-                p Срок годности
-              .aa-double-input-block.aa-double-price-block
-                input.aa-double-price-input.exp-date-input(type="number")
-                p.aa-double-price-text дней 
           .aa-add-more-container
             .aa-add-more#add-product-input
               p Добавить продукт
@@ -86,21 +75,21 @@ block content
             a.ar-add-button(data-product-id=``) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-process-container
+        .animal-results-container.animal-results-big#edit-process-container(data-raw=`${engRaw}` data-unit=`${rawProduct.unit}`)
           //-img.ar-image-back(src="/img/images/milk-icon.png")
           .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title Продукт
+          .ar-block-title= `Переработка ${rusRaw}`
 
           .aa-input-block
             lable.aa-label(for="size") 
-              p Молока переработано
+              p= `Переработано`
             .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit="l" value=`${rawProduct.size}`)
-              p.aa-double-price-text л.
+              input.aa-double-price-input#size(type="number" data-unit=`${rawProduct.unit}` value=`${rawProduct.size}`)
+              p.aa-double-price-text= `${rawProduct.unit === 'l' ? 'л.' : 'кг.'}`
           .aa-total-milk-box
             .aa-total-milk-line
-              .aa-total-milk-line-inner(data-total=`${totalMilk + rawProduct.size}`)
-            .aa-total-milk-text= `${totalMilk + rawProduct.size} л.`
+              .aa-total-milk-line-inner(data-total=`${totalRaw + rawProduct.size}`)
+            .aa-total-milk-text= `${totalRaw + rawProduct.size} ${rawProduct.unit === 'l' ? 'л.' : 'кг.'}`
 
           each product in products
             .aa-input-united-block.aa-input-united-block-valid(data-id=`${product._id}` data-new="false")
@@ -129,12 +118,6 @@ block content
                       option(value="kg" selected hidden) Кг.  
                     option(value="l") Л.
                     option(value="kg") Кг.  
-              .aa-input-block
-                lable.aa-label(for="price") 
-                  p Срок годности
-                .aa-double-input-block.aa-double-price-block
-                  input.aa-double-price-input.exp-date-input(type="number" value=`${Math.round((product.expDate.getTime() - rawProduct.date.getTime()) / 24 / 60 / 60 / 1000)}`)
-                  p.aa-double-price-text дней 
               .aa-iu-remove   
                 ion-icon(name="close")
           

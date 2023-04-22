@@ -44,18 +44,6 @@ block content
             input.aa-text-input.aa-date-input#date(type="date")
 
           .aa-input-block
-            .detailed-info-block
-              .detailed-info-icon 
-                ion-icon(name="help")
-              .detailed-info-text После окончания срока годности этот продукт будет записан как просроченный.
-                .detailed-info-text-triangle
-            lable.aa-label(for="price") 
-              p Срок годности
-            .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#exp-date(type="number" )
-              p.aa-double-price-text дней 
-
-          .aa-input-block
             lable.aa-label(for="note") 
               p Заметка
             textarea.aa-textarea-input#note(type="text")
@@ -169,18 +157,6 @@ block content
             label.aa-label(for="date")
               p Дата
             input.aa-text-input.aa-date-input#date(type="date"  value=`${product.date.toLocaleString('ru-RU', {year: 'numeric'})}-${product.date.toLocaleString('ru-RU', {month: '2-digit'})}-${product.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
-
-          .aa-input-block
-            .detailed-info-block
-              .detailed-info-icon 
-                ion-icon(name="help")
-              .detailed-info-text После окончания срока годности этот продукт будет записан как просроченный.
-                .detailed-info-text-triangle
-            lable.aa-label(for="price") 
-              p Срок годности
-            .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#exp-date(type="number"  value=`${Math.round((product.expDate.getTime() - product.date.getTime()) / 24 / 60 / 60 / 1000)}`)
-              p.aa-double-price-text дней 
 
           .aa-input-block
             lable.aa-label(for="note") 

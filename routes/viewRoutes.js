@@ -133,7 +133,7 @@ router.get('/distribution/add-product', authController.protect, authController.i
 
 router.get('/distribution/edit-product/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProduct);
 
-router.get('/distribution/add-process', authController.protect, authController.isLoggedIn, viewController.renderAddProcess);
+router.get('/distribution/add-process/:product', authController.protect, authController.isLoggedIn, viewController.renderAddProcess);
 
 router.get('/distribution/edit-process/:id', authController.protect, authController.isLoggedIn, viewController.renderEditProcess);
 
@@ -154,5 +154,10 @@ router.get('/distribution/add-outgo-decide', authController.protect, authControl
 router.get('/distribution/all-products', authController.protect, authController.isLoggedIn, viewController.renderAllProducts);
 
 router.get('/distribution/all-clients', authController.protect, authController.isLoggedIn, viewController.renderAllClients);
+
+router.get('/distribution/add-write-off/:product', authController.protect, authController.isLoggedIn, viewController.renderAddWriteOff);
+
+router.get('/distribution/edit-write-off/:id', authController.protect, authController.isLoggedIn, viewController.renderEditWriteOff);
+
 
 module.exports = router;

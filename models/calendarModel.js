@@ -18,9 +18,15 @@ const calendarScheme = new mongoose.Schema({
   },
   note: String,
   date: {
-    type: Date,
-    required: true
+    type: Date
   },
+  recuring: {
+    type: Boolean,
+    default: false
+  },
+  recuringDay: Number,
+  recuringHour: Number,
+  recuringMinute: Number, 
   creationDate: {
     type: Date,
     required: true,

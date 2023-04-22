@@ -1,0 +1,70 @@
+extends base
+
+block content
+
+  section.main-section 
+
+    .animal-results-window
+
+      -if(!forEdit)
+
+        .animal-results-container.animal-results-big#add-write-off-container(data-product=`${engProduct}` data-unit=`${unitProduct}`)
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+
+          .ar-block-sub-title ДОБАВИТЬ
+          .ar-block-title= `Списание ${rusProduct}`
+
+          .aa-input-block
+            lable.aa-label(for="size") 
+              p= `Количество`
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#size(type="number" data-unit=`${unitProduct}`)
+              p.aa-double-price-text= `${unitProduct === 'l' ? 'л.' : 'кг.'}`
+          .aa-total-milk-box
+            .aa-total-milk-line
+              .aa-total-milk-line-inner(data-total=`${totalProduct}`)
+            .aa-total-milk-text= `${totalProduct} ${unitProduct === 'l' ? 'л.' : 'кг.'}`
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date")
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")
+
+          .ar-btn-box          
+            a.ar-add-button(data-product-id=``) Сохранить
+
+      -if(forEdit)
+        .animal-results-container.animal-results-big#edit-write-off-container(data-product=`${engProduct}` data-unit=`${product.unit}`)
+          //-img.ar-image-back(src="/img/images/milk-icon.png")
+          .ar-block-sub-title РЕДАКТИРОВАТЬ
+          .ar-block-title= `Переработка ${rusProduct}`
+
+          .aa-input-block
+            lable.aa-label(for="size") 
+              p= `Количество`
+            .aa-double-input-block.aa-double-price-block
+              input.aa-double-price-input#size(type="number" data-unit=`${product.unit}` value=`${product.size}`)
+              p.aa-double-price-text= `${product.unit === 'l' ? 'л.' : 'кг.'}`
+          .aa-total-milk-box
+            .aa-total-milk-line
+              .aa-total-milk-line-inner(data-total=`${totalProduct + product.size}`)
+            .aa-total-milk-text= `${totalProduct + product.size} ${product.unit === 'l' ? 'л.' : 'кг.'}`
+
+          .aa-input-block
+            label.aa-label(for="date")
+              p Дата
+            input.aa-text-input.aa-date-input#date(type="date" value=`${product.date.toLocaleString('ru-RU', {year: 'numeric'})}-${product.date.toLocaleString('ru-RU', {month: '2-digit'})}-${product.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+
+          .aa-input-block
+            lable.aa-label(for="note") 
+              p Заметка
+            textarea.aa-textarea-input#note(type="text")= `${product.note !== undefined ? product.note : ''}`
+
+          .ar-btn-box          
+            a.ar-add-button(data-product-id=`${product._id}`) Сохранить
+
+
+

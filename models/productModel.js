@@ -46,7 +46,7 @@ const productScheme = new mongoose.Schema({
     distributionResult: {
         type: String,
         required: true,
-        enum: ['waiting', 'sold', 'personal-use', 'processed', 'calf-feeding'],
+        enum: ['waiting', 'sold', 'personal-use', 'processed', 'calf-feeding', 'write-off'],
         default: 'waiting'
     },
     calf: {

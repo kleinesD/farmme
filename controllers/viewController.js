@@ -597,29 +597,54 @@ exports.renderEditProduct = catchAsync(async (req, res, next) => {
 
 exports.renderAddProcess = catchAsync(async (req, res, next) => {
   const forEdit = false;
-  const milkInventory = await Product.find({ farm: req.user.farm, product: 'milk' })
-  const totalMilk = countInventoryTotal(milkInventory);
+  const rawInventory = await Product.find({ farm: req.user.farm, product: req.params.product })
+  const totalRaw = countInventoryTotal(rawInventory);
+  let unitRaw = rawInventory[0].unit;
+  let engRaw = req.params.product;
+  let rusRaw = '';
+
+  if (req.params.product === 'milk') rusRaw = 'молоко';
+  if (req.params.product === 'cottage-cheese') rusRaw = 'творог';
+  if (req.params.product === 'cheese') rusRaw = 'сыр';
+  if (req.params.product === 'whey') rusRaw = 'сыворотка';
+  if (req.params.product === 'cream') rusRaw = 'сливки';
+  if (req.params.product === 'butter') rusRaw = 'масло';
 
   res.status(200).render('distProcess', {
     forEdit,
-    totalMilk
+    totalRaw,
+    unitRaw,
+    rusRaw,
+    engRaw
   });
 });
 
 exports.renderEditProcess = catchAsync(async (req, res, next) => {
   const forEdit = true;
-  const milkInventory = await Product.find({ farm: req.user.farm, product: 'milk' })
-  const totalMilk = countInventoryTotal(milkInventory);
 
   const rawProduct = await Product.findById(req.params.id);
+  const rawInventory = await Product.find({ farm: req.user.farm, product: rawProduct.product });
+  const totalRaw = countInventoryTotal(rawInventory);
+
+  let engRaw = rawProduct.product;
+  let rusRaw = '';
 
   const products = await Product.find({ rawProduct: req.params.id });
+
+  if (rawProduct.product === 'milk') rusRaw = 'молоко';
+  if (rawProduct.product === 'cottage-cheese') rusRaw = 'творог';
+  if (rawProduct.product === 'cheese') rusRaw = 'сыр';
+  if (rawProduct.product === 'whey') rusRaw = 'сыворотка';
+  if (rawProduct.product === 'cream') rusRaw = 'сливки';
+  if (rawProduct.product === 'butter') rusRaw = 'масло';
 
   res.status(200).render('distProcess', {
     forEdit,
     rawProduct,
     products,
-    totalMilk
+    totalRaw,
+    engRaw,
+    rusRaw
   });
 });
 
@@ -794,5 +819,56 @@ exports.renderAllClients = catchAsync(async (req, res, next) => {
   res.status(200).render('distAllClients', {
     clients,
     products
+  });
+});
+
+exports.renderAddWriteOff = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+  const products = await Product.find({ farm: req.user.farm, product: req.params.product })
+  const totalProduct = countInventoryTotal(products);
+  let unitProduct = products[0].unit;
+  let engProduct = req.params.product;
+  let rusProduct = '';
+
+  if (req.params.product === 'milk') rusProduct = 'молоко';
+  if (req.params.product === 'cottage-cheese') rusProduct = 'творог';
+  if (req.params.product === 'cheese') rusProduct = 'сыр';
+  if (req.params.product === 'whey') rusProduct = 'сыворотка';
+  if (req.params.product === 'cream') rusProduct = 'сливки';
+  if (req.params.product === 'butter') rusProduct = 'масло';
+
+  res.status(200).render('distWriteOff', {
+    forEdit,
+    totalProduct,
+    unitProduct,
+    rusProduct,
+    engProduct
+  });
+});
+
+exports.renderEditWriteOff = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+
+  const product = await Product.findById(req.params.id);
+  const products = await Product.find({ farm: req.user.farm, product: product.product });
+  const totalProduct = countInventoryTotal(products);
+
+  let engProduct = product.product;
+  let rusProduct = '';
+
+  if (product.product === 'milk') rusProduct = 'молоко';
+  if (product.product === 'cottage-cheese') rusProduct = 'творог';
+  if (product.product === 'cheese') rusProduct = 'сыр';
+  if (product.product === 'whey') rusProduct = 'сыворотка';
+  if (product.product === 'cream') rusProduct = 'сливки';
+  if (product.product === 'butter') rusProduct = 'масло';
+
+  res.status(200).render('distWriteOff', {
+    forEdit,
+    product,
+    products,
+    totalProduct,
+    engProduct,
+    rusProduct
   });
 });
