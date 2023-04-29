@@ -241,9 +241,15 @@ block content
               label.aa-label(for="date")
                 p Дата
               input.aa-text-input.aa-date-input#date(type="date" value=`${orders[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${orders[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${orders[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+          -else
+            .aa-input-block.date-block#once-date(data-display="block")
+              label.aa-label(for="date")
+                p Дата
+              input.aa-text-input.aa-date-input#date(type="date")
+
 
           -if(orders[0].recuring)
-            .aa-input-block.aa-triple-date-block
+            .aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
               label.aa-label(for="date")
                 p День и время
               select.aa-triple-date-input-big#rec-date(data-val=`${orders[0].recuringDay}`)
@@ -255,7 +261,7 @@ block content
                 option(value="6") Суббота
                 option(value="0") Воскресенье
               select.aa-triple-date-input#rec-hour
-                option(selected hidden value=`${orders[0].recuringHour}`)
+                option(selected hidden value=`${orders[0].recuringHour}`)= `${orders[0].recuringHour}`
                 option(value="0") 00
                 option(value="1") 01
                 option(value="2") 02
@@ -282,7 +288,106 @@ block content
                 option(value="23") 23     
               .aa-triple-date-divider :
               select.aa-triple-date-input#rec-minute
-                option(selected hidden value=`${orders[0].recuringMinute}`)
+                option(selected hidden value=`${orders[0].recuringMinute}`)= `${orders[0].recuringMinute}`
+                option(value="0") 00
+                option(value="1") 01
+                option(value="2") 02
+                option(value="3") 03
+                option(value="4") 04
+                option(value="5") 05
+                option(value="6") 06
+                option(value="7") 07
+                option(value="8") 08
+                option(value="9") 09
+                option(value="10") 10
+                option(value="11") 11
+                option(value="12") 12
+                option(value="13") 13
+                option(value="14") 14
+                option(value="15") 15
+                option(value="16") 16
+                option(value="17") 17
+                option(value="18") 18
+                option(value="19") 19
+                option(value="20") 20
+                option(value="21") 21
+                option(value="22") 22
+                option(value="23") 23
+                option(value="24") 24
+                option(value="25") 25
+                option(value="26") 26
+                option(value="27") 27
+                option(value="28") 28
+                option(value="29") 29
+                option(value="30") 30
+                option(value="31") 31
+                option(value="32") 32
+                option(value="33") 33
+                option(value="34") 34
+                option(value="35") 35
+                option(value="36") 36
+                option(value="37") 37
+                option(value="38") 38
+                option(value="39") 39
+                option(value="40") 40
+                option(value="41") 41
+                option(value="42") 42
+                option(value="43") 43
+                option(value="44") 44
+                option(value="45") 45
+                option(value="46") 46
+                option(value="47") 47
+                option(value="48") 48
+                option(value="49") 49
+                option(value="50") 50
+                option(value="51") 51
+                option(value="52") 52
+                option(value="53") 53
+                option(value="54") 54
+                option(value="55") 55
+                option(value="56") 56
+                option(value="57") 57
+                option(value="58") 58
+                option(value="59") 59
+          -else
+            .aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
+              label.aa-label(for="date")
+                p День и время
+              select.aa-triple-date-input-big#rec-date
+                option(value="1") Понедельник
+                option(value="2") Вторник
+                option(value="3") Среда
+                option(value="4") Четверг
+                option(value="5") Пятница
+                option(value="6") Суббота
+                option(value="0") Воскресенье
+              select.aa-triple-date-input#rec-hour
+                option(value="0") 00
+                option(value="1") 01
+                option(value="2") 02
+                option(value="3") 03
+                option(value="4") 04
+                option(value="5") 05
+                option(value="6") 06
+                option(value="7") 07
+                option(value="8") 08
+                option(value="9") 09
+                option(value="10") 10
+                option(value="11") 11
+                option(value="12") 12
+                option(value="13") 13
+                option(value="14") 14
+                option(value="15") 15
+                option(value="16") 16
+                option(value="17") 17
+                option(value="18") 18
+                option(value="19") 19
+                option(value="20") 20
+                option(value="21") 21
+                option(value="22") 22
+                option(value="23") 23     
+              .aa-triple-date-divider :
+              select.aa-triple-date-input#rec-minute
                 option(value="0") 00
                 option(value="1") 01
                 option(value="2") 02

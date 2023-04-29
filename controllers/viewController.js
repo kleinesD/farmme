@@ -872,3 +872,10 @@ exports.renderEditWriteOff = catchAsync(async (req, res, next) => {
     rusProduct
   });
 });
+
+exports.renderDistMain = catchAsync(async(req, res, next) => {
+
+  res.status(200).render('distMain', {
+
+  });
+});

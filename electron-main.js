@@ -56,7 +56,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/all-products');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/edit-write-off/64423b63993f4ec9e5670013');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/edit-order/644422c36c5a89f360a597e6');
+  contentWindow.loadURL('http://127.0.0.1:604/distribution/');
 
 
   contentWindow.maximize();

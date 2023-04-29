@@ -6513,12 +6513,13 @@ $(document).ready(async function () {
 
     if (document.querySelector('#edit-order-container')) {
       $('input').trigger('click');
+      $('input').trigger('click');
 
       $('.aa-select-option-selected').trigger('click');
       $('.aa-select-option-selected').trigger('click');
 
-      $('#rec-date').find('option').each(function() {
-        if($(this).attr('value') === $('#rec-date').attr('data-val')) {
+      $('#rec-date').find('option').each(function () {
+        if ($(this).attr('value') === $('#rec-date').attr('data-val')) {
           $(this).attr('selected', true)
         }
       });
@@ -6597,27 +6598,60 @@ $(document).ready(async function () {
         $('.aa-input-united-block-valid').each(async function () {
           let response;
           if ($(this).attr('data-new') === 'false') {
-            response = await editReminder($(this).attr('data-id'), {
-              size: parseFloat($(this).find('.size-input').val()),
-              date: new Date($('#date').val()),
-              unit: $(this).find('.unit-input').val(),
-              product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
-            });
+            if ($('.ar-switch-btn-active').attr('id') === 'once') {
+              response = await editReminder($(this).attr('data-id'), {
+                size: parseFloat($(this).find('.size-input').val()),
+                date: new Date($('#date').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                subId: subId,
+                module: 'order',
+                client: $('#client').attr('data-id'),
+                note: note,
+                recuring: false,
+              });
+            } else {
+              response = await editReminder($(this).attr('data-id'), {
+                size: parseFloat($(this).find('.size-input').val()),
+                recuring: true,
+                recuringDay: parseFloat($('#rec-date').val()),
+                recuringHour: parseFloat($('#rec-hour').val()),
+                recuringMinute: parseFloat($('#rec-minute').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                subId: subId,
+                module: 'order',
+                client: $('#client').attr('data-id'),
+                note: note
+              });
+            }
           } else if ($(this).attr('data-new') === 'true') {
-            response = await addReminder({
-              size: parseFloat($(this).find('.size-input').val()),
-              date: new Date($('#date').val()),
-              unit: $(this).find('.unit-input').val(),
-              product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
-            });
+            if ($('.ar-switch-btn-active').attr('id') === 'once') {
+              response = await addReminder({
+                size: parseFloat($(this).find('.size-input').val()),
+                date: new Date($('#date').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                subId: subId,
+                module: 'order',
+                client: $('#client').attr('data-id'),
+                note: note
+              });
+            } else {
+              response = await addReminder({
+                size: parseFloat($(this).find('.size-input').val()),
+                recuring: true,
+                recuringDay: parseFloat($('#rec-date').val()),
+                recuringHour: parseFloat($('#rec-hour').val()),
+                recuringMinute: parseFloat($('#rec-minute').val()),
+                unit: $(this).find('.unit-input').val(),
+                product: $(this).find('.aa-select-option-selected').attr('data-val'),
+                subId: subId,
+                module: 'order',
+                client: $('#client').attr('data-id'),
+                note: note
+              });
+            }
           }
 
           if (response) counter++;

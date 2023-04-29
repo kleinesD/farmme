@@ -159,5 +159,7 @@ router.get('/distribution/add-write-off/:product', authController.protect, authC
 
 router.get('/distribution/edit-write-off/:id', authController.protect, authController.isLoggedIn, viewController.renderEditWriteOff);
 
+router.get('/distribution/', authController.protect, authController.isLoggedIn, viewController.renderDistMain);
+
 
 module.exports = router;
