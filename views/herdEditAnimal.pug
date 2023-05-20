@@ -1,8 +1,7 @@
 extends base
 
 block content
-  .menu-ref(data-block="herd-block" data-page="herd-add-animal" data-sub="")
-
+  include _rcmHerd
   section.main-section 
     .add-animal-container#edit-animal-container
       a.aa.back-btn(href=`/herd/animal-card/${animal._id}`)
@@ -141,6 +140,21 @@ block content
                   .animal-search-item(data-rus="Монбельярд" data-eng="Montbéliarde")
                     p.animal-search-name Монбельярд
             
+            -if(!animal.category)
+              .aa-input-block 
+                label.aa-label(for="type")
+                  p Категория
+                .aa-select-box.aa-select-box-one#type
+                  .aa-select-text Выберите категорию
+                  ion-icon(name="chevron-down")
+                  .aa-select-options-box
+                    -if(farm.animalCategories)
+                      each category in farm.animalCategories
+                        .aa-select-option= category
+                    .aa-select-add Добавить новую категорию &nbsp; +
+                    .aa-select-add-input
+                      input#new-category(type="text" placeholder="Новая категория")
+                      .aa-select-add-input-btn(data-id=`${farm._id}`) +         
             -if(animal.gender)
               .aa-input-block 
                 label.aa-label(for="gender")

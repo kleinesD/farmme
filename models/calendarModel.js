@@ -64,7 +64,17 @@ const calendarScheme = new mongoose.Schema({
   unit: {
     type: String
   },
-  subId: String
+  subId: String,
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ]
 });
 
 const Calendar = mongoose.model('Calendar', calendarScheme);

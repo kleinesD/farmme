@@ -27,7 +27,17 @@ const schemeSchema = new mongoose.Schema({
   included: {
     type: Boolean,
     default: false
-  }
+  },
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ],
 });
 
 const Scheme = mongoose.model('Scheme', schemeSchema);

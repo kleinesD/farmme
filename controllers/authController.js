@@ -88,7 +88,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) {
     res.redirect('/login')
     return next(new AppError('You are not logged in!', 403));
-  } 
+  }
 
   const decoded = await promisify(jwt.verify)(token, 'it-is-what-it-is-and-you-cant-do-nothing-about-it');
 
@@ -123,6 +123,21 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
   } catch (err) {
     return next();
   }
+  next();
+});
+
+exports.restrict = (block, other = false, data = false) => catchAsync(async (req, res, next) => {
+  const user = req.user;
+
+  /* Restrict by block */
+  if (!user.accessBlocks.includes(block)) return next(new AppError('Unauthorized access! This user is not allowed to use this block.', 401));
+
+  /* Restrict by edit other's data */
+  if (other && !user.editOther) return next(new AppError('Unauthorized access! This user cannot edit data of other users.', 401));
+
+  /* Restrict by add data */
+  if (data && !user.editData) return next(new AppError('Unauthorized access! This user cannot add data.', 401));
+
   next();
 });
 

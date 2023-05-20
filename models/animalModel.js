@@ -147,6 +147,16 @@ const animalSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   },
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ],
   forDevelopment: {
     type: Boolean,
     default: false
@@ -156,6 +166,11 @@ const animalSchema = new mongoose.Schema({
 animalSchema.pre(/^find/, function (next) {
   this.populate('mother').populate('father');
 
+  next();
+});
+
+animalSchema.pre('updateOne', function (next) {
+  this.editedAtBy.push({ date: new Date });
   next();
 });
 

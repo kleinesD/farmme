@@ -26,8 +26,19 @@ exports.createFarm = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.editFarm = catchAsync(async(req, res, next) => {
+exports.editFarm = catchAsync(async (req, res, next) => {
   const farm = await Farm.findByIdAndUpdate(req.params.farmId, req.body);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      farm
+    }
+  });
+});
+
+exports.addCategory = catchAsync(async (req, res, next) => {
+  const farm = await Farm.findByIdAndUpdate(req.params.farmId, { $addToSet: { animalCategories: req.body.category } })
 
   res.status(200).json({
     status: 'success',

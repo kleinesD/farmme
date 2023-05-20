@@ -1,8 +1,7 @@
 extends base
 
 block content
-  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
-
+  include _rcmHerd
   section.main-section 
     .all-animals-container
       .all-animals-search 
@@ -14,11 +13,11 @@ block content
           .af-checkbox
             ion-icon(name="checkmark")
           p Показывать прошлых животных
-        //-select.all-animals-sort 
-          option(selected hidden disabled) Сортировать
-          option(value="calving") Отел
-          option(value="calving") Осеменение
-          options(value="age") Возраст
+      .aa-filter-container
+        a.aa-filter-item(href="/herd/all-animals/?filter=all" class=`${filter === 'all' ? 'aa-filter-item-active' : ''}`) ВСЕ ЖИВОТНЫЕ
+        a.aa-filter-item(href="/herd/all-animals/?filter=bulls" class=`${filter === 'bulls' ? 'aa-filter-item-active' : ''}`) БЫКИ
+        a.aa-filter-item(href="/herd/all-animals/?filter=cows" class=`${filter === 'cows' ? 'aa-filter-item-active' : ''}`) КОРОВЫ
+        a.aa-filter-item(href="/herd/all-animals/?filter=calfs" class=`${filter === 'calfs' ? 'aa-filter-item-active' : ''}`) ТЕЛЯТА
       .animal-list-header
         .alh-item.alh-item-photo Фото 
         .alh-item # 

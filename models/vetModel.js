@@ -54,6 +54,16 @@ const vetSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ],
   finished: Boolean
 },
   {

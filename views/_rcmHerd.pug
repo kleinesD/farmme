@@ -1,0 +1,23 @@
+.rc-menu#rcm
+    a.rc-menu-item(href="/")
+      ion-icon(name="home")
+      p Домой
+    a.rc-menu-item(href="/herd/")
+      ion-icon(name="tablet-portrait")
+      p Страница блока
+    .rc-menu-item(onclick="history.back()")
+      ion-icon(name="arrow-undo")
+      p Назад
+    .rc-menu-item(onclick="history.forward()") 
+      ion-icon(name="arrow-redo")
+      p Вперед
+    .rc-menu-devider
+    .rc-menu-item.rc-menu-item-inactive 
+      ion-icon(name="bug")
+      p Сообщить об ошибке
+    .rc-menu-item.rc-menu-item-inactive  
+      ion-icon(name="camera")
+      p Скриншот страницы
+    .rc-menu-item.rc-menu-item-inactive  
+      ion-icon(name="document-text")
+      p Создать отчет

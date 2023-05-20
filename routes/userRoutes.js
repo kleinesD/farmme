@@ -16,5 +16,7 @@ router.post('/create-user-link', authController.protect, authController.createUs
 
 router.get('/check-email/:email', userController.checkEmail)
 
+router.get('/:id', userController.getUser)
+
 
 module.exports = router;

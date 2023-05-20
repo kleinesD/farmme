@@ -11,6 +11,8 @@ router.post('/', authController.protect, animalController.addOneAnimal);
 
 router.patch('/:animalId', authController.protect, animalController.updateOneAnimal);
 
+router.get('/animal-by-number/:number', authController.protect, animalController.getAnimalByNumber);
+
 router.post('/lactation/:animalId', authController.protect, animalController.addLactation);
 
 router.patch('/lactation/:animalId/:index', authController.protect, animalController.updateLactation);

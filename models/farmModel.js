@@ -33,6 +33,7 @@ const farmSchema = new mongoose.Schema({
     enum: ['gal', 'l'],
     default: 'l'
   },
+  animalCategories: [String],
   nextPayment: {
     type: Date
   },
@@ -50,7 +51,17 @@ const farmSchema = new mongoose.Schema({
   },
   lastPayment: {
     type: Date
-  }
+  },
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ]
 
 });
 

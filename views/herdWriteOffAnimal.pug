@@ -1,8 +1,7 @@
 extends base
 
 block content
-  .menu-ref(data-block="herd-block" data-page="herd-all-animals" data-sub="")
-
+  include _rcmHerd
   section.main-section 
     -if(forOne)
       include _animalHeader

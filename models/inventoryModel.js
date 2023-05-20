@@ -37,7 +37,17 @@ const inventoryScheme = new mongoose.Schema({
   animal: {
     type: mongoose.Schema.ObjectId,
     ref: 'Animal'
-  }
+  },
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ],
 });
 
 const Inventory = mongoose.model('Inventory', inventoryScheme);

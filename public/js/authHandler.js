@@ -32,23 +32,6 @@ export const logout = async () => {
     console.log(err);
   }
 }
-
-export const editFarm = async (farmId, data) => {
-  try {
-    const res = await axios({
-      method: 'PATCH',
-      url: `/api/farms/edit-farm/${farmId}`,
-      data
-    });
-
-    if (res.data.status === 'success') {
-      return true;
-    }
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 export const checkEmail = async (email) => {
   try {
     const res = await axios({
@@ -64,18 +47,17 @@ export const checkEmail = async (email) => {
   }
 }
 
-export const editUser = async (userId, data) => {
+export const getUser = async (userId) => {
   try {
     const res = await axios({
-      method: 'PATCH',
-      url: `/api/users/edit-user/${userId}`,
-      data
+      method: 'GET',
+      url: `/api/users/${userId}`
     });
 
     if (res.data.status === 'success') {
-      return true;
+      return res.data.data.user;
     }
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
 }

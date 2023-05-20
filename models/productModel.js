@@ -63,9 +63,19 @@ const productScheme = new mongoose.Schema({
     },
     note: String,
     subId: String,
+    editedAtBy: [
+        {
+            date: Date,
+            user: {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User'
+            }
+
+        }
+    ],
 });
 
-productScheme.virtual('produced',{
+productScheme.virtual('produced', {
     ref: 'Product',
     localField: '_id',
     foreignField: 'rawProduct'

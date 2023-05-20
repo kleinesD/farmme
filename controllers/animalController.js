@@ -27,6 +27,18 @@ exports.getOneAnimal = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getAnimalByNumber = catchAsync(async (req, res, next) => {
+  const animal = await Animal.findOne({farm: req.user.farm, number: req.params.number });
+  if(!animal) return false;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      animal
+    }
+  });
+});
+
 exports.addOneAnimal = catchAsync(async (req, res, next) => {
   req.body.farm = req.user.farm;
   const animal = await Animal.create(req.body);
@@ -89,7 +101,7 @@ exports.updateLactation = catchAsync(async (req, res, next) => {
 exports.deleteLactation = catchAsync(async (req, res, next) => {
   const lactation = await Animal.find({ _id: req.params.animalId }, { lactations: { $elemMatch: { _id: req.params.id } } });
   let lactationNumber = lactation[0].lactations[0].number
-  const animal = await Animal.findByIdAndUpdate({ _id: req.params.animalId }, { $pull: { lactations: { _id: req.params.id }} })
+  const animal = await Animal.findByIdAndUpdate({ _id: req.params.animalId }, { $pull: { lactations: { _id: req.params.id } } })
   /* const animal = await Animal.findByIdAndUpdate({ _id: req.params.animalId }, { $pull: { lactations: { _id: req.params.id },  milkingResults: { lactationNumber: lactationNumber } } }) */
 
   res.status(203).json({

@@ -30,7 +30,17 @@ const clientScheme = new mongoose.Schema({
     farm: {
         type: mongoose.Schema.ObjectId,
         ref: 'Farm'
-    }
+    },
+    editedAtBy: [
+        {
+            date: Date,
+            user: {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User'
+            }
+
+        }
+    ]
 });
 
 const Client = mongoose.model('Client', clientScheme);

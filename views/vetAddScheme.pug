@@ -1,8 +1,7 @@
 extends base
 
 block content
-  .menu-ref(data-block="vet-block" data-page="vet-scheme" data-sub="")
-
+  include _rcmVet
   section.main-section.vet-module
 
     .animal-results-container.vet-scheme-container#add-vet-scheme(class=`${forOne === true ? 'animal-results-big' : 'animal-results-full'}`)

@@ -8,6 +8,8 @@ router.post('/', authController.protect, farmController.createFarm);
 
 router.patch('/edit-farm/:farmId', authController.protect, farmController.editFarm);
 
+router.patch('/add-category/:farmId', authController.protect, farmController.addCategory);
+
 
 
 

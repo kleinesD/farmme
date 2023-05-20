@@ -65,7 +65,17 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   },
-  pendingUserLinks: [String]
+  pendingUserLinks: [String],
+  editedAtBy: [
+    {
+      date: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+
+    }
+  ],
 });
 
 userSchema.pre('save', async function (next) {

@@ -11,7 +11,7 @@ const router = express.Router();
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////
-router.get('/login', viewController.renderLogin);
+router.get('/login', viewController.renderLogin); 
 
 router.get('/', authController.protect, authController.isLoggedIn, viewController.renderMain);
 

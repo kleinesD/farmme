@@ -10,12 +10,13 @@ import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnima
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
-import { login, logout, editFarm, editUser, checkEmail } from './authHandler';
+import { login, logout, checkEmail } from './authHandler';
+import { editFarm, editUser, addCategory } from './manageHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
 import { getMilkingProjection } from './milkingProjection';
 import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct } from './distributionHandler';
-
+import { searchEngine } from './search';
 
 
 $(document).ready(async function () {
@@ -73,6 +74,46 @@ $(document).ready(async function () {
       history.back(-1)
     });
 
+  }
+
+  ///////////////////////
+  /* SEARCH ENGINE */
+  /////////////////////// 
+  if(document.querySelector('.main-search-block')) {
+    searchEngine($('.main-search-block').attr('data-user-id'));
+  }
+
+  ///////////////////////
+  /* RIGHT CLICK MENU */
+  /////////////////////// 
+  if (document.querySelector('.rc-menu')) {
+    $('body').on('mousedown', function (e) {
+      if (e.which === 3) {
+        let hor = '0%';
+        let ver = '0%';
+        if (e.pageX + parseFloat($('.rc-menu').width()) > parseFloat($(window).width())) {
+          hor = '-100%'
+        }
+        if (e.pageY + parseFloat($('.rc-menu').height()) > parseFloat($(window).height())) {
+          ver = '-100%'
+        }
+        $('.rc-menu').css({
+          'top': e.pageY,
+          'left': e.pageX,
+          'transform': `translate(${hor}, ${ver})`
+        }).show(0);
+      }
+    });
+
+    $(window).on('scroll', function () {
+      $('.rc-menu').hide()
+    });
+
+    $('body').click(function (e) {
+      if (e.target.id !== 'rcm' && e.target.parentElement.id !== 'rcm' && e.target.parentElement.parentElement.id !== 'rcm') {
+        $('.rc-menu').hide()
+      }
+    });
   }
 
   ///////////////////////
@@ -421,13 +462,18 @@ $(document).ready(async function () {
     });
 
     /* Advanced select block */
-    $('body').on('click', '.aa-select-box', function () {
+    $('body').on('click', '.aa-select-box', function (e) {
       if ($(this).find('ion-icon').attr('name') === 'chevron-down') {
         $(this).find('.aa-select-options-box').show();
         $(this).find('ion-icon').attr('name', 'chevron-up');
       } else if ($(this).find('ion-icon').attr('name') === 'chevron-up') {
-        $(this).find('.aa-select-options-box').hide();
-        $(this).find('ion-icon').attr('name', 'chevron-down');
+        if (e.target.parentElement.classList[0] !== 'aa-select-options-box' && e.target.parentElement.parentElement.classList[0] !== 'aa-select-options-box') {
+          $(this).find('.aa-select-options-box').hide();
+          $(this).find('ion-icon').attr('name', 'chevron-down');
+        } else if (e.target.classList[0] === 'aa-select-option') {
+          $(this).find('.aa-select-options-box').hide();
+          $(this).find('ion-icon').attr('name', 'chevron-down');
+        }
       }
     });
 
@@ -2138,6 +2184,41 @@ $(document).ready(async function () {
       $(this).parent().find(`#${color}`).addClass('aa-pick-picked');
     });
 
+    /* Adding new category */
+    $('.aa-select-add').on('click', function () {
+      $(this).hide();
+      $(this).parent().find('.aa-select-add-input').css('display', 'flex');
+    });
+
+    $('#new-category').on('change keyup', function () {
+      if ($(this).val().length > 0) {
+        $(this).parent().find('.aa-select-add-input-btn').css({
+          'pointer-events': 'auto',
+          'opacity': '1'
+        });
+      } else {
+        $(this).parent().find('.aa-select-add-input-btn').css({
+          'pointer-events': 'none',
+          'opacity': '0.5'
+        });
+      }
+    });
+
+    $('.aa-select-add-input-btn').on('click', async function () {
+      $(this).empty();
+      $(this).append(`<div class="mini-loader mini-loader-white"></div>`);
+
+      const response = await addCategory($(this).attr('data-id'), $(this).parent().find('#new-category').val());
+
+      if (response) {
+        $(this).empty();
+        $(this).text('+');
+        $(this).parent().hide();
+        $(this).parent().parent().find('.aa-select-add').css('display', 'flex');
+        $(this).parent().parent().prepend(`<div class="aa-select-option">${$(this).parent().find('#new-category').val()}</div>`)
+      }
+    });
+
     /* Validating mandatory fields */
     $('#number').on('keyup change focus click', function () {
       if ($(this).val().length === 0) {
@@ -2215,10 +2296,11 @@ $(document).ready(async function () {
       let breedRussian = $('#breed').attr('data-rus');
       let breedEnglish = $('#breed').attr('data-eng');
       let animalId = $(this).attr('data-animal-id');
+      let category = $('#type').find('.aa-select-option-selected').text()
 
       $(this).append(`<div class="mini-loader mini-loader-side-right"></div>`);
 
-      let result = await editAnimal(animalId, { number, name, buyCost, mother, father, birthDate, gender, colors, breedRussian, breedEnglish })
+      let result = await editAnimal(animalId, { number, name, buyCost, mother, father, birthDate, gender, colors, breedRussian, breedEnglish, category })
 
 
       if (result) {
@@ -7382,6 +7464,8 @@ $(document).ready(async function () {
       $('#phone').text($(this).attr('data-phone') !== 'undefined' ? $(this).attr('data-phone') : '');
       $('#email').text($(this).attr('data-email') !== 'undefined' ? $(this).attr('data-email') : '');
 
+      $('.dist-client-card-edit').attr('href', `/distribution/edit-client/${clientId}`)
+
       $('.dist-client-card-product-box').empty();
       $(this).find('.dist-client-item-hidden').each(function () {
         let rusName = $(this).attr('data-product');
@@ -7495,6 +7579,13 @@ $(document).ready(async function () {
     });
 
     $('.dist-client-item-active').trigger('click');
+
+    /* Changing the time period */
+    $('.main-page-header-period').on('change', function () {
+      if ($("#start-date").val() !== '' && $("#end-date").val() !== '') {
+        location.assign(`/distribution/all-clients/?start=${new Date($("#start-date").val())}&end=${new Date($("#end-date").val())}`)
+      }
+    });
   }
 
   ///////////////////////
@@ -7600,6 +7691,400 @@ $(document).ready(async function () {
 
 
   }
+
+  ///////////////////////
+  /* DIST MAIN PAGE*/
+  ///////////////////////
+  if (document.querySelector('#dist-main-page')) {
+    /* Getting the data */
+    let productData = [];
+
+    $('.dm-hidden-info').each(function () {
+      productData.push({
+        product: $(this).attr('data-product'),
+        productRus: productsToRus[$(this).attr('data-product').replace('-', '')],
+        type: $(this).attr('data-type'),
+        size: parseFloat($(this).attr('data-size')),
+        unit: $(this).attr('data-unit'),
+        date: new Date($(this).attr('data-date')),
+        distResult: $(this).attr('data-dist'),
+        client: $(this).attr('data-client'),
+        clientName: $(this).attr('data-client-name'),
+        price: parseFloat($(this).attr('data-price')),
+        pricePer: parseFloat($(this).attr('data-price-per'))
+      });
+    });
+
+    $('.dmm-btn').on('click', function () {
+      $('.dmm-btn-active').removeClass('dmm-btn-active');
+      $(this).addClass('dmm-btn-active');
+
+      /* For income total */
+      let productClientData = [];
+      if ($(this).attr('id') === 'dmm-income') {
+        let incomeTotal = 0;
+        productData.forEach((el) => {
+          if (el.distResult === 'sold') {
+            /* Counting total */
+            incomeTotal += el.price;
+
+            /* Working with clients share */
+            if (productClientData.find(client => client.id === el.client)) {
+              productClientData.find(client => client.id === el.client).products.push(el);
+              productClientData.find(client => client.id === el.client).total += el.price;
+            } else {
+              productClientData.push({
+                id: el.client,
+                name: el.clientName,
+                total: el.price,
+                products: [el]
+              })
+            }
+          }
+
+        });
+
+        productClientData.forEach(client => {
+          client.share = parseFloat((client.total / (incomeTotal / 100)).toFixed(1))
+        });
+
+        productClientData.sort((a, b) => b.share - a.share)
+
+        $('.dmm-list-block').empty();
+        productClientData.forEach((client, inx) => {
+          let clientTotalStr = client.total.toFixed(2).split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
+          if (clientTotalStr.startsWith(',')) clientTotalStr = clientTotalStr.split('').slice(1).join('');
+          clientTotalStr = clientTotalStr.replace(',.', '.')
+
+          $('.dmm-list-block').append(`
+            <div class="dmm-list-item ${inx + 1 < 5 ? `dmm-list-item-${inx + 1}` : 'dmm-list-item-5'}" style="width: ${60 + client.share * 0.4}%">
+              <div class="dmm-list-item-group">
+                <div class="dmm-list-item-number">#${inx + 1}</div>
+                <div class="dmm-list-item-text">${client.name}</div>
+              </div>
+              <div class="dmm-list-item-group">
+                <div class="dmm-list-item-sub-text">${clientTotalStr} ₽</div>
+                <div class="dmm-list-item-text">${client.share}%</div>
+              </div>
+            </div>
+          `);
+        })
+
+
+        let incomeTotalStr = incomeTotal.toFixed(2).split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
+        if (incomeTotalStr.startsWith(',')) incomeTotalStr = incomeTotalStr.split('').slice(1).join('');
+        incomeTotalStr = incomeTotalStr.replace(',.', '.')
+        $('.dmm-big-info-title').text(`${incomeTotalStr} ₽`);
+        $('.dmm-big-info-title').append('<div class="dmm-big-info-sub-title">общий доход</div>');
+      } else if ($(this).attr('id') === 'dmm-products') {
+        let productTotal = 0;
+        productData.forEach((el) => {
+          if (el.distResult === 'sold') {
+            /* Counting total */
+            productTotal += el.size;
+
+            /* Working with clients share */
+            if (productClientData.find(client => client.id === el.client)) {
+              productClientData.find(client => client.id === el.client).products.push(el);
+              productClientData.find(client => client.id === el.client).total += el.size;
+            } else {
+              productClientData.push({
+                id: el.client,
+                name: el.clientName,
+                total: el.size,
+                products: [el]
+              })
+            }
+          }
+
+        });
+
+        productClientData.forEach(client => {
+          client.share = parseFloat((client.total / (productTotal / 100)).toFixed(1))
+        });
+
+        productClientData.sort((a, b) => b.share - a.share)
+
+        $('.dmm-list-block').empty();
+        productClientData.forEach((client, inx) => {
+          let clientTotalStr = client.total.toString().split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
+          if (clientTotalStr.startsWith(',')) clientTotalStr = clientTotalStr.split('').slice(1).join('');
+
+          $('.dmm-list-block').append(`
+            <div class="dmm-list-item ${inx + 1 < 5 ? `dmm-list-item-${inx + 1}` : 'dmm-list-item-5'}" style="width: ${60 + client.share * 0.4}%">
+              <div class="dmm-list-item-group">
+                <div class="dmm-list-item-number">#${inx + 1}</div>
+                <div class="dmm-list-item-text">${client.name}</div>
+              </div>
+              <div class="dmm-list-item-group">
+                <div class="dmm-list-item-sub-text">${clientTotalStr} кг. / л.</div>
+                <div class="dmm-list-item-text">${client.share}%</div>
+              </div>
+            </div>
+          `);
+        })
+
+
+        let productTotalStr = productTotal.toString().split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
+        if (productTotalStr.startsWith(',')) productTotalStr = productTotalStr.split('').slice(1).join('');
+        $('.dmm-big-info-title').text(`${productTotalStr}`);
+        $('.dmm-big-info-title').append('<div class="dmm-big-info-sub-title">всего продано (кг. или л.)</div>');
+      }
+    });
+    $('.dmm-btn-active').trigger('click');
+
+    /* Working with products break down */
+    $('.dist-main-product-btns-block').empty();
+    let productsSorted = [];
+
+    productData.forEach(el => {
+      if (productsSorted.find(product => product.productRus === el.productRus)) {
+        productsSorted.find(product => product.productRus === el.productRus).products.push(el);
+      } else {
+        productsSorted.push({
+          product: el.product,
+          productRus: el.productRus,
+          products: [el],
+          unit: el.unit
+        })
+      }
+    });
+
+    productsSorted.forEach((el, inx, arr) => {
+      el.sold = 0;
+      el.processed = 0;
+      el.writeOff = 0;
+      el.used = 0;
+
+      el.products.forEach(prod => {
+        if (prod.distResult === 'sold') el.sold += prod.size;
+        if (prod.distResult === 'processed') el.processed += prod.size;
+        if (prod.distResult === 'personal-use' || prod.distResult === 'calf-feeding') el.used += prod.size;
+        if (prod.distResult === 'write-off') el.writeOff += prod.size;
+      });
+
+      el.popularIndex = el.sold + el.processed;
+    });
+
+    productsSorted.sort((a, b) => b.popularIndex - a.popularIndex)
+
+
+    productsSorted.forEach(el => {
+      $('.dist-main-product-btns-block').append(`<div class="dmp-btn" data-sold="${el.sold}" data-processed="${el.processed}" data-write-off="${el.writeOff}" data-used="${el.used}" data-unit-rus="${el.unit === 'l' ? 'ЛИТРОВ' : 'КИЛОГРАММ'}">${el.productRus.toUpperCase()}</div>`)
+    });
+
+    let interval;
+
+    $('body').on('click', '.dmp-btn', function () {
+      $('.dmp-btn-active').removeClass('dmp-btn-active');
+      $(this).addClass('dmp-btn-active')
+
+      $('#dist-sold').text($(this).attr('data-sold'));
+      $('#dist-processed').text($(this).attr('data-processed'));
+      $('#dist-write-off').text($(this).attr('data-write-off'));
+      $('#dist-used').text($(this).attr('data-used'));
+      $('.dmp-text-sub-title').text($(this).attr('data-unit-rus'));
+
+      clearInterval(interval);
+      $('.dist-main-product-block').animate({ 'opacity': '1' }, 500)
+
+      let counter = 1;
+      interval = setInterval(() => {
+        $(`.dist-info-${counter}`).animate({ 'opacity': '0' }, 500)
+
+        if (counter === 4) {
+          counter = 1;
+          $('.dist-main-product-block').animate({ 'opacity': '1' }, 500)
+        } else {
+          counter++;
+        }
+      }, 5000);
+    });
+
+    $('.dmp-btn').first().trigger('click');
+
+
+
+    /* Working with order calendar */
+    let ordersData = [];
+    $('.dm-hidden-order').each(function () {
+      ordersData.push({
+        product: $(this).attr('data-product'),
+        productRus: productsToRus[$(this).attr('data-product').replace('-', '')],
+        size: parseFloat($(this).attr('data-size')),
+        unit: $(this).attr('data-unit'),
+        date: new Date($(this).attr('data-date')),
+        client: $(this).attr('data-client'),
+        clientName: $(this).attr('data-client-name'),
+        clientAdress: $(this).attr('data-client-adress'),
+        clientPhone: $(this).attr('data-client-phone'),
+        subId: $(this).attr('data-sub-id')
+      });
+    });
+    let recOrdersData = [];
+    $('.dm-hidden-rec-order').each(function () {
+      recOrdersData.push({
+        product: $(this).attr('data-product'),
+        productRus: productsToRus[$(this).attr('data-product').replace('-', '')],
+        size: parseFloat($(this).attr('data-size')),
+        unit: $(this).attr('data-unit'),
+        client: $(this).attr('data-client'),
+        clientName: $(this).attr('data-client-name'),
+        clientAdress: $(this).attr('data-client-adress'),
+        clientPhone: $(this).attr('data-client-phone'),
+        day: parseFloat($(this).attr('data-day')),
+        hour: parseFloat($(this).attr('data-hour')),
+        minute: parseFloat($(this).attr('data-minute')),
+        subId: $(this).attr('data-sub-id')
+      });
+    });
+    let ordersDataSorted = []
+    ordersData.forEach(el => {
+      if (ordersDataSorted.find(order => order.subId === el.subId)) {
+        ordersDataSorted.find(order => order.subId === el.subId).orders.push(el);
+      } else {
+        ordersDataSorted.push({
+          subId: el.subId,
+          date: el.date,
+          clientName: el.clientName,
+          clientArdess: el.clientArdess,
+          clientPhone: el.clientPhone,
+          orders: [el]
+        })
+      }
+    });
+
+    let recOrdersDataSorted = []
+    recOrdersData.forEach(el => {
+      if (recOrdersDataSorted.find(order => order.subId === el.subId)) {
+        recOrdersDataSorted.find(order => order.subId === el.subId).orders.push(el);
+      } else {
+        recOrdersDataSorted.push({
+          subId: el.subId,
+          day: el.day,
+          hour: el.hour,
+          minute: el.minute,
+          clientName: el.clientName,
+          clientArdess: el.clientArdess,
+          clientPhone: el.clientPhone,
+          orders: [el]
+        })
+      }
+    });
+
+
+    $('.dmc-week-row').empty()
+    for (let i = 1; i < 8; i++) {
+      let date;
+      let day;
+      if (i === 7) {
+        date = new Date(moment().day(0 + 7));
+        day = 0;
+      } else {
+        date = new Date(moment().day(i));
+        day = i;
+      }
+
+      $('.dmc-week-row').append(`
+        <div class="dmc-week-item" data-date="${date}" data-day="${day}">
+          <div class="dmc-week-item-title">${moment(date).lang('ru').format('dddd').toUpperCase()}</div>
+          <div class="dmc-week-item-day">${moment(date).lang('ru').format('DD')}</div>
+          <div class="dmc-week-item-month">${moment(date).lang('ru').format('MMMM YYYY').toUpperCase()}</div>
+        </div>
+      `)
+    }
+
+    $('body').on('click', '.dmc-week-item', function () {
+      $('.dmc-week-item-active').removeClass('dmc-week-item-active')
+      $(this).addClass('dmc-week-item-active')
+
+      $('.dmc-order').remove();
+
+      let start = new Date(moment($(this).attr('data-date')).startOf('day'));
+      let end = new Date(moment($(this).attr('data-date')).endOf('day'));
+
+      let orders = [...ordersDataSorted.filter(order => start <= order.date && order.date < end), ...recOrdersDataSorted.filter(order => order.day === parseFloat($(this).attr('data-day')))]
+
+      if (orders.length > 0) {
+        $('.dmc-orders-row').css('justify-content', 'start')
+        ordersDataSorted.filter(order => start <= order.date && order.date < end).forEach(order => {
+          let el = $('.dmc-orders-row').append(`
+            <div class="dmc-order">
+              <div class="dmc-order-header">
+                <div class="dmc-order-header-name">${order.clientName !== undefined ? order.clientName : ''}</div>
+                <div class="dmc-order-header-info">${order.clientAdress !== undefined ? order.clientAdress : ''}</div>
+                <div class="dmc-order-header-info">${order.clientPhone !== undefined ? `+7 ${order.clientPhone}` : ''}</div>
+              </div>
+              <div class="dmc-order-time">${moment(order.date).format('hh:mm')}</div>
+              <div class="dmc-order-details">
+              </div>
+            </div>
+          `)
+
+          order.orders.forEach(prod => {
+            el.find('.dmc-order-details').append(`
+              <div class="dmc-order-details-line">
+                <p>${prod.productRus}</p>
+                <p>${prod.size} ${prod.unit === 'l' ? 'л.' : 'кг.'}</p>
+              </div>
+            `)
+          });
+        });
+
+        recOrdersDataSorted.filter(order => order.day === parseFloat($(this).attr('data-day'))).forEach(order => {
+          let el = $('.dmc-orders-row').append(`
+            <div class="dmc-order">
+              <div class="dmc-order-header">
+                <div class="dmc-order-header-name">${order.clientName !== undefined ? order.clientName : ''}</div>
+                <div class="dmc-order-header-info">${order.clientAdress !== undefined ? order.clientAdress : ''}</div>
+                <div class="dmc-order-header-info">${order.clientPhone !== undefined ? `+7 ${order.clientPhone}` : ''}</div>
+              </div>
+              <div class="dmc-order-time">${order.hour}:${order.minute.toString().length === 1 ? `0${order.minute}` : order.minute}</div>
+              <div class="dmc-order-details">
+              </div>
+            </div>
+          `)
+
+          order.orders.forEach(prod => {
+            el.find('.dmc-order-details').append(`
+              <div class="dmc-order-details-line">
+                <p>${prod.productRus}</p>
+                <p>${prod.size} ${prod.unit === 'l' ? 'л.' : 'кг.'}</p>
+              </div>
+            `)
+          });
+        });
+      } else {
+        $('.dmc-orders-row').css('justify-content', 'center')
+      }
+    });
+
+    $('.dmc-week-item').each(function () {
+      let start = new Date(moment($(this).attr('data-date')).startOf('day'));
+      let end = new Date(moment($(this).attr('data-date')).endOf('day'));
+
+      let remindersCounter = 0
+      ordersDataSorted.forEach(order => { if (start <= order.date && order.date < end) remindersCounter++ });
+      recOrdersDataSorted.forEach(order => { if (order.day === parseFloat($(this).attr('data-day'))) remindersCounter++ });
+
+      $(this).addClass(remindersCounter < 5 ? `dmc-week-item-${remindersCounter}` : `dmc-week-item-4`)
+
+      if (start < new Date() && new Date() < end) {
+        $(this).trigger('click')
+      }
+
+    });
+
+
+    /* Changing the time period */
+    $('.main-page-header-period').on('change', function () {
+      if ($("#start-date").val() !== '' && $("#end-date").val() !== '') {
+        location.assign(`/distribution/?start=${new Date($("#start-date").val())}&end=${new Date($("#end-date").val())}`)
+      }
+    });
+
+  }
+
 
 
 

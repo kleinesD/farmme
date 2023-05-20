@@ -126,3 +126,18 @@ export const bringBackAnimal = async(animalId) => {
     console.log(err);
   }
 };
+
+export const getAnimalByNumber = async(number) => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: `/api/animals/animal-by-number/${number}`
+    });
+
+    if (res.data.status === 'success') {
+      return res.data.data.animal
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};

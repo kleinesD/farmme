@@ -1,16 +1,123 @@
 extends base
 
 block content
+  
+  include _rcmDist
+
   section.main-section 
-    .dist-main-section
+    .dist-main-section#dist-main-page
+      .dm-hidden  
+        each product in products
+          -if(product.client)
+            .dm-hidden-info(data-product=`${product.product}` data-type=`${product.type}` data-size=`${product.size}` data-unit=`${product.unit}` data-date=`${product.date}` data-dist=`${product.distributionResult}` data-client=`${product.client._id}` data-client-name=`${product.client.name}` data-price=`${product.price}` data-price-per=`${product.pricePer}`)
+          -else
+            .dm-hidden-info(data-product=`${product.product}` data-type=`${product.type}` data-size=`${product.size}` data-unit=`${product.unit}` data-date=`${product.date}` data-dist=`${product.distributionResult}`  data-price=`${product.price}` data-price-per=`${product.pricePer}`)
+        each order in orders  
+          -if(order.client)
+            .dm-hidden-order(data-product=`${order.product}` data-sub-id=`${order.subId}` data-size=`${order.size}` data-unit=`${order.unit}` data-date=`${order.date}` data-client=`${order.client._id}` data-client-name=`${order.client.name}` data-client-adress=`${order.client.adress}` data-client-phone=`${order.client.phoneNumber}`)
+          -else
+            .dm-hidden-order(data-product=`${order.product}` data-sub-id=`${order.subId}` data-size=`${order.size}` data-unit=`${order.unit}` data-date=`${order.date}`)
+        each order in recOrders  
+          -if(order.client)
+            .dm-hidden-rec-order(data-product=`${order.product}` data-sub-id=`${order.subId}` data-size=`${order.size}` data-unit=`${order.unit}` data-day=`${order.recuringDay}` data-hour=`${order.recuringHour}` data-minute=`${order.recuringMinute}` data-client=`${order.client._id}` data-client-name=`${order.client.name}` data-client-adress=`${order.client.adress}` data-client-phone=`${order.client.phoneNumber}`)
+          -else
+            .dm-hidden-rec-order(data-product=`${order.product}` data-sub-id=`${order.subId}` data-size=`${order.size}` data-unit=`${order.unit}` data-day=`${order.recuringDay}` data-hour=`${order.recuringHour}` data-minute=`${order.recuringMinute}`)
+
       .main-page-header
         .main-page-header-title ПРОДУКЦИЯ
         .main-page-header-period-box
-          .main-page-header-period 25 марта
+          input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
           .main-page-header-devider -
-          .main-page-header-period 25 апреля
+          input(type="date" value=`${endDate.toLocaleString('ru-RU', {year: 'numeric'})}-${endDate.toLocaleString('ru-RU', {month: '2-digit'})}-${endDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#end-date
 
-      .dist-main-calendar-block
+      
+      .dist-main-columns-block
+        .dist-main-column-left
+          .dist-main-money-block.shadow
+            img.dmm-icon-1(src="/img/icons/dist-total.png")
+            img.dmm-icon-2(src="/img/icons/dist-total.png")
+            img.dmm-icon-3(src="/img/icons/dist-total.png")
+            .dmm-big-info
+              .dmm-btns-block
+                .dmm-btn#dmm-income.dmm-btn-active ДОХОД
+                .dmm-btn#dmm-products ПРОДУКЦИЯ
+              .dmm-big-info-title 345,112.22 ₽
+                .dmm-big-info-sub-title общий доход
+            .dmm-list-block
+              .dmm-list-item
+                .dmm-list-item-group
+                  .dmm-list-item-number #1
+                  .dmm-list-item-text Октябрьский
+                .dmm-list-item-group
+                  .dmm-list-item-sub-text 48,315.00 ₽
+                  .dmm-list-item-text 14%
+        .dist-main-column-right
+          .dist-main-product-btns-block
+            .dmp-btn.dmp-btn-active МОЛОКО
+            .dmp-btn ТВОРОГ
+            .dmp-btn СЛИВКИ
+            .dmp-btn МАСЛО
+            .dmp-btn СЫВОРОТКА
+            .dmp-btn СЫР
+
+          //-.dist-main-product-block#dist-inventory
+            img.dmp-image(src="/img/icons/dist-inventory.png")
+            .dmp-markers-block
+              .dmp-marker.dmp-marker-active
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker
+            .dmp-label В НАЛИЧИИ
+            .dmp-text-block   
+              .dmp-text-title 450
+              .dmp-text-sub-title ЛИТРОВ
+          .dist-main-product-block.dist-info-1#dist-money
+            img.dmp-image(src="/img/icons/dist-money.png")
+            .dmp-markers-block
+              .dmp-marker.dmp-marker-active
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker
+            .dmp-label ПРОДАНО
+            .dmp-text-block   
+              .dmp-text-title#dist-sold 13,526
+              .dmp-text-sub-title ЛИТРОВ
+          .dist-main-product-block.dist-info-2#dist-process
+            img.dmp-image(src="/img/icons/dist-process.png")
+            .dmp-markers-block
+              .dmp-marker
+              .dmp-marker.dmp-marker-active
+              .dmp-marker
+              .dmp-marker
+            .dmp-label ПЕРЕРАБОТАНО
+            .dmp-text-block   
+              .dmp-text-title#dist-processed 600
+              .dmp-text-sub-title ЛИТРОВ
+          .dist-main-product-block.dist-info-3#dist-writeoff
+            img.dmp-image(src="/img/icons/dist-writeoff.png")
+            .dmp-markers-block
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker.dmp-marker-active
+              .dmp-marker
+            .dmp-label СПИСАНО
+            .dmp-text-block   
+              .dmp-text-title#dist-write-off 50
+              .dmp-text-sub-title ЛИТРОВ
+          .dist-main-product-block.dist-info-4#dist-use
+            img.dmp-image(src="/img/icons/dist-use.png")
+            .dmp-markers-block
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker
+              .dmp-marker.dmp-marker-active
+            .dmp-label ИСПОЛЬЗОВАНО
+            .dmp-text-block   
+              .dmp-text-title#dist-used 20
+              .dmp-text-sub-title ЛИТРОВ
+
+      .dist-main-calendar-block.shadow
         .dmc-week-row
           .dmc-week-item
             .dmc-week-item-title ПОНЕДЕЛЬНИК
@@ -41,9 +148,9 @@ block content
             .dmc-week-item-day 24
             .dmc-week-item-month АПРЕЛЬ 2023
         .dmc-orders-row
-          a.dmc-orders-add(href=`#`)
+          a.dmc-orders-add(href=`/distribution/add-order`)
             p +
-          .dmc-order
+          //-.dmc-order
             .dmc-order-header
               .dmc-order-header-name Октябрьский
               .dmc-order-header-info п. Октябрьский ул. Солнечная 17
@@ -53,7 +160,7 @@ block content
               .dmc-order-details-line
                 p Молоко 
                 p 200 л.
-          .dmc-order
+          //-.dmc-order
             .dmc-order-header
               .dmc-order-header-name Октябрьский
               .dmc-order-header-info п. Октябрьский ул. Солнечная 17
@@ -63,95 +170,13 @@ block content
               .dmc-order-details-line
                 p Молоко 
                 p 200 л.
-      
-      .dist-main-columns-block
-        .dist-main-column-left
-          .dist-main-money-block
-            img.dmm-icon-1(src="/img/icons/dist-total.png")
-            img.dmm-icon-2(src="/img/icons/dist-total.png")
-            img.dmm-icon-3(src="/img/icons/dist-total.png")
-            .dmm-big-info
-              .dmm-btns-block
-                .dmm-btn ЦЕНА
-                .dmm-btn.dmm-btn-active ДОХОД
-                .dmm-btn ПРОДУКЦИЯ
-              .dmm-big-info-title 345,112.22 ₽
-                .dmm-big-info-sub-title общий доход
-            .dmm-list-block
-              .dmm-list-item
-                .dmm-list-item-group
-                  .dmm-list-item-number #1
-                  .dmm-list-item-text Октябрьский
-                .dmm-list-item-group
-                  .dmm-list-item-sub-text 48,315.00 ₽
-                  .dmm-list-item-text 14%
-        .dist-main-column-right
-          .dist-main-product-btns-block
-            .dmp-btn.dmp-btn-active МОЛОКО
-            .dmp-btn ТВОРОГ
-            .dmp-btn СЛИВКИ
-            .dmp-btn МАСЛО
-            .dmp-btn СЫВОРОТКА
-            .dmp-btn СЫР
-
-          .dist-main-product-block#dist-inventory
-            img.dmp-image(src="/img/icons/dist-inventory.png")
-            .dmp-markers-block
-              .dmp-marker.dmp-marker-active
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-            .dmp-label В НАЛИЧИИ
-            .dmp-text-block   
-              .dmp-text-title 450
-              .dmp-text-sub-title ЛИТРОВ
-          //.dist-main-product-block#dist-money
-            img.dmp-image(src="/img/icons/dist-money.png")
-            .dmp-markers-block
-              .dmp-marker
-              .dmp-marker.dmp-marker-active
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-            .dmp-label ПРОДАНО
-            .dmp-text-block   
-              .dmp-text-title 13,526
-              .dmp-text-sub-title ЛИТРОВ
-          //.dist-main-product-block#dist-process
-            img.dmp-image(src="/img/icons/dist-process.png")
-            .dmp-markers-block
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker.dmp-marker-active
-              .dmp-marker
-              .dmp-marker
-            .dmp-label ПЕРЕРАБОТАНО
-            .dmp-text-block   
-              .dmp-text-title 600
-              .dmp-text-sub-title ЛИТРОВ
-          //.dist-main-product-block#dist-writeoff
-            img.dmp-image(src="/img/icons/dist-writeoff.png")
-            .dmp-markers-block
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker.dmp-marker-active
-              .dmp-marker
-            .dmp-label СПИСАНО
-            .dmp-text-block   
-              .dmp-text-title 50
-              .dmp-text-sub-title ЛИТРОВ
-          //.dist-main-product-block#dist-use
-            img.dmp-image(src="/img/icons/dist-use.png")
-            .dmp-markers-block
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker
-              .dmp-marker.dmp-marker-active
-            .dmp-label ИСПОЛЬЗОВАНО
-            .dmp-text-block   
-              .dmp-text-title 20
-              .dmp-text-sub-title ЛИТРОВ
-          
+          //-.dmc-order
+            .dmc-order-header
+              .dmc-order-header-name Октябрьский
+              .dmc-order-header-info п. Октябрьский ул. Солнечная 17
+              .dmc-order-header-info +7 923 293 56 37
+            .dmc-order-time 09:00
+            .dmc-order-details
+              .dmc-order-details-line
+                p Молоко 
+                p 200 л.
