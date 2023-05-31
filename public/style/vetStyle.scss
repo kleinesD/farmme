@@ -1,0 +1,228 @@
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* VET HISTORY PAGE */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+.history-page-categories-block {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hp-category {
+    padding: 10px;
+    border: 1.5px solid;
+    cursor: pointer;
+    margin: 0 10px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+}
+
+#vet-history-container .hp-category ion-icon {
+    margin-right: 10px;
+    color: #5E72E8;
+}
+
+#vet-history-container .hp-category p {
+    font-size: 90%;
+    color: #5E72E8;
+}
+
+#vet-history-container .hp-category {
+    border-color: #5E72E8;
+}
+
+#vet-history-container .hp-category-active {
+    background-color: #5E72E8;
+}
+
+#vet-history-container .hp-category-active ion-icon,
+#vet-history-container .hp-category-active p {
+    color: #ffffff;
+}
+
+#herd-history-container .hp-category ion-icon {
+    margin-right: 10px;
+    color: #FFB038;
+}
+
+#herd-history-container .hp-category p {
+    font-size: 90%;
+    color: #FFB038;
+}
+
+#herd-history-container .hp-category {
+    border-color: #FFB038;
+}
+
+#herd-history-container .hp-category-active {
+    background-color: #FFB038;
+}
+
+#herd-history-container .hp-category-active ion-icon,
+#herd-history-container .hp-category-active p {
+    color: #000000;
+}
+
+.history-page-searched {
+    width: 100%;
+    max-width: 700px;
+    padding-bottom: 50px;
+    border-bottom: 1.5px solid #b8b8b8;
+    margin-top: 50px;
+    display: none;
+}
+
+.history-page-container {
+    width: 100%;
+    max-width: 700px;
+}
+
+.history-page-item-outter {
+    width: 100%;
+    height: 65px;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.history-page-item {
+    width: 100%;
+    height: 100%;
+    background-color: $elBackground;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+}
+
+.history-page-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    /* border: 1.5px solid #297045; */
+    background-color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-page-icon ion-icon {
+    font-size: 125%;
+    color: #e2e2e2;
+}
+
+.history-page-title {
+    margin-left: 76px;
+    font-size: 125%;
+    font-weight: 400;
+}
+
+#vet-history-container .history-page-title,
+#vet-history-container .history-page-icon ion-icon {
+    color: #5E72E8;
+}
+
+#herd-history-container .history-page-title,
+#herd-history-container .history-page-icon ion-icon {
+    color: #FFB038;
+}
+
+.history-page-date {
+    margin-right: 20px;
+    color: #818181;
+}
+
+.history-page-item:hover .history-page-date {
+    margin-right: 30px;
+}
+
+.history-page-month {
+    margin-top: 100px;
+    margin-bottom: 50px;
+    font-size: 175%;
+    color: #818181;
+    width: 100%;
+    text-align: left;
+}
+
+.history-page-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 0px;
+    transform: translateX(50%);
+    width: 35px;
+    height: 35px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.history-page-delete ion-icon {
+    font-size: 150%;
+    color: $error;
+}
+
+.history-page-delete:hover.history-page-delete ion-icon {
+    transform: rotate(90deg);
+}
+
+.history-page-item:hover .history-page-delete {
+    opacity: 1;
+}
+
+.hp-delete-block {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    opacity: 0;
+}
+
+.hp-delete-block p {
+    margin-right: 50px;
+
+}
+
+.hp-delete-block-btn {
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 90%;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+#vet-history-container .hp-delete-block-btn-keep {
+    background-color: #5E72E8;
+    color: #ffffff;
+}
+
+#herd-history-container .hp-delete-block-btn-keep {
+    background-color: #FFB038;
+    color: #ffffff;
+}
+
+.hp-delete-block-btn-delete {
+    color: $error;
+}

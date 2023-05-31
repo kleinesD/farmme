@@ -1,0 +1,423 @@
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* CHARTS AND GRAPHS */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+.basic-graph-container {
+    position: relative;
+}
+
+.basic-progress-container {
+    width: 100%;
+    min-height: 150px;
+}
+
+.basic-graph {
+    background-color: $elBackground;
+    border-radius: 10px;
+    width: 100%;
+    height: 100%
+}
+
+.line-graph-grid-line {
+    stroke-width: 1px;
+    stroke: #afafaf;
+    stroke-dasharray: 3 4;
+    fill: transparent;
+}
+
+.line-graph-grid-text {
+    font-size: 10px;
+    color: #e2e2e2;
+    background-color: $elBackground;
+}
+
+.graph-info-hidden .line-graph-grid-text {
+    opacity: 0;
+}
+
+.graph-info-hidden:hover .line-graph-grid-text {
+    opacity: 1;
+}
+
+.line-graph-data-circle {
+    fill: #ffffff;
+    stroke-width: 2px;
+    stroke: $success;
+}
+
+.line-graph-data-circle-1 {
+    stroke: #2a9d8f;
+}
+
+.line-graph-data-circle-2 {
+    stroke: #264653;
+}
+
+.line-graph-data-circle-3 {
+    stroke: #e9c46a;
+}
+
+.line-graph-data-circle-4 {
+    stroke: #f4a261;
+}
+
+.line-graph-data-circle-5 {
+    stroke: #e76f51;
+}
+
+.line-graph-data-line {
+    fill: transparent;
+    stroke: $success;
+    stroke-width: 2px;
+    stroke-linejoin: round;
+}
+
+.line-graph-average-circle {
+    fill: #dadada;
+    stroke: #dadada;
+}
+
+.mp-line-graph-average-circle {
+    fill: $success;
+    stroke: $success;
+}
+
+.graph-info-hidden .mp-line-graph-average-circle {
+    opacity: 0;
+}
+
+.graph-info-hidden:hover .mp-line-graph-average-circle {
+    opacity: 1;
+}
+
+.line-graph-average-line {
+    fill: transparent;
+    stroke: #e2e2e2;
+    stroke-width: 2px;
+    stroke-linejoin: round;
+}
+
+.mp-line-graph-average-line {
+    fill: transparent;
+    stroke: $success;
+    stroke-width: 2px;
+    stroke-linejoin: round;
+}
+
+.mp-line-graph-average-line {
+    fill: transparent;
+    stroke: $success;
+    stroke-width: 2px;
+    stroke-linejoin: round;
+}
+
+.line-graph-data-line-1 {
+    stroke: #2a9d8f;
+}
+
+.line-graph-data-line-2 {
+    stroke: #264653;
+}
+
+.line-graph-data-line-3 {
+    stroke: #e9c46a;
+}
+
+.line-graph-data-line-4 {
+    stroke: #f4a261;
+}
+
+.line-graph-data-line-5 {
+    stroke: #e76f51;
+}
+
+.basic-graph-tooltip {
+    /* border-radius: 5px; */
+    max-width: calc(500px - 40px);
+    border-radius: 10px;
+    padding: 20px;
+    background-color: rgb(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    display: none;
+    position: absolute;
+    transform: translateY(-50%);
+    z-index: 1000;
+    transition: 0.1s;
+    box-sizing: border-box;
+}
+
+.bgt-header-line {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.bgt-header-line-info {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.basic-graph-tooltip img {
+    width: 40px;
+    padding: 5px;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+}
+
+.bgt-number {
+    font-size: 110%;
+    color: #ffffff;
+}
+
+.bgt-name {
+    font-size: 70%;
+    color: #dadada;
+    margin-bottom: 10px;
+}
+
+.bgt-result-line {
+    width: calc(100% - 15px);
+    padding: 2.5px 0;
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.bgt-result-line:last-of-type {
+    margin-bottom: unset;
+}
+
+.bgt-result-line-color {
+    position: relative;
+}
+
+.bgt-result-line-color-el {
+    width: 5px;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bgt-result-line p {
+    font-size: 80%;
+    color: #ffffff
+}
+
+.bgt-result-line p:last-of-type {
+    margin-left: 20px;
+}
+
+.bgt-edit-btn {
+    width: 100%;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background-color: #ffffff;
+    /* border-radius: 5px; */
+    font-size: 85%;
+    margin-top: 10px;
+}
+
+.mp-tooltip-line {
+    fill: transparent;
+    stroke: #000000;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+}
+
+.mp-tooltip-box {
+    width: calc(170px - 20px);
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgb(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    transition: 0.1s;
+    z-index: 10001;
+}
+
+.mp-tooltip-title {
+    color: #ffffff;
+    font-size: 90%;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.mp-tooltip-info-line {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.mp-tooltip-info-line:last-of-type {
+    margin-bottom: unset;
+}
+
+.mp-tooltip-info {
+    font-size: 70%;
+    color: #ffffff;
+}
+
+.mp-tooltip-devider {
+    margin: 10px 10%;
+    margin-top: 0px;
+    width: 80%;
+    height: 0.5px;
+    background-color: #ffffff;
+}
+
+.mp-tooltip-result-line {
+    width: 100%;
+    display: flex;
+    position: relative;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.mp-tooltip-result-line:last-of-type {
+    margin-bottom: unset;
+}
+
+.mp-tooltip-marker {
+    width: 5px;
+    height: 20px;
+    border-radius: 50px;
+    background-color: $success;
+    margin-right: 10px;
+}
+
+.mp-tooltip-result-info {
+    color: #ffffff;
+    font-size: 70%;
+}
+
+.mp-tooltip-result {
+    position: absolute;
+    right: 0px;
+    color: #ffffff;
+    font-size: 70%;
+}
+
+
+/* Graph legend */
+.basic-graphs-legend {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    /* display: none; */
+}
+
+.basic-graphs-legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.basic-graphs-legend-item-off .basic-graphs-legend-item-text {
+    text-decoration: line-through;
+}
+
+.basic-graphs-legend-color {
+    width: calc(17px - 4px);
+    height: calc(17px - 4px);
+    border: 2px solid $mainBlack;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.basic-graphs-legend-item-line {
+    width: 25px;
+    margin-right: 10px;
+    border-top: 2px dashed #0ead6800;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.basic-graphs-legend-item-line-point {
+    width: 4px;
+    height: 4px;
+    border: 2px solid #0ead6800;
+    background-color: #ffffff00;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(10%, -10%);
+}
+
+.basic-graphs-legend-item-text {
+    font-size: 80%;
+}
+
+.generated-progress-line {
+    width: calc(100% - 4px);
+    min-height: calc(35px - 4px);
+    border: 2px solid $mainBlack;
+    border-radius: 50px;
+    display: flex;
+    overflow: hidden;
+}
+
+.progress-line-data {
+    /* height: 100%; */
+    transition: 0.1s;
+}
+
+.progress-line-data-gray {
+    background-color: #a2a2a2;
+}
+
+.progress-line-data-0 {
+    background-color: #2a9d8f;
+}
+
+.progress-line-data-1 {
+    background-color: #264653;
+}
+
+.progress-line-data-2 {
+    background-color: #e9c46a;
+}
+
+.progress-line-data-3 {
+    background-color: #f4a261;
+}
+
+.progress-line-data-4 {
+    background-color: #e76f51;
+}
+
+.graph-point-invisible {
+    opacity: 0;
+}

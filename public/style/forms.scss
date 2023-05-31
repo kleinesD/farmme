@@ -1,0 +1,176 @@
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* FORMS */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+/* ///////////////////////// */
+.form-section {
+    padding: 25px 0;
+    width: 100%;
+    min-height: calc(100vh - 50px);
+    background: linear-gradient(#ffffffdc, #ffffffdc), url('../img/images/cows-login-bw.jpg');
+    backdrop-filter: grayscale(100%);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-attachment: fixed;
+  }
+  
+  .common-form {
+    width: 350px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .form-icon {
+    width: 75px;
+    height: 75px;
+    border-radius: 5px;
+    margin-bottom: 50px;
+  }
+  
+  .form-title {
+    color: #ffffff;
+    font-size: 180%;
+    font-weight: 400;
+    margin-bottom: 7.5px;
+    letter-spacing: -0.5px;
+  }
+  
+  .form-sub-title {
+    font-weight: 300;
+    font-size: 125%;
+  }
+  
+  .input-box {
+    position: relative;
+    margin-top: 15px;
+    padding-top: 15px;
+    width: 100%;
+  }
+  
+  .common-form-input {
+    width: calc(100% - 23px);
+    background-color: #ffffff00;
+    outline: none;
+    border: none;
+    border-bottom: 1.5px solid #3E363F;
+    padding: 15px 10px;
+    font-weight: 300;
+  }
+  
+  .input-warning-text {
+    width: calc(100% - 20px);
+    padding: 0 10px;
+    font-size: 85%;
+    font-weight: 300;
+    color: $error;
+    position: absolute;
+    bottom: -5px;
+    transform: translateY(100%);
+  }
+  
+  .common-form-label {
+    color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .pass-visivility-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pass-visivility-btn ion-icon {
+    font-size: 20px;
+  }
+  
+  .form-forget-pass {
+    text-decoration: none;
+    font-weight: 300;
+    color: #f6b91d
+  }
+  
+  .common-form-btn {
+    width: 100%;
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    background-color: #f6b91d;
+    color: #000000;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    cursor: pointer;
+    font-weight: 300;
+    position: relative;
+  }
+  
+  .common-form-btn:hover {
+    background-color: #f6b91d;
+  }
+  
+  .common-form-or {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+    font-weight: 300;
+  }
+  
+  .alternative-login {
+    width: calc(100% - 3px);
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #000000;
+    font-weight: 300;
+    border-radius: 5px;
+    color: #000000;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    backdrop-filter: blur(3px);
+    margin-bottom: 30px;
+  }
+  
+  .alternative-login ion-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 150%;
+  }
+  
+  .form-final-text {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 300;
+  }
+  
+  .form-final-text a {
+    color: #f6b91d;
+    text-decoration: none;
+    margin-left: 5px;
+  }
+  
+  .form-final-text a:hover {
+    text-decoration: underline;
+  }

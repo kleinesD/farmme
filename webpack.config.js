@@ -10,10 +10,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/i,
+        test: /\.(sc|sa|c)ss$/i,
         use: [
           'style-loader',
           'css-loader',
+          'sass-loader',
           {
             loader: "postcss-loader",
              options: {

@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import 'jquery.marquee';
+/* import 'jquery.marquee'; */
+import '../style/main.scss';
 import 'animate.css';
 import * as d3 from "d3";
 import moment, { max } from 'moment';
