@@ -10,7 +10,7 @@ export const addAnimal = async (data) => {
     });
 
     if (res.data.status === 'success') {
-      setTimeout(() => { location.assign(`/herd/animal-card/${res.data.data.animal._id}`) }, 2000)
+      return res.data.data.animal;
     }
   } catch (err) {
     console.log(err);
@@ -136,6 +136,21 @@ export const getAnimalByNumber = async(number) => {
 
     if (res.data.status === 'success') {
       return res.data.data.animal
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const checkByField = async(field, value) => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: `/api/animals/check-by-field/${field}/${value}`
+    });
+
+    if (res.data.status === 'success') {
+      return res.data.data.exist
     }
   } catch (err) {
     console.log(err);

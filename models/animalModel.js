@@ -13,6 +13,8 @@ const animalSchema = new mongoose.Schema({
   colors: [{ type: String }],
   gender: String,
   category: String,
+  building: String,
+  spot: String,
   status: {
     type: String,
     enum: ['alive', 'dead'],

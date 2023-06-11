@@ -28,8 +28,8 @@ exports.getOneAnimal = catchAsync(async (req, res, next) => {
 });
 
 exports.getAnimalByNumber = catchAsync(async (req, res, next) => {
-  const animal = await Animal.findOne({farm: req.user.farm, number: req.params.number });
-  if(!animal) return false;
+  const animal = await Animal.findOne({ farm: req.user.farm, number: req.params.number });
+  if (!animal) return false;
 
   res.status(200).json({
     status: 'success',
@@ -381,5 +381,21 @@ exports.milkingProjectionData = catchAsync(async (req, res, next) => {
       allAnimals
     }
   });
+});
+
+exports.checkAnimalByField = catchAsync(async (req, res, next) => {
+  let animal;
+  if (req.params.field === 'number') animal = await Animal.findOne({ number: req.params.value });
+  if (req.params.field === 'name') animal = await Animal.findOne({ name: req.params.value });
+
+  let exist = false;
+  if(animal) exist = true;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      exist
+    }
+  })
 });
 

@@ -128,10 +128,25 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
 });
 
 exports.renderHerdAddAnimal = catchAsync(async (req, res, next) => {
-  const potMother = await Animal.find({ gender: 'female', status: 'alive' });
-  const potFather = await Animal.find({ gender: 'male', status: 'alive' });
+  const potMother = await Animal.find({ gender: 'female' });
+  const potFather = await Animal.find({ farm: req.user.farm, gender: 'male' });
 
   res.status(200).render('herdAddAnimal', {
+    potMother,
+    potFather
+  });
+});
+
+exports.renderEditAnimal = catchAsync(async (req, res, next) => {
+  const animal = await Animal.findById(req.params.animalId);
+  const farm = await Farm.findById(animal.farm);
+
+  const potMother = await Animal.find({ farm: req.user.farm, gender: 'female', _id: { $ne: animal._id } });
+  const potFather = await Animal.find({ farm: req.user.farm, gender: 'male', _id: { $ne: animal._id } });
+
+  res.status(200).render('herdEditAnimal', {
+    animal,
+    farm,
     potMother,
     potFather
   });
@@ -187,16 +202,16 @@ exports.renderAddInsemination = catchAsync(async (req, res, next) => {
 
 exports.renderAllAnimals = catchAsync(async (req, res, next) => {
   let animals = [];
-  if(req.query.filter === 'all') {
+  if (req.query.filter === 'all') {
     animals = await Animal.find({ farm: req.user.farm });
-  } else if(req.query.filter === 'bulls') {
+  } else if (req.query.filter === 'bulls') {
     animals = await Animal.find({ farm: req.user.farm, gender: 'male' });
-  } else if(req.query.filter === 'cows') {
+  } else if (req.query.filter === 'cows') {
     animals = await Animal.find({ farm: req.user.farm, gender: 'female' });
-  } else if(req.query.filter === 'calfs') {
-    animals = await Animal.find({ farm: req.user.farm, birthDate: {$lte: new Date(moment().subtract(1, 'year'))} });
+  } else if (req.query.filter === 'calfs') {
+    animals = await Animal.find({ farm: req.user.farm, birthDate: { $lte: new Date(moment().subtract(1, 'year')) } });
   }
-  
+
 
   res.status(200).render('herdAllAnimals', {
     animals,
@@ -301,21 +316,6 @@ exports.renderEditLactation = catchAsync(async (req, res, next) => {
     lactation,
     index,
     forEdit
-  });
-});
-
-exports.renderEditAnimal = catchAsync(async (req, res, next) => {
-  const animal = await Animal.findById(req.params.animalId);
-  const farm = await Farm.findById(animal.farm);
-
-  const potMother = await Animal.find({ gender: 'female', _id: { $ne: animal._id } });
-  const potFather = await Animal.find({ gender: 'male', _id: { $ne: animal._id } });
-
-  res.status(200).render('herdEditAnimal', {
-    animal,
-    farm,
-    potMother,
-    potFather
   });
 });
 
@@ -828,7 +828,7 @@ exports.renderAllProducts = catchAsync(async (req, res, next) => {
 exports.renderAllClients = catchAsync(async (req, res, next) => {
   let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'month'));
   let endDate = req.query.end ? new Date(req.query.end) : new Date();
-  
+
   const clients = await Client.find({ farm: req.user.farm });
   const products = await Product.find({ client: { $exists: true }, farm: req.user.farm, date: { $gte: startDate, $lte: endDate } });
 
@@ -900,8 +900,8 @@ exports.renderDistMain = catchAsync(async (req, res, next) => {
   let endDateOrder = req.query.end ? new Date(Date.now(req.query.end)) : new Date(moment().add(1, 'month'));
 
   let products = await Product.find({ date: { $gte: startDate, $lte: endDate } }).populate('client');
-  let orders = await Calendar.find({module: 'order', date: { $gte: startDate, $lte: endDateOrder } }).populate('client');
-  let recOrders = await Calendar.find({module: 'order', recuring: true}).populate('client');
+  let orders = await Calendar.find({ module: 'order', date: { $gte: startDate, $lte: endDateOrder } }).populate('client');
+  let recOrders = await Calendar.find({ module: 'order', recuring: true }).populate('client');
 
   res.status(200).render('distMain', {
     products,

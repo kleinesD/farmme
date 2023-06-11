@@ -3,6 +3,7 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
+
     include _animalHeader
     .animal-results-window
 
@@ -42,42 +43,46 @@ block content
           .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
 
       -if(!forEdit)
-        .animal-results-container.animal-results-big#weight-results-container
-          img.ar-image-back(src="/img/images/weight-icon.png")
-          .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title Изменение веса
-          .ar-one-line-result
-            .aa-input-block.aa-input-block-half
-              lable.aa-label(for="result")
-                p Вес
-                p |
-                p Килограммы
-              input.aa-text-input#result(type="number")
-            .aa-input-block.aa-input-block-half
-              label.aa-label(for="result-date")
-                p Дата
-              input.aa-text-input.aa-date-input#result-date(type="date" data-animal-birth=`${animal.birthDate}`)
-          .ar-btn-box    
-            a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
+        .ai-form-container.ai-form-container-headerful#weight-results-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Изменение веса
+
+          .ai-double-input-block
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Вес
+              input.ai-input.ai-input-half.ai-input-half-text#result(type="number")
+              .ai-inside-text кг.
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Дата
+              input.ai-input.ai-input-half.ai-input-half-date#result-date(type="date")
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+          
+          .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-weight-results-container
-          img.ar-image-back(src="/img/images/weight-icon.png")
-          .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title Изменение веса
-          .ar-one-line-result
-            .aa-input-block.aa-input-block-half
-              lable.aa-label(for="result")
-                p Вес
-                p |
-                p Килограммы
-              input.aa-text-input#result(type="number" value=`${result.result}`)
-            .aa-input-block.aa-input-block-half
-              label.aa-label(for="result-date")
-                p Дата
-              input.aa-text-input.aa-date-input#result-date(type="date" data-animal-birth=`${animal.birthDate}` data-value=`${result.date}`)
-          .ar-btn-box    
-            a.ar-add-button(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+        .ai-form-container.ai-form-container-headerful#edit-weight-results-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Изменение веса
+          
+          .ai-double-input-block
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Вес
+              input.ai-input.ai-input-half.ai-input-half-text#result(type="number"  value=`${result.result}`)
+              .ai-inside-text кг.
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Дата
+              input.ai-input.ai-input-half.ai-input-half-date#result-date(type="date" value=`${result.date.toLocaleString('ru-RU', {year: 'numeric'})}-${result.date.toLocaleString('ru-RU', {month: '2-digit'})}-${result.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
 
       
 

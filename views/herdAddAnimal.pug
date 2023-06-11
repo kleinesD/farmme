@@ -3,143 +3,128 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
-    .add-animal-container#add-animal-container(data-point="1" data-info-block="birth")
-      .aa-header
-        .aa-progress-box
-          a.aa-progress-btn#point-1
-            ion-icon(name="paw")
-          a.aa-progress-btn#point-2
-            ion-icon(name="reader")
-        //-.mini-loader
-        .aa-back-btn 
-          ion-icon(name="arrow-back-circle-outline")
-        .aa-create-btn Продолжить
-      .aa-main-block
-        .aa-decide-block
-          .aa-block-title 
-            | Животное было 
-            span.aa-buy куплено
-            |  или 
-            span.aa-birth родилось
-            |  на ферме?
-          .aa-decide-btn-box
-            .aa-decide-btn#aa-buy-btn
-              ion-icon(name="cash")
-            .aa-decide-btn#aa-birth-btn
-              ion-icon(name="paw")
+    .add-animal-container#add-animal-container
+      .ai-decide-block
+        .ai-decide-block-item#birth
+          .ai-decide-block-item-text 
+            | ЖИВОТНОЕ РОДИЛОСЬ НА 
+            span ФЕРМЕ
+          img.ai-decide-block-item-img(src="/img/icons/herd-calf.png")
+        .ai-decide-block-item#purchase
+          .ai-decide-block-item-text 
+            | ЖИВОТНОЕ БЫЛО 
+            span КУПЛЕНО
+          img.ai-decide-block-item-img(src="/img/icons/herd-bought-animal.png")
 
-        .aa-info-block
-          .aa-block-title Введите информацию о животном.
-          .aa-block-sub-title * поля обязательные для заполнения.
-          form.aa-form.aa-form-buy
-            .aa-input-block
-              lable.aa-label(for="number") 
-                p Номер*
-                //-.aa-label-warning -&nbsp; Данный номер уже занят
-              input.aa-text-input#number(type="text")
-            .aa-input-block
-              lable.aa-label(for="name")
-                p Имя
-              input.aa-text-input#name(type="text")
-            .aa-input-block.info-buy-items
-              lable.aa-label(for="buy-cost")
-                p Цена покупки
-                p |
-                p ₽
-              input.aa-text-input#buy-cost(type="number")
-            //-.aa-input-block 
-              label.aa-label(for="main-photos")
-                p Главное фото
-                p |
-                ion-icon(name="images-outline")
-              input.aa-photo-input#main-photos(type="file" accept="image/*")
-              .aa-photo-preview-box
-                //-img.aa-photo-preview(src="/img/images/cow-image.jpg")
-            //-.aa-input-block 
-              label.aa-label(for="add-photos")
-                p Доп. фото
-                p |
-                ion-icon(name="images-outline")
-              input.aa-photo-input#add-photos(type="file" accept="image/*" multiple)
-              .aa-photo-preview-box
-                //-img.aa-photo-preview(src="/img/images/cow-image.jpg")
+      .ai-form-container.add-animal-form
+        .ai-block-sub-title ДОБАВИТЬ
+        .ai-block-title Животное
 
-            -if(potMother.length > 0)
-              .aa-input-block.info-birth-items
-                lable.aa-label(for="mother") 
-                  p Мать
-                input.aa-search-input.aa-animal-search#mother(data-id="" data-placeholder="Имя или #Номер")
-                .animal-search-block#mother-search-block
-                  each anim in potMother
-                    .animal-search-item(data-id=`${anim._id}`)
-                      -if(anim.mainPhoto)
-                        img(src=`/img/images/${anim.mainPhoto}`)
-                      -if(anim.name)
-                        .animal-search-name= anim.name
-                      .animal-search-number= `#${anim.number}`
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Номер
+          .ai-inside-text #
+          input.ai-input.ai-input-text.ai-input-validation#number(type="text" placeholder="5026")
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
 
-            -if(potFather.length > 0)
-              .aa-input-block.info-birth-items
-                lable.aa-label(for="father") 
-                  p Отец
-                input.aa-search-input.aa-animal-search#father(data-id="" data-placeholder="Имя или #Номер")
-                .animal-search-block
-                  each anim in potFather
-                    .animal-search-item(data-id=`${anim._id}`)
-                      -if(anim.mainPhoto)
-                        img(src=`/img/images/${anim.mainPhoto}`)
-                      -if(anim.name)
-                        .animal-search-name= anim.name
-                      .animal-search-number= `#${anim.number}`
-
-            .aa-input-block 
-              label.aa-label(for="birth-date")
-                p Дата рождения*
-              input.aa-text-input.aa-date-input#birth-date(type="date")
-
-            .aa-input-block
-              lable.aa-label(for="breed") 
-                p Порода
-              input.aa-search-input.aa-breed-search#breed(data-placeholder="Название пароды")
-              .animal-search-block
-                .animal-search-item(data-rus="Айршир" data-eng="Ayrshire")
-                  p.animal-search-name Айршир
-                .animal-search-item(data-rus="Голштин" data-eng="Holstein")
-                  p.animal-search-name Голштин
-                .animal-search-item(data-rus="Сементал" data-eng="Semental")
-                  p.animal-search-name Сементал
-                .animal-search-item(data-rus="Швицкая" data-eng="Swiss")
-                  p.animal-search-name Швицкая
-                .animal-search-item(data-rus="Джерси" data-eng="Jersey")
-                  p.animal-search-name Джерси
-                .animal-search-item(data-rus="Монбельярд" data-eng="Montbéliarde")
-                  p.animal-search-name Монбельярд
-                .animal-search-item(data-rus="Чёрно-пёстрая" data-eng="Russian Black Pied")
-                  p.animal-search-name Чёрно-пёстрая
-                .animal-search-item(data-rus="Красно-пёстрая" data-eng="Russian Red Pied")
-                  p.animal-search-name Красно-пёстрая
-                .animal-search-item(data-rus="Красная Степная" data-eng="Red Steppe")
-                  p.animal-search-name Красная Степная
-
-            .aa-input-block 
-              label.aa-label(for="gender")
-                p Пол*
-              .aa-pick-box.aa-pick-box-one#gender
-                .aa-pick#female Женский
-                .aa-pick#male Мужской
-            .aa-input-block 
-              label.aa-label(for="colors")
-                p Цвета
-              .aa-pick-box.aa-pick-box-few#colors
-                .aa-pick#black Черный
-                .aa-pick#red Красный
-                .aa-pick#white Белый
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Имя
+          input.ai-input.ai-input-text#name(type="text" placeholder="Березка")
 
 
+        .ai-input-block.ai-input-block-text.purchase-input
+          .ai-input-label Стоимость
+          input.ai-input.ai-input-text#buy-cost(type="number" )
+          .ai-inside-text ₽
 
-        .aa-success-block 
-          ion-icon(name="checkmark-circle")
-          //p Животное успешно добавленно!
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Дата рождения
+          input.ai-input.ai-input-date.ai-input-validation#birth-date(type="date")
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
 
+        .ai-input-block.ai-input-block-select.birth-input
+          .ai-select-line
+          .ai-input-label Мать
+          input.ai-input.ai-input-select#mother(type="text" placeholder="Номер или имя коровы")
+          .ai-select-block.shadow
+            each animal in potMother
+              .ai-select-item(data-id=`${animal._id}`)
+                p.ai-select-name= `#${animal.number}`
+                -if(animal.name)
+                  p.ai-select-sub-name= animal.name
+
+        .ai-input-block.ai-input-block-select.birth-input.id-select
+          .ai-select-line
+          .ai-input-label Отец
+          input.ai-input.ai-input-select#father(type="text" placeholder="Номер или имя быка")
+          .ai-select-block.shadow
+            each animal in potFather
+              .ai-select-item(data-id=`${animal._id}`)
+                p.ai-select-name= `#${animal.number}`
+                -if(animal.name)
+                  p.ai-select-sub-name= animal.name
+
+        .ai-input-block.ai-input-block-select.breed-input.breed-select
+          .ai-select-line
+          .ai-input-label Порода
+          input.ai-input.ai-input-select#breed(type="text" placeholder="Наименование породы")
+          .ai-select-block.shadow
+            .ai-select-item(data-rus="Айршир" data-eng="Ayrshire")
+              p.ai-select-name Айршир
+            .ai-select-item(data-rus="Голштин" data-eng="Holstein")
+              p.ai-select-name Голштин
+            .ai-select-item(data-rus="Сементал" data-eng="Semental")
+              p.ai-select-name Сементал
+            .ai-select-item(data-rus="Швицкая" data-eng="Swiss")
+              p.ai-select-name Швицкая
+            .ai-select-item(data-rus="Джерси" data-eng="Jersey")
+              p.ai-select-name Джерси
+            .ai-select-item(data-rus="Монбельярд" data-eng="Montbéliarde")
+              p.ai-select-name Монбельярд
+            .ai-select-item(data-rus="Чёрно-пёстрая" data-eng="Russian Black Pied")
+              p.ai-select-name Чёрно-пёстрая
+            .ai-select-item(data-rus="Красно-пёстрая" data-eng="Russian Red Pied")
+              p.ai-select-name Красно-пёстрая
+            .ai-select-item(data-rus="Красная Степная" data-eng="Red Steppe")
+              p.ai-select-name Красная Степная
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#gender
+          .ai-input-label Пол
+          .ai-pick#male Мужской
+          .ai-pick#female Женский
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-many#colors
+          .ai-input-label Цвет
+          .ai-pick#black Черный
+          .ai-pick#red Красный
+          .ai-pick#white Белый
+
+        .ai-double-input-block
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Корпус
+            input.ai-input.ai-input-half.ai-input-half-text#building(type="text")
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Место
+            input.ai-input.ai-input-half.ai-input-half-text#spot(type="text")
+
+        .ai-input-submit-btn Сохранить
+
+      .ai-success-block 
+        ion-icon(name="checkmark-circle")
 
 

@@ -1170,107 +1170,7 @@
 /* ///////////////////////// */
 /* ///////////////////////// */
 /* ///////////////////////// */
-.add-animal-container {
-    width: 100%;
-    min-height: 100%;
-    background-color: #ffffff;
-    border-radius: 10px;
-    position: relative;
-}
 
-.aa.back-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1.5px solid #f6b91d;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.aa.back-btn:hover {
-    background-color: #f6b91d;
-}
-
-.aa.back-btn ion-icon {
-    font-size: 125%;
-    color: #f6b91d;
-}
-
-.aa.back-btn:hover.aa.back-btn ion-icon {
-    color: #ffffff;
-}
-
-.aa-header {
-    width: calc(100% - 20px);
-    padding: 0 10px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    position: relative;
-}
-
-.aa-progress-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    left: 10px;
-}
-
-.aa-progress-btn {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* background-color: #f6b91d; */
-    border-radius: 50%;
-    margin: 0 5px;
-    cursor: pointer;
-
-    background-color: #afafaf;
-}
-
-.aa-progress-btn ion-icon {
-    color: #ffffff;
-    font-size: 125%;
-}
-
-.aa-back-btn {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    display: none;
-}
-
-.aa-back-btn ion-icon {
-    font-size: 120%;
-}
-
-.aa-create-btn {
-    padding: 10px 20px;
-    color: #ffffff;
-    /* background-color: #f6b91d; */
-    border-radius: 15px;
-    margin-left: 10px;
-    font-size: 75%;
-    font-weight: 500;
-    cursor: pointer;
-
-    background-color: #afafaf;
-    pointer-events: none;
-}
-
-.aa-create-btn:hover {
-    color: #3E363F;
-}
 
 .aa-main-block {
     width: calc(100% - 40px);
@@ -2410,14 +2310,7 @@
     opacity: 0.8;
 }
 
-.animal-results-window {
-    width: 100%;
-    /* display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-    column-gap: 10px; */
-    min-height: calc(100vh - 100px)
-}
+
 
 .animal-results-container {
     width: calc(100% - 60px);
@@ -2453,19 +2346,7 @@
     /* margin-bottom: 0px; */
 }
 
-.ar-block-title {
-    font-size: 300%;
-    font-weight: 700;
-    margin-bottom: 50px;
-    width: 500px;
-}
 
-.ar-block-sub-title {
-    width: 500px;
-    font-size: 175%;
-    font-weight: 400;
-    color: #f4a261;
-}
 
 .vet-module .ar-block-sub-title {
     color: #5E72E8;

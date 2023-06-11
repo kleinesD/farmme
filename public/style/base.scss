@@ -66,10 +66,10 @@ ion-icon {
 }
 
 .mini-loader {
-    width: 11px;
-    height: 11px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
-    border: 2px solid #3E363F;
+    border: 3px solid $mainBlack;
     border-top-color: #466b4300;
     border-right-color: #466b4300;
     animation: spin 2s linear infinite;
@@ -77,7 +77,7 @@ ion-icon {
 }
 
 .mini-loader-white {
-    border: 2px solid #ffffff;
+    border: 3px solid #ffffff;
     border-top-color: rgba(255, 255, 255, 0);
     border-right-color: rgba(70, 107, 67, 0);
 }

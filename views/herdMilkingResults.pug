@@ -46,59 +46,56 @@ block content
           .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
 
       -if(!forEdit)
-        .animal-results-container.animal-results-big#milking-results-container
-          img.ar-image-back(src="/img/images/milk-icon.png")
+        .ai-form-container.ai-form-container-headerful#milking-results-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Контрольное доение
+          
+          .ai-double-input-block
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Результат
+              input.ai-input.ai-input-half.ai-input-half-text#result(type="number")
+              .ai-inside-text л.
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Дата
+              input.ai-input.ai-input-half.ai-input-half-date.ai-input-validation#result-date(type="date")
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-          .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title Контрольное доение
-          .ar-one-line-result
-            .aa-input-block.aa-input-block-half
-              lable.aa-label(for="result")
-                p Результат
-                p |
-                p Литры
-              input.aa-text-input#result(type="number")
-            .aa-input-block.aa-input-block-half
-              label.aa-label(for="result-date")
-                p Дата
-              input.aa-text-input.aa-date-input#result-date(type="date")
-          .aa-input-block 
-            label.aa-label(for="lactation-number")
-              p Лактация
-            .aa-pick-box.aa-pick-box-one#lactation-number
-              each lact in animal.lactations
-                .aa-pick(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)
-                  p= `#${lact.number}`
-                  .aa-pick-small= `${lact.startDate.toLocaleString('ru-RU', {year: 'numeric'})}`
-          .ar-btn-box          
-            a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
+            .ai-input-label Лактация
+            each lact in animal.lactations
+              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null || undefined ? new Date() : lact.finishDate}` data-finish-date-exist=`${lact.finishDate === null || undefined ? false : true}`)= `#${lact.number}`
+
+                   
+          .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-milking-results-container
-          img.ar-image-back(src="/img/images/milk-icon.png")
-          .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title Контрольное доение
-          .ar-one-line-result
-            .aa-input-block.aa-input-block-half
-              lable.aa-label(for="result")
-                p Результат
-                p |
-                p Литры
-              input.aa-text-input#result(type="number" value=`${result.result}`)
-            .aa-input-block.aa-input-block-half
-              label.aa-label(for="result-date")
-                p Дата
-              input.aa-text-input.aa-date-input#result-date(type="date" data-value=`${result.date}`)
-          .aa-input-block 
-            label.aa-label(for="lactation-number")
-              p Лактация
-            .aa-pick-box.aa-pick-box-one#lactation-number
-              each lact in animal.lactations
-                .aa-pick(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)
-                  p= `#${lact.number}`
-                  .aa-pick-small= `${lact.startDate.toLocaleString('ru-RU', {year: 'numeric'})}`
-          .ar-btn-box          
-            a.ar-add-button(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+        .ai-form-container.ai-form-container-headerful#edit-milking-results-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Контрольное доение
+
+          .ai-double-input-block
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Результат
+              input.ai-input.ai-input-half.ai-input-half-text#result(type="number"  value=`${result.result}`)
+              .ai-inside-text л.
+            .ai-input-block-half.ai-input-block-text
+              .ai-input-label Дата
+              input.ai-input.ai-input-half.ai-input-half-date.ai-input-validation#result-date(type="date" value=`${result.date.toLocaleString('ru-RU', {year: 'numeric'})}-${result.date.toLocaleString('ru-RU', {month: '2-digit'})}-${result.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
+            .ai-input-label Лактация
+            each lact in animal.lactations
+              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null || undefined ? new Date() : lact.finishDate}` data-finish-date-exist=`${lact.finishDate === null || undefined ? false : true}`)= `#${lact.number}`
+
+          .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
 
 
  
