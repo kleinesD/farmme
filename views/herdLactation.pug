@@ -4,97 +4,103 @@ block content
   include _rcmHerd
   section.main-section 
     include _animalHeader
+    .animal-results-window
 
 
-    //-.animal-results-history
-      .ar-block-title.ar-block-title-chart Дополнительная информация
+      //-.animal-results-history
+        .ar-block-title.ar-block-title-chart Дополнительная информация
 
-      .invis-animals-data-container
-        each anim in animals
-          each lact in anim.lactations 
-            .invis-animals-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
+        .invis-animals-data-container
+          each anim in animals
+            each lact in anim.lactations 
+              .invis-animals-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
 
-      .ar-bonus-info-line 
-        .ar-bi-big 293
-        .ar-bi-small дней - средняя длинна лактации на вашей ферме.
+        .ar-bonus-info-line 
+          .ar-bi-big 293
+          .ar-bi-small дней - средняя длинна лактации на вашей ферме.
 
-      .ar-tip-container 
-        .ar-tip-icon 
-          ion-icon(name="bulb")
-        .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
+        .ar-tip-container 
+          .ar-tip-icon 
+            ion-icon(name="bulb")
+          .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
 
 
-    -if(!forEdit)
-      .animal-results-container.animal-results-big#add-lactation-container
-        img.ar-image-back(src="/img/images/milking-cow-icon.png")
-        .ar-block-sub-title ДОБАВИТЬ
-        .ar-block-title Лактацию
-        .ar-one-line-result
-          .aa-input-block.aa-input-block-half
-            label.aa-label(for="start-date")
-              p Начало
-            input.aa-text-input.aa-date-input#start-date(type="date" data-birth-date=`${animal.birthDate}`)
-          .aa-input-block.aa-input-block-half 
-            label.aa-label(for="finish-date") 
-              p Окончание
-            input.aa-text-input.aa-date-input#finish-date(type="date")
-        .aa-input-block
-          each lactation in animal.lactations
-            .aa-input-invis(data-number=`${lactation.number}`)
-          lable.aa-label(for="number")
-            p Номер лактации
-          .invis-lact-data-container
+      -if(!forEdit)
+        .ai-form-container.ai-form-container-headerful#add-lactation-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Лактацию
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Начало
+            input.ai-input.ai-input-date.ai-input-validation#start-date(type="date" data-animal-birth=`${animal.birthDate}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Окончание
+            input.ai-input.ai-input.ai-input-date.ai-input-validation#finish-date(type="date")
+
+          .invis-lact-cont
             each lact in animal.lactations 
               .invis-lact-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
-          .aa-pick-box.aa-pick-box-one#lactation-number
-            .aa-pick 1
-            .aa-pick 2
-            .aa-pick 3
-            .aa-pick 4
-            .aa-pick 5
-            .aa-pick 6
-            .aa-pick 7
-            .aa-pick 8
-            .aa-pick 9
-            .aa-pick 10
-        .ar-btn-box  
-          a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
+            .ai-input-label Номер лактации
+            .ai-pick 1
+            .ai-pick 2
+            .ai-pick 3
+            .ai-pick 4
+            .ai-pick 5
+            .ai-pick 6
+            .ai-pick 7
+            .ai-pick 8
+            .ai-pick 9
 
-    -if(forEdit)
-      .animal-results-container.animal-results-big#edit-lactation-container
-        img.ar-image-back(src="/img/images/milking-cow-icon.png")
-        .ar-block-sub-title РЕДАКТИРОВАТЬ
-        .ar-block-title Лактацию
-        .ar-one-line-result
-          .aa-input-block.aa-input-block-half
-            label.aa-label(for="start-date")
-              p Начало
-            input.aa-text-input.aa-date-input#start-date(type="date" data-birth-date=`${animal.birthDate}` data-value=`${lactation.startDate}`)
-          .aa-input-block.aa-input-block-half 
-            label.aa-label(for="finish-date") 
-              p Окончание
-            input.aa-text-input.aa-date-input#finish-date(type="date" data-value=`${lactation.finishDate}`)
-        .aa-input-block
-          each lactation in animal.lactations
-            .aa-input-invis(data-number=`${lactation.number}`)
-          lable.aa-label(for="number")
-            p Номер лактации
-          .invis-lact-data-container
+          .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
+
+      -if(forEdit)
+        .ai-form-container.ai-form-container-headerful#edit-lactation-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Лактацию
+          
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Начало
+            input.ai-input.ai-input-date.ai-input-validation#start-date(type="date" data-animal-birth=`${animal.birthDate}` value=`${lactation.startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${lactation.startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${lactation.startDate.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+          
+          -if(lactation.finishDate)
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Окончание
+              input.ai-input.ai-input.ai-input-date.ai-input-validation#finish-date(type="date" value=`${lactation.finishDate.toLocaleString('ru-RU', {year: 'numeric'})}-${lactation.finishDate.toLocaleString('ru-RU', {month: '2-digit'})}-${lactation.finishDate.toLocaleString('ru-RU', {day: '2-digit'})}`)
+          -else
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Окончание
+              input.ai-input.ai-input.ai-input-date.ai-input-validation#finish-date(type="date" )
+
+          .invis-lact-cont
             each lact in animal.lactations 
               .invis-lact-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
-          .aa-pick-box.aa-pick-box-one#lactation-number
-            .aa-pick(class=`${lactation.number === 1 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 1 ? 'true' : 'false'}`) 1
-            .aa-pick(class=`${lactation.number === 2 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 2 ? 'true' : 'false'}`) 2
-            .aa-pick(class=`${lactation.number === 3 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 3 ? 'true' : 'false'}`) 3
-            .aa-pick(class=`${lactation.number === 4 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 4 ? 'true' : 'false'}`) 4
-            .aa-pick(class=`${lactation.number === 5 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 5 ? 'true' : 'false'}`) 5
-            .aa-pick(class=`${lactation.number === 6 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 6 ? 'true' : 'false'}`) 6
-            .aa-pick(class=`${lactation.number === 7 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 7 ? 'true' : 'false'}`) 7
-            .aa-pick(class=`${lactation.number === 8 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 8 ? 'true' : 'false'}`) 8
-            .aa-pick(class=`${lactation.number === 9 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 9 ? 'true' : 'false'}`) 9
-            .aa-pick(class=`${lactation.number === 10 ? 'aa-pick-picked' : ''}` data-current=`${lactation.number === 10 ? 'true' : 'false'}`) 10
-        .ar-btn-box  
-          a.ar-add-button(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
+            .ai-input-label Номер лактации
+            .ai-pick(class=`${lactation.number === 1 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 1 ? 'true' : 'false'}`) 1
+            .ai-pick(class=`${lactation.number === 2 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 2 ? 'true' : 'false'}`) 2
+            .ai-pick(class=`${lactation.number === 3 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 3 ? 'true' : 'false'}`) 3
+            .ai-pick(class=`${lactation.number === 4 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 4 ? 'true' : 'false'}`) 4
+            .ai-pick(class=`${lactation.number === 5 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 5 ? 'true' : 'false'}`) 5
+            .ai-pick(class=`${lactation.number === 6 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 6 ? 'true' : 'false'}`) 6
+            .ai-pick(class=`${lactation.number === 7 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 7 ? 'true' : 'false'}`) 7
+            .ai-pick(class=`${lactation.number === 8 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 8 ? 'true' : 'false'}`) 8
+            .ai-pick(class=`${lactation.number === 9 ? 'ai-to-pick' : ''}` data-current=`${lactation.number === 9 ? 'true' : 'false'}`) 9
+
+          
+
+          .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
 
 
 

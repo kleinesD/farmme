@@ -5,11 +5,14 @@ block content
   section.main-section 
 
     .animal-results-window
-      .animal-distribution-decide-container
-        .addc-title ДОБАВИТЬ...
-        a.addc-item(href="/distribution/add-sale")
-          img(src="/img/images/sale-icon.png")
-          .addc-item-text Продажа
-        a.addc-item(href="/distribution/add-consumption")
-          img(src="/img/images/consumption-icon.png")
-          .addc-item-text Употребление
+      .ai-decide-block
+        a.ai-decide-block-item#sale(href="/distribution/add-sale")
+          .ai-decide-block-item-text
+            | ДОБАВИТЬ 
+            span ПРОДАЖУ
+          img.ai-decide-block-item-img(src="/img/icons/dist-sale.png")
+        a.ai-decide-block-item#consumption(href="/distribution/add-consumption")
+          .ai-decide-block-item-text
+            | ДОБАВИТЬ 
+            span УПОТРЕБЛЕНИЕ
+          img.ai-decide-block-item-img(src="/img/icons/dist-consumption.png")

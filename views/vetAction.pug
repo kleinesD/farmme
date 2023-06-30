@@ -2,167 +2,124 @@ extends base
 
 block content
   include _rcmVet
-  section.main-section.vet-module
+  section.main-section
 
     -if(!forEdit)
       -if(forOne)
         include _animalHeader
 
-      .animal-results-container#vet-action-container(class=`${forOne === true ? 'animal-results-big' : 'animal-results-full'}`)
-        img.ar-image-back(src="/img/images/med-cross-icon.png")
-        .ar-block-sub-title ДОБАВИТЬ
-        .ar-block-title Ветеринарное действие
-        
+      .animal-results-window
+        .ai-form-container.ai-form-vet#vet-action-container(class=`${forOne ? 'ai-form-container-headerful' : ''}`)
 
-        -if(!forOne)
-          .ar-selected-animals-block
-            lable.aa-label.aa-label-shrinked
-              p Выбранные животные
-            .ar-selected-animals#multiple-animals-container
-              //-.ar-selected-animals-item #120231
-                .ar-selected-animals-remove 
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Ветеринарное действие
+
+
+          -if(!forOne)
+            .ar-selected-animals-block
+              lable.aa-label.aa-label-shrinked
+                p Выбранные животные
+              .ar-selected-animals#multiple-animals-container
+                //-.ar-selected-animals-item #120231
+                  .ar-selected-animals-remove 
+                    ion-icon(name="close")
+            
+            .ai-selected-animals-block
+              .ai-input-label Выбранные животные
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
                   ion-icon(name="close")
-          .aa-input-block.info-birth-items
-            lable.aa-label(for="multiple-animals") 
-              p Животные
-            input.aa-search-input.aa-animal-search#multiple-animals(data-id="")
-            .animal-search-block#multiple-animals-search-block
-              each anim in animals
-                .animal-search-item(data-id=`${anim._id}` data-number=`${anim.number}`)
-                  -if(anim.mainPhoto)
-                    img(src=`/img/images/${anim.mainPhoto}`)
-                  -if(anim.name)
-                    .animal-search-name= anim.name
-                  .animal-search-number= `#${anim.number}`
-        .aa-input-block
-          lable.aa-label(for="name") 
-            p Название
-          input.aa-text-input#name(type="text")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+              .ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
 
-        .aa-input-block.hidden-input-block#dose-input
-          lable.aa-label(for="dose") 
-            p Дозировка
-          .aa-double-input-block
-            input.aa-double-input#dose(type="number")
-            select.aa-double-input#unit
-              option(value="mg" selected) Мг.
-              option(value="ml") Мл.
-              option(value="g") Гм.
-
-        .aa-add-more-container
-          .aa-add-more#add-dose-input
-            p Добавить дозировку
-            ion-icon.aa-add-more-icon(name="add-circle")
-        .aa-input-block
-          lable.aa-label(for="note") 
-            p Описание
-          input.aa-text-input#note(type="text")
-        .aa-input-block.aa-triple-date-block
-          label.aa-label(for="date")
-            p Дата и время
-          input.aa-triple-date-input-big#date(type="date" data-animal-birth=`${animal.birthDate}`)
-          select.aa-triple-date-input#hour
-            option(value="0") 00
-            option(value="1") 01
-            option(value="2") 02
-            option(value="3") 03
-            option(value="4") 04
-            option(value="5") 05
-            option(value="6") 06
-            option(value="7") 07
-            option(value="8") 08
-            option(value="9") 09
-            option(value="10") 10
-            option(value="11") 11
-            option(value="12") 12
-            option(value="13") 13
-            option(value="14") 14
-            option(value="15") 15
-            option(value="16") 16
-            option(value="17") 17
-            option(value="18") 18
-            option(value="19") 19
-            option(value="20") 20
-            option(value="21") 21
-            option(value="22") 22
-            option(value="23") 23     
-          .aa-triple-date-divider :
-          select.aa-triple-date-input#minute
-            option(value="0") 00
-            option(value="1") 01
-            option(value="2") 02
-            option(value="3") 03
-            option(value="4") 04
-            option(value="5") 05
-            option(value="6") 06
-            option(value="7") 07
-            option(value="8") 08
-            option(value="9") 09
-            option(value="10") 10
-            option(value="11") 11
-            option(value="12") 12
-            option(value="13") 13
-            option(value="14") 14
-            option(value="15") 15
-            option(value="16") 16
-            option(value="17") 17
-            option(value="18") 18
-            option(value="19") 19
-            option(value="20") 20
-            option(value="21") 21
-            option(value="22") 22
-            option(value="23") 23
-            option(value="24") 24
-            option(value="25") 25
-            option(value="26") 26
-            option(value="27") 27
-            option(value="28") 28
-            option(value="29") 29
-            option(value="30") 30
-            option(value="31") 31
-            option(value="32") 32
-            option(value="33") 33
-            option(value="34") 34
-            option(value="35") 35
-            option(value="36") 36
-            option(value="37") 37
-            option(value="38") 38
-            option(value="39") 39
-            option(value="40") 40
-            option(value="41") 41
-            option(value="42") 42
-            option(value="43") 43
-            option(value="44") 44
-            option(value="45") 45
-            option(value="46") 46
-            option(value="47") 47
-            option(value="48") 48
-            option(value="49") 49
-            option(value="50") 50
-            option(value="51") 51
-            option(value="52") 52
-            option(value="53") 53
-            option(value="54") 54
-            option(value="55") 55
-            option(value="56") 56
-            option(value="57") 57
-            option(value="58") 58
-            option(value="59") 59
-        .ar-btn-box 
-          -if(forOne)
-            a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
-          -else
-            a.ar-add-button(data-animal-id=``) Сохранить
+            .ai-input-block.ai-input-block-select
+              .ai-select-line
+              .ai-input-label Животные
+              input.ai-input.ai-input-select#multiple-animals(type="text" placeholder="Номер или имя животного")
+              .ai-select-block.shadow
+                each animal in animals
+                  .ai-select-item(data-id=`${animal._id}`)
+                    p.ai-select-name= `#${animal.number}`
+                    -if(animal.name)
+                      p.ai-select-sub-name= animal.name
 
 
-    -if(forEdit)      
+
+
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Название
+            input.ai-input.ai-input-text#name(type="text")
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+
+          .ai-input-block.ai-input-block-small-select
+            .ai-input-label Дозировка
+            input.ai-input.ai-input-text.ai-input-small-select#dose(type="number")
+            .ai-small-select#unit
+              .ai-select-line
+              .ai-small-select-block.shadow
+                .ai-small-select-item(data-val="ml") мл.
+                .ai-small-select-item(data-val="mg") мг.
+                .ai-small-select-item(data-val="g") гм.
+
+
+          .ai-add-input-container
+            .ai-add-input#add-dose-input
+              p
+                | Дозировка
+                span +
+
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Описание
+            textarea.ai-textarea.ai-input-text#note
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date.ai-input-validation#date(type="datetime-local" data-animal-birth=`${forOne ? animal.birthDate : new Date()}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          a.ai-input-submit-btn(data-animal-id=`${forOne ? animal._id : ''}`) Сохранить
+
+
+    //-if(forEdit)      
       include _animalHeader
 
       .animal-results-container#edit-vet-action-container(class='animal-results-big')
         img.ar-image-back(src="/img/images/med-cross-icon.png")
         .ar-block-sub-title РЕДАКТИРОВАТЬ
         .ar-block-title Ветеринарное действие
-        
+
 
         .aa-input-block
           lable.aa-label(for="name") 

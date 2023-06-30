@@ -4,84 +4,85 @@ block content
   include _rcmHerd
   section.main-section 
     include _animalHeader
+    .animal-results-window
 
-    -if(!forEdit)
-      .ai-form-container.ai-form-container-headerful#add-insemination-container
-        .ai-block-sub-title ДОБАВИТЬ
-        .ai-block-title Осеменение
+      -if(!forEdit)
+        .ai-form-container.ai-form-container-headerful#add-insemination-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Осеменение
 
-        .ai-input-block.ai-input-block-text
-          .ai-input-label Дата
-          input.ai-input.ai-input-date.ai-input-validation#date(type="date" data-animal-birth=`${animal.birthDate}`)
-          .ai-input-marker.ai-input-marker-r
-            ion-icon(name="alert")
-          .ai-input-explain-block.ai-input-explain-block-required
-            .ai-input-eb-tri
-            .ai-input-eb-text Обязательно
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата
+            input.ai-input.ai-input-date.ai-input-validation#date(type="date" data-animal-birth=`${animal.birthDate}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#type
-          .ai-input-label Вид
-          .ai-pick#natural Естественное
-          .ai-pick#artifical Искусственное
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#type
+            .ai-input-label Вид
+            .ai-pick#natural Естественное
+            .ai-pick#artifical Искусственное
 
-        -if(bulls.length > 0)
-          .ai-input-block.ai-input-block-select.birth-input.id-select
-            .ai-select-line
-            .ai-input-label Бык
-            input.ai-input.ai-input-select#bull(type="text" placeholder="Номер или имя быка")
-            .ai-select-block.shadow
-              each animal in bulls
-                .ai-select-item(data-id=`${animal._id}`)
-                  p.ai-select-name= `#${animal.number}`
-                  -if(animal.name)
-                    p.ai-select-sub-name= animal.name
-        
-        
-        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
-          .ai-input-label Результат
-          .ai-pick#success Успешно
-          .ai-pick#fail Не успешно
+          -if(bulls.length > 0)
+            .ai-input-block.ai-input-block-select.birth-input.id-select
+              .ai-select-line
+              .ai-input-label Бык
+              input.ai-input.ai-input-select#bull(type="text" placeholder="Номер или имя быка")
+              .ai-select-block.shadow
+                each animal in bulls
+                  .ai-select-item(data-id=`${animal._id}`)
+                    p.ai-select-name= `#${animal.number}`
+                    -if(animal.name)
+                      p.ai-select-sub-name= animal.name
+          
+          
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
+            .ai-input-label Результат
+            .ai-pick#success Успешно
+            .ai-pick#fail Не успешно
 
-        
-        .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
+          
+          .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
 
-    -if(forEdit)
-      .ai-form-container.ai-form-container-headerful#edit-insemination-container
-        .ai-block-sub-title РЕДАКТИРОВАТЬ
-        .ai-block-title Осеменение
+      -if(forEdit)
+        .ai-form-container.ai-form-container-headerful#edit-insemination-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Осеменение
 
-        .ai-input-block.ai-input-block-text
-          .ai-input-label Дата
-          input.ai-input.ai-input-date.ai-input-validation#date(type="date" data-animal-birth=`${animal.birthDate}` value=`${insemination.date.toLocaleString('ru-RU', {year: 'numeric'})}-${insemination.date.toLocaleString('ru-RU', {month: '2-digit'})}-${insemination.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
-          .ai-input-marker.ai-input-marker-r
-            ion-icon(name="alert")
-          .ai-input-explain-block.ai-input-explain-block-required
-            .ai-input-eb-tri
-            .ai-input-eb-text Обязательно
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата
+            input.ai-input.ai-input-date.ai-input-validation#date(type="date" data-animal-birth=`${animal.birthDate}` value=`${insemination.date.toLocaleString('ru-RU', {year: 'numeric'})}-${insemination.date.toLocaleString('ru-RU', {month: '2-digit'})}-${insemination.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#type
-          .ai-input-label Вид
-          .ai-pick#natural(class=`${insemination.type === 'natural' ? 'ai-to-pick' : ''}`) Естественное
-          .ai-pick#artifical(class=`${insemination.type === 'artifical' ? 'ai-to-pick' : ''}`) Искусственное
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#type
+            .ai-input-label Вид
+            .ai-pick#natural(class=`${insemination.type === 'natural' ? 'ai-to-pick' : ''}`) Естественное
+            .ai-pick#artifical(class=`${insemination.type === 'artifical' ? 'ai-to-pick' : ''}`) Искусственное
 
-        -if(bulls.length > 0)
-          .ai-input-block.ai-input-block-select.birth-input.id-select
-            .ai-select-line
-            .ai-input-label Бык
-            input.ai-input.ai-input-select#bull(type="text" placeholder="Номер или имя быка")
-            .ai-select-block.shadow
-              each animal in bulls
-                .ai-select-item(data-id=`${animal._id}` data-bull=`${insemination.bull}` class=`${insemination.bull.number === animal.number ? 'ai-select-item-selected' : ''}`)
-                  p.ai-select-name= `#${animal.number}`
-                  -if(animal.name)
-                    p.ai-select-sub-name= animal.name
+          -if(bulls.length > 0)
+            .ai-input-block.ai-input-block-select.birth-input.id-select
+              .ai-select-line
+              .ai-input-label Бык
+              input.ai-input.ai-input-select#bull(type="text" placeholder="Номер или имя быка")
+              .ai-select-block.shadow
+                each animal in bulls
+                  .ai-select-item(data-id=`${animal._id}` data-bull=`${insemination.bull}` class=`${insemination.bull.number === animal.number ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name= `#${animal.number}`
+                    -if(animal.name)
+                      p.ai-select-sub-name= animal.name
 
-        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
-          .ai-input-label Результат
-          .ai-pick#success(class=`${insemination.success === true ? 'ai-to-pick' : ''}`) Успешно
-          .ai-pick#fail(class=`${insemination.success === false ? 'ai-to-pick' : ''}`) Не успешно
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
+            .ai-input-label Результат
+            .ai-pick#success(class=`${insemination.success === true ? 'ai-to-pick' : ''}`) Успешно
+            .ai-pick#fail(class=`${insemination.success === false ? 'ai-to-pick' : ''}`) Не успешно
 
-        .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
+          .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
 
 
 

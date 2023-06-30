@@ -34,6 +34,19 @@ const farmSchema = new mongoose.Schema({
     default: 'l'
   },
   animalCategories: [String],
+  compoundFeedIngredients: [String],
+  feedTypes: [
+    {
+      name: String,
+      alertAmount: Number,
+      recuring: {
+        type: Boolean,
+        default: false
+      },
+      lastRecuringRecord: Date,
+      recuringFrequency: Number
+    }
+  ],
   nextPayment: {
     type: Date
   },

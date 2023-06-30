@@ -76,7 +76,7 @@ exports.renderEditUser = catchAsync(async (req, res, next) => {
 });
 
 exports.renderChangeRestrictions = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.userId);
+  const user = await User.findOne({farm: req.user.farm, _id: req.params.userId});
 
   res.status(200).render('changeRestrictions', {
     user

@@ -3,6 +3,19 @@ extends base
 block content
   include _rcmDist
   section.main-section 
+    
+    .animal-results-window
+      .ai-decide-block
+        a.ai-decide-block-item#sale(href="/distribution/add-product")
+          .ai-decide-block-item-text
+            | ДОБАВИТЬ 
+            span СЫРОЙ ПРОДУКТ
+          img.ai-decide-block-item-img(src="/img/icons/dist-raw.png")
+        a.ai-decide-block-item#consumption(href="/distribution/add-process")
+          .ai-decide-block-item-text
+            | ДОБАВИТЬ 
+            span ПЕРЕРАБОТКУ
+          img.ai-decide-block-item-img(src="/img/icons/dist-processing.png")
 
     .animal-results-window
       .animal-distribution-decide-container
