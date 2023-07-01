@@ -409,9 +409,9 @@ $(document).ready(async function () {
       $(this).parent().find('.ai-small-select-item-selected').removeClass('ai-small-select-item-selected');
       $(this).addClass('ai-small-select-item-selected');
       $(this).parent().parent().find('p').text($(this).text());
-      anime({ targets: $(this).parent().parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 }); 
+      anime({ targets: $(this).parent().parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
 
-      
+
     });
 
 
@@ -5048,8 +5048,31 @@ $(document).ready(async function () {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
       $(this).parent().hide();
-      $('#dose-input').css('display', 'flex');
+      $('#dose-input').css({ 'display': 'flex', 'opacity': '0' });
+      anime({ targets: $('#dose-input')[0], opacity: 1, easing: 'easeInOutQuad', duration: 500 })
     });
+
+    /* Adding multiple animals */
+    $('#multiple-animals').find('.ai-select-item').on('click', function () {
+      $(this).addClass('ai-select-item-unvail');
+      $('.ai-selected-animals-block').append(`
+        <div class="ai-selected-animals-item" data-id="${$(this).attr('data-id')}">${$(this).find('.ai-select-name').text()}
+          <div class="ai-selected-animals-remove"> 
+            <ion-icon name="close"></ion-icon>
+          </div>
+        </div>
+      `)
+      if ($('.ai-selected-animals-block').css('display') === 'none') {
+        $('.ai-selected-animals-block').css({ 'display': 'block', 'opacity': '0' });
+        anime({ targets: $('.ai-selected-animals-block')[0], opacity: 1, easing: 'easeInOutQuad', duration: 500 })
+      }
+    });
+
+    $('.ai-selected-animals-block').on('click', '.ai-selected-animals-item', function () {
+       const id = $(this).attr('data-id');
+       $(this).remove();
+      $('#multiple-animals').find('.ai-select-item').each(function () { if ($(this).attr('data-id') === id) $(this).removeClass('ai-select-item-unvail') });
+    })
 
 
     /* Validating form */

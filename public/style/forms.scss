@@ -366,7 +366,7 @@
   width: 420px;
   position: relative;
   margin: 22px 0 42px 0;
-  
+  display: none;
 }
 .ai-selected-animals-item {
   font-size: 16px;
@@ -509,6 +509,10 @@
 
 .ai-select-item-selected {
   background-color: $lightOrange;
+}
+.ai-select-item-unvail {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .ai-select-name {
