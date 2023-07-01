@@ -391,6 +391,29 @@ $(document).ready(async function () {
       }
     });
 
+    /* Small select input */
+    $('.ai-small-select').on('click', function () {
+      if ($(this).attr('data-state') !== 'show') {
+        $(this).find('.ai-small-select-block').show();
+        $(this).attr('data-state', 'show');
+        anime({ targets: $(this).find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
+      } else {
+        $(this).find('.ai-small-select-block').hide();
+        $(this).attr('data-state', 'hide');
+        anime({ targets: $(this).find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
+      }
+
+    });
+
+    $('.ai-small-select-item').on('click', function () {
+      $(this).parent().find('.ai-small-select-item-selected').removeClass('ai-small-select-item-selected');
+      $(this).addClass('ai-small-select-item-selected');
+      $(this).parent().parent().find('p').text($(this).text());
+      anime({ targets: $(this).parent().parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 }); 
+
+      
+    });
+
 
 
     /* Required block explanation */
@@ -3139,100 +3162,100 @@ $(document).ready(async function () {
       });
     });
 
-   /* Validating start date */
-   $('#start-date').on('keyup change', async function () {
-    if ($(this).val() !== '') {
+    /* Validating start date */
+    $('#start-date').on('keyup change', async function () {
+      if ($(this).val() !== '') {
 
-      if (new Date($(this).val()) <= new Date($(this).attr('data-animal-birth')) || new Date($(this).val()) >= new Date()) {
-        $(this).parent().find('.ai-input-marker-s').remove();
-        if ($(this).parent().find('.ai-input-marker-f').length === 0) {
-          $(this).parent().append(`
+        if (new Date($(this).val()) <= new Date($(this).attr('data-animal-birth')) || new Date($(this).val()) >= new Date()) {
+          $(this).parent().find('.ai-input-marker-s').remove();
+          if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+            $(this).parent().append(`
         <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
           <ion-icon name="close-sharp"></ion-icon>
         </div>`)
-        }
+          }
 
-        if ($(this).parent().find('.ai-warning-text').length === 0) {
-          $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
-        }
+          if ($(this).parent().find('.ai-warning-text').length === 0) {
+            $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
+          }
 
-        $(this).removeClass('ai-valid-input');
-      } else {
-        $(this).parent().find('.ai-input-marker-f').remove();
-        if ($(this).parent().find('.ai-input-marker-s').length === 0) {
-          $(this).parent().append(`
+          $(this).removeClass('ai-valid-input');
+        } else {
+          $(this).parent().find('.ai-input-marker-f').remove();
+          if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+            $(this).parent().append(`
           <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
           <ion-icon name="checkmark-sharp"></ion-icon>
           </div>`)
+          }
+
+          $(this).parent().find('.ai-warning-text').remove()
+
+          $(this).addClass('ai-valid-input');
         }
+      } else {
+        $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+        $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+        setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+        setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+        setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
 
-        $(this).parent().find('.ai-warning-text').remove()
-
-        $(this).addClass('ai-valid-input');
+        $(this).removeClass('ai-valid-input');
       }
-    } else {
-      $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-      $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-      setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
-      setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
-      setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
 
-      $(this).removeClass('ai-valid-input');
-    }
+    });
 
-  });
+    /* Validating finish date */
+    $('#finish-date').on('keyup change', async function () {
+      if ($(this).val() !== '') {
 
-   /* Validating finish date */
-   $('#finish-date').on('keyup change', async function () {
-    if ($(this).val() !== '') {
-
-      if (new Date($(this).val()) <= new Date($('#start-date').val()) || new Date($(this).val()) >= new Date()) {
-        $(this).parent().find('.ai-input-marker-s').remove();
-        if ($(this).parent().find('.ai-input-marker-f').length === 0) {
-          $(this).parent().append(`
+        if (new Date($(this).val()) <= new Date($('#start-date').val()) || new Date($(this).val()) >= new Date()) {
+          $(this).parent().find('.ai-input-marker-s').remove();
+          if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+            $(this).parent().append(`
         <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
           <ion-icon name="close-sharp"></ion-icon>
         </div>`)
-        }
+          }
 
-        if ($(this).parent().find('.ai-warning-text').length === 0) {
-          $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
-        }
+          if ($(this).parent().find('.ai-warning-text').length === 0) {
+            $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
+          }
 
-        $(this).removeClass('ai-valid-input');
-      } else {
-        $(this).parent().find('.ai-input-marker-f').remove();
-        if ($(this).parent().find('.ai-input-marker-s').length === 0) {
-          $(this).parent().append(`
+          $(this).removeClass('ai-valid-input');
+        } else {
+          $(this).parent().find('.ai-input-marker-f').remove();
+          if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+            $(this).parent().append(`
           <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
           <ion-icon name="checkmark-sharp"></ion-icon>
           </div>`)
+          }
+
+          $(this).parent().find('.ai-warning-text').remove()
+
+          $(this).addClass('ai-valid-input');
         }
+      } else {
+        $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+        $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+        setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+        setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+        setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
 
-        $(this).parent().find('.ai-warning-text').remove()
-
-        $(this).addClass('ai-valid-input');
+        $(this).removeClass('ai-valid-input');
       }
-    } else {
-      $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-      $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-      setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
-      setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
-      setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
 
-      $(this).removeClass('ai-valid-input');
-    }
-
-  });
+    });
 
 
-  $('*').on('click change keyup mouseenter', function () {
-    if ($('#start-date').hasClass('ai-valid-input') && $('#lactation-number').find('.ai-pick-active').length > 0) {
-      $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
-    } else {
-      $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
-    }
-  });
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#start-date').hasClass('ai-valid-input') && $('#lactation-number').find('.ai-pick-active').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
 
   }
   ///////////////////////
@@ -5025,8 +5048,7 @@ $(document).ready(async function () {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
       $(this).parent().hide();
-      $('#dose-input').show()
-      $('#dose-input').find('.aa-double-input-block').trigger('click');
+      $('#dose-input').css('display', 'flex');
     });
 
 

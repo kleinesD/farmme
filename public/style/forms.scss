@@ -521,6 +521,9 @@
   font-weight: 600;
   opacity: 0.75;
 }
+.ai-input-hidden {
+  display: none;
+}
 /* Small select */
 .ai-small-select {
   background-color: #f0f0f0;
@@ -534,6 +537,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+.ai-small-select p {
+  font-size: 16px;
+  font-weight: 600;
 }
 .ai-small-select-block {
   position: absolute;
@@ -544,6 +552,7 @@
   background-color: #f0f0f0;
   border-radius: 10px;
   z-index: 100;
+  display: none;
 }
 .ai-small-select-item {
   width: 100%;
@@ -557,6 +566,14 @@
 
   &:hover {
     background-color: $lightOrange;
+  }
+  &:first-of-type {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  &:last-of-type {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
   }
 }
 .ai-small-select-item-selected {
