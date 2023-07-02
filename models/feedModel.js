@@ -22,11 +22,20 @@ const feedSchema = new mongoose.Schema({
     type: String,
     default: 'all'
   },
+  autoRefill: Boolean,
+  autoWriteOff: Boolean,
+  autoTimeSpan: Number,
+  nextAutoAction: Date,
   date: Date,
   creationDate: {
     type: Date,
     required: true,
     default: Date.now()
+  },
+  farm: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Farm',
+    required: true
   },
   editedAtBy: [
     {
