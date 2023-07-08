@@ -59,6 +59,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/distribution/?start=2023-03-06T18:10:26.040Z');
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-action/multiple');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme/');
 
 
   contentWindow.maximize();

@@ -363,18 +363,21 @@ $(document).ready(async function () {
       $(this).parent().parent().attr('data-state', 'hide');
       anime({ targets: $(this).parent().parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
 
-      if ($(this).parent().find('.ai-select-item-selected').length > 0) {
-        if ($(this).parent().parent().find('.ai-input-marker-s').length === 0) {
-          $(this).parent().parent().append(`
+      if (!$(this).parent().hasClass('ai-input-validation')) {
+        if ($(this).parent().find('.ai-select-item-selected').length > 0) {
+          if ($(this).parent().parent().find('.ai-input-marker-s').length === 0) {
+            $(this).parent().parent().append(`
         <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
           <ion-icon name="checkmark-sharp"></ion-icon>
         </div>`)
-          //setTimeout(() => { $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__pulse') }, 1500)
+            //setTimeout(() => { $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__pulse') }, 1500)
+          }
+        } else {
+          $(this).parent().parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).parent().parent().find('.ai-input-marker-s').remove() }, 800)
         }
-      } else {
-        $(this).parent().parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-        setTimeout(() => { $(this).parent().parent().find('.ai-input-marker-s').remove() }, 800)
       }
+
 
       /* Select action for different select inputs */
       /* Breed */
@@ -5042,9 +5045,9 @@ $(document).ready(async function () {
   /////////////////////////
 
   ///////////////////////
-  /* ADD VET ACTION */
+  /* VET ACTION */
   ///////////////////////
-  if (document.querySelector('#vet-action-container')) {
+  if (document.querySelector('#vet-action-container') || document.querySelector('#edit-vet-action-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
       $(this).parent().hide();
@@ -5068,481 +5071,475 @@ $(document).ready(async function () {
       }
     });
 
-    $('.ai-selected-animals-block').on('click', '.ai-selected-animals-item', function () {
-       const id = $(this).attr('data-id');
-       $(this).remove();
+    $('.ai-selected-animals-block').on('click', '.ai-selected-animals-remove', function () {
+      const id = $(this).parent().attr('data-id');
       $('#multiple-animals').find('.ai-select-item').each(function () { if ($(this).attr('data-id') === id) $(this).removeClass('ai-select-item-unvail') });
-    })
+      $(this).parent().remove();
 
-
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) > new Date() || new Date($(this).val()) < new Date($(this).attr('data-animal-birth'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
-      }
-
-    });
-
-    $('*').on('click focus blur change', function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#multiple-animals-container').children().length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      } else {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input')) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
+      if ($('.ai-selected-animals-block').find('.ai-selected-animals-item').length === 0) {
+        $('.ai-selected-animals-block').hide();
       }
     });
 
-    $('.ar-add-button').click(async function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
+    /* Validating start date */
+    $('#date').on('keyup change', async function () {
+      if ($(this).hasClass('ai-input-validation')) {
+        if ($(this).val() !== '') {
+
+          if (new Date($(this).val()) <= new Date($(this).attr('data-animal-birth'))) {
+            $(this).parent().find('.ai-input-marker-s').remove();
+            if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+              $(this).parent().append(`
+          <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
+            <ion-icon name="close-sharp"></ion-icon>
+          </div>`)
+            }
+
+            if ($(this).parent().find('.ai-warning-text').length === 0) {
+              $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
+            }
+
+            $(this).removeClass('ai-valid-input');
+          } else {
+            $(this).parent().find('.ai-input-marker-f').remove();
+            if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+              $(this).parent().append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
+            }
+
+            $(this).parent().find('.ai-warning-text').remove()
+
+            $(this).addClass('ai-valid-input');
+          }
+        } else {
+          $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
+
+          $(this).removeClass('ai-valid-input');
+        }
+      }
 
 
-        let doneAnimals = 0;
+    });
 
-        $('.ar-add-button').append(`<div class="mini-loader"></div>`);
-        $('.mini-loader').css({
-          'position': 'absolute',
-          'right': '-35px'
-        });
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#name').hasClass('ai-valid-input') && $('#date').hasClass('ai-valid-input')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
 
-        let subId = randomstring.generate(12);
+    if (document.querySelector('#edit-vet-action-container')) {
+      $('.ai-input').trigger('keyup')
+      $('.ai-textarea').trigger('keyup')
+    }
 
-        $('#multiple-animals-container').children().each(async function () {
-          let animalId = $(this).attr('data-id');
+
+    if (document.querySelector('#vet-action-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        if (document.querySelector('.ai-selected-animals-block')) {
+
+
+          let doneAnimals = 0;
+
+          $(this).empty();
+          $(this).append(`<div class="mini-loader"></div>`);
+          anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+          let subId = randomstring.generate(12);
+
+          $('#multiple-animals-container').find('.ai-selected-animals-item').each(async function () {
+            let animalId = $(this).attr('data-id');
+            let name = $('#name').val();
+            let date = new Date($('#date').val());
+            let note = $('#note').val() === '' ? undefined : $('#note').val();
+            let dose;
+            if ($('#dose').val().length > 0) {
+              dose = {
+                amount: parseFloat($('#dose').val()),
+                unit: $('#unit').find('.ai-small-select-item-selected').attr('data-val')
+              }
+            }
+
+            const response = await addVetAction(animalId, { name, date, note, dose, subId });
+
+            if (response) doneAnimals++;
+
+            if (doneAnimals === $('#multiple-animals-container').find('.ai-selected-animals-item').length) {
+              addConfirmationEmpty($('.animal-results-window'));
+              setTimeout(() => { location.reload(true); }, 1500)
+            }
+          });
+
+        } else {
+          let animalId = $(this).attr('data-animal-id');
           let name = $('#name').val();
-          let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-          let note = $('#note').val() === '' ? undefined : $('#note').val();
+          let date = new Date($('#date').val());
+          let note = $('#note').val();
           let dose;
           if ($('#dose').val().length > 0) {
             dose = {
               amount: parseFloat($('#dose').val()),
-              unit: $('#unit').val()
+              unit: $('#unit').find('.ai-small-select-item-selected').attr('data-val')
             }
           }
 
-          const response = await addVetAction(animalId, { name, date, note, dose, subId });
+          $(this).empty();
+          $(this).append(`<div class="mini-loader"></div>`);
+          anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-          if (response) doneAnimals++;
+          const response = await addVetAction(animalId, { name, date, note, dose });
 
-          if (doneAnimals === $('#multiple-animals-container').children().length) {
-            $('.mini-loader').hide();
-            addConfirmationEmpty($('.animal-results-container'));
-            setTimeout(() => {
-              location.reload(true);
-            }, 1500)
-
-            /* location.assign('/herd/all-animals'); */
+          if (response) {
+            addConfirmationEmpty($('.animal-results-window'));
+            setTimeout(() => { location.reload(true); }, 1500)
           }
-        });
-
-      } else {
-        let animalId = $(this).attr('data-animal-id');
+        }
+      })
+    } else if (document.querySelector('#edit-vet-action-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let id = $(this).attr('data-action-id');
         let name = $('#name').val();
-        let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
+        let date = new Date($('#date').val());
         let note = $('#note').val();
         let dose;
         if ($('#dose').val().length > 0) {
           dose = {
             amount: parseFloat($('#dose').val()),
-            unit: $('#unit').val()
+            unit: $('#unit').find('.ai-small-select-item-selected').attr('data-val')
           }
         }
 
+        $(this).empty();
         $(this).append(`<div class="mini-loader"></div>`);
-        $('.mini-loader').css({
-          'position': 'absolute',
-          'right': '-35px'
-        });
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-        const response = await addVetAction(animalId, { name, date, note, dose });
+        const response = await editVetAction(id, { name, date, note, dose });
 
         if (response) {
-          $('.mini-loader').hide();
-          addConfirmationEmpty($('.animal-results-container'));
-          setTimeout(() => {
-            location.reload(true);
-          }, 1500)
-
-          /* location.assign('/herd/all-animals'); */
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
         }
-      }
-    })
-  }
+      })
+    }
 
-  ///////////////////////
-  /* EDIT VET ACTION */
-  ///////////////////////
-  if (document.querySelector('#edit-vet-action-container')) {
-    /* Adding the dose input */
-    $('#add-dose-input').click(function () {
-      $(this).parent().hide();
-      $('#dose-input').show()
-      $('#dose-input').find('.aa-double-input-block').trigger('click');
-    });
 
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) > new Date() || new Date($(this).val()) < new Date($(this).attr('data-animal-birth'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
-      }
-    });
-
-    $('*').on('click focus blur change', function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#multiple-animals-container').children().length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      } else {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input')) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      }
-    });
-
-    $('input').trigger('click');
-
-    $('.ar-add-button').click(async function () {
-      let actionId = $(this).attr('data-id');
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val();
-      let dose;
-      if ($('#dose').val().length > 0) {
-        dose = {
-          amount: parseFloat($('#dose').val()),
-          unit: $('#unit').val()
-        }
-      }
-
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
-
-      const response = await editVetAction(actionId, { name, date, note, dose });
-
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
-      }
-    })
   }
 
   ///////////////////////
   /* ADD VET PROBLEM */
   ///////////////////////
-  if (document.querySelector('#vet-problem-container')) {
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) > new Date() || new Date($(this).val()) < new Date($(this).attr('data-animal-birth'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
+  if (document.querySelector('#vet-problem-container') || document.querySelector('#edit-vet-problem-container')) {
+    /* Adding multiple animals */
+    $('#multiple-animals').find('.ai-select-item').on('click', function () {
+      $(this).addClass('ai-select-item-unvail');
+      $('.ai-selected-animals-block').append(`
+        <div class="ai-selected-animals-item" data-id="${$(this).attr('data-id')}">${$(this).find('.ai-select-name').text()}
+          <div class="ai-selected-animals-remove"> 
+            <ion-icon name="close"></ion-icon>
+          </div>
+        </div>
+      `)
+      if ($('.ai-selected-animals-block').css('display') === 'none') {
+        $('.ai-selected-animals-block').css({ 'display': 'block', 'opacity': '0' });
+        anime({ targets: $('.ai-selected-animals-block')[0], opacity: 1, easing: 'easeInOutQuad', duration: 500 })
       }
     });
 
-    $('*').on('click focus blur change', function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#multiple-animals-container').children().length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      } else {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input')) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
+    $('.ai-selected-animals-block').on('click', '.ai-selected-animals-remove', function () {
+      const id = $(this).parent().attr('data-id');
+      $('#multiple-animals').find('.ai-select-item').each(function () { if ($(this).attr('data-id') === id) $(this).removeClass('ai-select-item-unvail') });
+      $(this).parent().remove();
+
+      if ($('.ai-selected-animals-block').find('.ai-selected-animals-item').length === 0) {
+        $('.ai-selected-animals-block').hide();
       }
     });
 
-    $('.ar-add-button').click(async function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
+    /* Validating date */
+    $('#date').on('keyup change', async function () {
+      if ($(this).hasClass('ai-input-validation')) {
+        if ($(this).val() !== '') {
 
-        let doneAnimals = 0;
+          if (new Date($(this).val()) <= new Date($(this).attr('data-animal-birth'))) {
+            $(this).parent().find('.ai-input-marker-s').remove();
+            if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+              $(this).parent().append(`
+          <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
+            <ion-icon name="close-sharp"></ion-icon>
+          </div>`)
+            }
 
-        $('.ar-add-button').append(`<div class="mini-loader"></div>`);
-        $('.mini-loader').css({
-          'position': 'absolute',
-          'right': '-35px'
-        });
+            if ($(this).parent().find('.ai-warning-text').length === 0) {
+              $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
+            }
 
-        let subId = randomstring.generate(12);
+            $(this).removeClass('ai-valid-input');
+          } else {
+            $(this).parent().find('.ai-input-marker-f').remove();
+            if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+              $(this).parent().append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
+            }
 
-        $('#multiple-animals-container').children().each(async function () {
-          let animalId = $(this).attr('data-id');
-          let name = $('#name').val();
-          let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-          let note = $('#note').val() === '' ? undefined : $('#note').val();
+            $(this).parent().find('.ai-warning-text').remove()
 
-          const response = await addVetProblem(animalId, { name, date, note, subId });
-
-          if (response) doneAnimals++;
-
-          if (doneAnimals === $('#multiple-animals-container').children().length) {
-            $('.mini-loader').hide();
-            addConfirmationEmpty($('.animal-results-container'));
-            setTimeout(() => {
-              location.reload(true);
-            }, 1500)
-
-            /* location.assign('/herd/all-animals'); */
+            $(this).addClass('ai-valid-input');
           }
-        });
+        } else {
+          $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
 
+          $(this).removeClass('ai-valid-input');
+        }
+      }
+
+
+    });
+
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#name').hasClass('ai-valid-input') && $('#date').hasClass('ai-valid-input')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        let animalId = $(this).attr('data-animal-id');
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    if (document.querySelector('#edit-vet-problem-container')) {
+      $('.ai-input').trigger('keyup')
+      $('.ai-textarea').trigger('keyup')
+    }
+
+    if (document.querySelector('#vet-problem-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        if (document.querySelector('.ai-selected-animals-block')) {
+
+
+          let doneAnimals = 0;
+
+          $(this).empty();
+          $(this).append(`<div class="mini-loader"></div>`);
+          anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+          let subId = randomstring.generate(12);
+
+          $('#multiple-animals-container').find('.ai-selected-animals-item').each(async function () {
+            let animalId = $(this).attr('data-id');
+            let name = $('#name').val();
+            let date = new Date($('#date').val());
+            let note = $('#note').val() === '' ? undefined : $('#note').val();
+
+            const response = await addVetProblem(animalId, { name, date, note, subId });
+
+            if (response) doneAnimals++;
+
+            if (doneAnimals === $('#multiple-animals-container').find('.ai-selected-animals-item').length) {
+              addConfirmationEmpty($('.animal-results-window'));
+              setTimeout(() => { location.reload(true); }, 1500)
+            }
+          });
+
+        } else {
+          let animalId = $(this).attr('data-animal-id');
+          let name = $('#name').val();
+          let date = new Date($('#date').val());
+          let note = $('#note').val();
+
+          $(this).empty();
+          $(this).append(`<div class="mini-loader"></div>`);
+          anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+          const response = await addVetProblem(animalId, { name, date, note });
+
+          if (response) {
+            addConfirmationEmpty($('.animal-results-window'));
+            setTimeout(() => { location.reload(true); }, 1500)
+          }
+        }
+      })
+    } else if (document.querySelector('#edit-vet-problem-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let id = $(this).attr('data-problem-id');
         let name = $('#name').val();
-        let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
+        let date = new Date($('#date').val());
         let note = $('#note').val();
 
+        $(this).empty();
         $(this).append(`<div class="mini-loader"></div>`);
-        $('.mini-loader').css({
-          'position': 'absolute',
-          'right': '-35px'
-        });
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-        const response = await addVetProblem(animalId, { name, date, note });
+        const response = await editVetProblem(id, { name, date, note });
 
         if (response) {
-          $('.mini-loader').hide();
-          addConfirmationEmpty($('.animal-results-container'));
-          setTimeout(() => {
-            location.reload(true);
-          }, 1500)
-
-          /* location.assign('/herd/all-animals'); */
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
         }
-      }
-    })
+      })
+    }
   }
 
   ///////////////////////
-  /* EDIT VET PROBLEM */
+  /* VET TREATMENT */
   ///////////////////////
-  if (document.querySelector('#edit-vet-problem-container')) {
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) > new Date() || new Date($(this).val()) < new Date($(this).attr('data-animal-birth'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
-      }
-    });
-
-    $('*').on('click focus blur change', function () {
-      if (document.querySelector('.ar-selected-animals-block')) {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#multiple-animals-container').children().length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      } else {
-        if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input')) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
-      }
-    });
-
-    $('input').trigger('click');
-
-    $('.ar-add-button').click(async function () {
-      let problemId = $(this).attr('data-id');
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val();
-
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
-
-      const response = await editVetProblem(problemId, { name, date, note });
-
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
-      }
-    })
-  }
-
-  ///////////////////////
-  /* ADD VET TREATMENT */
-  ///////////////////////
-  if (document.querySelector('#vet-treatment-container')) {
+  if (document.querySelector('#vet-treatment-container') || document.querySelector('#edit-vet-treatment-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
       $(this).parent().hide();
-      $('#dose-input').show()
-      $('#dose-input').find('.aa-double-input-block').trigger('click');
+      $('#dose-input').css({ 'display': 'flex', 'opacity': '0' });
+      anime({ targets: $('#dose-input')[0], opacity: 1, easing: 'easeInOutQuad', duration: 500 })
     });
 
-    /* Expanding the problem block */
-    $('.ar-problem-expand-btn').click(function () {
-      if ($(this).attr('data-state') === 'to-show') {
-        $(this).find('ion-icon').css('transform', 'rotate(180deg)');
-        $(this).css('border-bottom-right-radius', '0px');
-        $('.ar-problem-text').show();
-        $(this).attr('data-state', 'to-hide');
+    /* Formating date in problem */
+    $('#problem-date').text(moment($('#problem-date').attr('data-date')).lang('ru').format('DD MMMM YYYY, hh:mm'))
+
+    /* Showing note in problem */
+    $('.ai-problem-block').on('click', function () {
+      if ($(this).attr('data-state') === 'show') {
+        $(this).find('.ai-problem-detail').show()
+        anime({ targets: $(this).find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
+
+        $(this).attr('data-state', 'hide');
       } else {
-        $(this).css('border-bottom-right-radius', '5px');
-        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
-        $('.ar-problem-text').hide();
-        $(this).attr('data-state', 'to-show');
+        $(this).find('.ai-problem-detail').hide()
+        anime({ targets: $(this).find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
+
+        $(this).attr('data-state', 'show');
       }
     });
 
+    /* Validating date */
+    $('#date').on('keyup change', async function () {
+      if ($(this).hasClass('ai-input-validation')) {
+        if ($(this).val() !== '') {
 
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
+          if (new Date($(this).val()) <= new Date($(this).attr('data-disease-date'))) {
+            $(this).parent().find('.ai-input-marker-s').remove();
+            if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+              $(this).parent().append(`
+          <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
+            <ion-icon name="close-sharp"></ion-icon>
+          </div>`)
+            }
 
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) < new Date($(this).attr('data-disease-date'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
+            if ($(this).parent().find('.ai-warning-text').length === 0) {
+              $(this).parent().append(`<div class="ai-warning-text">Введите корректную дату</div>`)
+            }
+
+            $(this).removeClass('ai-valid-input');
+          } else {
+            $(this).parent().find('.ai-input-marker-f').remove();
+            if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+              $(this).parent().append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
+            }
+
+            $(this).parent().find('.ai-warning-text').remove()
+
+            $(this).addClass('ai-valid-input');
+          }
         } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
+          $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
+
+          $(this).removeClass('ai-valid-input');
         }
       }
     });
 
-    $('*').on('click focus blur change', function () {
-      if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#cured').find('.aa-pick-picked').length > 0) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#name').hasClass('ai-valid-input') && $('#date').hasClass('ai-valid-input')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
 
-    $('.ar-add-button').click(async function () {
+    if (document.querySelector('#edit-vet-treatment-container')) {
+      $('.ai-input').trigger('keyup')
+      $('.ai-textarea').trigger('keyup')
+      $('.ai-to-pick').trigger('click');
+      $('.ai-small-select-item-selected').trigger('click').trigger('click');
+    }
 
-      let diseaseId = $(this).attr('data-disease-id');
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val();
-      let cured = $('#cured').find('.aa-pick-picked').attr('id') === 'cured';
-      let dose;
-      if ($('#dose').val().length > 0) {
-        dose = {
-          amount: parseFloat($('#dose').val()),
-          unit: $('#unit').val()
+
+    if (document.querySelector('#vet-treatment-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let diseaseId = $(this).attr('data-disease-id');
+        let name = $('#name').val();
+        let date = new Date($('#date').val());
+        let note = $('#note').val();
+        let cured = $('#cured').find('.ai-pick-active').attr('id') === 'cured';
+        let dose;
+        if ($('#dose').val().length > 0) {
+          dose = {
+            amount: parseFloat($('#dose').val()),
+            unit: $('#unit').find('.ai-small-select-item-selected').attr('data-val')
+          }
         }
-      }
 
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await addVetTreatment(diseaseId, { name, date, note, dose, cured });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
       });
+    } else if (document.querySelector('#edit-vet-treatment-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let treatmentId = $(this).attr('data-treatment-id');
+        let name = $('#name').val();
+        let date = new Date($('#date').val());
+        let note = $('#note').val();
+        let cured = $('#cured').find('.ai-pick-active').attr('id') === 'cured';
+        let dose;
+        if ($('#dose').val().length > 0) {
+          dose = {
+            amount: parseFloat($('#dose').val()),
+            unit: $('#unit').find('.ai-small-select-item-selected').attr('data-val')
+          }
+        }
 
-      const response = await addVetTreatment(diseaseId, { name, date, note, dose, cured });
 
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-        /* location.assign('/herd/all-animals'); */
-      }
-    })
+        const response = await editVetTreatment(treatmentId, { name, date, note, dose, cured });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      });
+    }
+
   }
 
   ///////////////////////
   /* EDIT VET TREATMENT */
   ///////////////////////
-  if (document.querySelector('#edit-vet-treatment-container')) {
+  if (document.querySelector('#edirt-vet-treatment-container')) {
     /* Adding the dose input */
     $('#add-dose-input').click(function () {
       $(this).parent().hide();
