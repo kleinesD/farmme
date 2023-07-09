@@ -395,7 +395,7 @@ $(document).ready(async function () {
     });
 
     /* Small select input */
-    $('.ai-small-select').on('click', function () {
+    $('.ai-form-container').on('click', '.ai-small-select', function () {
       if ($(this).attr('data-state') !== 'show') {
         $(this).find('.ai-small-select-block').show();
         $(this).attr('data-state', 'show');
@@ -408,7 +408,7 @@ $(document).ready(async function () {
 
     });
 
-    $('.ai-small-select-item').on('click', function () {
+    $('.ai-form-container').on('click', '.ai-small-select-item', function () {
       $(this).parent().find('.ai-small-select-item-selected').removeClass('ai-small-select-item-selected');
       $(this).addClass('ai-small-select-item-selected');
       $(this).parent().parent().find('p').text($(this).text());
@@ -5233,7 +5233,7 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* ADD VET PROBLEM */
+  /* VET PROBLEM */
   ///////////////////////
   if (document.querySelector('#vet-problem-container') || document.querySelector('#edit-vet-problem-container')) {
     /* Adding multiple animals */
@@ -5537,245 +5537,134 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* EDIT VET TREATMENT */
-  ///////////////////////
-  if (document.querySelector('#edirt-vet-treatment-container')) {
-    /* Adding the dose input */
-    $('#add-dose-input').click(function () {
-      $(this).parent().hide();
-      $('#dose-input').show()
-      $('#dose-input').find('.aa-double-input-block').trigger('click');
-    });
-
-    /* Expanding the problem block */
-    $('.ar-problem-expand-btn').click(function () {
-      if ($(this).attr('data-state') === 'to-show') {
-        $(this).find('ion-icon').css('transform', 'rotate(180deg)');
-        $(this).css('border-bottom-right-radius', '0px');
-        $('.ar-problem-text').show();
-        $(this).attr('data-state', 'to-hide');
-      } else {
-        $(this).css('border-bottom-right-radius', '5px');
-        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
-        $('.ar-problem-text').hide();
-        $(this).attr('data-state', 'to-show');
-      }
-    });
-
-
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()) < new Date($(this).attr('data-disease-date'))) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $('.aa-label-warning').remove();
-          $('.ar-btn-box').append(`<div class="aa-label-warning">× - Введите правильную дату</div>`)
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
-      }
-    });
-
-    $('*').on('click focus blur change', function () {
-      if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#cured').find('.aa-pick-picked').length > 0) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-      } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-      }
-    });
-
-    $('input').trigger('click');
-
-    $('.ar-add-button').click(async function () {
-
-      let treatmentId = $(this).attr('data-id');
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val();
-      let cured = $('#cured').find('.aa-pick-picked').attr('id') === 'cured';
-      let dose;
-      if ($('#dose').val().length > 0) {
-        dose = {
-          amount: parseFloat($('#dose').val()),
-          unit: $('#unit').val()
-        }
-      }
-
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
-
-      const response = await editVetTreatment(treatmentId, { name, date, note, dose, cured });
-
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
-      }
-    })
-  }
-
-  ///////////////////////
   /* ADD NEW VET SCHEME */
   ///////////////////////
-  if (document.querySelector('.vet-scheme-container')) {
-    $('#add-step').click(function () {
-      let nextNumber = parseFloat($('.scheme-step-container').last().attr('data-step')) + 1;
-      const markup = `<div class="scheme-step-container" data-step="${nextNumber}">
-      <div class="scheme-step-container-label">#${nextNumber}</div>
-      <div class="scheme-step-container-close">
-        <ion-icon name="close"></ion-icon>
+  if (document.querySelector('#vet-scheme-container') || document.querySelector('#edit-vet-scheme-container')) {
+    $('#add-step').on('click', function () {
+      const markup = `
+      <div class="ai-combined-block" data-step="${parseFloat($('.ai-combined-block').last().attr('data-step')) + 1}">
+      <div class="ai-combined-block-title">ШАГ #${parseFloat($('.ai-combined-block').last().attr('data-step')) + 1}</div>
+      <div class="ai-combined-block-remove"><ion-icon name="close"></ion-icon></div>
+      <div class="ai-input-block ai-input-block-text">
+        <div class="ai-input-label">Действие</div>
+        <input class="ai-input ai-input-text ai-input-validation name" type="text"/>
       </div>
-      <div class="aa-input-block">
-          <lable class="aa-label" for="name">
-              <p>Название</p>
-          </lable><input class="aa-text-input scheme-step-action" type="text" />
+      <div class="ai-input-block ai-input-block-small-select">
+        <div class="ai-input-label">Временной отрезок</div>
+        <input class="ai-input ai-input-text ai-input-small-select ai-input-block-triple ai-input-validation step-in" type="number"/>
+        <div class="ai-small-select ai-input-block-triple step-unit">
+          <p>Дней</p>
+          <div class="ai-select-line"></div>
+          <div class="ai-small-select-block shadow">
+            <div class="ai-small-select-item" data-val="h">Часов</div>
+            <div class="ai-small-select-item ai-small-select-item-selected" data-val="d">Дней</div>
+          </div>
+        </div>
+        <div class="ai-small-select ai-input-block-triple step-count">
+          <p>От начала</p>
+          <div class="ai-select-line"></div>
+          <div class="ai-small-select-block shadow">
+            <div class="ai-small-select-item ai-small-select-item-selected" data-val="start">От начала</div>
+            <div class="ai-small-select-item" data-val="last-point">От пред. действия</div>
+          </div>
+        </div>
       </div>
-      <div class="aa-input-block scheme-step">
-          <lable class="aa-label">
-              <p>Временной отрезок</p>
-          </lable>
-          <div class="aa-double-input-block"><input class="aa-double-input scheme-step-in" type="number" /><select class="aa-double-input scheme-step-unit">
-                  <option value="h" selected="selected">Часов</option>
-                  <option value="d">Дней</option>
-              </select><select class="aa-double-input scheme-step-count">
-                  <option value="start" selected="selected">От начала</option>
-                  <option value="last-point">От пред. действия</option>
-              </select></div>
-      </div>
-  </div>`;
+    </div>`;
 
       $(this).before(markup);
     });
 
     /* Removing scheme step */
-    $('.main-section').delegate('.scheme-step-container-close', 'click', function () {
+    $('.ai-form-container').on('click', '.ai-combined-block-remove', function () {
       $(this).parent().remove();
+
+      $('.ai-combined-block').each(function () {
+        if ($(this).prev() && $(this).prev().hasClass('ai-combined-block') && parseFloat($(this).prev().attr('data-step')) + 1 !== parseFloat($(this).attr('data-step'))) {
+          $(this).attr('data-step', parseFloat($(this).prev().attr('data-step')) + 1);
+          $(this).find('.ai-combined-block-title').text(`ШАГ #${parseFloat($(this).prev().attr('data-step')) + 1}`)
+        }
+      });
     });
 
-    /* Validating form */
-    $('.main-section').delegate('input', 'keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-    });
-
-    $('.main-section').delegate('*', 'click keyup blur change', function () {
-      let validSteps = 0;
-      $('.scheme-step-container').each(function () {
-        if ($(this).attr('data-step') !== '1' && $(this).find('.scheme-step-action').hasClass('valid-aa-input') && $(this).find('.scheme-step-in').hasClass('valid-aa-input')) {
-          validSteps++;
-        } else if ($(this).attr('data-step') === '1' && $(this).find('.scheme-step-action').hasClass('valid-aa-input')) {
-          validSteps++;
+    /* Validationg from */
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-combined-block').each(function () {
+        if ($(this).attr('id') === 'ai-combined-block-1' && $(this).find('.name').val().length > 0 || $(this).attr('id') !== 'ai-combined-block-1' && $(this).find('.name').val().length > 0 && $(this).find('.step-in').val().length > 0) {
+          $(this).addClass('ai-combined-block-valid')
+        } else {
+          $(this).removeClass('ai-combined-block-valid')
         }
       });
 
-      if ($('#name').hasClass('valid-aa-input') && $('.scheme-step-container').length === validSteps) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+      if ($('#name').hasClass('ai-valid-input') && $('#ai-combined-block-1').hasClass('ai-combined-block-valid') && $('#ai-combined-block-2').hasClass('ai-combined-block-valid')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
-
     });
 
-    $('input').trigger('click');
+    if (document.querySelector('#edit-vet-scheme-container')) {
+      $('.ai-input').trigger('keyup')
+      $('.ai-small-select-item-selected').trigger('click').trigger('click');
+    }
 
-  }
-
-  ///////////////////////
-  /* ADD VET SCHEME */
-  ///////////////////////
-  if (document.querySelector('#add-vet-scheme')) {
-    $('.ar-add-button').click(async function () {
-      let name = $('#name').val();
-      let points = [];
-      $('.scheme-step-container').each(function () {
-        points.push({
-          action: $(this).find('.scheme-step-action').val(),
-          firstPoint: points.length === 0 ? true : false,
-          scheduledIn: $(this).find('.scheme-step-in').val(),
-          countFrom: $(this).find('.scheme-step-count').val(),
-          timeUnit: $(this).find('.scheme-step-unit').val()
+    if (document.querySelector('#vet-scheme-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let name = $('#name').val();
+        let points = [];
+        $('.ai-combined-block').each(function () {
+          points.push({
+            action: $(this).find('.name').val(),
+            firstPoint: points.length === 0 ? true : false,
+            scheduledIn: $(this).find('.step-in').val(),
+            countFrom: $(this).find('.step-count').find('.ai-small-select-item-selected').attr('data-val'),
+            timeUnit: $(this).find('.step-unit').find('.ai-small-select-item-selected').attr('data-val')
+          });
         });
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await addVetScheme({ name, points });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
       });
-
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
-
-      const response = await addVetScheme({ name, points });
-
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
-      }
-
-    })
-  }
-
-  ///////////////////////
-  /* EDIT VET SCHEME */
-  ///////////////////////
-  if (document.querySelector('#edit-vet-scheme')) {
-    $('.ar-add-button').click(async function () {
-      let schemeId = $(this).attr('data-id')
-      let name = $('#name').val();
-      let points = [];
-      $('.scheme-step-container').each(function () {
-        points.push({
-          action: $(this).find('.scheme-step-action').val(),
-          firstPoint: points.length === 0 ? true : false,
-          scheduledIn: $(this).find('.scheme-step-in').val(),
-          countFrom: $(this).find('.scheme-step-count').val(),
-          timeUnit: $(this).find('.scheme-step-unit').val()
+    } else if (document.querySelector('#edit-vet-scheme-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let schemeId = $(this).attr('data-scheme-id');
+        let name = $('#name').val();
+        let points = [];
+        $('.ai-combined-block').each(function () {
+          points.push({
+            action: $(this).find('.name').val(),
+            firstPoint: points.length === 0 ? true : false,
+            scheduledIn: $(this).find('.step-in').val(),
+            countFrom: $(this).find('.step-count').find('.ai-small-select-item-selected').attr('data-val'),
+            timeUnit: $(this).find('.step-unit').find('.ai-small-select-item-selected').attr('data-val')
+          });
         });
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await editVetScheme(schemeId, { name, points });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
       });
+    }
 
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
 
-      const response = await editVetScheme(schemeId, { name, points });
-
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
-      }
-
-    })
   }
 
+  
   ///////////////////////
   /* START A SCHEME */
   ///////////////////////

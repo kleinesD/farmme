@@ -456,20 +456,22 @@ exports.renderEditVetTreatment = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAddVetScheme = catchAsync(async (req, res, next) => {
+  const forEdit = false;
 
-
-  res.status(200).render('vetAddScheme', {
-
+  res.status(200).render('vetScheme', {
+    forEdit
   });
 });
 
 exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
+  
   const animal = await Animal.findById(req.params.animalId);
   const schemes = await Scheme.find({ farm: req.user.farm });
 
-  res.status(200).render('vetStartScheme', {
+  res.status(200).render('vetScheme', {
     animal,
-    schemes
+    schemes,
+    
   });
 });
 
@@ -488,10 +490,12 @@ exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
 });
 
 exports.renderEditScheme = catchAsync(async (req, res, next) => {
+  const forEdit = true;
   const scheme = await Scheme.findById(req.params.schemeId);
 
-  res.status(200).render('vetEditScheme', {
-    scheme
+  res.status(200).render('vetScheme', {
+    scheme,
+    forEdit
   });
 });
 

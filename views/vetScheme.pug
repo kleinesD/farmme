@@ -1,0 +1,111 @@
+extends base
+
+block content
+  include _rcmVet
+  section.main-section.vet-module
+
+    -if(!forEdit)
+      .animal-results-window
+        .ai-form-container.ai-form-vet#vet-scheme-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Ветеринарную схему
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Название
+            input.ai-input.ai-input-text#name(type="text" )
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-combined-block#ai-combined-block-1(data-step="1")
+            .ai-combined-block-title ШАГ #1
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Действие
+              input.ai-input.ai-input-text.ai-input-validation.name(type="text")
+
+          .ai-combined-block#ai-combined-block-2(data-step="2")
+            .ai-combined-block-title ШАГ #2
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Действие
+              input.ai-input.ai-input-text.ai-input-validation.name(type="text")
+
+            .ai-input-block.ai-input-block-small-select
+              .ai-input-label Временной отрезок
+              input.ai-input.ai-input-text.ai-input-small-select.ai-input-block-triple.ai-input-validation.step-in(type="number")
+              .ai-small-select.step-unit.ai-input-block-triple
+                p Дней
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item(data-val="h") Часов
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="d") Дней
+              .ai-small-select.step-count.ai-input-block-triple
+                p От начала
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="start") От начала
+                  .ai-small-select-item(data-val="last-point") От пред. действия
+
+          .ai-add-combined-block#add-step
+            | ДОБАВИТЬ ШАГ
+            span +
+
+          a.ai-input-submit-btn(data-action-id=``) Сохранить
+
+    -if(forEdit)
+      .animal-results-window
+        .ai-form-container.ai-form-vet#edit-vet-scheme-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Ветеринарную схему
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Название
+            input.ai-input.ai-input-text#name(type="text" value=`${scheme.name}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-combined-block#ai-combined-block-1(data-step="1")
+            .ai-combined-block-title ШАГ #1
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Действие
+              input.ai-input.ai-input-text.ai-input-validation.name(type="text" value=`${scheme.points[0].action}`)
+
+          each point in scheme.points 
+            -if(scheme.points.indexOf(point) !== 0)
+              .ai-combined-block#ai-combined-block-2(data-step="2")
+                .ai-combined-block-title= `ШАГ #${scheme.points.indexOf(point) + 1}`
+                //-.ai-combined-block-remove
+                  ion-icon(name="close")
+                .ai-input-block.ai-input-block-text
+                  .ai-input-label Действие
+                  input.ai-input.ai-input-text.ai-input-validation.name(type="text" value=`${point.action}`)
+
+                .ai-input-block.ai-input-block-small-select
+                  .ai-input-label Временной отрезок
+                  input.ai-input.ai-input-text.ai-input-small-select.ai-input-block-triple.ai-input-validation.step-in(type="number" value=`${point.scheduledIn}`)
+                  .ai-small-select.step-unit.ai-input-block-triple
+                    p Дней
+                    .ai-select-line
+                    .ai-small-select-block.shadow
+                      .ai-small-select-item(data-val="h" class=`${point.timeUnit === 'h' ? 'ai-small-select-item-selected' : ''}`) Часов
+                      .ai-small-select-item(data-val="d" class=`${point.timeUnit === 'd' ? 'ai-small-select-item-selected' : ''}`) Дней
+                  .ai-small-select.step-count.ai-input-block-triple
+                    p От начала
+                    .ai-select-line
+                    .ai-small-select-block.shadow
+                      .ai-small-select-item(data-val="start" class=`${point.countFrom === 'start' ? 'ai-small-select-item-selected' : ''}`) От начала
+                      .ai-small-select-item(data-val="last-point" class=`${point.countFrom === 'last-point' ? 'ai-small-select-item-selected' : ''}`) От пред. действия
+
+          .ai-add-combined-block#add-step
+            | ДОБАВИТЬ ШАГ
+            span +
+
+          a.ai-input-submit-btn(data-scheme-id=`${scheme._id}`) Сохранить
+
+

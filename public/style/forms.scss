@@ -887,7 +887,10 @@
   flex-direction: column;
   justify-content: flex-end;
   position: relative;
-  margin: 22px 0 42px 0;
+  margin: 0px 0 42px 0;
+}
+.ai-combined-block-valid {
+  background: repeating-linear-gradient(135deg, rgb(14, 173, 105, 0.5), rgb(14, 173, 105, 0.5) 32px, #ffffff 32px, #ffffff 64px);
 }
 
 .ai-combined-block-title {
@@ -897,6 +900,24 @@
   top: 10px;
   left: 10px;
 }
+.ai-combined-block-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover ion-icon {
+    transform: rotate(90deg);
+  }
+
+  ion-icon {
+    font-size: 250%;
+  }
+}
+
 
 .ai-input-block-triple {
   min-height: unset;
@@ -914,6 +935,7 @@
   justify-content: center;
   font-size: 15px;
   font-weight: 700;
+  cursor: pointer;
 
   span {
     font-size: 24px;
