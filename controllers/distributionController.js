@@ -57,3 +57,11 @@ exports.deleteProduct = catchAsync(async(req, res, next) => {
     status: 'success'
   });
 });
+
+exports.deleteSubIdProducts = catchAsync(async(req, res, next) => {
+  const products = await Product.deleteMany({subId: req.params.subId});
+
+  res.status(203).json({
+    status: 'success'
+  });
+});

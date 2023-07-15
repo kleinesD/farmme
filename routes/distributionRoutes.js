@@ -14,4 +14,6 @@ router.patch('/product/:id', authController.protect, distributionController.edit
 
 router.delete('/product/:id', authController.protect, distributionController.deleteProduct);
 
+router.delete('/subIdProducts/:subId', authController.protect, distributionController.deleteSubIdProducts);
+
 module.exports = router;

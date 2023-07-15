@@ -76,7 +76,7 @@ exports.renderEditUser = catchAsync(async (req, res, next) => {
 });
 
 exports.renderChangeRestrictions = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({farm: req.user.farm, _id: req.params.userId});
+  const user = await User.findOne({ farm: req.user.farm, _id: req.params.userId });
 
   res.status(200).render('changeRestrictions', {
     user
@@ -463,32 +463,6 @@ exports.renderAddVetScheme = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
-  
-  const animal = await Animal.findById(req.params.animalId);
-  const schemes = await Scheme.find({ farm: req.user.farm });
-
-  res.status(200).render('vetScheme', {
-    animal,
-    schemes,
-    
-  });
-});
-
-exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
-  const firstSchemeAction = await Vet.findById(req.params.firstSchemeAction).populate('scheme');
-
-  const schemes = await Scheme.find({ farm: req.user.farm });
-
-  const animal = await Animal.findById(firstSchemeAction.animal);
-
-  res.status(200).render('vetEditStartedScheme', {
-    firstSchemeAction,
-    schemes,
-    animal
-  })
-});
-
 exports.renderEditScheme = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const scheme = await Scheme.findById(req.params.schemeId);
@@ -497,6 +471,34 @@ exports.renderEditScheme = catchAsync(async (req, res, next) => {
     scheme,
     forEdit
   });
+});
+
+exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+  const animal = await Animal.findById(req.params.animalId);
+  const schemes = await Scheme.find({ farm: req.user.farm });
+
+  res.status(200).render('vetStartScheme', {
+    animal,
+    schemes,
+    forEdit
+  });
+});
+
+exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const firstSchemeAction = await Vet.findById(req.params.firstSchemeAction).populate('scheme');
+
+  const schemes = await Scheme.find({ farm: req.user.farm });
+
+  const animal = await Animal.findById(firstSchemeAction.animal);
+
+  res.status(200).render('vetStartScheme', {
+    firstSchemeAction,
+    schemes,
+    animal,
+    forEdit
+  })
 });
 
 exports.renderVetMain = catchAsync(async (req, res, next) => {
@@ -641,7 +643,7 @@ exports.renderEditProcess = catchAsync(async (req, res, next) => {
   const forEdit = true;
 
   const rawProduct = await Product.findById(req.params.id);
-  const rawInventory = await Product.find({ farm: req.user.farm, product: rawProduct.product });
+  const rawInventory = await Product.find({ farm: req.user.farm, product: rawProduct.product, _id: { $ne: req.params.id } });
   const totalRaw = countInventoryTotal(rawInventory);
 
   let engRaw = rawProduct.product;
@@ -875,7 +877,7 @@ exports.renderEditWriteOff = catchAsync(async (req, res, next) => {
   const forEdit = true;
 
   const product = await Product.findById(req.params.id);
-  const products = await Product.find({ farm: req.user.farm, product: product.product });
+  const products = await Product.find({ farm: req.user.farm, product: product.product, _id: { $ne: req.params.id } });
   const totalProduct = countInventoryTotal(products);
 
   let engProduct = product.product;

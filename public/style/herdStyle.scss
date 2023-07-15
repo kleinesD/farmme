@@ -2120,43 +2120,6 @@
     background-color: $elBackground;
 }
 
-.aa-total-milk-box {
-    width: 500px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.aa-total-milk-line {
-    width: 80%;
-    height: 10px;
-    border-radius: 50px;
-    border: 1px solid #a2a2a2;
-    position: relative;
-    overflow: hidden;
-    color: $error;
-    background-color: $elBackground;
-}
-
-.aa-total-milk-line-inner {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    /* background: repeating-linear-gradient(135deg, rgb(244, 162, 97, 0.5), rgb(244, 162, 97, 0.5) 4px, rgb(240, 240, 240, 0.5) 4px, rgb(240, 240, 240, 0.5) 8px); */
-    background-color: #f4a26180;
-    border-radius: 50px;
-    width: 0%;
-    height: 100%;
-}
-
-.aa-total-milk-text {
-    width: 20%;
-    text-align: center;
-    font-size: 80%;
-    font-weight: 500;
-}
-
 .aa-sale-total {
     width: calc(500px - 30px);
     padding: 15px;

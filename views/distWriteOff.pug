@@ -8,63 +8,64 @@ block content
 
       -if(!forEdit)
 
-        .animal-results-container.animal-results-big#add-write-off-container(data-product=`${engProduct}` data-unit=`${unitProduct}`)
-          //-img.ar-image-back(src="/img/images/milk-icon.png")
+        .ai-form-container.ai-form-dist#dist-write-off-container(data-product=`${engProduct}` data-unit=`${unitProduct}`)
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title= `Списание: ${rusProduct}`
 
-          .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title= `Списание ${rusProduct}`
+          .ai-input-block.ai-input-block-text.purchase-input
+            .ai-input-label Количество
+            input.ai-input.ai-input-text#size(type="number" data-unit=`${unitRaw}`)
+            .ai-inside-text= `${unitProduct === 'l' ? 'л.' : 'кг.'}`
+          
+          .ai-total-product-box
+            .ai-total-product-line
+              .ai-total-product-line-inner(data-total=`${totalProduct}`)
+            .ai-total-product-text= `${totalProduct} ${unitProduct === 'l' ? 'л.' : 'кг.'}`
 
-          .aa-input-block
-            lable.aa-label(for="size") 
-              p= `Количество`
-            .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit=`${unitProduct}`)
-              p.aa-double-price-text= `${unitProduct === 'l' ? 'л.' : 'кг.'}`
-          .aa-total-milk-box
-            .aa-total-milk-line
-              .aa-total-milk-line-inner(data-total=`${totalProduct}`)
-            .aa-total-milk-text= `${totalProduct} ${unitProduct === 'l' ? 'л.' : 'кг.'}`
-          .aa-input-block
-            label.aa-label(for="date")
-              p Дата
-            input.aa-text-input.aa-date-input#date(type="date")
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local" )
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-          .ar-btn-box          
-            a.ar-add-button(data-product-id=``) Сохранить
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Заметка
+            textarea.ai-textarea.ai-input-text#note
+
+          .ai-input-submit-btn(data-product-id=``) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-write-off-container(data-product=`${engProduct}` data-unit=`${product.unit}`)
-          //-img.ar-image-back(src="/img/images/milk-icon.png")
-          .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title= `Переработка ${rusProduct}`
+        .ai-form-container.ai-form-dist#edit-dist-write-off-container(data-product=`${engProduct}` data-unit=`${product.unit}`)
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title= `Переработка ${rusProduct}`
 
-          .aa-input-block
-            lable.aa-label(for="size") 
-              p= `Количество`
-            .aa-double-input-block.aa-double-price-block
-              input.aa-double-price-input#size(type="number" data-unit=`${product.unit}` value=`${product.size}`)
-              p.aa-double-price-text= `${product.unit === 'l' ? 'л.' : 'кг.'}`
-          .aa-total-milk-box
-            .aa-total-milk-line
-              .aa-total-milk-line-inner(data-total=`${totalProduct + product.size}`)
-            .aa-total-milk-text= `${totalProduct + product.size} ${product.unit === 'l' ? 'л.' : 'кг.'}`
+          .ai-input-block.ai-input-block-text.purchase-input
+            .ai-input-label Количество
+            input.ai-input.ai-input-text#size(type="number" data-unit=`${product.unit}`  value=`${product.size}`)
+            .ai-inside-text= `${product.unit === 'l' ? 'л.' : 'кг.'}`
 
-          .aa-input-block
-            label.aa-label(for="date")
-              p Дата
-            input.aa-text-input.aa-date-input#date(type="date" value=`${product.date.toLocaleString('ru-RU', {year: 'numeric'})}-${product.date.toLocaleString('ru-RU', {month: '2-digit'})}-${product.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+          .ai-total-product-box
+            .ai-total-product-line
+              .ai-total-product-line-inner(data-total=`${totalProduct}`)
+            .ai-total-product-text= `${totalProduct} ${product.unit === 'l' ? 'л.' : 'кг.'}`
 
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")= `${product.note !== undefined ? product.note : ''}`
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local" value=`${product.date.toLocaleString('ru-RU', {year: 'numeric'})}-${product.date.toLocaleString('ru-RU', {month: '2-digit'})}-${product.date.toLocaleString('ru-RU', {day: '2-digit'})}T${product.date.toLocaleString('ru-RU', {hour: '2-digit'})}:${product.date.toLocaleString('ru-RU', {minute: '2-digit'}).length < 2 ? `0${product.date.toLocaleString('ru-RU', {minute: '2-digit'})}` : product.date.toLocaleString('ru-RU', {minute: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-          .ar-btn-box          
-            a.ar-add-button(data-product-id=`${product._id}`) Сохранить
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Заметка
+            textarea.ai-textarea.ai-input-text#note= product.note
+
+          .ai-input-submit-btn(data-product-id=`${product._id}`) Сохранить
 
 
 

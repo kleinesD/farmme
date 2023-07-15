@@ -77,6 +77,20 @@ export const deleteProduct = async (id) => {
         console.log(err);
     }
 }
+export const deleteSubIdProducts = async (subId) => {
+    try {
+        const res = await axios({
+            method: 'DELETE',
+            url: `/api/distribution/subIdProducts/${subId}`
+        });
+
+        if(res.data.status === 'success') {
+            return true
+        }
+    } catch(err) {
+        console.log(err);
+    }
+}
 
 export const addProductReturn = async (data) => {
     try {

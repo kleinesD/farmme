@@ -6,115 +6,74 @@ block content
 
     include _animalHeader
 
-    .animal-results-container.animal-results-big#vet-start-scheme-container
+    -if(!forEdit)
+      .animal-results-window
+        .ai-form-container.ai-form-vet.ai-form-container-headerful#vet-start-scheme-container
 
-      .ar-block-title Начать схему
+
+          .ai-block-sub-title НАЧАТЬ
+          .ai-block-title Ветеринарную схему
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date.ai-input-validation#date(type="datetime-local" data-animal-birth=`${animal.birthDate}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Схема
+            input.ai-input.ai-input-select(type="text" placeholder="Название схемы")
+            .ai-select-block.shadow#scheme
+              each scheme in schemes
+                .ai-select-item(data-id=`${scheme._id}`)
+                  p.ai-select-name= scheme.name
+                  p.ai-select-sub-name= `Шагов: ${scheme.points.length}`
+            
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          a.ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
+    -if(forEdit)
+      .animal-results-window
+        .ai-form-container.ai-form-vet.ai-form-container-headerful#edit-vet-start-scheme-container
 
 
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Начатую ветеринарную схему
 
-      .aa-input-block.aa-triple-date-block
-        label.aa-label(for="date")
-          p Дата и время
-        input.aa-triple-date-input-big#date(type="date")
-        select.aa-triple-date-input#hour
-          option(value="0") 00
-          option(value="1") 01
-          option(value="2") 02
-          option(value="3") 03
-          option(value="4") 04
-          option(value="5") 05
-          option(value="6") 06
-          option(value="7") 07
-          option(value="8") 08
-          option(value="9") 09
-          option(value="10") 10
-          option(value="11") 11
-          option(value="12") 12
-          option(value="13") 13
-          option(value="14") 14
-          option(value="15") 15
-          option(value="16") 16
-          option(value="17") 17
-          option(value="18") 18
-          option(value="19") 19
-          option(value="20") 20
-          option(value="21") 21
-          option(value="22") 22
-          option(value="23") 23     
-        .aa-triple-date-divider :
-        select.aa-triple-date-input#minute
-          option(value="0") 00
-          option(value="1") 01
-          option(value="2") 02
-          option(value="3") 03
-          option(value="4") 04
-          option(value="5") 05
-          option(value="6") 06
-          option(value="7") 07
-          option(value="8") 08
-          option(value="9") 09
-          option(value="10") 10
-          option(value="11") 11
-          option(value="12") 12
-          option(value="13") 13
-          option(value="14") 14
-          option(value="15") 15
-          option(value="16") 16
-          option(value="17") 17
-          option(value="18") 18
-          option(value="19") 19
-          option(value="20") 20
-          option(value="21") 21
-          option(value="22") 22
-          option(value="23") 23
-          option(value="24") 24
-          option(value="25") 25
-          option(value="26") 26
-          option(value="27") 27
-          option(value="28") 28
-          option(value="29") 29
-          option(value="30") 30
-          option(value="31") 31
-          option(value="32") 32
-          option(value="33") 33
-          option(value="34") 34
-          option(value="35") 35
-          option(value="36") 36
-          option(value="37") 37
-          option(value="38") 38
-          option(value="39") 39
-          option(value="40") 40
-          option(value="41") 41
-          option(value="42") 42
-          option(value="43") 43
-          option(value="44") 44
-          option(value="45") 45
-          option(value="46") 46
-          option(value="47") 47
-          option(value="48") 48
-          option(value="49") 49
-          option(value="50") 50
-          option(value="51") 51
-          option(value="52") 52
-          option(value="53") 53
-          option(value="54") 54
-          option(value="55") 55
-          option(value="56") 56
-          option(value="57") 57
-          option(value="58") 58
-          option(value="59") 59
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date.ai-input-validation#date(type="datetime-local" data-animal-birth=`${animal.birthDate}` value=`${firstSchemeAction.date.toLocaleString('ru-RU', {year: 'numeric'})}-${firstSchemeAction.date.toLocaleString('ru-RU', {month: '2-digit'})}-${firstSchemeAction.date.toLocaleString('ru-RU', {day: '2-digit'})}T${firstSchemeAction.date.toLocaleString('ru-RU', {hour: '2-digit'})}:${firstSchemeAction.date.toLocaleString('ru-RU', {minute: '2-digit'}).length < 2 ? `0${firstSchemeAction.date.toLocaleString('ru-RU', {minute: '2-digit'})}` : firstSchemeAction.date.toLocaleString('ru-RU', {minute: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-      .aa-input-block
-        lable.aa-label(for="scheme") 
-          p Схема
-        input.aa-search-input.aa-scheme-search#scheme(data-id="" data-placeholder="Выберите схему")
-        .animal-search-block#scheme-search-block
-          each scheme in schemes
-            .animal-search-item(data-id=`${scheme._id}`)
-              .animal-search-name= scheme.name
-              .animal-search-number= `Шагов: ${scheme.points.length}`
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Схема
+            input.ai-input.ai-input-select(type="text" placeholder="Название схемы")
+            .ai-select-block.shadow#scheme
+              each scheme in schemes
+                .ai-select-item(data-id=`${scheme._id}` class=`${firstSchemeAction.scheme._id.toString() === scheme._id.toString() ? 'ai-select-item-selected' : ''}`)
+                  p.ai-select-name= scheme.name
+                  p.ai-select-sub-name= `Шагов: ${scheme.points.length}`
+            
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
 
-      a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
+          a.ai-input-submit-btn(data-animal-id=`${animal._id}` data-action-id=`${firstSchemeAction._id}`) Сохранить
 
 
 

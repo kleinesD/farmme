@@ -8,7 +8,7 @@ block content
 
       -if(!forEdit)
 
-        .animal-results-container.animal-results-big#add-consumption-container
+        .ai-form-container.ai-form-dist#dist-consumption-container
           .arc-inventory-data(data-product=`milk` data-quantity=`${milkTotal}`)
           .arc-inventory-data(data-product=`cottage-cheese` data-quantity=`${cottageCheeseTotal}`)
           .arc-inventory-data(data-product=`butter` data-quantity=`${butterTotal}`)
@@ -19,57 +19,76 @@ block content
           .arc-inventory-data(data-product=`meat` data-quantity=`${meatTotal}`)
           //-img.ar-image-back(src="/img/images/milk-icon.png")
 
-          .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title Употребление
-          .ar-switch-btn-box
-            .ar-switch-btn.ar-switch-btn-active#personal-use Личное
-            .ar-switch-btn#calf-feeding Телятам
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Употребление
 
-          .aa-input-united-block 
-            .aa-input-block 
-              label.aa-label(for="type")
-                p Продукт
-              .aa-select-box.aa-select-box-one
-                .aa-select-text Выберите продукт
-                ion-icon(name="chevron-down")
-                .aa-select-options-box
-                  .aa-select-option(data-val="milk") Молоко
-                  .aa-select-option(data-val="cottage-cheese") Творог
-                  .aa-select-option(data-val="butter") Масло 
-                  .aa-select-option(data-val="cream") Сливки 
-                  .aa-select-option(data-val="cheese") Сыр
-                  .aa-select-option(data-val="whey") Сыворотка 
-                  .aa-select-option(data-val="sour-cream") Сметана  
-                  .aa-select-option(data-val="meat") Мясо
-            .aa-input-block
-              lable.aa-label(for="price") 
-                p Вес | Объем
-              .aa-double-input-block
-                input.aa-double-input.size-input(type="number")
-                p.aa-double-price-text.range-text / &nbsp;
-                select.aa-double-input.unit-input
-                  option(value="l" selected) Л.
-                  option(value="kg") Кг.  
-          .aa-add-more-container
-            .aa-add-more#add-product-input
-              p Добавить продукт
-              ion-icon.aa-add-more-icon(name="add")
-          .aa-input-block
-            label.aa-label(for="date")
-              p Дата
-            input.aa-text-input.aa-date-input#date(type="date")
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#personal-use Личное
+            .ai-switch-btn.ai-switch-btn-right#calf-feeding Телятам
 
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")
+          .ai-combined-block.ai-combined-block-1(data-product="1")
+            .ai-combined-block-title ПРОДУКТ #1
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование продукта
+              input.ai-input.ai-input-select.ai-input-validation.product-input(type="text" placeholder="Выберите продукт")
+              .ai-select-block.shadow.ai-input-validation.product
+                .ai-select-item(data-value="milk")
+                  p.ai-select-name Молоко
+                .ai-select-item(data-value="meat")
+                  p.ai-select-name Мясо
+                .ai-select-item(data-value="cottage-cheese")
+                  p.ai-select-name Творог
+                .ai-select-item(data-value="cheese")
+                  p.ai-select-name Сыр
+                .ai-select-item(data-value="butter")
+                  p.ai-select-name Масло
+                .ai-select-item(data-value="whey")
+                  p.ai-select-name Сыворотка
+                .ai-select-item(data-value="cream")
+                  p.ai-select-name Сливки
+                .ai-select-item(data-value="sour-cream")
+                  p.ai-select-name Сметана
+
+            .ai-input-block.ai-input-block-small-select
+              .ai-input-label Вес | Объем
+              .ai-input-text-wraper
+                input.ai-input.ai-input-text.ai-input-small-select.ai-input-validation.size(type="number")
+                .ai-inside-text.range-text
+              .ai-small-select.unit
+                p л.
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item(data-val="kg") кг.
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="l") л.
+
+          .ai-add-input-container
+            .ai-add-input#add-product-input
+              p
+                | Продукт
+                span +
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local" )
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Заметка
+            textarea.ai-textarea.ai-input-text#note
 
 
-          .ar-btn-box          
-            a.ar-add-button Сохранить
+          .ai-input-submit-btn(data-product-id=``) Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-consumption-container
+        
+        .ai-form-container.ai-form-dist#edit-dist-consumption-container
           .arc-inventory-data(data-product=`milk` data-quantity=`${milkTotal}`)
           .arc-inventory-data(data-product=`cottage-cheese` data-quantity=`${cottageCheeseTotal}`)
           .arc-inventory-data(data-product=`butter` data-quantity=`${butterTotal}`)
@@ -78,63 +97,75 @@ block content
           .arc-inventory-data(data-product=`whey` data-quantity=`${wheyTotal}`)
           .arc-inventory-data(data-product=`sour-cream` data-quantity=`${sourCreamTotal}`)
           .arc-inventory-data(data-product=`meat` data-quantity=`${meatTotal}`)
-
           //-img.ar-image-back(src="/img/images/milk-icon.png")
-          .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title Употребление
 
-          .ar-switch-btn-box
-            .ar-switch-btn#personal-use(class=`${products[0].distributionResult === 'personal-use' ? 'ar-switch-btn-active' : ''}`) Личное
-            .ar-switch-btn#calf-feeding(class=`${products[0].distributionResult === 'calf-feeding' ? 'ar-switch-btn-active' : ''}`) Телятам
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Употребление
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left#personal-use(class=`${products[0].distributionResult === 'personal-use' ? 'ai-switch-btn-click' : ''}`) Личное
+            .ai-switch-btn.ai-switch-btn-right#calf-feeding(class=`${products[0].distributionResult === 'calf-feeding' ? 'ai-switch-btn-click' : ''}`) Телятам
 
           each product in products
-            .aa-input-united-block.aa-input-united-block-valid(data-id=`${product._id}` data-new="false")
-              .aa-input-block 
-                label.aa-label(for="type")
-                  p Продукт
-                .aa-select-box.aa-select-box-one
-                  .aa-select-text Выберите продукт
-                  ion-icon(name="chevron-down")
-                  .aa-select-options-box
-                    .aa-select-option(class=`${product.product === 'milk' ? 'aa-select-option-selected' : ''}`  data-val="milk") Молоко
-                    .aa-select-option(class=`${product.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
-                    .aa-select-option(class=`${product.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
-                    .aa-select-option(class=`${product.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
-                    .aa-select-option(class=`${product.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
-                    .aa-select-option(class=`${product.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
-                    .aa-select-option(class=`${product.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
-                    .aa-select-option(class=`${product.product === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо 
-              .aa-input-block
-                lable.aa-label(for="price") 
-                  p Вес | Объем
-                .aa-double-input-block
-                  input.aa-double-input.size-input(type="number"  value=`${product.size}`)
-                  p.aa-double-price-text.range-text / &nbsp;
-                  select.aa-double-input.unit-input
-                    -if(product.unit === 'l')
-                      option(value="l" selected hidden) Л.
-                    -if(product.unit === 'kg')
-                      option(value="kg" selected hidden) Кг.  
-                    option(value="l") Л.
-                    option(value="kg") Кг.  
-              .aa-iu-remove   
+            .ai-combined-block.ai-combined-block-1(data-product=`${products.indexOf(product) + 1}` )
+              .ai-combined-block-title= `ПРОДУКТ #${products.indexOf(product) + 1}`
+              .ai-combined-block-remove
                 ion-icon(name="close")
-          .aa-add-more-container
-            .aa-add-more#add-product-input
-              p Добавить продукт
-              ion-icon.aa-add-more-icon(name="add")
-          .aa-input-block
-            label.aa-label(for="date")
-              p Дата
-            input.aa-text-input.aa-date-input#date(type="date" value=`${products[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${products[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${products[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Наименование продукта
+                input.ai-input.ai-input-select.ai-input-validation.product-input(type="text" placeholder="Выберите продукт")
+                .ai-select-block.shadow.ai-input-validation.product
+                  .ai-select-item(data-value="milk" class=`${product.product === 'milk' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Молоко
+                  .ai-select-item(data-value="meat" class=`${product.product === 'meat' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Мясо
+                  .ai-select-item(data-value="cottage-cheese" class=`${product.product === 'cottage-cheese' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Творог
+                  .ai-select-item(data-value="cheese" class=`${product.product === 'cheese' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сыр
+                  .ai-select-item(data-value="butter" class=`${product.product === 'butter' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Масло
+                  .ai-select-item(data-value="whey" class=`${product.product === 'whey' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сыворотка
+                  .ai-select-item(data-value="cream" class=`${product.product === 'cream' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сливки
+                  .ai-select-item(data-value="sour-cream" class=`${product.product === 'sour-cream' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сметана
 
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")= `${products[0].note !== undefined ? products[0].note : ''}`
+              .ai-input-block.ai-input-block-small-select
+                .ai-input-label Вес | Объем
+                .ai-input-text-wraper
+                  input.ai-input.ai-input-text.ai-input-small-select.ai-input-validation.size(type="number" value=`${product.size}`)
+                  .ai-inside-text.range-text
+                .ai-small-select.unit
+                  p л.
+                  .ai-select-line
+                  .ai-small-select-block.shadow
+                    .ai-small-select-item(data-val="kg" class=`${product.unit === 'kg' ? 'ai-small-select-item-selected' : ''}`) кг.
+                    .ai-small-select-item(data-val="l" class=`${product.unit === 'l' ? 'ai-small-select-item-selected' : ''}`) л.
 
-          .ar-btn-box          
-            a.ar-add-button(data-consumption-id=`${products[0].subId}`) Сохранить
+          .ai-add-input-container
+            .ai-add-input#add-product-input
+              p
+                | Продукт
+                span +
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local" value=`${products[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${products[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${products[0].date.toLocaleString('ru-RU', {day: '2-digit'})}T${products[0].date.toLocaleString('ru-RU', {hour: '2-digit'})}:${products[0].date.toLocaleString('ru-RU', {minute: '2-digit'}).length < 2 ? `0${products[0].date.toLocaleString('ru-RU', {minute: '2-digit'})}` : products[0].date.toLocaleString('ru-RU', {minute: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Заметка
+            textarea.ai-textarea.ai-input-text#note= products[0].note
+
+
+          .ai-input-submit-btn(data-id=`${products[0].subId}`) Сохранить
 
 
 

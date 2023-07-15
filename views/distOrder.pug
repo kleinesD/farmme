@@ -8,61 +8,107 @@ block content
 
       -if(!forEdit)
 
-        .animal-results-container.animal-results-big#add-order-container
-          //-img.ar-image-back(src="/img/images/milk-icon.png")
+        .ai-form-container.ai-form-dist#dist-order-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Заказ
 
-          .ar-block-sub-title ДОБАВИТЬ
-          .ar-block-title Заказ
-          .ar-switch-btn-box
-            .ar-switch-btn.ar-switch-btn-first#once(data-el="once-date") Разовый
-            .ar-switch-btn#recuring(data-el="recuring-date") Повторяющийся
+          //-.ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#once(data-el="once-date") Разовый
+            .ai-switch-btn.ai-switch-btn-right#recuring(data-el="recuring-date") Повторяющийся
 
           -if(clients.length > 0)
-            .aa-input-block.info-birth-items
-              lable.aa-label(for="client") 
-                p Клиент
-              input.aa-search-input.aa-animal-search#client(data-id="" data-placeholder="Имя | Наименование")
-              .animal-search-block#client-search-block
+            .ai-input-block.ai-input-block-select
+              .ai-select-line
+              .ai-input-label Клиент
+              input.ai-input.ai-input-select(type="text" placeholder="Имя или наименование клиента")
+              .ai-select-block.shadow#client
                 each client in clients
-                  .animal-search-item(data-id=`${client._id}`)
-                    img(src=`/img/images/user-default.png`)
-                    .animal-search-name= client.name 
+                  .ai-select-item(data-id=`${client._id}`)
+                    p.ai-select-name= client.name
+                    each product in client.products
+                      .asi-hidden(data-product=`${product.productName}` data-price=`${product.pricePer}`)  
 
-          .aa-input-united-block 
-            .aa-input-block 
-              label.aa-label(for="type")
-                p Продукт
-              .aa-select-box.aa-select-box-one
-                .aa-select-text Выберите продукт
-                ion-icon(name="chevron-down")
-                .aa-select-options-box
-                  .aa-select-option(data-val="milk") Молоко
-                  .aa-select-option(data-val="cottage-cheese") Творог
-                  .aa-select-option(data-val="butter") Масло 
-                  .aa-select-option(data-val="cream") Сливки 
-                  .aa-select-option(data-val="cheese") Сыр
-                  .aa-select-option(data-val="whey") Сыворотка 
-                  .aa-select-option(data-val="sour-cream") Сметана  
-                  .aa-select-option(data-val="meat") Мясо
-            .aa-input-block
-              lable.aa-label(for="price") 
-                p Вес | Объем
-              .aa-double-input-block
-                input.aa-double-input.size-input(type="number" )
-                select.aa-double-input.unit-input
-                  option(value="l" selected) Л.
-                  option(value="kg") Кг.  
-          .aa-add-more-container
-            .aa-add-more#add-product-input
-              p Добавить продукт
-              ion-icon.aa-add-more-icon(name="add")
+          .ai-combined-block.ai-combined-block-1(data-product="1")
+            .ai-combined-block-title ПРОДУКТ #1
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование продукта
+              input.ai-input.ai-input-select.ai-input-validation.product-input(type="text" placeholder="Выберите продукт")
+              .ai-select-block.shadow.ai-input-validation.product
+                .ai-select-item(data-value="milk")
+                  p.ai-select-name Молоко
+                .ai-select-item(data-value="meat")
+                  p.ai-select-name Мясо
+                .ai-select-item(data-value="cottage-cheese")
+                  p.ai-select-name Творог
+                .ai-select-item(data-value="cheese")
+                  p.ai-select-name Сыр
+                .ai-select-item(data-value="butter")
+                  p.ai-select-name Масло
+                .ai-select-item(data-value="whey")
+                  p.ai-select-name Сыворотка
+                .ai-select-item(data-value="cream")
+                  p.ai-select-name Сливки
+                .ai-select-item(data-value="sour-cream")
+                  p.ai-select-name Сметана
 
-          .aa-input-block.date-block#once-date(data-display="block")
-            label.aa-label(for="date")
-              p Дата
-            input.aa-text-input.aa-date-input#date(type="date")
+            .ai-input-block.ai-input-block-small-select
+              .ai-input-label Вес | Объем
+              .ai-input-text-wraper
+                input.ai-input.ai-input-text.ai-input-small-select.ai-input-validation.size(type="number")
+                .ai-inside-text.range-text
+              .ai-small-select.unit
+                p л.
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item(data-val="kg") кг.
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="l") л.        
 
-          .aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
+
+          .ai-add-input-container
+            .ai-add-input#add-product-input
+              p
+                | Продукт
+                span +
+
+          .ai-input-block.ai-input-block-text#once-date
+            .ai-input-label Дата
+            input.ai-input.ai-input-date#date(type="datetime-local")
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+          
+          //-.ai-input-block.ai-input-block-small-select
+              .ai-input-label Временной отрезок
+              .ai-small-select.step-unit.ai-input-block-triple
+                p Понедельник
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="1") Понедельник
+                  .ai-small-select-item(data-val="2") Вторник
+                  .ai-small-select-item(data-val="3") Вторник
+                  .ai-small-select-item(data-val="4") Вторник
+                  .ai-small-select-item(data-val="5") Вторник
+                  .ai-small-select-item(data-val="6") Вторник
+                  .ai-small-select-item(data-val="7") Вторник
+              .ai-small-select.step-unit.ai-input-block-triple
+                p Дней
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item(data-val="h") Часов
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="9") 09
+              .ai-small-select.step-count.ai-input-block-triple
+                p От начала
+                .ai-select-line
+                .ai-small-select-block.shadow
+                  .ai-small-select-item.ai-small-select-item-selected(data-val="start") От начала
+                  .ai-small-select-item(data-val="last-point") От пред. действия
+
+          //-.aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
             label.aa-label(for="date")
               p День и время
             select.aa-triple-date-input-big#rec-date
@@ -161,14 +207,12 @@ block content
               option(value="58") 58
               option(value="59") 59
 
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")
+          .ai-input-block.ai-input-block-text.ai-input-block-textarea
+            .ai-input-label Заметка
+            textarea.ai-textarea.ai-input-text#note
 
 
-          .ar-btn-box          
-            a.ar-add-button Сохранить
+          .ai-input-submit-btn Сохранить
 
       -if(forEdit)
         .animal-results-container.animal-results-big#edit-order-container

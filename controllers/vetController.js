@@ -245,16 +245,16 @@ exports.editStartedScheme = catchAsync(async (req, res, next) => {
   let firstAction = await Vet.findById(req.params.firstSchemeAction);
   firstAction.name = scheme.points[0].action;
   firstAction.scheme = scheme._id;
-  firstAction.date = req.body.date;
+  firstAction.date = new Date(req.body.date);
 
   await firstAction.save();
 
   let prevPointDate = firstAction.date;
-
+  
   scheme.points.forEach(async (point, index, array) => {
-    if (!point.firstAction) {
+    if (!point.firstPoint) {
       let date;
-      let timeInHours = point.timeUnit === 'h' ? point.scheduledIn : point.scheduledIn * 24;
+      let timeInHours = parseFloat(point.timeUnit === 'h' ? point.scheduledIn : point.scheduledIn * 24);
       if (point.countFrom === 'last-point') {
         date = new Date(prevPointDate.getTime() + timeInHours * 60 * 60 * 1000);
       } else {
