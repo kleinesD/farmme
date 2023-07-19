@@ -3,6 +3,34 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
+    .ai-list-container#list-milking-results-container
+      .ai-block-sub-title ДОБАВИТЬ
+      .ai-block-title Результаты доения
+      .ai-list-header 
+        input.ai-list-header-date#date(type="date" value=`${date.toLocaleString('ru-RU', {year: 'numeric'})}-${date.toLocaleString('ru-RU', {month: '2-digit'})}-${date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+        input.ai-list-header-search#search(type="text" placeholder="Номер или кличка животного")
+        .ai-input-submit-btn.ai-list-header-btn Сохранить
+      .ai-box-list-header
+        .ail-header-text.ail-item-number Номер  
+        .ail-header-text.ail-item-name Кличка
+        .ail-header-text.ail-item-result Результат
+        .ail-header-text.ail-item-lact-number Лактации
+        .ail-header-text.ail-item-result.ail-result-note Заметка
+      .ai-box-list
+        each animal in animals
+          .ai-list-item(data-id=`${animal._id}`)
+            .ail-part.ail-item-number= `#${animal.number}`  
+            .ail-part.ail-item-name= `${animal.name ? animal.name: '-'}`
+            .ail-part.ail-item-result
+              input.ail-result.result(type="number")
+              .ail-unit л.
+            .ail-part.ail-item-lact-number
+              each lact in animal.lactations
+                .ail-small-lact(data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)= lact.number
+            .ail-item-result.ail-result-note
+              input.ail-result#note(type="text")
+
+
     .all-animals-container.animals-result-list#list-milking-results
       .ar-block-title Контрольное доение
       .all-animals-search 

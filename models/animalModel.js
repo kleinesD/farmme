@@ -88,7 +88,9 @@ const animalSchema = new mongoose.Schema({
       },
       date: Date,
       result: Number,
-      lactationNumber: Number
+      lactationNumber: Number,
+      note: String,
+      subId: String
     }
   ],
   calvings: [

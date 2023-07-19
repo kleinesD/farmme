@@ -1903,7 +1903,7 @@ $(document).ready(async function () {
   /* EDIT USER PAGE */
   ///////////////////////
   if (document.querySelector('#edit-user-container')) {
-    
+
     /* Validating email */
     $('#email').on('keyup change', async function () {
       if ($(this).hasClass('ai-input-validation')) {
@@ -1931,9 +1931,9 @@ $(document).ready(async function () {
               <ion-icon name="checkmark-sharp"></ion-icon>
               </div>`)
             }
-            
+
             $(this).parent().find('.ai-warning-text').remove()
-            
+
             $(this).addClass('ai-valid-input');
           }
         } else {
@@ -1947,7 +1947,7 @@ $(document).ready(async function () {
         }
       }
     });
-    
+
     /* Validation from */
     $('*').on('click change keyup mouseenter', function () {
       if ($('#first-name').hasClass('ai-valid-input') && $('#last-name').hasClass('ai-valid-input') && $('#email').hasClass('ai-valid-input') && $('body').find('.ai-warning-text').length === 0) {
@@ -1956,9 +1956,9 @@ $(document).ready(async function () {
         $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
-    
+
     $('.ai-input').trigger('keyup');
-    
+
     $('.ai-input-submit-btn').click(async function () {
       const userId = $(this).attr('data-user-id');
       const firstName = $('#first-name').val();
@@ -4577,74 +4577,94 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD LIST MILKING RESULTS */
   ///////////////////////
-  if (document.querySelector('#list-milking-results')) {
+  if (document.querySelector('#list-milking-results-container')) {
 
-    $('.rl-date-btn').on('click focus blur change', function () {
+    $('#search').on('keyup change', function () {
+      let value = $(this).val();
+
+      if (value.length > 0) {
+        $('.ai-list-item').each(function () {
+          let container = $('.ai-box-list');
+          let name = $(this).find('.ail-item-name').text();
+          let number = $(this).find('.ail-item-number').text();
+
+          if (name.includes(value) || number.includes(value)) {
+            $(this).detach().prependTo(container);
+          }
+        });
+      }
+    });
+
+    $('#date').on('keyup change', function () {
       let date = new Date($(this).val());
 
-      $('.rl-small-lact').each(function () {
-        $(this).removeClass('rl-small-lact-active')
+      $('.ail-small-lact').each(function () {
+        $(this).removeClass('ail-small-lact-active')
         if (new Date($(this).attr('data-start-date')) < date && date < new Date($(this).attr('data-finish-date'))) {
-          $(this).addClass('rl-small-lact-active');
+          $(this).addClass('ail-small-lact-active');
         }
       });
 
-      $('.al-animal').each(function () {
-        if ($(this).find('.rl-small-lact-active').length === 0) {
-          $(this).css({
-            'opacity': '0.5',
-            'pointer-events': 'none'
-          });
+      $('.ai-list-item').each(function () {
+        if ($(this).find('.ail-small-lact-active').length === 0) {
+          $(this).addClass('ai-list-item-unav');
         } else {
-          $(this).css({
-            'opacity': '1',
-            'pointer-events': 'auto'
-          });
+          $(this).removeClass('ai-list-item-unav');
         }
       });
     });
 
-    $('.rl-date-btn').val(moment().format('YYYY-MM-DD'));
-    $('.rl-date-btn').trigger('change');
+    $('#date').trigger('change');
 
-    let amountToDo = 0
-    $('.rl-add-btn').click(function () {
-      $(this).css({
-        'pointer-events': 'none',
-        'filter': 'grayscale(1)'
-      });
-
-      $('.al-animal').each(function () {
-        if ($(this).find('.rl-small-lact-active').length === 1 && $(this).find('.rl-result').val().length > 0) {
-          amountToDo++;
-        }
-      });
-
-      $('.al-animal').each(async function () {
-        if ($(this).find('.rl-small-lact-active').length === 1 && $(this).find('.rl-result').val().length > 0) {
-          let date = new Date($('.rl-date-btn').val());
-          let result = parseFloat($(this).find('.rl-result').val());
-          let lactationNumber = parseFloat($(this).find('.rl-small-lact-active').text());
-          let animalId = $(this).attr('data-id');
-
-          let res = await addAnimalResults('milking-results', animalId, { date, result, lactationNumber });
-          if (res) amountToDo--;
-
-          if (amountToDo === 0) {
-            $('.all-animals-container').css({
-              'display': 'flex',
-              'align-items': 'center',
-              'justify-content': 'center'
-            });
-            addConfirmationEmpty($('.all-animals-container'));
-            setTimeout(() => { location.reload(true) }, 2000);
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-list-item').each(function () {
+        if ($(this).find('.ail-small-lact-active').length > 0 && $(this).find('.result').val().length > 0) {
+          $(this).addClass('ai-list-item-valid')
+          if ($(this).find('.ai-input-marker-s').length === 0) {
+            $(this).append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
           }
+        } else {
+          $(this).removeClass('ai-list-item-valid')
+          $(this).find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).find('.ai-input-marker-s').remove() }, 800)
         }
       });
 
-
+      if ($('.ai-list-item-valid').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
     });
 
+    $('.ai-input-submit-btn').on('click', function () {
+      let doneAnimals = 0;
+
+      $(this).empty();
+      $(this).append(`<div class="mini-loader"></div>`);
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+      let subId = randomstring.generate(12);
+
+      $('.ai-list-item-valid').each(async function () {
+        let date = new Date($('#date').val());
+        let result = parseFloat($(this).find('.result').val());
+        let lactationNumber = parseFloat($(this).find('.ail-small-lact-active').text());
+        let animalId = $(this).attr('data-id');
+
+        const response = await addAnimalResults('milking-results', animalId, { date, result, lactationNumber, subId });
+
+        if (response) doneAnimals++;
+
+        if (doneAnimals === $('.ai-list-item-valid').length) {
+          /* addConfirmationEmpty($('.animal-results-window')); */
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      });
+    });
 
   }
 

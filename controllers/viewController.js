@@ -321,9 +321,11 @@ exports.renderEditLactation = catchAsync(async (req, res, next) => {
 
 exports.renderListMilkingResults = catchAsync(async (req, res, next) => {
   const animals = await Animal.find({ farm: req.user.farm, gender: 'female' });
+  const date = new Date();
 
   res.status(200).render('herdListAddMilkingResults', {
-    animals
+    animals,
+    date
   });
 });
 
