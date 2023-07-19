@@ -3,45 +3,38 @@ extends base
 block content
   include _rcmMain
   section.main-section 
+    .animal-results-window
+      .ai-form-container#edit-farm-container
+        .ai-block-sub-title РЕДАКТИРОВАТЬ
+        .ai-block-title Ферма
 
-    .animal-results-container.animal-results-full#edit-farm-container
-      img.ar-image-back(src="/img/images/milking-cow-icon.png")
-      .ar-block-sub-title НАСТРОЙКА
-      .ar-block-title Ферма
-      .aa-input-block 
-        //.detailed-info-block
-          .detailed-info-icon 
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Название
+          input.ai-input.ai-input-text#name(type="text" value=`${farm.name ? farm.name : ''}`)
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#liquid-unit
+          .ai-input-label Единица измерения жидкости
+          .ai-pick#l(class=`${farm.liquidUnit === 'l' ? 'ai-to-pick' : ''}`) Литр
+          .ai-pick#gl(class=`${farm.liquidUnit === 'gl' ? 'ai-to-pick' : ''}`) Галон
+          .ai-input-marker.ai-input-marker-r
             ion-icon(name="alert")
-          .detailed-info-text aowidgoiawugd oawiudgoiawugdoiwaugodi nwago diugaowidgoiwano idgaowidgn oiwaudniua gnwodiugawoin dgoaiwdngaiwundgoianwgdoiugaodnigawodigaiudgoaw
-            .detailed-info-text-triangle
-        label.aa-label(for="name")
-          p Название
-        -if(!farm.name)
-          input.aa-text-input#name(type="text")
-        -else
-          input.aa-text-input#name(type="text" value=`${farm.name}`)
-      .aa-input-block 
-        label.aa-label(for="type")
-          p Ед. измерения жидкости
-        .aa-pick-box.aa-pick-box-one#liquid-unit(data=`${farm.liquidUnit}`)
-          -if(farm.liquidUnit === 'l')
-            .aa-pick.aa-pick-picked#l Литр
-            .aa-pick#gl Галон
-          -if(farm.liquidUnit === 'gl')
-            .aa-pick#l Литр
-            .aa-pick.aa-pick-picked#gl Галон
-      .aa-input-block 
-        label.aa-label(for="type")
-          p Ед. измерения веса
-        .aa-pick-box.aa-pick-box-one#weight-unit
-          -if(farm.weightUnit === 'kg')
-            .aa-pick.aa-pick-picked#kg Килограмм
-            .aa-pick#lb Фунт
-          -if(farm.weightUnit === 'lb')
-            .aa-pick#kg Килограмм
-            .aa-pick.aa-pick-picked#lb Фунт
-      .ar-btn-box  
-        a.ar-add-button(data-farm-id=`${farm._id}`) Сохранить
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#weight-unit
+          .ai-input-label Единица измерения веса
+          .ai-pick#kg(class=`${farm.weightUnit === 'kg' ? 'ai-to-pick' : ''}`) Килограмм
+          .ai-pick#lb(class=`${farm.weightUnit === 'lb' ? 'ai-to-pick' : ''}`) Фунт
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
+
+        .ai-input-submit-btn(data-farm-id=`${farm._id}`) Сохранить
 
 
 

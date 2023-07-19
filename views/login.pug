@@ -25,7 +25,7 @@ block content
       p Еще нет аккаунта?
       a(href='#') Регистрация
 
-    //DELETE AFTER
+    //-DELETE AFTER
     //-.basic-graph-tooltip
       .bgt-header-line
         img(src="/img/images/default-cow-image.png")
@@ -43,10 +43,10 @@ block content
         p Лактация:
         p#tooltip-lactation #3
       a.bgt-edit-btn(href="#") Редактировать 
-    each cow in cows
+    //-each cow in cows
       each result in cow.milkingResults
         .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
     //-svg#test-graph
-    //.generated-progress-line
+    //-.generated-progress-line
       
         

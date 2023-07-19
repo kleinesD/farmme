@@ -563,6 +563,11 @@ $(document).ready(async function () {
       }
     });
 
+    /* Radio buttons */
+    $('.ai-radio').on('click', function () {
+      $(this).toggleClass('ai-radio-active');
+    });
+
   }
 
   ///////////////////////
@@ -1871,46 +1876,25 @@ $(document).ready(async function () {
   /* EDIT FARM PAGE */
   ///////////////////////
   if (document.querySelector('#edit-farm-container')) {
-    /* Working with form */
-    $('input').on('click keyup change', function () {
-      if ($(this).val() !== '') {
-        $(this).addClass('ar-valid-input');
-      } else {
-        $(this).removeClass('ar-valid-input');
-      }
-    });
+    $('.ai-input').trigger('keyup');
+    $('.ai-to-pick').trigger('click');
+    $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
 
-    $('*').on('click change keyup', function () {
-      if ($('#liquid-unit').find('.aa-pick-picked').length > 0 && $('#weight-unit').find('.aa-pick-picked').length > 0) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-      } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-      }
-    });
-    $('input').trigger('click');
-
-    $('.ar-add-button').click(async function () {
+    $('.ai-input-submit-btn').click(async function () {
       const farmId = $(this).attr('data-farm-id');
       const name = $('#name').val().length > 0 ? $('#name').val() : undefined;
-      const liquidUnit = $('#liquid-unit').find('.aa-pick-picked').attr('id');
-      const weightUnit = $('#weight-unit').find('.aa-pick-picked').attr('id');
+      const liquidUnit = $('#liquid-unit').find('.ai-pick-active').attr('id');
+      const weightUnit = $('#weight-unit').find('.ai-pick-active').attr('id');
 
+      $(this).empty();
       $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
       const response = await editFarm(farmId, { name, liquidUnit, weightUnit });
 
       if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
+        addConfirmationEmpty($('.animal-results-window'));
+        setTimeout(() => { location.reload(true); }, 1500)
       }
     });
   }
@@ -1919,71 +1903,78 @@ $(document).ready(async function () {
   /* EDIT USER PAGE */
   ///////////////////////
   if (document.querySelector('#edit-user-container')) {
-    /* Working with form */
-    $('input').on('click keyup change', function () {
-      if ($(this).val() !== '') {
-        $(this).addClass('ar-valid-input');
-      } else {
-        $(this).removeClass('ar-valid-input');
-      }
-    });
+    
+    /* Validating email */
+    $('#email').on('keyup change', async function () {
+      if ($(this).hasClass('ai-input-validation')) {
+        if ($(this).val().length > 0) {
 
-    $('#email').on('click change keyup focus', async function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('ar-valid-input');
-      } else {
-        $(this).removeClass('ar-valid-input');
-      }
-      if ($(this).val().length > 0 && $(this).val() !== $(this).attr('data-email')) {
-        if (!validator.isEmail($(this).val())) {
-          $(this).removeClass('ar-valid-input');
+          if (!validator.isEmail($(this).val())) {
+            $(this).parent().find('.ai-input-marker-s').remove();
+            if ($(this).parent().find('.ai-input-marker-f').length === 0) {
+              $(this).parent().append(`
+          <div class="ai-input-marker ai-input-marker-f animate__animated animate__flipInY">
+            <ion-icon name="close-sharp"></ion-icon>
+          </div>`)
+            }
 
-        }
-        if (!await checkEmail($('#email').val())) {
-          $(this).removeClass('ar-valid-input');
-          $('body').trigger('click');
-          $(this).parent().find('.aa-input-ps').remove();
-          $(this).after(`<div class="aa-input-ps aa-input-ps-warning">Эта электронная почта уже занята</div>`)
+            if ($(this).parent().find('.ai-warning-text').length === 0) {
+              $(this).parent().append(`<div class="ai-warning-text">Введите действительную электронную почту</div>`)
+            }
+
+            $(this).removeClass('ai-valid-input');
+          } else {
+            $(this).parent().find('.ai-input-marker-f').remove();
+            if ($(this).parent().find('.ai-input-marker-s').length === 0) {
+              $(this).parent().append(`
+              <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+              <ion-icon name="checkmark-sharp"></ion-icon>
+              </div>`)
+            }
+            
+            $(this).parent().find('.ai-warning-text').remove()
+            
+            $(this).addClass('ai-valid-input');
+          }
         } else {
-          $(this).parent().find('.aa-input-ps').remove();
+          $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          $(this).parent().find('.ai-input-marker-f').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-input-marker-f').remove() }, 800)
+          setTimeout(() => { $(this).parent().find('.ai-warning-text').remove() }, 800)
+
+          $(this).removeClass('ai-valid-input');
         }
       }
-
-
-    })
-
-    $('*').on('click change keyup', async function () {
-      if ($('#first-name').hasClass('ar-valid-input') && $('#last-name').hasClass('ar-valid-input') && $('#email').hasClass('ar-valid-input')) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+    });
+    
+    /* Validation from */
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#first-name').hasClass('ai-valid-input') && $('#last-name').hasClass('ai-valid-input') && $('#email').hasClass('ai-valid-input') && $('body').find('.ai-warning-text').length === 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
-    $('input').trigger('click');
-
-    $('.ar-add-button').click(async function () {
+    
+    $('.ai-input').trigger('keyup');
+    
+    $('.ai-input-submit-btn').click(async function () {
       const userId = $(this).attr('data-user-id');
       const firstName = $('#first-name').val();
       const lastName = $('#last-name').val();
       const email = $('#email').val();
       const birthDate = new Date($('#birth-date').val());
 
+      $(this).empty();
       $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
       const response = await editUser(userId, { firstName, lastName, email, birthDate });
 
       if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
+        addConfirmationEmpty($('.animal-results-window'));
+        setTimeout(() => { location.reload(true); }, 1500)
       }
     });
   }
@@ -1992,33 +1983,27 @@ $(document).ready(async function () {
   /* CHANGE RESTRICTIONS */
   ///////////////////////
   if (document.querySelector('#change-rest-container')) {
-    $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
+    $('.ai-to-pick').trigger('click');
+    $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
 
-    $('.ar-add-button').click(async function () {
+    $('.ai-input-submit-btn').click(async function () {
       const userId = $(this).attr('data-user-id');
       const accessBlocks = [];
-      $('#modules').find('.aa-pick-picked').each(function () {
+      $('#modules').find('.ai-pick-active').each(function () {
         accessBlocks.push($(this).attr('id'));
       });
-      const editData = $('#edit-data').find('.aa-check-box-checked').length > 0;
-      const editOther = $('#edit-other').find('.aa-check-box-checked').length > 0;
+      const editData = $('#edit-data').hasClass('ai-radio-active');
+      const editOther = $('#edit-other').hasClass('ai-radio-active');
 
+      $(this).empty();
       $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
       const response = await editUser(userId, { accessBlocks, editData, editOther });
 
       if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
-
-        /* location.assign('/herd/all-animals'); */
+        addConfirmationEmpty($('.animal-results-window'));
+        setTimeout(() => { location.reload(true); }, 1500)
       }
     });
   }
@@ -5967,7 +5952,7 @@ $(document).ready(async function () {
     });
 
 
-    /* Validation phone number */
+    /* Validating email */
     $('#email').on('keyup change', async function () {
       if ($(this).hasClass('ai-input-validation')) {
         if ($(this).val().length > 0) {

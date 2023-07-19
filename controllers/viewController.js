@@ -12,9 +12,9 @@ const Client = require('../models/clientModel');
 const Product = require('../models/productModel');
 
 exports.renderLogin = catchAsync(async (req, res, next) => {
-  const cows = await Animal.find({ farm: '628c8bc53108dae81ddad028', gender: 'female' });
+  //-const cows = await Animal.find({ farm: '628c8bc53108dae81ddad028', gender: 'female' });
   res.status(200).render('login', {
-    cows
+    /* cows */
   });
 });
 

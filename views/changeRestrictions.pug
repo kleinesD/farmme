@@ -8,67 +8,43 @@ block content
         .ai-block-sub-title ИЗМЕНИТЬ
         .ai-block-title Допуск сотрудника
 
-        .ai-input-block.ai-input-block-select.breed-input.breed-select
-          .ai-select-line
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-big.ai-input-block-pick-many#modules
           .ai-input-label Модули
-          input.ai-input.ai-input-select#modules(type="text" placeholder="Выберите модули")
-          .ai-select-block.shadow
-            .ai-select-item(data-module="herd")
-              p.ai-select-name Животные
-            .ai-select-item(data-module="vet")
-              p.ai-select-name Ветеренария
-            .ai-select-item(data-module="warehouse")
-              p.ai-select-name Склад
-            .ai-select-item(data-module="distribution")
-              p.ai-select-name Продукция
-            .ai-select-item(data-module="feed")
-              p.ai-select-name Кормление
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="help")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text Пользователь будет иметь доступ к информации выбранных модулями
 
-        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#type
-          .ai-input-label Модули
-          .ai-pick#herd Животные
-          .ai-pick#vet Ветеренария
-          .ai-pick#warehouse Склад
-          .ai-pick#distribution Продукция
-          .ai-pick#feed Кормление
+          .ai-pick#herd(class=`${user.accessBlocks.includes('herd') ? 'ai-to-pick' : ''}`) Животные
+          .ai-pick#vet(class=`${user.accessBlocks.includes('vet') ? 'ai-to-pick' : ''}`) Ветеренария
+          .ai-pick#warehouse(class=`${user.accessBlocks.includes('warehouse') ? 'ai-to-pick' : ''}`) Склад
+          .ai-pick#distribution(class=`${user.accessBlocks.includes('distribution') ? 'ai-to-pick' : ''}`) Продукция
+          .ai-pick#feed(class=`${user.accessBlocks.includes('feed') ? 'ai-to-pick' : ''}`) Кормление
 
-        .aa-input-block 
-          .detailed-info-block
-            .detailed-info-icon 
-              ion-icon(name="help")
-            .detailed-info-text Пользователь будет иметь доступ к информации связанной с выбранными модулями.
-              .detailed-info-text-triangle
-          label.aa-label(for="modules")
-            p Модули
-          .aa-pick-box.aa-pick-box-few#modules
-            .aa-pick#herd(class=`${user.accessBlocks.includes('herd') ? 'aa-pick-picked' : ''}`) Животные
-            .aa-pick#vet(class=`${user.accessBlocks.includes('vet') ? 'aa-pick-picked' : ''}`) Ветеренария
-            .aa-pick#warehouse(class=`${user.accessBlocks.includes('warehouse') ? 'aa-pick-picked' : ''}`) Склад
+        .ai-input-block.ai-radio-block
+          .ai-radio#edit-data(class=`${user.editData === true ? 'ai-radio-active' : ''}`) 
+            .ai-radio-inner
+              ion-icon(name="checkmark")
+          .ai-radio-text Добавление данных
 
-        .aa-input-block 
-          .detailed-info-block
-            .detailed-info-icon 
-              ion-icon(name="help")
-            .detailed-info-text Пользователь сможет добавлять данные связанные с выбранными модулями.
-              .detailed-info-text-triangle
-          .aa-check-box-line
-            .aa-check-box#edit-data
-              .aa-check-box-inner(class=`${user.editData === true ? 'aa-check-box-checked' : ''}`)
-                ion-icon(name="checkmark")
-            .aa-check-box-text Вносить данные
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="help")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text  Пользователь сможет добавлять и изменять данные связанные с выбранными модулями
 
-        .aa-input-block 
-          .detailed-info-block
-            .detailed-info-icon 
-              ion-icon(name="help")
-            .detailed-info-text Пользователь сможет редактировать информацию добавленную другими пользователями.
-              .detailed-info-text-triangle
-          .aa-check-box-line
-            .aa-check-box#edit-other
-              .aa-check-box-inner(class=`${user.editOther === true ? 'aa-check-box-checked' : ''}`)
-                ion-icon(name="checkmark")
-            .aa-check-box-text Изменять чужие данные
+        .ai-input-block.ai-radio-block
+          .ai-radio#edit-other(class=`${user.editOther === true ? 'ai-radio-active' : ''}`) 
+            .ai-radio-inner
+              ion-icon(name="checkmark")
+          .ai-radio-text Изменение чужих данных
 
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="help")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text Пользователь сможет редактировать информацию добавленную другими пользователями
 
         .ai-input-submit-btn(data-user-id=`${user._id}`) Сохранить
 

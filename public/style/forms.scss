@@ -387,6 +387,10 @@
   width: calc(420px - 0px);
   padding: unset;
 }
+.ai-input-block-pick-big {
+  height: unset;
+  display: block;
+}
 
 .ai-input-block-small-select {
   width: calc(420px - 0px);
@@ -704,6 +708,13 @@
   pointer-events: none;
   opacity: 0.5;
 }
+.ai-input-block-pick-big .ai-pick {
+  height: 60px;
+  padding: 0 15px;
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
 
 .ai-input-submit-btn {
   height: 60px;
@@ -740,6 +751,8 @@
   position: absolute;
   left: -35px;
   background-color: #f0f0f0;
+
+  top: calc(50% - 12.5px);
 }
 
 .ai-input-marker-s {
@@ -780,7 +793,7 @@
 }
 
 .ai-input-explain-block-required {
-  top: 0;
+  top: calc(50% - 30px);
   left: -55px;
   transform: translate(-100%);
 }
@@ -1045,5 +1058,44 @@
   width: 20%;
   text-align: center;
   font-size: 15px;
+  font-weight: 600;
+}
+/* Radio */
+.ai-radio-block {
+  padding: unset;
+  width: 420px;
+}
+.ai-radio {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  margin-right: 15px;
+  
+  &:hover {
+    background-color: #c0c0c0;
+  }
+}
+.ai-radio-inner {
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  background-color: $mainBlack;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+
+  ion-icon {
+    font-size: 200%;
+    color: #f0f0f0;
+  }
+}
+.ai-radio-active .ai-radio-inner {
+  display: flex;
+}
+.ai-radio-text {
+  font-size: 16px;
   font-weight: 600;
 }
