@@ -3,14 +3,38 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
-    .all-animals-container.animals-result-list#list-inseminations
-      .ar-block-title Осеменение
-      .all-animals-search 
-        ion-icon(name="search-outline")
-        input#all-animals-search(type="text" placeholder="Найти животное")
+    .ai-list-container#list-inseminations-container
+      .ai-block-sub-title ДОБАВИТЬ
+      .ai-block-title Осеменение
+      .ai-list-header 
+        input.ai-list-header-search#search(type="text" placeholder="Номер или кличка животного")
+        .ai-input-submit-btn.ai-list-header-btn Сохранить
 
-      .result-list-btns-block.result-list-btns-block-insem
-        .rl-add-btn Сохранить результаты
+      .ai-box-list-header
+        .ail-header-text.ail-item-number Номер  
+        .ail-header-text.ail-item-name Кличка
+        .ail-header-text.ail-item-result Результат
+        .ail-header-text.ail-item-lact-number Лактации
+        .ail-header-text.ail-item-result.ail-result-note Заметка
+      .ai-box-list
+        each animal in animals
+          .ai-list-item(data-id=`${animal._id}`)
+            .ail-part.ail-item-number= `#${animal.number}`  
+            .ail-part.ail-item-name= `${animal.name ? animal.name: '-'}`
+            .ail-part.ail-item-result.ail-item-date
+              input.ail-input.date(type="date")
+            .ail-part.ail-item-result.ail-item-success
+              input.ail-input(type="text")
+              .ail-select-box.shadow
+                .ail-select-item Успешно
+                .ail-select-item Не успешно
+            .ail-part.ail-item-result.ail-item-type
+              input.ail-input(type="text")
+              .ail-select-box.shadow
+                .ail-select-item Искусственное
+                .ail-select-item Естественное
+            .ail-item-result.ail-result-note
+              input.ail-input#note(type="text")
 
       .animal-list-header
         .alh-item.alh-item-photo Фото 
