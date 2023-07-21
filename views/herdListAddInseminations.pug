@@ -13,9 +13,10 @@ block content
       .ai-box-list-header
         .ail-header-text.ail-item-number Номер  
         .ail-header-text.ail-item-name Кличка
-        .ail-header-text.ail-item-result Результат
-        .ail-header-text.ail-item-lact-number Лактации
-        .ail-header-text.ail-item-result.ail-result-note Заметка
+        .ail-header-text.ail-item-date Дата
+        .ail-header-text.ail-item-success Результат
+        .ail-header-text.ail-item-type Тип
+        .ail-header-text.ail-item-bull Бык
       .ai-box-list
         each animal in animals
           .ai-list-item(data-id=`${animal._id}`)
@@ -23,39 +24,24 @@ block content
             .ail-part.ail-item-name= `${animal.name ? animal.name: '-'}`
             .ail-part.ail-item-result.ail-item-date
               input.ail-input.date(type="date")
-            .ail-part.ail-item-result.ail-item-success
-              input.ail-input(type="text")
-              .ail-select-box.shadow
-                .ail-select-item Успешно
-                .ail-select-item Не успешно
-            .ail-part.ail-item-result.ail-item-type
-              input.ail-input(type="text")
-              .ail-select-box.shadow
-                .ail-select-item Искусственное
-                .ail-select-item Естественное
-            .ail-item-result.ail-result-note
-              input.ail-input#note(type="text")
-
-      .animal-list-header
-        .alh-item.alh-item-photo Фото 
-        .alh-item Кличка 
-        .alh-item #
-        .alh-item.alh-item-date Дата
-        .alh-item.alh-item-insem-result Результат
-      .animals-list-block
-        each animal in animals
-          .al-animal(data-id=`${animal._id}`)
-            .al-animal-mark •
-            .al-item.al-item-photo 
-              img(src=`/img/images/${animal.mainPhoto}`)
-            .al-item.al-item-name= animal.name
-            .al-item.al-item-number= animal.number
-            .al-item.al-item-insem-date
-              input.rl-result(type="date")
-            .al-item.al-item-insem-result
-              .rl-big-lact#success Успешно
-              .rl-big-lact#failure Не успешно
-            a.al-more-options-link(href=`/herd/add-insemination/${animal._id}`) Больше опций >
+            .ail-part.ail-item-result.ail-item-result-select.ail-item-success
+              .ai-select-line
+              input.ail-input.ail-input-select(type="text")
+              .ail-select-box.success.shadow
+                .ail-select-item(data-val="success") Успешно
+                .ail-select-item(data-val="fail") Не успешно
+            .ail-part.ail-item-result.ail-item-result-select.ail-item-type
+              .ai-select-line
+              input.ail-input.ail-input-select(type="text")
+              .ail-select-box.type.shadow
+                .ail-select-item(data-val="artifical") Искусственное
+                .ail-select-item(data-val="natural") Естественное
+            .ail-item-result.ail-item-result-select.ail-item-bull
+              .ai-select-line
+              input.ail-input.ail-input-select(type="text")
+              .ail-select-box.bull.shadow
+                each bull in bulls
+                  .ail-select-item(data-val=`${bull._id}`)= `#${bull.number} ${bull.name ? `| ${bull.name}` : ''}`
         
           
 

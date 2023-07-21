@@ -191,7 +191,7 @@ exports.renderAddLactation = catchAsync(async (req, res, next) => {
 exports.renderAddInsemination = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
-  const bulls = await Animal.find({ gender: 'male' });
+  const bulls = await Animal.find({ farm: req.user.farm, gender: 'male' });
 
   res.status(200).render('herdInsemination', {
     animal,
@@ -331,9 +331,11 @@ exports.renderListMilkingResults = catchAsync(async (req, res, next) => {
 
 exports.renderListInseminations = catchAsync(async (req, res, next) => {
   const animals = await Animal.find({ farm: req.user.farm, gender: 'female' });
+  const bulls = await Animal.find({ farm: req.user.farm, gender: 'male' });
 
   res.status(200).render('herdListAddInseminations', {
-    animals
+    animals,
+    bulls
   });
 });
 

@@ -4671,62 +4671,108 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD LIST INSEMINATIONS */
   ///////////////////////
-  if (document.querySelector('#list-inseminations')) {
-    $('.rl-big-lact').click(function () {
-      if ($(this).hasClass('rl-big-lact-active')) {
-        $(this).removeClass('rl-big-lact-active');
+  if (document.querySelector('#list-inseminations-container')) {
+    $('.ail-input-select').on('click', function () {
+      if ($(this).attr('data-state') !== 'hide') {
+        $('.ail-select-box').hide();
+        $('.ail-input-select').attr('data-state', 'show');
+        $('.ai-select-line').each(function () { anime({ targets: $(this)[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint' }); })
+
+        $(this).parent().find('.ail-select-box').show();
+        anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
+
+        $(this).attr('data-state', 'hide');
       } else {
-        $(this).siblings().removeClass('rl-big-lact-active');
-        $(this).addClass('rl-big-lact-active');
+        $(this).parent().find('.ail-select-box').hide();
+        anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint' });
+
+        $(this).attr('data-state', 'show');
+      }
+    });
+    $('.ail-input-select').on('keyup', function () {
+      $('.ail-select-box').hide();
+      $('.ail-input-select').attr('data-state', 'show');
+      $('.ai-select-line').each(function () { anime({ targets: $(this)[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint' }); })
+
+      $(this).parent().find('.ail-select-box').show();
+      anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
+
+      $(this).attr('data-state', 'hide');
+
+      let value = $(this).val();
+      let container = $(this).parent().find('.ail-select-box');
+      if (value.length > 0) {
+        $(this).parent().find('.ail-select-item').each(function () {
+          if ($(this).text().includes(value)) {
+            $(this).detach().prependTo(container);
+          }
+        });
       }
     });
 
-    $('.rl-result').on('click change blur focus', function () {
-      if ($(this).val() !== '') {
-        $(this).parent().parent().find('.al-animal-mark').show();
+    $('.ail-select-item').on('click', function () {
+      $(this).parent().find('.ail-select-item-active').removeClass('ail-select-item-active');
+      $(this).addClass('ail-select-item-active');
+
+      $(this).parent().parent().find('.ail-input-select').val($(this).text());
+
+      $(this).parent().hide();
+      anime({ targets: $(this).parent().parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint' });
+
+      $(this).parent().parent().find('.ail-input-select').attr('data-state', 'show');
+    });
+
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-list-item').each(function () {
+        if ($(this).find('.date').val() !== '') {
+          $(this).addClass('ai-list-item-valid')
+          if ($(this).find('.ai-input-marker-s').length === 0) {
+            $(this).append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
+          }
+        } else {
+          $(this).removeClass('ai-list-item-valid')
+          $(this).find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).find('.ai-input-marker-s').remove() }, 800)
+        }
+      });
+
+      if ($('.ai-list-item-valid').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        $(this).parent().parent().find('.al-animal-mark').hide();
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
 
-    let amountToDo = 0
-    $('.rl-add-btn').click(function () {
-      $(this).css({
-        'pointer-events': 'none',
-        'filter': 'grayscale(1)'
-      });
 
-      $('.al-animal').each(function () {
-        if ($(this).find('.al-animal-mark').css('display') === 'block') {
-          amountToDo++;
+
+    $('.ai-input-submit-btn').on('click', function () {
+      let doneAnimals = 0;
+
+      $(this).empty();
+      $(this).append(`<div class="mini-loader"></div>`);
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+      let subId = randomstring.generate(12);
+
+      $('.ai-list-item-valid').each(async function () {
+        let date = new Date($(this).find('.date').val());
+        let success = $(this).find('.success').find('.ail-select-item-active').attr('data-val') === 'success';
+        let type = $(this).find('.type').find('.ail-select-item-active').attr('data-val');
+        const bull = $(this).find('.bull').find('.ail-select-item-active').attr('data-val');
+        let animalId = $(this).attr('data-id');
+
+        const response = await addAnimalResults('insemination', animalId, { date, success, bull, type });
+
+        if (response) doneAnimals++;
+
+        if (doneAnimals === $('.ai-list-item-valid').length) {
+          /* addConfirmationEmpty($('.animal-results-window')); */
+          setTimeout(() => { location.reload(true); }, 1500)
         }
       });
-
-      $('.al-animal').each(async function () {
-        if ($(this).find('.al-animal-mark').css('display') === 'block') {
-          let date = new Date($('.rl-result').val());
-          let success;
-          if ($(this).find('.rl-big-lact-active').length > 0) {
-            success = $('.rl-big-lact-active').attr('id') === 'success';
-          }
-          let animalId = $(this).attr('data-id');
-
-          let res = await addAnimalResults('insemination', animalId, { date, success });
-          if (res) amountToDo--;
-
-          if (amountToDo === 0) {
-            $('.all-animals-container').css({
-              'display': 'flex',
-              'align-items': 'center',
-              'justify-content': 'center'
-            });
-            addConfirmationEmpty($('.all-animals-container'));
-            setTimeout(() => { location.reload(true) }, 2000);
-          }
-        }
-      });
-
-
     });
 
   }

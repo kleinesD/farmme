@@ -59,7 +59,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-action/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order/');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/list-inseminations');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/list-milking-results');
 
 
   contentWindow.maximize();

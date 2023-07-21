@@ -1160,12 +1160,13 @@
   flex-direction: column;
 }
 .ai-list-item {
-  width: calc(100% - 35px);
-  padding: 0 17.5px;
+  width: calc(100% - 0px);
+  /* width: calc(100% - 35px);
+  gap: 10px;
+  padding: 0 17.5px; */
   height: 50px;
   display: flex;
   align-items: center;
-  gap: 10px;
   position: relative;
 
   border: 1px solid #f0f0f0;
@@ -1181,7 +1182,8 @@
 .ail-item-number {
   font-size: 16px;
   font-weight: 600;
-  width: 16%;
+  width: calc(12% - 20px);
+  padding: 0 10px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -1189,7 +1191,8 @@
 .ail-item-name {
   font-size: 16px;
   font-weight: 600;
-  width: 16%;
+  width: calc(16% - 20px);
+  padding: 0 10px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -1204,14 +1207,28 @@
   position: relative;
   gap: 10px;
 }
+.ail-item-result-select {
+  justify-content: center;
+}
 .ail-item-date {
-  width: calc(15% - 20px);
+  width: calc(20% - 20px);
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .ail-item-success {
-  width: calc(15% - 20px);
+  width: calc(14% - 20px);
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .ail-item-type {
+  width: calc(18% - 20px);
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.ail-item-bull {
   width: calc(20% - 20px);
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .ail-input {
   font-size: 16px;
@@ -1233,15 +1250,16 @@
   font-weight: 600;
 }
 .ail-result-note {
-  width: calc(28% - 20px);
+  width: calc(32% - 20px);
 
-  input{
+  /* input{
     text-align: center;
-  }
+  } */
 }
 .ail-item-lact-number { 
   height: 100%;
-  width: 30%;
+  width: calc(30% - 20px);
+  padding: 0 10px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1266,15 +1284,10 @@
 }
 .ai-box-list-header {
   margin-top: 50px;
-  width: calc(100% - 35px);
-  padding: 0 17.5px;
+  width: calc(100%);
   height: 50px;
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  /* border-right: 1px solid #f0f0f0;
-  border-left: 1px solid #f0f0f0; */
 }
 .ail-header-text {
   font-size: 14px;
@@ -1285,11 +1298,12 @@
 .ail-select-box {
   position: absolute;
   bottom: 0;
-  left: -10px;
+  left: 0px;
   transform: translateY(100%);
-  width: calc(100% + 10px);
+  width: calc(100%);
   max-height: 150px;
   background-color: #f0f0f0;
+  z-index: 100;
 
   display: none;
 }
@@ -1301,6 +1315,7 @@
   font-weight: 600;
   display: flex;
   align-items: center;
+  cursor: pointer;
 
   &:hover {
     background-color: $lightOrange;
