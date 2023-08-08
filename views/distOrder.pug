@@ -12,7 +12,7 @@ block content
           .ai-block-sub-title ДОБАВИТЬ
           .ai-block-title Заказ
 
-          //-.ai-switch-btn-box
+          .ai-switch-btn-box
             .ai-switch-btn-slider
             .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#once(data-el="once-date") Разовый
             .ai-switch-btn.ai-switch-btn-right#recuring(data-el="recuring-date") Повторяющийся
@@ -81,32 +81,30 @@ block content
             .ai-input-explain-block.ai-input-explain-block-required
               .ai-input-eb-tri
               .ai-input-eb-text Обязательно
-          
-          //-.ai-input-block.ai-input-block-small-select
-              .ai-input-label Временной отрезок
-              .ai-small-select.step-unit.ai-input-block-triple
-                p Понедельник
-                .ai-select-line
-                .ai-small-select-block.shadow
-                  .ai-small-select-item.ai-small-select-item-selected(data-val="1") Понедельник
-                  .ai-small-select-item(data-val="2") Вторник
-                  .ai-small-select-item(data-val="3") Вторник
-                  .ai-small-select-item(data-val="4") Вторник
-                  .ai-small-select-item(data-val="5") Вторник
-                  .ai-small-select-item(data-val="6") Вторник
-                  .ai-small-select-item(data-val="7") Вторник
-              .ai-small-select.step-unit.ai-input-block-triple
-                p Дней
-                .ai-select-line
-                .ai-small-select-block.shadow
-                  .ai-small-select-item(data-val="h") Часов
-                  .ai-small-select-item.ai-small-select-item-selected(data-val="9") 09
-              .ai-small-select.step-count.ai-input-block-triple
-                p От начала
-                .ai-select-line
-                .ai-small-select-block.shadow
-                  .ai-small-select-item.ai-small-select-item-selected(data-val="start") От начала
-                  .ai-small-select-item(data-val="last-point") От пред. действия
+
+          .ai-input-block.ai-input-block-small-select
+            .ai-input-label День и время
+            .ai-small-select.step-unit.ai-input-block-triple
+              p Понедельник
+              .ai-select-line
+              .ai-small-select-block.shadow
+                .ai-small-select-item.ai-small-select-item-selected(data-val="1") Понедельник
+                .ai-small-select-item(data-val="2") Вторник
+                .ai-small-select-item(data-val="3") Среда
+                .ai-small-select-item(data-val="4") Четверг
+                .ai-small-select-item(data-val="5") Пятница
+                .ai-small-select-item(data-val="6") Суббота
+                .ai-small-select-item(data-val="7") Воскресенье
+
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.hour(type="number" value="09")
+            .ai-inside-text :
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.minute(type="number" value="00")
+            //-.ai-small-select.step-count.ai-input-block-triple
+              p От начала
+              .ai-select-line
+              .ai-small-select-block.shadow
+                .ai-small-select-item.ai-small-select-item-selected(data-val="start") От начала
+                .ai-small-select-item(data-val="last-point") От пред. действия
 
           //-.aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
             label.aa-label(for="date")

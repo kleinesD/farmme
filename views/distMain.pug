@@ -29,7 +29,10 @@ block content
           input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
           .main-page-header-devider -
           input(type="date" value=`${endDate.toLocaleString('ru-RU', {year: 'numeric'})}-${endDate.toLocaleString('ru-RU', {month: '2-digit'})}-${endDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#end-date
-
+          .mp-date-quick-box  
+            .mp-date-quick(data-months="12") ГОД
+            .mp-date-quick(data-months="3") КВАРТАЛ
+            .mp-date-quick(data-months="1") МЕСЯЦ
       
       .dist-main-columns-block
         .dist-main-column-left
@@ -73,7 +76,7 @@ block content
               .dmp-text-title 450
               .dmp-text-sub-title ЛИТРОВ
           .dist-main-product-block.dist-info-1#dist-money
-            img.dmp-image(src="/img/icons/dist-money.png")
+            img.dmp-image(src="/img/icons/dist-product-sale.png")
             .dmp-markers-block
               .dmp-marker.dmp-marker-active
               .dmp-marker
@@ -84,7 +87,7 @@ block content
               .dmp-text-title#dist-sold 13,526
               .dmp-text-sub-title ЛИТРОВ
           .dist-main-product-block.dist-info-2#dist-process
-            img.dmp-image(src="/img/icons/dist-process.png")
+            img.dmp-image(src="/img/icons/dist-product-process.png")
             .dmp-markers-block
               .dmp-marker
               .dmp-marker.dmp-marker-active
@@ -95,7 +98,7 @@ block content
               .dmp-text-title#dist-processed 600
               .dmp-text-sub-title ЛИТРОВ
           .dist-main-product-block.dist-info-3#dist-writeoff
-            img.dmp-image(src="/img/icons/dist-writeoff.png")
+            img.dmp-image(src="/img/icons/dist-product-writeoff.png")
             .dmp-markers-block
               .dmp-marker
               .dmp-marker
@@ -106,7 +109,7 @@ block content
               .dmp-text-title#dist-write-off 50
               .dmp-text-sub-title ЛИТРОВ
           .dist-main-product-block.dist-info-4#dist-use
-            img.dmp-image(src="/img/icons/dist-use.png")
+            img.dmp-image(src="/img/icons/dist-product-consumption.png")
             .dmp-markers-block
               .dmp-marker
               .dmp-marker

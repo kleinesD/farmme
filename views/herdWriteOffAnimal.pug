@@ -6,58 +6,61 @@ block content
     -if(forOne)
       include _animalHeader
 
-    .animal-results-container.animal-results-big#write-off-container
-      -if(forOne)
-        .ar-block-title Списать животное
-      -else
-        .ar-block-title Списать животных
+    .animal-results-window
+      .ai-form-container#write-off-container(class=`${forOne ? 'ai-form-container-headerful' : ''}`)
+        -if(forOne)
+          .ai-block-sub-title СПИСАТЬ
+          .ai-block-title Животное
+        -else
+          .ai-block-sub-title СПИСАТЬ
+          .ai-block-title Животных
 
-      -if(!forOne)
-        .ar-selected-animals-block
-          lable.aa-label.aa-label-shrinked
-            p Выбранные животные
-          .ar-selected-animals#multiple-animals-container
-            //-.ar-selected-animals-item #120231
-              .ar-selected-animals-remove 
+        -if(!forOne)
+          .ai-selected-animals-block.ai-input-hidden#multiple-animals-container
+            .ai-input-label Выбранные животные
+            //-.ai-selected-animals-item #120231
+              .ai-selected-animals-remove 
                 ion-icon(name="close")
-        .aa-input-block.info-birth-items
-          lable.aa-label(for="multiple-animals") 
-            p Животные
-          input.aa-search-input.aa-animal-search#multiple-animals(data-id="")
-          .animal-search-block#multiple-animals-search-block
-            each anim in animals
-              .animal-search-item(data-id=`${anim._id}` data-number=`${anim.number}`)
-                -if(anim.mainPhoto)
-                  img(src=`/img/images/${anim.mainPhoto}`)
-                -if(anim.name)
-                  .animal-search-name= anim.name
-                .animal-search-number= `#${anim.number}`
-      .aa-input-block 
-        label.aa-label(for="reason")
-          p Причина
-        .aa-pick-box.aa-pick-box-one#reason
-          .aa-pick#slaughtered Забой
-          .aa-pick#sickness Болезнь
-          .aa-pick#sold Продажа
-      .aa-input-block.info-buy-items#sell-price-block
-        lable.aa-label(for="sell-price")
-          -if(forOne)
-            p Сумма продажи
-          -else
-            p Общая сумма
-          p |
-          p ₽
-        input.aa-text-input#sell-price(type="number")
-      .aa-input-block
-        lable.aa-label(for="note") 
-          p Заметка
-        input.aa-text-input#note(type="text")
-      .aa-input-block 
-        label.aa-label(for="date")
-          p Дата
-        input.aa-text-input.aa-date-input#date(type="date")
 
-      -if(forOne)
-        a.ar-add-button(data-animal-id=`${animal._id}`) Сохранить
-      -else
-        a.ar-add-button(data-animal-id=``) Сохранить
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Животные
+            input.ai-input.ai-input-select(type="text" placeholder="Номер или имя животного")
+            .ai-select-block.ai-input-validation.shadow#multiple-animals
+              each animal in animals
+                .ai-select-item(data-id=`${animal._id}`)
+                  p.ai-select-name= `#${animal.number}`
+                  -if(animal.name)
+                    p.ai-select-sub-name= animal.name
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#reason
+          .ai-input-label Причина
+          .ai-pick#slaughtered Забой
+          .ai-pick#sickness Болезнь
+          .ai-pick#sold Продажа
+
+        //-.ai-input-block.ai-input-block-small-select
+          .ai-input-label Сумма
+          .ai-input-text-wraper
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-validation.price(type="number")
+            .ai-inside-text.per-text ₽
+          .ai-inside-text.price-text / 7 = 30000₽
+
+
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Дата рождения
+          input.ai-input.ai-input-date#date(type="date")
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text Обязательно
+
+        .ai-input-block.ai-input-block-text.ai-input-block-textarea
+          .ai-input-label Заметка
+          textarea.ai-textarea.ai-input-text#note
+
+        -if(forOne)
+          .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
+        -else
+          .ai-input-submit-btn(data-animal-id=``) Сохранить

@@ -3,13 +3,70 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
-    .main-page-container#mp-herd-container 
-      .mp-title ЖИВОТНЫЕ
+    .dist-main-section#mp-herd 
+      .main-page-header
+        .main-page-header-title ЖИВОТНЫЕ
+        //-.main-page-header-period-box
+          input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
+          .main-page-header-devider -
+          input(type="date" value=`${endDate.toLocaleString('ru-RU', {year: 'numeric'})}-${endDate.toLocaleString('ru-RU', {month: '2-digit'})}-${endDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#end-date
+          .mp-date-quick-box  
+            .mp-date-quick(data-months="12") ГОД
+            .mp-date-quick(data-months="3") КВАРТАЛ
+            .mp-date-quick(data-months="1") МЕСЯЦ
       .mp-info-box
         each cow in cows
           each result in cow.milkingResults
             .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
-        .mp-animal-graph-container   
+        
+      .herd-mp-flex-block 
+        .herd-mp-list-block.herd-mp-list-block-1
+        .herd-mp-list-block.herd-mp-list-block-2
+
+        .herd-mp-quick-info-block
+          .herd-mp-quick-info-item(title="Животные")
+            .herd-mp-quick-info-res 172
+            img.herd-mp-quick-info-img(src="/img/icons/herd-animal.png")
+          .herd-mp-quick-info-item(title="Коровы")
+            .herd-mp-quick-info-res 32
+            img.herd-mp-quick-info-img(src="/img/icons/herd-cow.png")
+          .herd-mp-quick-info-item(title="Быки")
+            .herd-mp-quick-info-res 123
+            img.herd-mp-quick-info-img(src="/img/icons/herd-bull.png")
+          .herd-mp-quick-info-item(title="Доящиеся коровы")
+            .herd-mp-quick-info-res 32
+            img.herd-mp-quick-info-img(src="/img/icons/herd-milking-cow.png")
+          .herd-mp-quick-info-item(title="Осемененные коровы")
+            .herd-mp-quick-info-res 415
+            img.herd-mp-quick-info-img(src="/img/icons/herd-inseminated-cow.png")
+          .herd-mp-quick-info-item(title="Быки на забой")
+            .herd-mp-quick-info-res 324
+            img.herd-mp-quick-info-img(src="/img/icons/herd-ready-bull.png")
+          .herd-mp-quick-info-item(title="Скоро отел")
+            .herd-mp-quick-info-res 22
+            img.herd-mp-quick-info-img(src="/img/icons/herd-calf.png")
+          .herd-mp-quick-info-item(title="Коровы перестой")
+            .herd-mp-quick-info-res 2
+            img.herd-mp-quick-info-img(src="/img/icons/herd-overstaying-cow.png")
+          .herd-mp-quick-info-item(title="Телята")
+            .herd-mp-quick-info-res 12372
+            img.herd-mp-quick-info-img(src="/img/icons/herd-calf-alone.png")
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        //.mp-animal-graph-container   
           //-.mp-tooltip-box
             .mp-tooltip-title Ноябрь 2022
             .mp-tooltip-info-line
@@ -36,7 +93,7 @@ block content
             //-.mp-animal-graphs-legend-item
               .mp-animal-graphs-legend-item-line
               .mp-animal-graphs-legend-item-text Результат ( 26 коров )
-        .mp-milking-results-block.shadow
+        //.mp-milking-results-block.shadow
           .mp-mr-title Доение
           .mp-mr-main-line
             .mp-mr-main-btn#prev-result -
@@ -55,7 +112,7 @@ block content
               .mp-mr-seconary-number#milk-average-cow 0
               .mp-mr-seconary-sub-text литров / среднее
 
-      .mp-top-results-block.shadow
+      //.mp-top-results-block.shadow
         .mp-top-results-left-block
           .mp-top-results-title Лучшие результаты
           .mp-top-results-sub-title Последние результаты добавлены Январь 2023
@@ -89,7 +146,7 @@ block content
             .mp-top-result-result 0
 
 
-      .mp-two-list-blocks
+      //.mp-two-list-blocks
         .mpt-list-block.shadow
           .mpt-list-block-header
             .mpt-list-block-title Ближайший отел
@@ -167,7 +224,7 @@ block content
               .mp-tc-name Березка
               .mp-tc-number #5036
 
-      .mp-quick-info-block
+      //.mp-quick-info-block
         .mp-quick-info-tile.shadow
           .mp-quick-info-tile-img
             img(src="/img/images/cow-icon.png")

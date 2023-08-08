@@ -811,7 +811,9 @@ exports.renderAddOutgoDecide = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAllProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.find({ farm: req.user.farm }).populate('client').populate('rawProduct').populate('produced').populate('user').sort('-date');
+  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'month'));
+  let endDate = req.query.end ? new Date(req.query.end) : new Date();
+  const products = await Product.find({ farm: req.user.farm, date: { $gte: startDate, $lte: endDate } }).populate('client').populate('rawProduct').populate('produced').populate('user').sort('-date');
 
   const milkTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'milk' }))
   const cottageCheeseTotal = countInventoryTotal(await Product.find({ farm: req.user.farm, product: 'cottage-cheese' }))
@@ -831,7 +833,9 @@ exports.renderAllProducts = catchAsync(async (req, res, next) => {
     wheyTotal,
     cheeseTotal,
     sourCreamTotal,
-    meatTotal
+    meatTotal,
+    startDate,
+    endDate
   });
 });
 
