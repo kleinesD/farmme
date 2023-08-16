@@ -16,17 +16,31 @@
 }
 .herd-mp-quick-info-block {
     /* width: 40%; */
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 30px;
     grid-column: 7/11;
+}
+.herd-mp-quick-info-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+.herd-mp-quick-info-row-rev {
+    grid-template-columns: 1fr 2fr;
 }
 .herd-mp-quick-info-item {
     background-color: #f0f0f0;
     border-radius: 10px;
     position: relative;
     aspect-ratio: 1/1;
+}
+.herd-mp-quick-info-item-active {
+    aspect-ratio: unset;
+
+    .herd-mp-quick-info-name {
+        display: block;
+    }
 }
 .herd-mp-quick-info-res {
     position: absolute;
@@ -35,17 +49,27 @@
     font-size: 32px;
     font-weight: 600;
 }
+.herd-mp-quick-info-name {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    font-size: 24px;
+    font-weight: 600;
+    display: none;
+}
 .herd-mp-quick-info-img {
     position: absolute;
-    left: 0px;
+    left: 5px;
     bottom: 0px;
-    width: 50%;
-    height: auto;
+    height: 50%;
+    width: auto;
 }
 .herd-mp-list-block {
     background-color: #f0f0f0;
     border-radius: 10px;
-    height: 100%;
+    height: calc(100% - 40px);
+    width: calc(100% - 40px);
+    padding: 20px;
 }
 .herd-mp-list-block-1 {
     grid-column: 1/4;
@@ -54,6 +78,82 @@
     grid-column: 4/7;
  }
 
+.herd-mp-list-item {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #d1d1d1;
+    overflow: hidden;
+    position: relative;
+
+    img {
+        height: 100%;
+        width: auto;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        filter: brightness(0.5);
+        opacity: 0.5
+    }
+
+}
+.herd-mp-list-item-active {
+    padding: 20px 10px;
+}
+.herd-mp-li-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    width: calc(100% - 40px);
+    padding-right: 40px;
+}
+.herd-mp-li-animal {
+    display: flex;
+    flex-direction: column;
+}
+.herd-mp-li-number {
+    font-size: 16px;
+    font-weight: 600;
+}
+.herd-mp-li-name {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.5;
+    margin-top: 2.5px;
+}
+.herd-mp-li-indicator {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    right: 5px;
+    background-color: rgb(212, 77, 92, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.herd-mp-li-inner {
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    
+    background-color: rgb(212, 77, 92);
+}
+
+/* MAIN PAGE GRAPH */
+.mp-herd-graph-block {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+.mp-herd-graph-container {
+    width: 100%;
+    grid-column: 1/8;
+    background-color: #f0f0f0;
+    aspect-ratio: 2/1;
+    border-radius: 10px;
+}
 
 
 

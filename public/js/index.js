@@ -7,7 +7,7 @@ import moment, { max } from 'moment';
 import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
-import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField } from './animalHandler';
+import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph } from './animalHandler';
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
@@ -15,7 +15,7 @@ import { login, logout, checkEmail } from './authHandler';
 import { editFarm, editUser, addCategory } from './manageHandler';
 import { addConfirmationEmpty } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
-import { getMilkingProjection } from './milkingProjection';
+import { getMilkingProjection, getFarmProjections } from './projections';
 import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts } from './distributionHandler';
 import { searchEngine } from './search';
 
@@ -4161,7 +4161,9 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD MAIN PAGE */
   ///////////////////////
-  if (document.querySelector('#mp-herd-container')) {
+  if (document.querySelector('#mp-herd')) {
+    await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
+
     /* Main vars */
     let milkPerDay = { value: 0, growth: 0 }
     let milkPerMonth = { value: 0, growth: 0 }
@@ -4572,6 +4574,98 @@ $(document).ready(async function () {
     });
 
     $('.mp-animal-graphs-switch-btn-active').trigger('click');
+
+  }
+
+  /* Herd main page graph */
+  if (document.querySelector('#mp-herd-graph')) {
+    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
+    let data = [];
+    animals.cows.forEach((animal) => {
+      animal.milkingResults.forEach(res => {
+        data.push({ result: res.result, date: new Date(res.date), lactationNumber: res.lactationNumber, animal: animal._id, number: animal.number });
+      });
+    });
+
+    /* Counting average and total by each month */
+    let dataByMonth = [];
+    data.forEach(res => {
+      if (dataByMonth.length === 0) return dataByMonth.push({ date: new Date(moment(res.date).startOf('month')), results: [res], total: res.result, average: res.result });
+      if (dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'))) {
+        dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).results.push(res);
+        dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).total += res.result;
+        dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).average = dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).total / dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).results.length;
+      } else {
+        dataByMonth.push({ date: new Date(moment(res.date).startOf('month')), results: [res], total: res.result, average: res.result });
+      }
+    });
+
+    /* Counting daily average and total */
+    let dataByMonthLactation = [];
+    data.forEach(res => {
+      if (!res.lactationNumber) return;
+
+      if (dataByMonthLactation.length === 0) return dataByMonthLactation.push({ date: new Date(moment(res.date).startOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
+
+      if (dataByMonthLactation.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'))) {
+        let el = dataByMonthLactation.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'));
+
+        if (el.lactations.find(lact => lact.number === res.lactationNumber)) {
+          el.lactations.find(lact => lact.number === res.lactationNumber).results.push(res);
+          el.lactations.find(lact => lact.number === res.lactationNumber).total += res.result;
+          el.lactations.find(lact => lact.number === res.lactationNumber).average = el.lactations.find(lact => lact.number === res.lactationNumber).total / el.lactations.find(lact => lact.number === res.lactationNumber).results.length;
+        } else {
+          el.lactations.push({ number: res.lactationNumber, results: [res], total: res.result, average: res.result })
+        }
+      } else {
+        dataByMonthLactation.push({ date: new Date(moment(res.date).startOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
+      }
+
+    });
+
+    /* Sorting monthly data by year */
+    let dataByMonthAndYear = [];
+    dataByMonth.forEach(res => {
+      if (dataByMonthAndYear.length === 0) return dataByMonthAndYear.push({ date: new Date(moment(res.date).startOf('year')), results: [res] });
+
+      if (dataByMonthAndYear.find(resMonth => moment(res.date).isSame(resMonth.date, 'year'))) {
+        dataByMonthAndYear.find(resMonth => moment(res.date).isSame(resMonth.date, 'year')).results.push(res);
+      } else {
+        dataByMonthAndYear.push({ date: new Date(moment(res.date).startOf('year')), results: [res] });
+      }
+    });
+
+    /* Counting top and bottom 10 percent */
+    let dataByAnimal = [];
+    data.forEach(res => {
+      if (dataByAnimal.length === 0) return dataByAnimal.push({ animal: res.animal, results: [res], total: res.result, average: res.result });
+      if (dataByAnimal.find(resAnimal => resAnimal.animal === res.animal)) {
+        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).results.push(res);
+        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).total += res.result;
+        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).average = dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).total / dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).results.length;
+      } else {
+        dataByAnimal.push({ animal: res.animal, results: [res], total: res.result, average: res.result });
+      }
+    });
+
+    let tenPercentAmount = Math.round(dataByAnimal.length * 0.1)
+    dataByAnimal.sort((a, b) => b.average - a.average);
+    let top10Percent = dataByAnimal.slice(0, tenPercentAmount);
+    dataByAnimal.sort((a, b) => a.average - b.average);
+    let bottom10Percent = dataByAnimal.slice(0, tenPercentAmount);;
+
+
+    console.log(dataByMonth);
+    console.log(dataByMonthLactation);
+    console.log(dataByMonthAndYear);
+    console.log(dataByAnimal);
+    console.log(top10Percent);
+    console.log(bottom10Percent);
+
+    ///////////////////////
+    // WORKING WITH A GRAPH
+    ///////////////////////
+    
 
   }
 
@@ -7352,10 +7446,10 @@ $(document).ready(async function () {
       $('.dist-big-info-block-5').find('.dist-big-info-block-data ').append(`<span> ${$(this).attr('data-unit') === 'l' ? ' л.' : ' кг.'}</span>`)
     });
 
-    $('.dist-info-list-item-header').on('click', function() {
+    $('.dist-info-list-item-header').on('click', function () {
       $(this).parent().find('.dist-info-item-body').toggle();
     });
-    
+
     /* Changing the time period */
     $('.main-page-header-period').on('change', function () {
       if ($("#start-date").val() !== '' && $("#end-date").val() !== '') {
@@ -7363,7 +7457,7 @@ $(document).ready(async function () {
       }
     });
 
-    $('.mp-date-quick').on('click', function() {
+    $('.mp-date-quick').on('click', function () {
       const startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'month'));
       const endDate = new Date();
 
@@ -8074,7 +8168,7 @@ $(document).ready(async function () {
       }
     });
 
-    $('.mp-date-quick').on('click', function() {
+    $('.mp-date-quick').on('click', function () {
       const startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'month'));
       const endDate = new Date();
 

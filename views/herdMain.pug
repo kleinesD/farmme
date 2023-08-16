@@ -3,7 +3,7 @@ extends base
 block content
   include _rcmHerd
   section.main-section 
-    .dist-main-section#mp-herd 
+    .dist-main-section#mp-herd(data-farm-id=`${user.farm}`)
       .main-page-header
         .main-page-header-title ЖИВОТНЫЕ
         //-.main-page-header-period-box
@@ -21,37 +21,53 @@ block content
         
       .herd-mp-flex-block 
         .herd-mp-list-block.herd-mp-list-block-1
+          .herd-mp-list-item.herd-mp-list-item-active
+            img(src="/img/images/cows-login.jpg")
+            .herd-mp-li-header
+              .herd-mp-li-animal
+                .herd-mp-li-number #542341
+                .herd-mp-li-name Березка
+              .herd-mp-li-animal
+                .herd-mp-li-number 5 дн. назад
+                .herd-mp-li-name Август 06, 2023
+              .herd-mp-li-indicator
+                .herd-mp-li-inner
         .herd-mp-list-block.herd-mp-list-block-2
 
         .herd-mp-quick-info-block
-          .herd-mp-quick-info-item(title="Животные")
-            .herd-mp-quick-info-res 172
-            img.herd-mp-quick-info-img(src="/img/icons/herd-animal.png")
-          .herd-mp-quick-info-item(title="Коровы")
-            .herd-mp-quick-info-res 32
-            img.herd-mp-quick-info-img(src="/img/icons/herd-cow.png")
-          .herd-mp-quick-info-item(title="Быки")
-            .herd-mp-quick-info-res 123
-            img.herd-mp-quick-info-img(src="/img/icons/herd-bull.png")
-          .herd-mp-quick-info-item(title="Доящиеся коровы")
-            .herd-mp-quick-info-res 32
-            img.herd-mp-quick-info-img(src="/img/icons/herd-milking-cow.png")
-          .herd-mp-quick-info-item(title="Осемененные коровы")
-            .herd-mp-quick-info-res 415
-            img.herd-mp-quick-info-img(src="/img/icons/herd-inseminated-cow.png")
-          .herd-mp-quick-info-item(title="Быки на забой")
-            .herd-mp-quick-info-res 324
-            img.herd-mp-quick-info-img(src="/img/icons/herd-ready-bull.png")
-          .herd-mp-quick-info-item(title="Скоро отел")
-            .herd-mp-quick-info-res 22
-            img.herd-mp-quick-info-img(src="/img/icons/herd-calf.png")
-          .herd-mp-quick-info-item(title="Коровы перестой")
-            .herd-mp-quick-info-res 2
-            img.herd-mp-quick-info-img(src="/img/icons/herd-overstaying-cow.png")
-          .herd-mp-quick-info-item(title="Телята")
-            .herd-mp-quick-info-res 12372
-            img.herd-mp-quick-info-img(src="/img/icons/herd-calf-alone.png")
-        
+          .herd-mp-quick-info-row
+            .herd-mp-quick-info-item.herd-mp-quick-info-item-active(title="Животные")
+              .herd-mp-quick-info-name Животные
+              .herd-mp-quick-info-res 172
+              img.herd-mp-quick-info-img(src="/img/icons/herd-animal.png")
+            .herd-mp-quick-info-item(title="Телята")
+              .herd-mp-quick-info-name Телята
+              .herd-mp-quick-info-res 12372
+              img.herd-mp-quick-info-img(src="/img/icons/herd-calf-alone.png")
+          .herd-mp-quick-info-row.herd-mp-quick-info-row-rev
+            .herd-mp-quick-info-item(title="Коровы")
+              .herd-mp-quick-info-name Коровы
+              .herd-mp-quick-info-res 32
+              img.herd-mp-quick-info-img(src="/img/icons/herd-cow.png")
+            .herd-mp-quick-info-item.herd-mp-quick-info-item-active(title="Быки")
+              .herd-mp-quick-info-name Быки
+              .herd-mp-quick-info-res 123
+              img.herd-mp-quick-info-img(src="/img/icons/herd-bull.png")
+          .herd-mp-quick-info-row
+            .herd-mp-quick-info-item.herd-mp-quick-info-item-active(title="Доящиеся коровы")
+              .herd-mp-quick-info-name Доящ. коровы
+              .herd-mp-quick-info-res 32
+              img.herd-mp-quick-info-img(src="/img/icons/herd-milking-cow.png")
+            .herd-mp-quick-info-item(title="Коровы перестой")
+              .herd-mp-quick-info-name Коровы перестой
+              .herd-mp-quick-info-res 2
+              img.herd-mp-quick-info-img(src="/img/icons/herd-overstaying-cow.png")
+
+      #mp-herd-graph(data-farm-id=`${user.farm}`)  
+
+      .mp-herd-graph-block
+        .mp-herd-graph-container
+        .mp-herd-graph-info-block
         
         
         

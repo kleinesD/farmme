@@ -1,4 +1,5 @@
 const Farm = require('../models/farmModel')
+const Animal = require('../models/animalModel')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 
@@ -44,6 +45,21 @@ exports.addCategory = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       farm
+    }
+  });
+});
+
+exports.getProjectionData = catchAsync(async(req, res, next) => {
+  const cows = await Animal.find({farm: req.params.farmId, gender: 'female'});
+  const bulls = await Animal.find({farm: req.params.farmId, gender: 'male'});
+  const animals = await Animal.find({farm: req.params.farmId});
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      cows,
+      bulls,
+      animals
     }
   });
 });

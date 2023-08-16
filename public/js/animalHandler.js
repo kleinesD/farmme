@@ -156,3 +156,17 @@ export const checkByField = async(field, value) => {
     console.log(err);
   }
 };
+
+export const getAnimalsForGraph = async(farmId) => {
+  try {
+    let res = await axios({
+      method: 'GET',
+      url: `/api/farms/get-projection-data/${farmId}`
+    });
+
+    if (res.data.status === 'success') return res.data.data;
+
+  } catch (err) {
+    console.log(err);
+  }
+}
