@@ -305,8 +305,9 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
     console.log(err);
   }
 
-  /* Counting an average between calvings based on lactations */
-  data.cows.forEach(cow => {
+  /* Counting an average between calvings based on lactations | ON HOLD | currently using only avearge data */
+  
+  /* data.cows.forEach(cow => {
     if (cow.lactations.length <= 1) return;
 
     let spanArr = [];
@@ -315,17 +316,16 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
 
       spanArr.push((new Date(lact.startDate).getTime() - new Date(arr[inx - 1].startDate).getTime()) / 1000 / 60 / 60 / 24 / 30 / 12);
     });
-    /* console.log(spanArr); */
-  });
+  }); */
 
   /* Converting animals data into another format */
   let animals = [];
   data.animals.forEach(animal => {
     animals.push({
-      status: 'alive',
+      status: animal.status,
       gender: animal.gender,
       birthDate: animal.birthDate,
-      lastLact: animal.lactations[animal.lactations.length - 1].startDate,
+      lastLact: animal.lactations.length > 0 ? animal.lactations[animal.lactations.length - 1].startDate : undefined,
     });
   });
 
@@ -383,6 +383,7 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
 
     years.push({ year: i, animals: animalsBuf });
   }
+  console.log(years)
   /* years.forEach((year) => {
     console.log({
       year: year.year, 

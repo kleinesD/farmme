@@ -3,7 +3,7 @@ import '../style/main.scss';
 import 'animate.css';
 import anime from 'animejs/lib/anime.es.js';
 import * as d3 from "d3";
-import moment, { max } from 'moment';
+import moment, { max, months } from 'moment';
 import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
@@ -4162,441 +4162,143 @@ $(document).ready(async function () {
   /* HERD MAIN PAGE */
   ///////////////////////
   if (document.querySelector('#mp-herd')) {
+    /* Working with projectrion data */
     await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
+    let slideInterval;
+    /* Working with quick info */
+    $('.herd-mp-quick-info-counter').on('click', function () {
+      clearInterval(slideInterval);
+      $(this).siblings().removeClass('herd-mp-quick-info-counter-active')
+      $(this).addClass('herd-mp-quick-info-counter-active')
 
-    /* Main vars */
-    let milkPerDay = { value: 0, growth: 0 }
-    let milkPerMonth = { value: 0, growth: 0 }
-    let milkAverage = { value: 0, growth: 0 }
-
-    /* Getting and working with milking data */
-    let milkingData = [];
-    $('.mp-graph-data').each(function () {
-      milkingData.push({
-        result: parseFloat($(this).attr('data-result')),
-        date: new Date($(this).attr('data-date')),
-        lactation: parseFloat($(this).attr('data-lact')),
-        cowId: $(this).attr('data-cow-id'),
-        cowPhoto: $(this).attr('data-cow-photo'),
-        cowNumber: $(this).attr('data-cow-number'),
-        cowName: $(this).attr('data-cow-name')
-      });
-    });
-
-    milkingData.sort((a, b) => a.date - b.date);
-
-    /* Getting the last month data */
-    let lastMonthData = [];
-    milkingData.forEach((data, i, arr) => {
-      let lastElDate = arr[arr.length - 1].date;
-      if (moment(data.date).month() === moment(lastElDate).month() && moment(data.date).year() === moment(lastElDate).year()) {
-        lastMonthData.push(data);
-      }
-    });
-
-    lastMonthData.sort((a, b) => b.result - a.result);
-
-    //Adding data to the milking results block
-    lastMonthData.forEach((data, i, arr) => {
-      milkPerDay.value += data.result;
-    });
-    milkPerMonth.value = milkPerDay.value * 30;
-    milkAverage.value = parseFloat((milkPerDay.value / lastMonthData.length).toFixed(1));
-
-    if (milkPerDay.value > 1000) {
-      $('#milk-per-day').text(parseFloat((milkPerDay.value / 1000).toFixed(1)));
-      $('#milk-per-day-text').text('тыс. л / день');
-    } else {
-      $('#milk-per-day').text(milkPerDay.value);
-      $('#milk-per-day-text').text('литров / день');
-    }
-    if (milkPerMonth.value > 1000) {
-      $('#milk-per-month').text(parseFloat((milkPerMonth.value / 1000).toFixed(1)))
-      $('#milk-per-month-text').text('тыс. л / месяц');
-    } else {
-      $('#milk-per-month').text(milkPerMonth.value)
-      $('#milk-per-month-text').text('литров / месяц');
-    }
-
-    $('#milk-average-cow').text(milkAverage.value)
-    $('.mp-mr-main-number').text(milkAverage.value)
-
-    //Adding data to the top cow block
-    $('#tc-all-res').text(lastMonthData.length)
-    $('#tc-avg-res').text(milkAverage.value)
-
-    $('.mp-top-result').each(function () {
-      let index = parseFloat($(this).attr('id').split('-')[1]);
-      $(this).find('.mp-top-result-number').text(`#${lastMonthData[index].cowNumber}`);
-      $(this).find('.mp-top-result-name').text(`${lastMonthData[index].cowName}`);
-      $(this).find('.mp-top-result-result').text(`${lastMonthData[index].result}`);
-      $(this).find('img').attr('src', `/img/images/${lastMonthData[index].cowPhoto}`);
-    });
-
-    let lastRusMonth = moment(lastMonthData[0].date).lang('ru').format('MMMM YYYY');
-    lastRusMonth = lastRusMonth.charAt(0).toUpperCase() + lastRusMonth.slice(1);
-    $('.mp-top-results-sub-title').text(`Последние результаты добавлены ${lastRusMonth}`)
-
-    // Making milk result block work
-    $('.mp-mr-main-btn').on('click', function () {
-      let currentActive = $('.mp-mr-seconary-item-active')
-      if ($(this).attr('id') === 'prev-result') {
-        if (currentActive.prev().length === 0) {
-          currentActive.removeClass('mp-mr-seconary-item-active')
-          $('.mp-mr-seconary-item-last').addClass('mp-mr-seconary-item-active')
-        } else {
-          currentActive.removeClass('mp-mr-seconary-item-active')
-          currentActive.prev().addClass('mp-mr-seconary-item-active')
-        }
-      } else if ($(this).attr('id') === 'next-result') {
-        if (currentActive.next().length === 0) {
-          currentActive.removeClass('mp-mr-seconary-item-active')
-          $('.mp-mr-seconary-item-first').addClass('mp-mr-seconary-item-active')
-        } else {
-          currentActive.removeClass('mp-mr-seconary-item-active')
-          currentActive.next().addClass('mp-mr-seconary-item-active')
-        }
-      }
-
-      $('.mp-mr-main-number').text($('.mp-mr-seconary-item-active').find('.mp-mr-seconary-number').text())
-      $('.mp-mr-main-sub-text').text($('.mp-mr-seconary-item-active').find('.mp-mr-seconary-sub-text').text())
-    });
-
-    // Working with lists
-    $('.mpt-list-item-date').each(function () {
-      let date = $(this).attr('data-date');
-      let rusMonth = moment(date).lang('ru').format('MMMM');
-      rusMonth = rusMonth.charAt(0).toUpperCase() + rusMonth.slice(1);
-      $(this).text(`${moment(date).format('DD')} ${rusMonth}, ${moment(date).format('YYYY')}`)
-    });
-
-
-    let length;
-
-    length = $('#mp-soon-to-calv-list').find('.mpt-list-item').length
-    for (let i = 0; i < length; i++) {
-      $('#mp-soon-to-calv-list').find('.mpt-list-item').each(function () {
-        let number = parseFloat($(this).find('.mpt-list-item-day-text').text().split(' ')[0])
-        let prevNumber = parseFloat($(this).prev().find('.mpt-list-item-day-text').text().split(' ')[0]);
-
-        if (number < prevNumber) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-    length = $('#mp-soon-to-insem-list').find('.mpt-list-item').length
-    for (let i = 0; i < length; i++) {
-      $('#mp-soon-to-insem-list').find('.mpt-list-item').each(function () {
-        let number = parseFloat($(this).find('.mpt-list-item-day-text').text().split(' ')[0])
-        let prevNumber = parseFloat($(this).prev().find('.mpt-list-item-day-text').text().split(' ')[0]);
-
-        if (number < prevNumber) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-    /* Handling empty lists */
-    $('.mp-list-block').each(function () {
-      if ($(this).children().length === 0) {
-        /* $(this).prepend(`<div class="mp-empty-list">Данные отсутствуют</div>`) */
-        $(this).parent().hide();
-      }
-    });
-
-
-    /////////////////////
-    // MAIN PAGE GRAPH
-    /////////////////////
-    /* Switching among graphs */
-    $('.mp-animal-graphs-period-btn').on('click', function () {
-      $(this).addClass('mp-animal-graphs-period-btn-active');
-      $(this).siblings().removeClass('mp-animal-graphs-period-btn-active');
-
-      $('.mp-animal-graphs-switch-btn-active').trigger('click');
-    });
-    $('.mp-animal-graphs-switch-btn').on('click', function () {
-      $(this).addClass('mp-animal-graphs-switch-btn-active');
-      $(this).siblings().removeClass('mp-animal-graphs-switch-btn-active');
-
-      let period = 0;
-      if ($('.mp-animal-graphs-period-btn-active').attr('data-period') === 'all-time') {
-        period = Math.round((Date.now() - milkingData[0].date.getTime()) / 1000 / 60 / 60 / 24 / 30)
-      } else {
-        period = parseFloat($('.mp-animal-graphs-period-btn-active').attr('data-period'));
-      }
-
-      let milkingDataPeriod = milkingData.filter(data => data.date.getTime() > Date.now() - period * 1000 * 60 * 60 * 24 * 30);
-
-
-      /* Creating the milk average graph */
-      if ($(this).attr('id') === 'milk-average') {
-
-        /* Adding average */
-        let milkingAverage = [];
-
-        milkingDataPeriod.forEach((result, index, array) => {
-          /* Preparing second array */
-          if (milkingAverage.length < 1) {
-            milkingAverage.push({ date: result.date, results: [{ number: result.result, date: result.date }] })
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingAverage.length; i++) {
-              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year()) {
-                milkingAverage[i].results.push({ number: result.result, date: result.date });
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingAverage.push({ date: result.date, results: [{ number: result.result, date: result.date }] });
-            }
-          }
-        });
-
-        /* Counting averages */
-        milkingAverage.forEach((result, index, array) => {
-          let total = 0;
-          result.results.forEach(el => total += el.number);
-          result.number = parseFloat((total / result.results.length).toFixed(1));
-        });
-
-        const parameters = {
-          graphSettings: {
-            timelineType: 'date',
-            startDate: new Date(moment().subtract(period, 'month')),
-            finishDate: new Date(),
-            periodMonths: period,
-            min: 0,
-            max: 50,
-            showLegend: true,
-            boxHeight: true,
-            //heightRatio: 0.75
-          },
-          tooltips: {
-            type: 'simple', // Detailed or simple
-            description: 'Сред. результат',
-            unitText: 'л.',
-            dateUnit: 'month'
-          },
-          datasets: [
-            {
-              showPoint: true,
-              pointColor: '#f4a261',
-              showLine: true,
-              lineColor: '#264653',
-              averageGraph: true,
-              showAllResults: true,
-              breakLactations: false,
-              legendName: 'Молока в среднем',
-              tooltipName: 'Молока в среднем',
-              data: milkingAverage
-            }
-          ]
-        };
-        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
-
-
-        /* Showing the milk total graph */
-      } else if ($(this).attr('id') === 'milk-total') {
-        /* Couting totals */
-        let milkingTotal = [];
-
-        milkingData.forEach((result, index, array) => {
-          /* Preparing second array for total line */
-          if (milkingTotal.length < 1) {
-            milkingTotal.push({ date: result.date, number: result.result })
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingTotal.length; i++) {
-              if (moment(milkingTotal[i].date).month() === moment(result.date).month() && moment(milkingTotal[i].date).year() === moment(result.date).year()) {
-                milkingTotal[i].number += result.result;
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingTotal.push({ date: result.date, number: result.result });
-            }
-          }
-        });
-
-        /* Adding max result */
-        let maxResult = 0;
-        milkingTotal.forEach(total => {
-          total.number = total.number * 30;
-          if (total.number > maxResult) maxResult = total.number
-        });
-        maxResult = Math.round((maxResult + 100) / 100) * 100;
-
-
-        const parameters = {
-          graphSettings: {
-            timelineType: 'date',
-            startDate: new Date(moment().subtract(period, 'month')),
-            finishDate: new Date(),
-            periodMonths: period,
-            min: 0,
-            max: maxResult,
-            showLegend: true,
-            boxHeight: true,
-            //heightRatio: 0.75
-          },
-          tooltips: {
-            type: 'simple', // Detailed or simple
-            description: 'Молока в месяц',
-            unitText: 'л.',
-            dateUnit: 'month'
-          },
-          datasets: [
-            {
-              showPoint: true,
-              pointColor: '#f4a261',
-              showLine: true,
-              lineColor: '#264653',
-              averageGraph: false,
-              showAllResults: false,
-              breakLactations: false,
-              legendName: 'Молока в месяц',
-              tooltipName: 'Молока в месяц',
-              data: milkingTotal
-            }
-          ]
-        };
-        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
-
-
-        /* Milk averages by lactations */
-      } else if ($(this).attr('id') === 'milk-lact') {
-        /* Adding average line and dots */
-        let milkingAverage = [];
-
-        milkingData.forEach((result, index, array) => {
-          /* Preparing second array for average line */
-          if (milkingAverage.length < 1) {
-            milkingAverage.push({ date: result.date, results: [{ date: result.date, number: result.result }], lactation: result.lactation });
-          } else {
-            let toPush = true;
-            for (let i = 0; i < milkingAverage.length; i++) {
-              if (moment(milkingAverage[i].date).month() === moment(result.date).month() && moment(milkingAverage[i].date).year() === moment(result.date).year() && milkingAverage[i].lactation === result.lactation) {
-                milkingAverage[i].results.push({ date: result.date, number: result.result });
-                toPush = false;
-              }
-            }
-
-            if (toPush) {
-              milkingAverage.push({ date: result.date, results: [{ date: result.date, number: result.result }], lactation: result.lactation });
-            }
-          }
-        });
-
-        /* Counting averages and adding lines */
-        milkingAverage.sort((a, b) => a.lactation - b.lactation);
-
-        milkingAverage.forEach((result, index, array) => {
-          let total = 0
-          result.results.forEach(el => total += el.number);
-          result.number = parseFloat((total / result.results.length).toFixed(1));
-        });
-
-        let milkAverageByLactation = [];
-        milkingAverage.forEach(data => {
-          if (!isNaN(data.lactation)) {
-            if (milkAverageByLactation.length < 1) {
-              milkAverageByLactation.push({ lactation: data.lactation, data: [data] });
-            } else {
-              let toPush = true;
-              for (let i = 0; i < milkAverageByLactation.length; i++) {
-                if (milkAverageByLactation[i].lactation === data.lactation) {
-                  milkAverageByLactation[i].data.push(data);
-                  toPush = false;
-                }
-              }
-
-              if (toPush) {
-                milkAverageByLactation.push({ lactation: data.lactation, data: [data] });
-              }
-            }
-          }
-        });
-
-
-        const parameters = {
-          graphSettings: {
-            timelineType: 'date',
-            startDate: new Date(moment().subtract(period, 'month')),
-            finishDate: new Date(),
-            periodMonths: period,
-            min: 0,
-            max: 50,
-            showLegend: true,
-            boxHeight: true,
-            //heightRatio: 0.75
-          },
-          tooltips: {
-            type: 'simple', // Detailed or simple
-            description: 'Сред. результат',
-            unitText: 'л.',
-            dateUnit: 'month'
-          },
-          datasets: []
-        };
-
-        let colors = ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'];
-        milkAverageByLactation.forEach((el, index) => {
-          parameters.datasets.push({
-            showPoint: true,
-            pointColor: colors[index],
-            showLine: true,
-            lineColor: colors[index],
-            averageGraph: true,
-            showAllResults: false,
-            breakLactations: true,
-            legendName: `Лактация #${el.lactation}`,
-            tooltipName: `Лактация #${el.lactation}`,
-            data: el.data
+      $('.herd-mp-quick-info-item').each(function () {
+        if ($(this).attr('data-index') === $('.herd-mp-quick-info-counter-active').attr('data-index')) {
+          anime({
+            targets: '.herd-mp-quick-info-item',
+            opacity: '0',
+            easing: 'easeInOutQuad',
+            duration: 500
           });
+          anime({
+            targets: $(this)[0],
+            opacity: '1',
+            easing: 'easeInOutQuad',
+            delay: 650,
+            duration: 750
+          });
+          anime({
+            targets: $(this).find('.herd-mp-quick-info-item-res')[0],
+            innerText: [0, parseFloat($(this).attr('data-res'))],
+            round: true,
+            delay: 1000,
+            duration: 500
+          });
+        }
+      });
+
+      slideInterval = setInterval(() => {
+        if ($('.herd-mp-quick-info-counter-active').next().length !== 0) {
+          $('.herd-mp-quick-info-counter-active').removeClass('herd-mp-quick-info-counter-active').next().addClass('herd-mp-quick-info-counter-active');
+        } else {
+          $('.herd-mp-quick-info-counter-active').removeClass('herd-mp-quick-info-counter-active');
+          $('.herd-mp-quick-info-counter-first').addClass('herd-mp-quick-info-counter-active');
+        }
+
+        $('.herd-mp-quick-info-item').each(function () {
+          if ($(this).attr('data-index') === $('.herd-mp-quick-info-counter-active').attr('data-index')) {
+            anime({
+              targets: '.herd-mp-quick-info-item',
+              opacity: '0',
+              easing: 'easeInOutQuad',
+              duration: 500
+            });
+            anime({
+              targets: $(this)[0],
+              opacity: '1',
+              easing: 'easeInOutQuad',
+              delay: 650,
+              duration: 750
+            });
+            anime({
+              targets: $(this).find('.herd-mp-quick-info-item-res')[0],
+              innerText: [0, parseFloat($(this).attr('data-res'))],
+              round: true,
+              delay: 1000,
+              duration: 500
+            });
+          }
         });
+      }, 5000)
+    });
+    $('.herd-mp-quick-info-counter-active').trigger('click');
 
-        const graph = renderLineGraph(document.querySelector('.mp-animal-graph-container'), parameters);
-
-      }
-
+    /* Working with lists */
+    anime({
+      targets: '.herd-mp-li-indicator',
+      opacity: [
+        {value: 1, duration: 500},
+        {value: 0, duration: 500, delay: 1000}
+      ],
+      scale: [
+        {value: 35, duration: 1000},
+        {value: 1, duration: 1, delay: 1500},
+      ],
+      easing: 'easeOutQuint',
+      delay: 1000
+    });
+    anime({
+      targets: '.herd-mp-li-number-red',
+      color: '#D44D5C',
+      easing: 'easeOutQuint',
+      duration: 500,
+      delay: 2000
+    });
+    anime({
+      targets: '.herd-mp-li-name-red',
+      color: '#D44D5C',
+      easing: 'easeOutQuint',
+      duration: 500,
+      delay: 2000
     });
 
-    $('.mp-animal-graphs-switch-btn-active').trigger('click');
+    $('.herd-mp-list-block-1').find('.herd-mp-list-item').each(function() {
+      if($('.herd-mp-list-block-1').find('.herd-mp-list-item').index($(this)) % 2 === 0) {
+        $(this).css('background-color', '#d9d9d9')
+      }
+    });
+    $('.herd-mp-list-block-2').find('.herd-mp-list-item').each(function() {
+      if($('.herd-mp-list-block-2').find('.herd-mp-list-item').index($(this)) % 2 === 0) {
+        $(this).css('background-color', '#d9d9d9')
+      }
+    });
 
   }
 
+  //////////////////////////
+  //////////////////////////
+  //////////////////////////
   /* Herd main page graph */
+  //////////////////////////
+  //////////////////////////
   if (document.querySelector('#mp-herd-graph')) {
     const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     let data = [];
     animals.cows.forEach((animal) => {
       animal.milkingResults.forEach(res => {
-        data.push({ result: res.result, date: new Date(res.date), lactationNumber: res.lactationNumber, animal: animal._id, number: animal.number });
+        data.push({ result: res.result, date: new Date(res.date), lactationNumber: res.lactationNumber, animal: animal._id, number: animal.number, name: animal.name });
       });
     });
 
     /* Counting average and total by each month */
     let dataByMonth = [];
     data.forEach(res => {
-      if (dataByMonth.length === 0) return dataByMonth.push({ date: new Date(moment(res.date).startOf('month')), results: [res], total: res.result, average: res.result });
+      if (dataByMonth.length === 0) return dataByMonth.push({ date: new Date(moment(res.date).endOf('month')), results: [res], total: res.result, average: res.result });
       if (dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'))) {
         dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).results.push(res);
         dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).total += res.result;
         dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).average = dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).total / dataByMonth.find(resMonth => moment(res.date).isSame(resMonth.date, 'month')).results.length;
       } else {
-        dataByMonth.push({ date: new Date(moment(res.date).startOf('month')), results: [res], total: res.result, average: res.result });
+        dataByMonth.push({ date: new Date(moment(res.date).endOf('month')), results: [res], total: res.result, average: res.result });
       }
     });
 
@@ -4605,7 +4307,7 @@ $(document).ready(async function () {
     data.forEach(res => {
       if (!res.lactationNumber) return;
 
-      if (dataByMonthLactation.length === 0) return dataByMonthLactation.push({ date: new Date(moment(res.date).startOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
+      if (dataByMonthLactation.length === 0) return dataByMonthLactation.push({ date: new Date(moment(res.date).endOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
 
       if (dataByMonthLactation.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'))) {
         let el = dataByMonthLactation.find(resMonth => moment(res.date).isSame(resMonth.date, 'month'));
@@ -4618,7 +4320,7 @@ $(document).ready(async function () {
           el.lactations.push({ number: res.lactationNumber, results: [res], total: res.result, average: res.result })
         }
       } else {
-        dataByMonthLactation.push({ date: new Date(moment(res.date).startOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
+        dataByMonthLactation.push({ date: new Date(moment(res.date).endOf('month')), lactations: [{ number: res.lactationNumber, results: [res], total: res.result, average: res.result }] });
       }
 
     });
@@ -4626,46 +4328,533 @@ $(document).ready(async function () {
     /* Sorting monthly data by year */
     let dataByMonthAndYear = [];
     dataByMonth.forEach(res => {
-      if (dataByMonthAndYear.length === 0) return dataByMonthAndYear.push({ date: new Date(moment(res.date).startOf('year')), results: [res] });
+      if (dataByMonthAndYear.length === 0) return dataByMonthAndYear.push({ date: new Date(moment(res.date).endOf('year')), results: [res] });
 
       if (dataByMonthAndYear.find(resMonth => moment(res.date).isSame(resMonth.date, 'year'))) {
         dataByMonthAndYear.find(resMonth => moment(res.date).isSame(resMonth.date, 'year')).results.push(res);
       } else {
-        dataByMonthAndYear.push({ date: new Date(moment(res.date).startOf('year')), results: [res] });
+        dataByMonthAndYear.push({ date: new Date(moment(res.date).endOf('year')), results: [res] });
       }
     });
 
     /* Counting top and bottom 10 percent */
-    let dataByAnimal = [];
-    data.forEach(res => {
-      if (dataByAnimal.length === 0) return dataByAnimal.push({ animal: res.animal, results: [res], total: res.result, average: res.result });
-      if (dataByAnimal.find(resAnimal => resAnimal.animal === res.animal)) {
-        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).results.push(res);
-        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).total += res.result;
-        dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).average = dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).total / dataByAnimal.find(resAnimal => resAnimal.animal === res.animal).results.length;
-      } else {
-        dataByAnimal.push({ animal: res.animal, results: [res], total: res.result, average: res.result });
-      }
+    dataByMonth.forEach(data => {
+      data.results.sort((a, b) => b.result - a.result);
+      let topArr = data.results.slice(0, data.results.length * 0.1)
+      data.results.sort((a, b) => a.result - b.result);
+      let bottomArr = data.results.slice(0, data.results.length * 0.1)
+
+      data.top10Res = topArr.length === 0 ? undefined : 0;
+      topArr.forEach(res => {
+        data.top10Res += res.result
+        res.top = true;
+      });
+      data.top10Res = parseFloat((data.top10Res / topArr.length).toFixed(1))
+
+      data.bottom10Res = bottomArr.length === 0 ? undefined : 0;
+      bottomArr.forEach(res => {
+        data.bottom10Res += res.result
+        res.bottom = true;
+      });
+      data.bottom10Res = parseFloat((data.bottom10Res / topArr.length).toFixed(1))
     });
 
-    let tenPercentAmount = Math.round(dataByAnimal.length * 0.1)
-    dataByAnimal.sort((a, b) => b.average - a.average);
-    let top10Percent = dataByAnimal.slice(0, tenPercentAmount);
-    dataByAnimal.sort((a, b) => a.average - b.average);
-    let bottom10Percent = dataByAnimal.slice(0, tenPercentAmount);;
+
+    dataByMonth.sort((a, b) => a.date - b.date);
+
+    /* console.log('Data by month', dataByMonth);
+    console.log('Data by month broke by lactations', dataByMonthLactation);
+    console.log('Data by month and year', dataByMonthAndYear); */
 
 
-    console.log(dataByMonth);
-    console.log(dataByMonthLactation);
-    console.log(dataByMonthAndYear);
-    console.log(dataByAnimal);
-    console.log(top10Percent);
-    console.log(bottom10Percent);
+    // //////////////////// //
+    // //////////////////// //
+    // //////////////////// //
+    // //////////////////// //
+    // WORKING WITH A GRAPH //
 
-    ///////////////////////
-    // WORKING WITH A GRAPH
-    ///////////////////////
-    
+    $('.mp-hg-btn').on('click', function () {
+      $(this).addClass('mp-hg-btn-active');
+      $(this).siblings().removeClass('mp-hg-btn-active');
+      const graphState = $('#graph-btns').find('.mp-hg-btn-active').attr('data-graph') === 'average' ? 'average' : 'total';
+
+      /* Allowing time buttons with 5 and more results */
+      $('#months-btns').find('.mp-hg-btn').each(function () {
+        if ($(this).attr('data-months') === 'all') return;
+        let startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'months'));
+        if (dataByMonth.filter(el => el.date >= startDate).length < 5) {
+          $(this).addClass('mp-hg-btn-unav')
+        } else {
+          $(this).removeClass('mp-hg-btn-unav')
+        }
+      });
+
+      if ($('#months-btns').find('.mp-hg-btn-active').length === 0) {
+        $('#months-btns').find('.mp-hg-btn').not('.mp-hg-btn-unav').first().addClass('mp-hg-btn-active');
+      }
+
+      let workingArr
+      if ($('#months-btns').find('.mp-hg-btn-active').attr('data-months') !== 'all') {
+        let startDate = new Date(moment().subtract(parseFloat($('#months-btns').find('.mp-hg-btn-active').attr('data-months')), 'months'));
+        workingArr = dataByMonth.filter(el => el.date >= startDate);
+      } else {
+        workingArr = dataByMonth;
+      }
+
+      /* Setting max and min */
+      let max, min;
+      max = 0;
+      min = 0;
+
+      workingArr.forEach(el => {
+        if (graphState === 'average') {
+          if (max < el.average) max = el.average;
+          if (min > el.average) min = el.average;
+        } else {
+          if (max < el.total) max = el.total;
+          if (min > el.total) min = el.total;
+        }
+      });
+      max = Math.ceil(max / 10) * 10 * 1.5;
+
+      /* Cleaning previously created graph */
+      $('#main-column').find('.mp-herd-legend-item').remove();
+      $('#additional-column').find('.mp-herd-legend-item').remove();
+
+      $('.basic-graph-svg').remove()
+
+      /* Adding main SVG */
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      svg.classList.add('basic-graph-svg')
+      $('.mp-herd-graph-container').append(svg);
+      svg.style.width = $('.mp-herd-graph-container').width();
+      svg.style.height = $('.mp-herd-graph-container').height();
+
+      /* Creating showlines */
+      const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      showLineHor.classList.add('basic-graph-show-line')
+      showLineHor.setAttribute('id', 'graph-show-line-hor')
+      svg.append(showLineHor);
+
+      const showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      showLineVer.classList.add('basic-graph-show-line')
+      showLineVer.setAttribute('id', 'graph-show-line-ver')
+      svg.append(showLineVer);
+
+      /* Creating ticks */
+      const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      tickHor.classList.add('basic-graph-tick');
+      svg.append(tickHor);
+      const tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      tickVer.classList.add('basic-graph-tick-date');
+      svg.append(tickVer);
+
+      /* Counting the horizontal gap */
+      let horGap = parseFloat($('.mp-herd-graph-container').height()) / 12;
+
+      const workingAreaHeight = Math.round($('.mp-herd-graph-container').height() - horGap * 2);
+      const workingAreaWidth = Math.round($('.mp-herd-graph-container').width() - horGap * 2);
+
+      /* Adding horizontal grid lines and ticks */
+      for (let i = 11; i >= 1; i--) {
+        const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        gridLine.classList.add('basic-graph-grid-line')
+        svg.append(gridLine);
+        gridLine.setAttribute('x1', 0)
+        gridLine.setAttribute('y1', i * horGap)
+        gridLine.setAttribute('x2', parseFloat($('.mp-herd-graph-container').width()))
+        gridLine.setAttribute('y2', i * horGap)
+      }
+
+      /* Adding the vertical grid lines */
+      for (let i = 1; i <= parseFloat($('.mp-herd-graph-container').width()) / horGap; i++) {
+        const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        gridLine.classList.add('basic-graph-grid-line')
+        svg.append(gridLine);
+        gridLine.setAttribute('x1', i * horGap)
+        gridLine.setAttribute('y1', 0)
+        gridLine.setAttribute('x2', i * horGap)
+        gridLine.setAttribute('y2', parseFloat($('.mp-herd-graph-container').height()))
+      }
+
+      /* Adding data */
+      let start = workingArr[0].date;
+      let end = workingArr[workingArr.length - 1].date;
+
+      let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+      /* Adding all data dots */
+
+      $('.mp-herd-graph-info-item').remove();
+
+      workingArr.forEach((data, inx, arr) => {
+        data.results.sort((a, b) => a.date - b.date);
+        data.results.forEach(res => {
+          let id = randomstring.generate(10);
+          let resDaysSpan = Math.round((res.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+          if (graphState === 'average') {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.classList.add('basic-graph-average-dot')
+            if (res.top) circle.classList.add('basic-graph-average-dot-top')
+            if (res.bottom) circle.classList.add('basic-graph-average-dot-bottom')
+            svg.append(circle);
+            circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (resDaysSpan / (daysSpan / 100) / 100)))
+            circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (res.result / (max / 100) / 100)))
+            circle.setAttribute('r', 4);
+            circle.setAttribute('data-id', id);
+            circle.style.animation = `fadeIn ${Math.floor(Math.random() * (3 - 1 + 1) + 1)}s ease-in`
+          }
+          let mode = '';
+          if (res.top) mode = 'mp-herd-graph-info-item-top';
+          if (res.bottom) mode = 'mp-herd-graph-info-item-bottom';
+          $('.mp-herd-graph-info-block').append(`
+            <div class="mp-herd-graph-info-item ${mode}" data-id="${id}">
+              <div class="mp-herd-graph-info-item-group">
+                <div class="mp-herd-graph-info-text">#${res.number}</div>
+                <div class="mp-herd-graph-info-sub-text">${res.name ? res.name : ''}</div>
+              </div>
+              <div class="mp-herd-graph-info-item-group">
+                <div class="mp-herd-graph-info-item-label">10%</div>
+                <div class="mp-herd-graph-info-text">${res.result}</div>
+              </div>
+            </div>
+          `)
+
+        });
+      });
+
+
+      let circleTimer = 0;
+      workingArr.forEach((data, inx, arr) => {
+        let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+        /* Adding data line */
+        let path;
+        if (inx === 0) {
+          path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+          path.classList.add('basic-graph-point-line');
+          path.classList.add('average-graph-data');
+          svg.append(path);
+          if (graphState === 'average') {
+            path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+          } else {
+            path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.total / (max / 100) / 100))}`)
+          }
+          path.setAttribute('id', `graph-line-average`);
+        } else {
+          path = document.getElementById(`graph-line-average`);
+          if (graphState === 'average') {
+            path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+          } else {
+            path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.total / (max / 100) / 100))}`)
+          }
+        }
+
+        /* Adding data points */
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+        circle.classList.add('basic-graph-point')
+        circle.classList.add('average-graph-data');
+        svg.append(circle);
+        circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100)))
+        if (graphState === 'average') {
+          circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100)))
+        } else {
+          circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.total / (max / 100) / 100)))
+        }
+        circle.setAttribute('r', 4);
+        circle.setAttribute('data-average', data.average);
+        circle.setAttribute('data-total', data.total);
+        circle.setAttribute('data-results', data.results.length);
+        circle.setAttribute('data-date', data.date);
+
+        circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+        circleTimer += 0.1;
+
+        /* Adding top and bottom results */
+        if (graphState === 'average') {
+          if (!isNaN(data.top10Res)) {
+            if (!document.getElementById(`graph-line-top`)) {
+              path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+              path.classList.add('basic-graph-top-line');
+              svg.append(path);
+              path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.top10Res / (max / 100) / 100))}`)
+              path.setAttribute('id', `graph-line-top`);
+            } else {
+              path = document.getElementById(`graph-line-top`);
+              path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.top10Res / (max / 100) / 100))}`)
+            }
+          }
+
+          if (!isNaN(data.bottom10Res)) {
+            if (!document.getElementById(`graph-line-bottom`)) {
+              path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+              path.classList.add('basic-graph-bottom-line');
+              svg.append(path);
+              path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.bottom10Res / (max / 100) / 100))}`)
+              path.setAttribute('id', `graph-line-bottom`);
+            } else {
+              path = document.getElementById(`graph-line-bottom`);
+              path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.bottom10Res / (max / 100) / 100))}`)
+            }
+          }
+        }
+      });
+
+      anime({
+        targets: '.basic-graph-point-line',
+        strokeDashoffset: [1000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+      anime({
+        targets: '.basic-graph-top-line',
+        strokeDashoffset: [1000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+      anime({
+        targets: '.basic-graph-bottom-line',
+        strokeDashoffset: [1000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+
+      /* Adding result point selections */
+      $('.basic-graph-average-dot').off();
+      $('.basic-graph-average-dot').on('mouseenter', function () {
+        const id = $(this).attr('data-id');
+        $('.mp-herd-graph-info-item').each(function () {
+          if ($(this).attr('data-id') === id) {
+            $(this).css('border-color', '#0a0a0a');
+            $('.mp-herd-graph-info-block').scrollTop($('.mp-herd-graph-info-item').index($(this)) * 42)
+          }
+        });
+      });
+      $('.basic-graph-average-dot').on('mouseleave', function () {
+        $('.mp-herd-graph-info-item').css('border-color', '#00000000');
+      });
+
+      /* Adding result point selections reverse */
+      $('.mp-herd-graph-info-item').on('mouseenter', function () {
+        const id = $(this).attr('data-id');
+        $(this).css('border-color', '#0a0a0a');
+        $('.basic-graph-average-dot').each(function () {
+          if ($(this).attr('data-id') !== id) return;
+
+          if ($(this).hasClass('basic-graph-average-dot-top')) return $(this).css('fill', '#0EAD69');
+
+          if ($(this).hasClass('basic-graph-average-dot-bottom')) return $(this).css('fill', '#D44D5C');
+
+          $(this).css('fill', '#0a0a0a');
+        });
+      });
+
+      $('.mp-herd-graph-info-item').on('mouseleave', function () {
+        $(this).css('border-color', '#00000000');
+        $('.basic-graph-average-dot').css('fill', '#a2a2a280');
+      });
+
+      /* Adding ticks on mousemove */
+      $('.mp-herd-graph-container').off()
+      $('.mp-herd-graph-container').on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
+        let point = svg.createSVGPoint();
+        point.x = clientX;
+        point.y = clientY;
+        point = point.matrixTransform(svg.getScreenCTM().inverse());
+
+
+        let xStop = false;
+        let yStop = false;
+        if (point.x < horGap) {
+          showLineVer.setAttribute('x1', horGap + 1);
+          showLineVer.setAttribute('x2', horGap + 1);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('.mp-herd-graph-container').height()) - horGap)
+          xStop = true;
+        }
+        if (point.y < horGap) {
+          showLineHor.setAttribute('y1', horGap + 1);
+          showLineHor.setAttribute('y2', horGap + 1);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('.mp-herd-graph-container').width()));
+          yStop = true;
+        }
+        if (point.x > parseFloat($('.mp-herd-graph-container').width()) - horGap) {
+          showLineVer.setAttribute('x1', parseFloat($('.mp-herd-graph-container').width()) - horGap);
+          showLineVer.setAttribute('x2', parseFloat($('.mp-herd-graph-container').width()) - horGap);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('.mp-herd-graph-container').height()) - horGap)
+          xStop = true;
+        }
+        if (point.y > parseFloat($('.mp-herd-graph-container').height()) - horGap) {
+          showLineHor.setAttribute('y1', parseFloat($('.mp-herd-graph-container').height()) - horGap - 1);
+          showLineHor.setAttribute('y2', parseFloat($('.mp-herd-graph-container').height()) - horGap - 1);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('.mp-herd-graph-container').width()));
+          yStop = true;
+        }
+
+
+        if (!yStop) {
+          showLineHor.setAttribute('y1', point.y);
+          showLineHor.setAttribute('y2', point.y);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('.mp-herd-graph-container').width()));
+        }
+
+        if (!xStop) {
+          showLineVer.setAttribute('x1', point.x);
+          showLineVer.setAttribute('x2', point.x);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('.mp-herd-graph-container').height()) - horGap)
+        }
+
+
+        tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
+        tickHor.setAttribute('x', 10)
+        tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+
+        tickVer.textContent = moment(start).add(Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100)), 'day').lang('ru').format('DD MMMM, YY')
+        tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
+        tickVer.setAttribute('y', $('.mp-herd-graph-container').height() - 10)
+
+      });
+
+      $('.mp-herd-graph-container').on('mouseleave', '.basic-graph-svg', function () {
+        showLineVer.setAttribute('x1', 0);
+        showLineVer.setAttribute('x2', 0);
+        showLineVer.setAttribute('y1', 0);
+        showLineVer.setAttribute('y2', 0);
+        showLineHor.setAttribute('x1', 0);
+        showLineHor.setAttribute('x2', 0);
+        showLineHor.setAttribute('y1', 0);
+        showLineHor.setAttribute('y2', 0);
+        tickHor.textContent = '';
+        tickVer.textContent = '';
+      });
+
+      /* Adding tooltips on mouse hover */
+      $('.basic-graph-point').off()
+      $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+        $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
+
+        if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('.mp-herd-graph-container').width()) {
+          $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
+        } else {
+          $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
+        }
+
+        $('.mp-graph-tooltip').empty();
+        if (graphState === 'average') {
+          $('.mp-graph-tooltip').append(`
+            <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
+            <div class="mp-graph-tooltip-title">Средний результат</div>
+            <div class="mp-graph-tooltip-gap"></div>
+            <div class="mp-graph-tooltip-sub-res">${Math.round(parseFloat($(this).attr('data-total')))}</div>
+            <div class="mp-graph-tooltip-title">Всего молока</div>
+            <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
+            <div class="mp-graph-tooltip-title">Кол-во результатов</div>
+            <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+          `)
+        } else {
+          $('.mp-graph-tooltip').append(`
+            <div class="mp-graph-tooltip-res">${Math.round(parseFloat($(this).attr('data-total')))} </div>
+            <div class="mp-graph-tooltip-title">Всего молока</div>
+            <div class="mp-graph-tooltip-gap"></div>
+            <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
+            <div class="mp-graph-tooltip-title">Средний результат </div>
+            <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
+            <div class="mp-graph-tooltip-title">Кол-во результатов</div>
+            <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+          `)
+        }
+
+
+        $('.mp-graph-tooltip').show();
+      });
+
+      $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+        $('.mp-graph-tooltip').hide();
+      });
+
+      /* Working legend work */
+      $('#legend-btn').off('click')
+      $('#legend-btn').on('click', function () {
+        if ($('.mp-herd-legend').css('display') === 'flex') {
+          $('.mp-herd-legend').hide()
+        } else {
+          $('.mp-herd-legend').css('display', 'flex')
+        }
+      });
+
+      if (graphState === 'average') {
+        $('#main-column').append(`
+          <div class="mp-herd-legend-item" data-rel-element='average-graph-data'>
+            <div class="mp-herd-li-mark">
+              <div class="mp-herd-li-mark-average"></div>
+            </div>
+            <div class="mp-herd-li-text">Средний результат</div>
+          </div>
+        `)
+      } else {
+        $('#main-column').append(`
+          <div class="mp-herd-legend-item" data-rel-element='average-graph-data'>
+            <div class="mp-herd-li-mark">
+              <div class="mp-herd-li-mark-average"></div>
+            </div>
+            <div class="mp-herd-li-text">Всего молока</div>
+          </div>
+        `)
+
+      }
+
+      if (graphState === 'average') {
+        $('#additional-column').append(`
+        <div class="mp-herd-legend-item" data-rel-element='basic-graph-average-dot'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-average-dot"></div>
+          </div>
+          <div class="mp-herd-li-text">Индивидуальный рез.</div>
+        </div>
+        <div class="mp-herd-legend-item" data-rel-element='basic-graph-top-line'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-top-line"></div>
+          </div>
+          <div class="mp-herd-li-text">Лучшие 10%</div>
+        </div>
+        <div class="mp-herd-legend-item" data-rel-element='basic-graph-bottom-line'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-bottom-line"></div>
+          </div>
+          <div class="mp-herd-li-text">Худшие 10%</div>
+        </div>
+      `)
+      }
+
+
+      $('.mp-herd-graph-container').off('click')
+      $('.mp-herd-graph-container').on('click', '.mp-herd-legend-item', function () {
+        if ($(this).hasClass('mp-herd-legend-item-non-click')) return;
+
+        if (!$(this).hasClass('mp-herd-legend-item-off')) {
+          $(`.${$(this).attr('data-rel-element')}`).hide();
+
+          $(this).addClass('mp-herd-legend-item-off')
+        } else {
+          $(`.${$(this).attr('data-rel-element')}`).show();
+
+          $(this).removeClass('mp-herd-legend-item-off')
+        }
+      });
+    });
+
+    $('#graph-btns').find('.mp-hg-btn-active').trigger('click');
+
+
+
 
   }
 

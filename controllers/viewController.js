@@ -100,30 +100,46 @@ exports.renderAllEmployees = catchAsync(async (req, res, next) => {
 /////////////////
 /////////////////
 exports.renderHerdMain = catchAsync(async (req, res, next) => {
+  const data = {};
+
   const animals = await Animal.find({ farm: req.user.farm, status: 'alive' });
   const cows = await Animal.find({ farm: req.user.farm, gender: 'female', status: 'alive' });
   const bulls = await Animal.find({ farm: req.user.farm, gender: 'male', status: 'alive' });
 
-  let milkingCows = 0;
-  let inseminatedCows = 0;
-  let bullsReady = 0;
+  data.milkingCows = 0;
+  data.inseminatedCows = 0;
+  data.bullsReady = 0;
+  data.soonToCalv = 0;
+  data.calves = 0;
+
+  data.animals = animals;
+  data.cows = cows;
+  data.bulls = bulls;
+
+  animals.forEach(animal => {
+    if(Date.now() < animal.birthDate.getTime() + 18 * 30 * 24 * 60 * 60 * 1000) data.calves++;
+  });
 
   cows.forEach(cow => {
-    if (cow.lactations.length > 0 && cow.lactations[cow.lactations.length - 1].finishDate === null) milkingCows++;
+    if (cow.lactations.length > 0 && cow.lactations[cow.lactations.length - 1].finishDate === null) data.milkingCows++;
     if (cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success) {
-      if (cow.lactations.length === 0 || cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate) inseminatedCows++
+      if (cow.lactations.length === 0 || cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate) {
+        data.inseminatedCows++
+        if(cow.inseminations[cow.inseminations.length - 1].date.getTime() > cow.inseminations[cow.inseminations.length - 1].date.getTime() + 225 * 24 * 60 * 60 * 1000) data.soonToCalv++;
+      }
     }
+
   });
 
   bulls.forEach(bull => {
-    if ((bull.birthDate.getTime() + 24 * 30 * 24 * 60 * 60 * 1000) > Date.now()) bullsReady++;
+    if ((bull.birthDate.getTime() + 24 * 30 * 24 * 60 * 60 * 1000) > Date.now()) data.bullsReady++;
   })
 
   res.status(200).render('herdMain', {
     animals,
     cows,
     bulls,
-    milkingCows, inseminatedCows, bullsReady
+    data
   });
 });
 

@@ -17,7 +17,7 @@ const animalSchema = new mongoose.Schema({
   spot: String,
   status: {
     type: String,
-    enum: ['alive', 'dead'],
+    enum: ['alive', 'diseased'],
     default: 'alive'
   },
   writeOffReason: {
