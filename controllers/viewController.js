@@ -111,13 +111,12 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
   data.bullsReady = 0;
   data.soonToCalv = 0;
   data.calves = 0;
-
   data.animals = animals;
   data.cows = cows;
   data.bulls = bulls;
 
   animals.forEach(animal => {
-    if(Date.now() < animal.birthDate.getTime() + 18 * 30 * 24 * 60 * 60 * 1000) data.calves++;
+    if (Date.now() < animal.birthDate.getTime() + 18 * 30 * 24 * 60 * 60 * 1000) data.calves++;
   });
 
   cows.forEach(cow => {
@@ -125,7 +124,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
     if (cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success) {
       if (cow.lactations.length === 0 || cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate) {
         data.inseminatedCows++
-        if(cow.inseminations[cow.inseminations.length - 1].date.getTime() > cow.inseminations[cow.inseminations.length - 1].date.getTime() + 225 * 24 * 60 * 60 * 1000) data.soonToCalv++;
+        if (cow.inseminations[cow.inseminations.length - 1].date.getTime() > cow.inseminations[cow.inseminations.length - 1].date.getTime() + 225 * 24 * 60 * 60 * 1000) data.soonToCalv++;
       }
     }
 
@@ -135,11 +134,42 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
     if ((bull.birthDate.getTime() + 24 * 30 * 24 * 60 * 60 * 1000) > Date.now()) data.bullsReady++;
   })
 
+  const tableData = {
+    soonToCalv: [],
+    soonToInsem: [],
+    firstCalv: []
+  };
+
+  cows.forEach(cow => {
+    const lactAmount = cow.lactations.length;
+    const insemAmount = cow.inseminations.length;
+    let lastInsemRes = false;
+    let lastInsem;
+    let lastLact;
+     if (insemAmount > 0) {
+      lastInsemRes = cow.inseminations[cow.inseminations.length - 1].success;
+      lastInsem = cow.inseminations[cow.inseminations.length - 1];
+    }
+    if (lactAmount > 0) {
+      lastLact = cow.lactations[cow.lactations.length - 1];
+    }
+    // Adding firts calv
+    if (lactAmount === 0 && !lastInsemRes && new Date() > new Date(moment(cow.birthDate).add(18, 'months'))) tableData.firstCalv.push(cow)
+
+    // Adding soon to calv
+    if(lactAmount === 0 && lastInsemRes || lactAmount > 0 && insemAmount > 0 && lastInsem.date > lastLact.startDate && lastInsemRes) tableData.soonToCalv.push(cow); 
+
+    // Adding soon to insem
+    if(lactAmount > 0 && insemAmount > 0 && !lastInsemRes && new Date() > new Date(moment(lastLact.startDate).add(60, 'days')) || lactAmount > 0 && lastInsemRes && lastInsem.date < lastLact.date) tableData.soonToInsem.push(cow);
+
+  });
+
   res.status(200).render('herdMain', {
     animals,
     cows,
     bulls,
-    data
+    data,
+    tableData
   });
 });
 
