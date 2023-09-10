@@ -20,40 +20,13 @@ block content
             .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
 
       .herd-mp-flex-block 
-        .herd-mp-list-block.herd-mp-list-block-1
-          each cow in cows
-            -if(cow.lactations.length === 0 && cow.inseminations.length === 0 || cow.lactations.length === 0 && cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
-              .herd-mp-list-item
-                .herd-mp-li-header
-                  .herd-mp-li-animal.herd-mp-li-animal-row
-                    .herd-mp-li-number.herd-mp-li-number-red= `#${cow.number}`
-                    .herd-mp-li-name.herd-mp-li-name-red= `${cow.name ? cow.name : ''}`
-                  .herd-mp-li-animal
-                    .herd-mp-li-number.herd-mp-li-number-red Пора осеменять
-                  .herd-mp-li-indicator
-
-            -if(cow.lactations.length > 0)
-              -if(cow.inseminations.length === 0 || cow.lactations[cow.lactations.length - 1].startDate > cow.inseminations[cow.inseminations.length - 1].date || cow.lactations[cow.lactations.length - 1].startDate < cow.inseminations[cow.inseminations.length - 1].date && !cow.inseminations[cow.inseminations.length - 1].success)
-                .herd-mp-list-item
-                  .herd-mp-li-header
-                    .herd-mp-li-animal.herd-mp-li-animal-row
-                      .herd-mp-li-number.herd-mp-li-number-red= `#${cow.number}`
-                      .herd-mp-li-name.herd-mp-li-name-red= `${cow.name ? cow.name : ''}`
-                    .herd-mp-li-animal
-                      .herd-mp-li-number.herd-mp-li-number-red Пора осеменять
-                    .herd-mp-li-indicator
-
-          //.herd-mp-list-item
-            .herd-mp-li-header
-              .herd-mp-li-animal.herd-mp-li-animal-row
-                .herd-mp-li-number.herd-mp-li-number-red #542341
-                .herd-mp-li-name.herd-mp-li-name-red Березка
-              .herd-mp-li-animal
-                .herd-mp-li-number.herd-mp-li-number-red 5 дн. назад
-                .herd-mp-li-name.herd-mp-li-name-red Август 06, 2023
-              .herd-mp-li-indicator
-
-        .herd-mp-list-block.herd-mp-list-block-2
+        .herd-mp-list-block.herd-mp-list-block-insem
+          .herd-mp-list-block-header
+            .herd-mp-li-header-item Номер
+            .herd-mp-li-header-item Кличка
+            .herd-mp-li-header-item Начало лактации
+            .herd-mp-li-header-item Дата осеменения
+            .herd-mp-li-header-item
 
         .herd-mp-quick-info-block
           .herd-mp-quick-info-counter-block
