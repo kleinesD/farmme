@@ -4233,44 +4233,104 @@ $(document).ready(async function () {
     $('.herd-mp-quick-info-counter-active').trigger('click');
 
     /* Working with lists */
-    anime({
-      targets: '.herd-mp-li-indicator',
-      opacity: [
-        {value: 1, duration: 500},
-        {value: 0, duration: 500, delay: 1000}
-      ],
-      scale: [
-        {value: 35, duration: 1000},
-        {value: 1, duration: 1, delay: 1500},
-      ],
-      easing: 'easeOutQuint',
-      delay: 1000
+    $('.herd-mp-list-block-insem').find('.herd-mp-list-line').each(function () {
+      if ($(this).attr('data-first') === 'false') {
+        const date = new Date($(this).find('.date-format').attr('data-date'));
+        $(this).find('.date-format').text(moment(date).format('DD.MM.YYYY'));
+        $(this).find('.date').text(moment(date).add(60, 'days').format('DD.MM.YYYY'));
+        $(this).find('.day').text(`${Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000)} дн.`);
+        $(this).find('.day').attr('data-days', Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000));
+      } else {
+        const date = new Date($(this).find('.date-format').attr('data-date'));
+        $(this).find('.date').text(moment(date).add(18, 'months').format('DD.MM.YYYY'));
+        $(this).find('.day').text(`${Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000)} дн.`);
+        $(this).find('.day').attr('data-days', Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000));
+      }
+
     });
-    anime({
-      targets: '.herd-mp-li-number-red',
-      color: '#D44D5C',
-      easing: 'easeOutQuint',
-      duration: 500,
-      delay: 2000
-    });
-    anime({
-      targets: '.herd-mp-li-name-red',
-      color: '#D44D5C',
-      easing: 'easeOutQuint',
-      duration: 500,
-      delay: 2000
+    $('.herd-mp-list-block-calv').find('.herd-mp-list-line').each(function () {
+      const date = new Date($(this).find('.date-format').attr('data-date'));
+      $(this).find('.date-format').text(moment(date).format('DD.MM.YYYY'));
+      $(this).find('.date').text(moment(date).add(283, 'days').format('DD.MM.YYYY'));
+      $(this).find('.day').text(`${Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000)} дн.`);
+      $(this).find('.day').attr('data-days', Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000));
+
+
     });
 
-    $('.herd-mp-list-block-1').find('.herd-mp-list-item').each(function() {
-      if($('.herd-mp-list-block-1').find('.herd-mp-list-item').index($(this)) % 2 === 0) {
+    $('.herd-mp-list-line').each(function () {
+      if (parseFloat($(this).find('.day').attr('data-days')) <= 0) {
+        $(this).addClass('herd-mp-list-line-red');
+        $(this).append(`<div class="herd-mp-list-line-indicator"></div>`)
+      } else if (parseFloat($(this).find('.day').attr('data-days')) > 0 && parseFloat($(this).find('.day').attr('data-days')) <= 30) {
+        $(this).addClass('herd-mp-list-line-yellow');
+        $(this).append(`<div class="herd-mp-list-line-indicator"></div>`)
+      }
+      let el = $(this);
+      let elDays = parseFloat($(this).find('.day').attr('data-days'))
+      let shifted = false;
+
+      $(this).parent().find('.herd-mp-list-line').each(function () {
+        if (shifted) return;
+        if (elDays < parseFloat($(this).find('.day').attr('data-days'))) {
+          el.detach()
+          $(this).before(el);
+          shifted = true;
+        }
+      });
+    });
+
+    $('.herd-mp-list-block-insem').find('.herd-mp-list-line').each(function () {
+      if ($('.herd-mp-list-block-insem').find('.herd-mp-list-line').index($(this)) % 2 === 0) {
         $(this).css('background-color', '#d9d9d9')
       }
     });
-    $('.herd-mp-list-block-2').find('.herd-mp-list-item').each(function() {
-      if($('.herd-mp-list-block-2').find('.herd-mp-list-item').index($(this)) % 2 === 0) {
+    $('.herd-mp-list-block-calv').find('.herd-mp-list-line').each(function () {
+      if ($('.herd-mp-list-block-calv').find('.herd-mp-list-line').index($(this)) % 2 === 0) {
         $(this).css('background-color', '#d9d9d9')
       }
     });
+
+    $('#table-btns').find('.mp-block-outside-header-btn').on('click', function() {
+      $('.mp-block-outside-header-btn-active').removeClass('mp-block-outside-header-btn-active');
+      $(this).addClass('mp-block-outside-header-btn-active');
+
+      if($(this).attr('id') === 'insem') {
+        $('.herd-mp-list-block-insem').show();
+        $('.herd-mp-list-block-calv').hide();
+        $('.mp-block-outside-header-title').text('Ближайшее осеменение')
+      } else {
+        $('.herd-mp-list-block-calv').show();
+        $('.herd-mp-list-block-insem').hide();
+        $('.mp-block-outside-header-title').text('Ближайшее отел')
+      }
+
+      anime({
+        targets: '.herd-mp-list-line-indicator',
+        opacity: [
+          { value: 1, duration: 500 },
+          { value: 0, duration: 1500, delay: 500 }
+        ],
+        easing: 'easeOutQuint',
+        delay: 500
+      });
+      anime({
+        targets: '.herd-mp-list-line-red .herd-mp-list-line-indicator-text',
+        color: '#D44D5C',
+        easing: 'easeOutQuint',
+        duration: 1500,
+        delay: 1000
+      });
+      anime({
+        targets: '.herd-mp-list-line-yellow .herd-mp-list-line-indicator-text',
+        color: '#f6b91d',
+        easing: 'easeOutQuint',
+        duration: 1500,
+        delay: 1000
+      });
+    });
+
+    $('#table-btns').find('.mp-block-outside-header-btn-active').trigger('click');
 
   }
 

@@ -137,7 +137,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
   const tableData = {
     soonToCalv: [],
     soonToInsem: [],
-    firstCalv: []
+    firstInsem: []
   };
 
   cows.forEach(cow => {
@@ -154,7 +154,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
       lastLact = cow.lactations[cow.lactations.length - 1];
     }
     // Adding firts calv
-    if (lactAmount === 0 && !lastInsemRes && new Date() > new Date(moment(cow.birthDate).add(18, 'months'))) tableData.firstCalv.push(cow)
+    if (lactAmount === 0 && !lastInsemRes && new Date() > new Date(moment(cow.birthDate).add(18, 'months'))) tableData.firstInsem.push(cow)
 
     // Adding soon to calv
     if(lactAmount === 0 && lastInsemRes || lactAmount > 0 && insemAmount > 0 && lastInsem.date > lastLact.startDate && lastInsemRes) tableData.soonToCalv.push(cow); 

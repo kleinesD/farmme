@@ -20,13 +20,6 @@ block content
             .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
 
       .herd-mp-flex-block 
-        .herd-mp-list-block.herd-mp-list-block-insem
-          .herd-mp-list-block-header
-            .herd-mp-li-header-item Номер
-            .herd-mp-li-header-item Кличка
-            .herd-mp-li-header-item Начало лактации
-            .herd-mp-li-header-item Дата осеменения
-            .herd-mp-li-header-item
 
         .herd-mp-quick-info-block
           .herd-mp-quick-info-counter-block
@@ -73,6 +66,50 @@ block content
             .herd-mp-quick-info-item-title ТЕЛЯТА
             .herd-mp-quick-info-item-res= data.calves
 
+        .herd-mp-list-block-combined
+          .mp-block-outside-header
+            .mp-block-outside-header-title Список коров на осеменение
+            .mp-block-outside-header-btn-block#table-btns
+              .mp-block-outside-header-btn.mp-block-outside-header-btn-active#insem Осеменение
+              .mp-block-outside-header-btn#calv Отел
+          .herd-mp-list-block.herd-mp-list-block-insem
+            .herd-mp-list-block-header
+              .herd-mp-li-header-item Номер
+              .herd-mp-li-header-item Кличка
+              .herd-mp-li-header-item Лактация
+              .herd-mp-li-header-item Осеменение
+              .herd-mp-li-header-item
+            .herd-mp-list-container
+              each cow in tableData.soonToInsem
+                a.herd-mp-list-line(data-first="false" href=`/herd/animal-card/${cow._id}`)
+                  .herd-mp-list-line-item ##{cow.number}
+                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                  .herd-mp-list-line-item.date-format(data-date=`${cow.lactations[cow.lactations.length - 1].startDate}`) 
+                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+              each cow in tableData.firstInsem
+                a.herd-mp-list-line(data-first="true" href=`/herd/animal-card/${cow._id}`)
+                  .herd-mp-list-line-item ##{cow.number}
+                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                  .herd-mp-list-line-item.date-format(data-date=`${cow.birthDate}`) -
+                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text 
+                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+
+          .herd-mp-list-block.herd-mp-list-block-calv
+            .herd-mp-list-block-header
+              .herd-mp-li-header-item Номер
+              .herd-mp-li-header-item Кличка
+              .herd-mp-li-header-item Осеменение
+              .herd-mp-li-header-item Отел
+              .herd-mp-li-header-item
+            .herd-mp-list-container
+              each cow in tableData.soonToCalv
+                a.herd-mp-list-line(href=`/herd/animal-card/${cow._id}`)
+                  .herd-mp-list-line-item ##{cow.number}
+                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                  .herd-mp-list-line-item.date-format(data-date=`${cow.inseminations[cow.inseminations.length - 1].date}`) 
+                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
 
       #mp-herd-graph(data-farm-id=`${user.farm}`)  
 
