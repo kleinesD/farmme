@@ -262,9 +262,10 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    position: relative;
 
     img {
-        width: 70%;
+        width: 90%;
         height: auto;
     }
 
@@ -274,6 +275,25 @@
         border-radius: 50%;
         background-color: #D9D9D9;
         filter: blur(5px);
+    }
+
+    &::before {
+        content: '';
+        width: 2px;
+        background-color: #D9D9D9;
+        height: 50%;
+        border-radius: 10px;
+        position: absolute;
+        left: 0px
+    }
+    &::after {
+        content: '';
+        width: 2px;
+        background-color: #D9D9D9;
+        height: 50%;
+        border-radius: 10px;
+        position: absolute;
+        right: 0px
     }
 }
 
