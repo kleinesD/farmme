@@ -4161,6 +4161,7 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD MAIN PAGE */
   ///////////////////////
+  const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
   if (document.querySelector('#mp-herd')) {
     /* Working with projectrion data */
     await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
@@ -4302,7 +4303,7 @@ $(document).ready(async function () {
       } else {
         $('.herd-mp-list-block-calv').show();
         $('.herd-mp-list-block-insem').hide();
-        $('.mp-block-outside-header-title').text('Ближайшее отел')
+        $('.mp-block-outside-header-title').text('Ближайший отел')
       }
 
       anime({
@@ -4341,7 +4342,6 @@ $(document).ready(async function () {
   //////////////////////////
   //////////////////////////
   if (document.querySelector('#mp-herd-graph')) {
-    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     let data = [];
     animals.cows.forEach((animal) => {
       animal.milkingResults.forEach(res => {
