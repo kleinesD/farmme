@@ -234,135 +234,128 @@
 
 
 .mp-herd-top-results-block {
-    width: calc(100% - 50px);
-    aspect-ratio: 3/1;
-    background-color: $lightOrange;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 25px;
-    z-index: 100;
-}
-.mp-herd-top-results-block-inner {
     width: 100%;
-    height: 100%;
-    background-color: #f0f0f0;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    height: 450px;
+    display: flex;
+    align-items: flex-start;
     gap: 30px;
-    border-radius: 10px;
-}
-.mp-herd-tr-image-block {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
     position: relative;
-
-    img {
-        width: 90%;
-        height: auto;
-    }
-
-    div {
-        width: 50%;
-        height: 15px;
-        border-radius: 50%;
-        background-color: #D9D9D9;
-        filter: blur(5px);
-    }
-
-    &::before {
-        content: '';
-        width: 2px;
-        background-color: #D9D9D9;
-        height: 50%;
-        border-radius: 10px;
-        position: absolute;
-        left: 0px
-    }
-    &::after {
-        content: '';
-        width: 2px;
-        background-color: #D9D9D9;
-        height: 50%;
-        border-radius: 10px;
-        position: absolute;
-        right: 0px
-    }
+    z-index: 100;
 }
 
 .mp-herd-tr-podium {
-    width: 100%;
+    width: 45%;
     height: 100%;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-evenly;
+    position: relative;
 }
 .mp-herd-tr-podium-step-block {
     display: flex;
     flex-direction: column;
-    width: 27%;
     align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-}
-.mp-herd-tr-podium-step {
-    width: 100%;
-    border-radius: 10px;
-    margin-top: 15px;
-    margin-bottom: 10px;
-}
-.mp-herd-tr-podium-step-3 {
-    height: 30%;
-    background-color: #cd7f32 ;
-}
-.mp-herd-tr-podium-step-1 {
-    height: 50%;
-    background-color: #FFD700;
-}
-.mp-herd-tr-podium-step-2 {
-    height: 40%;
-    background-color: #C0C0C0;
+    justify-content: center;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    position: absolute;
+
+    img {
+        width: 30%;
+        height: auto;
+        position: absolute;
+        z-index: 99;
+    }
 }
 .mp-herd-tr-podium-step-res {
     font-size: 36px;
     font-weight: 600;
+    z-index: 100;
 }
 .mp-herd-tr-podium-step-number {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     margin-top: 10px;
+    z-index: 100;
 }
 .mp-herd-tr-podium-step-name {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 600;
     opacity: 0.5;
+    z-index: 100;
 }
+.mp-herd-tr-podium-step-1 {
+    width: 66%;
+    background-color: #FFD700;
+    top: 0;
+    left: 0;
+
+    img {
+        left: 0;
+        bottom: 0;
+    }
+}
+.mp-herd-tr-podium-step-2 {
+    width: 50%;
+    bottom: 0;
+    right: 0;
+    background-color: #C0C0C0;
+
+    img {
+        right: 0;
+        top: 0;
+    } 
+    .mp-herd-tr-podium-step-res {
+        font-size: 30px;
+    }
+    .mp-herd-tr-podium-step-number {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    .mp-herd-tr-podium-step-name {
+        font-size: 14px;
+    }
+}
+.mp-herd-tr-podium-step-3 {
+    background-color: #cd7f32 ;
+    width: 30%;
+    bottom: 5px;
+    left: 60px;
+
+    img {
+        right: 0;
+        bottom: 0;
+    } 
+    .mp-herd-tr-podium-step-res {
+        font-size: 24px;
+    }
+    .mp-herd-tr-podium-step-number {
+        font-size: 12px;
+        margin-top: 0px;
+    }
+    .mp-herd-tr-podium-step-name {
+        font-size: 12px;
+    }
+}
+
+
 .mp-herd-tr-list {
-    width: 100%;
+    width: 65%;
+    max-height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 30px;
     overflow: auto;
 }
 .mp-herd-tr-list::-webkit-scrollbar {
     display: none;
 }
 .mp-herd-tr-list-item {
-    width: calc(75% - 50px);
-    padding: 0 10px;
-    margin-left: 30px;
-    height: 35px;
+    width: 100%;
+    aspect-ratio: 1/1;
     background-color: #D9D9D9;
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
+    border-radius: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
+    justify-content: center;
     position: relative;
 }
 .mp-herd-tr-list-item-place {
