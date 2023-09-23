@@ -4292,11 +4292,11 @@ $(document).ready(async function () {
       }
     });
 
-    $('#table-btns').find('.mp-block-outside-header-btn').on('click', function() {
+    $('#table-btns').find('.mp-block-outside-header-btn').on('click', function () {
       $('.mp-block-outside-header-btn-active').removeClass('mp-block-outside-header-btn-active');
       $(this).addClass('mp-block-outside-header-btn-active');
 
-      if($(this).attr('id') === 'insem') {
+      if ($(this).attr('id') === 'insem') {
         $('.herd-mp-list-block-insem').show();
         $('.herd-mp-list-block-calv').hide();
         $('.mp-block-outside-header-title').text('Ближайшее осеменение')
@@ -4341,7 +4341,7 @@ $(document).ready(async function () {
   /* Herd main page graph */
   //////////////////////////
   //////////////////////////
-  if (document.querySelector('#mp-herd-graph')) {
+  if (document.querySelector('#mp-results-graph')) {
     let data = [];
     animals.cows.forEach((animal) => {
       animal.milkingResults.forEach(res => {
@@ -4433,7 +4433,7 @@ $(document).ready(async function () {
     // //////////////////// //
     // WORKING WITH A GRAPH //
 
-    $('.mp-hg-btn').on('click', function () {
+    $('#mp-results-graph .mp-hg-btn').on('click', function () {
       $(this).addClass('mp-hg-btn-active');
       $(this).siblings().removeClass('mp-hg-btn-active');
       const graphState = $('#graph-btns').find('.mp-hg-btn-active').attr('data-graph') === 'average' ? 'average' : 'total';
@@ -4918,98 +4918,91 @@ $(document).ready(async function () {
 
   }
 
-  ///////////////////////
-  /* HERD LIST MILKING RESULTS */
-  ///////////////////////
-  if (document.querySelector('#list-milking-results-container')) {
+  //////////////////////////
+  //////////////////////////
+  //////////////////////////
+  /* Herd main page PROJECTION graph */
+  //////////////////////////
+  //////////////////////////
+  if (document.querySelector('#mp-herd-projection-chart')) {
+    const projData = await getFarmProjections($('#mp-herd').attr('data-farm-id'), 5);
+    const projDataFormat = [];
 
-    $('#search').on('keyup change', function () {
-      let value = $(this).val();
+    projData.forEach((el, inx, arr) => {
+      let animals = { count: 0, change: 0 };
+      let cows = { count: 0, change: 0 };
+      let bulls = { count: 0, change: 0 };
+      let milkingCows = { count: 0, change: 0 };
+      let calves = { count: 0, change: 0 };
+      let writeOff = { count: 0, change: 0 };
 
-      if (value.length > 0) {
-        $('.ai-list-item').each(function () {
-          let container = $('.ai-box-list');
-          let name = $(this).find('.ail-item-name').text();
-          let number = $(this).find('.ail-item-number').text();
 
-          if (name.includes(value) || number.includes(value)) {
-            $(this).detach().prependTo(container);
-          }
-        });
-      }
-    });
+      el.animals.forEach(animal => {
+        if (animal.status === 'alive') animals.count++;
+        if (animal.status === 'alive' && animal.gender === 'female' && ((new Date(moment().add(el.year, 'year')).getTime() - new Date(animal.birthDate).getTime()) / 1000 / 60 / 60 / 24 / 30) > 12) cows.count++;
+        if (animal.status === 'alive' && animal.gender === 'male' && ((new Date(moment().add(el.year, 'year')).getTime() - new Date(animal.birthDate).getTime()) / 1000 / 60 / 60 / 24 / 30) > 12) bulls.count++;
+        if (animal.status === 'alive' && animal.gender === 'female' && animal.lastLact) milkingCows.count++;
+        if (animal.status === 'alive' && ((new Date(moment().add(el.year, 'year')).getTime() - new Date(animal.birthDate).getTime()) / 1000 / 60 / 60 / 24 / 30) < 12) calves.count++;
+        if (animal.status === 'diseased' && new Date(animal.dateOfDeath) > new Date(moment().add(el.year - 1, 'year')) && new Date(animal.dateOfDeath) < new Date(moment().add(el.year, 'year'))) writeOff.count++;
 
-    $('#date').on('keyup change', function () {
-      let date = new Date($(this).val());
 
-      $('.ail-small-lact').each(function () {
-        $(this).removeClass('ail-small-lact-active')
-        if (new Date($(this).attr('data-start-date')) < date && date < new Date($(this).attr('data-finish-date'))) {
-          $(this).addClass('ail-small-lact-active');
-        }
       });
 
-      $('.ai-list-item').each(function () {
-        if ($(this).find('.ail-small-lact-active').length === 0) {
-          $(this).addClass('ai-list-item-unav');
-        } else {
-          $(this).removeClass('ai-list-item-unav');
-        }
-      });
-    });
-
-    $('#date').trigger('change');
-
-    $('*').on('click change keyup mouseenter', function () {
-      $('.ai-list-item').each(function () {
-        if ($(this).find('.ail-small-lact-active').length > 0 && $(this).find('.result').val().length > 0) {
-          $(this).addClass('ai-list-item-valid')
-          if ($(this).find('.ai-input-marker-s').length === 0) {
-            $(this).append(`
-            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
-            <ion-icon name="checkmark-sharp"></ion-icon>
-            </div>`)
-          }
-        } else {
-          $(this).removeClass('ai-list-item-valid')
-          $(this).find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-          setTimeout(() => { $(this).find('.ai-input-marker-s').remove() }, 800)
-        }
-      });
-
-      if ($('.ai-list-item-valid').length > 0) {
-        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
-      } else {
-        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
-      }
-    });
-
-    $('.ai-input-submit-btn').on('click', function () {
-      let doneAnimals = 0;
-
-      $(this).empty();
-      $(this).append(`<div class="mini-loader"></div>`);
-      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
-
-      let subId = randomstring.generate(12);
-
-      $('.ai-list-item-valid').each(async function () {
-        let date = new Date($('#date').val());
-        let result = parseFloat($(this).find('.result').val());
-        let lactationNumber = parseFloat($(this).find('.ail-small-lact-active').text());
-        let animalId = $(this).attr('data-id');
-
-        const response = await addAnimalResults('milking-results', animalId, { date, result, lactationNumber, subId });
-
-        if (response) doneAnimals++;
-
-        if (doneAnimals === $('.ai-list-item-valid').length) {
-          /* addConfirmationEmpty($('.animal-results-window')); */
-          setTimeout(() => { location.reload(true); }, 1500)
-        }
+      projDataFormat.push({
+        year: el.year,
+        animals,
+        cows,
+        bulls,
+        milkingCows,
+        calves,
+        writeOff
       });
     });
 
+    projDataFormat.forEach((el, inx, arr) => {
+      let prevYear = inx === 0 ? undefined : arr[inx - 1];
+      if (!prevYear) return;
+
+      el.animals.change = el.animals.count - prevYear.animals.count;
+      el.cows.change = el.cows.count - prevYear.cows.count;
+      el.bulls.change = el.bulls.count - prevYear.bulls.count;
+      el.milkingCows.change = el.milkingCows.count - prevYear.milkingCows.count;
+      el.calves.change = el.calves.count - prevYear.calves.count;
+      el.writeOff.change = el.writeOff.count - prevYear.writeOff.count;
+    });
+
+    console.log(projDataFormat);
+
+    /* WORKING WITH CHART */
+    let max = 0;
+    projDataFormat.forEach(el => { if (el.animals.count > max) max = el.animals.count })
+
+    $('.mp-projection-graph-working-area').empty();
+    projDataFormat.forEach((el, inx) => {
+      if (inx === 0) return;
+      const animals = el.animals.count > 0 ? '' : ''
+      const cows = el.cows.count > 0 ? '' : ''
+      const bulls = el.bulls.count > 0 ? '' : ''
+      const milkingCows = el.milkingCows.count > 0 ? '' : ''
+      const writeOff = el.writeOff.count > 0 ? '' : ''
+
+      $('.mp-projection-graph-working-area').append(`
+        <div class="mp-projection-graph-item" id="mp-projection-graph-item-${el.year}">
+          <div class="mp-projection-graph-item-title">${el.year}Г</div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-off"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-milking"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-male"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-female"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-animals"></div>
+        </div>
+      `)
+      let parentHeight = $('.mp-projection-graph-working-area').height();
+      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-animals').css('height', parentHeight * ((el.animals.count / (max / 100)) / 100))
+      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-female').css('height', parentHeight * ((el.cows.count / (max / 100)) / 100))
+      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-male').css('height', parentHeight * ((el.bulls.count / (max / 100)) / 100))
+      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-milking').css('height', parentHeight * ((el.milkingCows.count / (max / 100)) / 100))
+      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-off').css('height', parentHeight * ((el.writeOff.count / (max / 100)) / 100))
+    });
   }
 
   ///////////////////////

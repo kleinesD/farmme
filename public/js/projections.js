@@ -383,7 +383,6 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
 
     years.push({ year: i, animals: animalsBuf });
   }
-  console.log(years)
   /* years.forEach((year) => {
     console.log({
       year: year.year, 
@@ -398,5 +397,6 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
       newBornsDied: year.animals.filter(animal => animal.status = 'diseased' && animal.cause === 'calving-death' && moment().add(year.year, 'year').isSame(animal.dateOfDeath, 'year') ),
     })
   }); */
-
+  
+  return years;
 }

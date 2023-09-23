@@ -114,7 +114,7 @@ block content
       #mp-herd-graph(data-farm-id=`${user.farm}`)  
 
       .mp-herd-graph-block
-        .mp-herd-graph-container
+        .mp-herd-graph-container#mp-results-graph
           //-.mp-herd-graph-load 
 
           .mp-hg-btn-block.mp-hg-btn-block-1#graph-btns
@@ -174,6 +174,52 @@ block content
               .mp-herd-graph-info-text 17.2
 
       .mp-projection-block
+        .mp-projection-graph#mp-herd-projection-chart
+          .mp-projection-graph-working-area
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 1Г
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 2Г
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 3Г
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 4Г
+              .mp-projection-graph-item-bar
+        .mp-projection-info-block
+          .mp-projection-info-item.mp-projection-info-item-all
+            .mp-projection-info-item-title 
+              | ВСЕГО ЖИВОТНЫХ
+              span.span-success +12
+            .mp-projection-info-item-res 107 
+            .mp-projection-info-item-mark
+          .mp-projection-info-item.mp-projection-info-item-female
+            .mp-projection-info-item-title 
+              | КОРОВЫ
+              span.span-fail -10
+            .mp-projection-info-item-res 34
+            .mp-projection-info-item-mark
+          .mp-projection-info-item.mp-projection-info-item-male
+            .mp-projection-info-item-title 
+              | БЫКИ
+              span.span-success +12
+            .mp-projection-info-item-res 56
+            .mp-projection-info-item-mark
+          .mp-projection-info-item.mp-projection-info-item-milking
+            .mp-projection-info-item-title 
+              | ДОЯЩИЕСЯ КОРОВЫ
+              span.span-success +17
+            .mp-projection-info-item-res 12 
+            .mp-projection-info-item-mark
+          .mp-projection-info-item.mp-projection-info-item-off
+            .mp-projection-info-item-title 
+              | СПИСАНО ЖИВОТНЫХ
+              span.span-fail -8
+            .mp-projection-info-item-res 30 
+            .mp-projection-info-item-mark
+          
 
 
       //-.mp-herd-top-results-block
