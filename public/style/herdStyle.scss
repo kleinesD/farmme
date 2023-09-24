@@ -815,6 +815,7 @@
     position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    
 }
 .mp-projection-graph-item {
     width: 100%;
@@ -825,17 +826,27 @@
     gap: 10px;
     position: relative;
 }
+.mp-projection-graph-item:hover .mp-projection-graph-item-title{
+    color: $lightOrange;
+}
 .mp-projection-graph-item-title {
-    font-size: 175%;
-    font-weight: 800;
+    font-size: 150%;
+    font-weight: 600;
     position: absolute;
-    top: -10px;
-    transform: translateY(-100%);
+    bottom: -10px;
+    transform: translateY(100%);
 }
 .mp-projection-graph-item-bar {
     width: 10px;
     height: 0px;
     background-color: $lightOrange;
+    border-top-right-radius: 50px;
+    border-top-left-radius: 50px;
+    border: 1.5px solid $mainBlack;
+    cursor: pointer;
+}
+.mp-projection-graph-item-bar-transp {
+    opacity: 0.5;
 }
 .mp-projection-info-block {
     width: 30%;
@@ -853,6 +864,10 @@
     background-color: #f0f0f0;
     position: relative;
 }
+.mp-projection-info-item-transp {
+    opacity: 0.5;
+}
+
 .mp-projection-info-item-title {
     font-size: 15px;
     font-weight: 600;
@@ -886,7 +901,7 @@
     bottom: 10px;
     left: 10px;
 }
-.mp-projection-info-item-all {
+.mp-projection-info-item-animals {
     grid-column: 1/3;
     grid-row: 1/2;
 
@@ -926,7 +941,7 @@
         background-color: $mainBlack;
     }
 }
-.mp-projection-graph-item-bar-all {
+.mp-projection-graph-item-bar-animals {
     background-color: $lightOrange;
 }
 .mp-projection-graph-item-bar-female {
@@ -941,6 +956,8 @@
 .mp-projection-graph-item-bar-off {
     background-color: $mainBlack;
 }
+
+
 
 
 

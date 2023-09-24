@@ -4987,13 +4987,13 @@ $(document).ready(async function () {
       const writeOff = el.writeOff.count > 0 ? '' : ''
 
       $('.mp-projection-graph-working-area').append(`
-        <div class="mp-projection-graph-item" id="mp-projection-graph-item-${el.year}">
+        <div class="mp-projection-graph-item" id="mp-projection-graph-item-${el.year}" data-animals="${el.animals.count}" data-animals-change="${el.animals.change}" data-female="${el.cows.count}" data-female-change="${el.cows.change}" data-male="${el.bulls.count}" data-male-change="${el.bulls.change}" data-milking="${el.milkingCows.count}" data-milking-change="${el.milkingCows.change}" data-off="${el.writeOff.count}" data-off-change="${el.writeOff.change}">
           <div class="mp-projection-graph-item-title">${el.year}Г</div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-off"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-milking"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-male"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-female"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-animals"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-off" data-el=".mp-projection-info-item-off"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-milking" data-el=".mp-projection-info-item-milking"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-male" data-el=".mp-projection-info-item-male"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-female" data-el=".mp-projection-info-item-female"></div>
+          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-animals" data-el=".mp-projection-info-item-animals"></div>
         </div>
       `)
       let parentHeight = $('.mp-projection-graph-working-area').height();
@@ -5002,6 +5002,41 @@ $(document).ready(async function () {
       $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-male').css('height', parentHeight * ((el.bulls.count / (max / 100)) / 100))
       $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-milking').css('height', parentHeight * ((el.milkingCows.count / (max / 100)) / 100))
       $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-off').css('height', parentHeight * ((el.writeOff.count / (max / 100)) / 100))
+    });
+
+    $('.mp-projection-graph-item').on('mouseenter', function() {
+      $('.span-success').removeClass('span-success');
+      $('.span-fail').removeClass('span-fail');
+
+      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-res').text($(this).attr('data-animals'));
+      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-animals-change')) > 0 ? '+' : ''}${$(this).attr('data-animals-change')}`);
+      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-animals-change')) > 0 ? 'span-success' : 'span-fail');
+
+      $('.mp-projection-info-item-female').find('.mp-projection-info-item-res').text($(this).attr('data-female'));
+      $('.mp-projection-info-item-female').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-female-change')) > 0 ? '+' : ''}${$(this).attr('data-female-change')}`);
+      $('.mp-projection-info-item-female').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-female-change')) > 0 ? 'span-success' : 'span-fail');
+
+      $('.mp-projection-info-item-male').find('.mp-projection-info-item-res').text($(this).attr('data-male'));
+      $('.mp-projection-info-item-male').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-male-change')) > 0 ? '+' : ''}${$(this).attr('data-male-change')}`);
+      $('.mp-projection-info-item-male').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-male-change')) > 0 ? 'span-success' : 'span-fail');
+
+      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-res').text($(this).attr('data-milking'));
+      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-milking-change')) > 0 ? '+' : ''}${$(this).attr('data-milking-change')}`);
+      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-milking-change')) > 0 ? 'span-success' : 'span-fail');
+
+      $('.mp-projection-info-item-off').find('.mp-projection-info-item-res').text($(this).attr('data-off'));
+      $('.mp-projection-info-item-off').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-off-change')) > 0 ? '+' : ''}${$(this).attr('data-off-change')}`);
+      $('.mp-projection-info-item-off').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-off-change')) > 0 ? 'span-success' : 'span-fail');
+    });
+
+    $('.mp-projection-graph-item-bar').on('mouseenter', function() {
+      $('.mp-projection-graph-item-bar').not($(this)).addClass('mp-projection-graph-item-bar-transp');
+      let infoEl = $(this).attr('data-el');
+      $('.mp-projection-info-item').not(infoEl).addClass('mp-projection-info-item-transp')
+    });
+    $('.mp-projection-graph-item-bar').on('mouseleave', function() {
+      $('.mp-projection-graph-item-bar-transp').removeClass('mp-projection-graph-item-bar-transp');
+      $('.mp-projection-info-item-transp').removeClass('mp-projection-info-item-transp')
     });
   }
 
