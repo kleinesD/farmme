@@ -68,7 +68,7 @@ block content
 
         .herd-mp-list-block-combined
           .mp-block-outside-header
-            .mp-block-outside-header-title Список коров на осеменение
+            .mp-block-outside-header-title#table-title Список коров на осеменение
             .mp-block-outside-header-btn-block#table-btns
               .mp-block-outside-header-btn.mp-block-outside-header-btn-active#insem Осеменение
               .mp-block-outside-header-btn#calv Отел
@@ -114,6 +114,8 @@ block content
       #mp-herd-graph(data-farm-id=`${user.farm}`)  
 
       .mp-herd-graph-block
+        .mp-block-outside-header
+          .mp-block-outside-header-title Результаты доения
         .mp-herd-graph-container#mp-results-graph
           //-.mp-herd-graph-load 
 
@@ -174,20 +176,8 @@ block content
               .mp-herd-graph-info-text 17.2
 
       .mp-projection-block
-        .mp-projection-graph#mp-herd-projection-chart
-          .mp-projection-graph-working-area
-            .mp-projection-graph-item
-              .mp-projection-graph-item-title 1Г
-              .mp-projection-graph-item-bar
-            .mp-projection-graph-item
-              .mp-projection-graph-item-title 2 ГОД
-              .mp-projection-graph-item-bar
-            .mp-projection-graph-item
-              .mp-projection-graph-item-title 3Г
-              .mp-projection-graph-item-bar
-            .mp-projection-graph-item
-              .mp-projection-graph-item-title 4Г
-              .mp-projection-graph-item-bar
+        .mp-block-outside-header
+          .mp-block-outside-header-title Проекция изменения поголовья
         .mp-projection-info-block
           .mp-projection-info-item.mp-projection-info-item-animals
             .mp-projection-info-item-title 
@@ -219,7 +209,44 @@ block content
               span.span-fail -8
             .mp-projection-info-item-res 30 
             .mp-projection-info-item-mark
-          
+        .mp-projection-graph#mp-herd-projection-chart
+          .mp-detail-btn  
+            ion-icon(name="help")
+          .mp-detail-text-block
+            .mp-detail-text-title ОСНОВАНО НА:
+            .mp-detail-text-sub-title Данная проекция изменения поголовья стада основана на средне статистических данных полученных в открытом доступе.
+            .mp-detail-text-text 
+              | Каждый год из-за болезней списывается
+              span 1.67% 
+              | животных.
+            .mp-detail-text-text 
+              | Каждая корова телится с переодичностью в 
+              span 13
+              | месяцев.
+            .mp-detail-text-text 
+              | При рождении или в первые несколько месяцев 
+              span 12%
+              | телят умирает.
+            .mp-detail-text-text 
+              | Быки после  
+              span 2
+              | лет, а коровы после
+              span 6
+              | списываются на забой.
+          .mp-projection-graph-working-area
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 1Г
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 2 ГОД
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 3Г
+              .mp-projection-graph-item-bar
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 4Г
+              .mp-projection-graph-item-bar
+
 
 
       //-.mp-herd-top-results-block

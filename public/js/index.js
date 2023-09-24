@@ -4299,11 +4299,11 @@ $(document).ready(async function () {
       if ($(this).attr('id') === 'insem') {
         $('.herd-mp-list-block-insem').show();
         $('.herd-mp-list-block-calv').hide();
-        $('.mp-block-outside-header-title').text('Ближайшее осеменение')
+        $('#table-title').text('Ближайшее осеменение')
       } else {
         $('.herd-mp-list-block-calv').show();
         $('.herd-mp-list-block-insem').hide();
-        $('.mp-block-outside-header-title').text('Ближайший отел')
+        $('#table-title').text('Ближайший отел')
       }
 
       anime({
@@ -4988,7 +4988,7 @@ $(document).ready(async function () {
 
       $('.mp-projection-graph-working-area').append(`
         <div class="mp-projection-graph-item" id="mp-projection-graph-item-${el.year}" data-animals="${el.animals.count}" data-animals-change="${el.animals.change}" data-female="${el.cows.count}" data-female-change="${el.cows.change}" data-male="${el.bulls.count}" data-male-change="${el.bulls.change}" data-milking="${el.milkingCows.count}" data-milking-change="${el.milkingCows.change}" data-off="${el.writeOff.count}" data-off-change="${el.writeOff.change}">
-          <div class="mp-projection-graph-item-title">${el.year}Г</div>
+          <div class="mp-projection-graph-item-title">${el.year} г.</div>
           <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-off" data-el=".mp-projection-info-item-off"></div>
           <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-milking" data-el=".mp-projection-info-item-milking"></div>
           <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-male" data-el=".mp-projection-info-item-male"></div>
@@ -5037,6 +5037,27 @@ $(document).ready(async function () {
     $('.mp-projection-graph-item-bar').on('mouseleave', function() {
       $('.mp-projection-graph-item-bar-transp').removeClass('mp-projection-graph-item-bar-transp');
       $('.mp-projection-info-item-transp').removeClass('mp-projection-info-item-transp')
+    });
+
+    $('.mp-projection-graph-item').first().trigger('mouseenter');
+
+    $('.mp-detail-btn').on('click', function() {
+      if($(this).find('ion-icon').attr('name') === 'help') {
+
+        $('.mp-detail-text-block').show();
+        $(this).find('ion-icon').attr('name', 'close');
+      } else {
+        
+        $('.mp-detail-text-block').hide();
+        $(this).find('ion-icon').attr('name', 'help');
+      }
+    });
+    
+    $('.mp-detail-btn').on('mouseenter', function() {
+      $('.mp-detail-text-block').show();
+    });
+    $('.mp-detail-btn').on('mouseleave', function() {
+      $('.mp-detail-text-block').hide();
     });
   }
 

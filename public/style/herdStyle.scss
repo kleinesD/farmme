@@ -408,6 +408,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     gap: 30px;
+    position: relative;
 }
 .mp-herd-graph-container {
     width: 100%;
@@ -799,7 +800,10 @@
     align-items: center;
     gap: 20px;
     padding: 20px;
-    background: repeating-linear-gradient(135deg, $lightOrange, $lightOrange 16px, #f0f0f0 16px, #f0f0f0 32px);
+   /*  background: repeating-linear-gradient(135deg, $lightOrange, $lightOrange 32px, #f0f0f0 32px, #f0f0f0 64px); */
+   background-color: $lightOrange;
+   position: relative;
+   margin-top: 30px;
 }
 .mp-projection-graph {
     width: calc(70% - 20px);
@@ -955,6 +959,71 @@
 }
 .mp-projection-graph-item-bar-off {
     background-color: $mainBlack;
+}
+.mp-detail-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 50px;
+    height: 50px;
+    background-color: #D9D9D9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 102;
+    cursor: pointer;
+
+    ion-icon {
+        font-size: 150%;
+    }
+}
+.mp-detail-text-block {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #f0f0f0;
+    width: calc(100% - 90px);
+    height: calc(100% - 90px);
+    border-radius: 10px;
+    padding: 70px 20px 20px 70px;
+    z-index: 101;
+    display: none;
+}
+.mp-detail-text-title {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.mp-detail-text-sub-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+.mp-detail-text-text {
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+
+    span {
+        font-size: 14px;
+        font-weight: 600; 
+        text-decoration: underline;
+        margin: 0 10px;
+    }
+}
+.mp-detail-text-text::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: $mainBlack;
+    position: absolute;
+    left: 0px;
 }
 
 
