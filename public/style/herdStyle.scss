@@ -189,6 +189,10 @@
     display: grid;
     position: relative;
     text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 .herd-mp-list-line:last-of-type {
     border-bottom: unset;

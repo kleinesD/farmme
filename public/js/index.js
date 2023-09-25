@@ -4971,8 +4971,6 @@ $(document).ready(async function () {
       el.writeOff.change = el.writeOff.count - prevYear.writeOff.count;
     });
 
-    console.log(projDataFormat);
-
     /* WORKING WITH CHART */
     let max = 0;
     projDataFormat.forEach(el => { if (el.animals.count > max) max = el.animals.count })
