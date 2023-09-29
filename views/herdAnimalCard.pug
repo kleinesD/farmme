@@ -3,6 +3,96 @@ extends base
 block content
   include _rcmHerd
   section.main-section(data-animal-id=`${animal._id}`)
+    .animal-card-section
+      .animal-info-header
+        .aih-image-block 
+          img(src="/img/images/default-cow-image.png")
+        .aih-details-container
+          .aih-details-info
+            .aih-details-info-number= `#${animal.number}`
+            .aih-details-info-name= `${animal.name ? animal.name : ''}`
+
+            a.aih-edit-btn(href=`/herd/edit-animal/${animal._id}`) 
+              ion-icon(name="settings-outline")
+
+            .aih-details-row
+              -if(animal.birthDate)
+                .aih-details-row-item
+                  ion-icon(name="calendar-number-outline")
+                  .aih-details-text= `${animal.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+              -if(animal.gender)
+                .aih-details-row-item
+                  ion-icon(name="male-female-outline")
+                  .aih-details-text= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
+              -if(animal.buyCost)
+                .aih-details-row-item
+                  ion-icon(name="pricetag-outline")
+                  .aih-details-text= `${animal.buyCost}₽`
+              -if(animal.breedRussian)
+                .aih-details-row-item
+                  ion-icon(name="paw-outline")
+                  .aih-details-text= `${animal.breedRussian}`
+              -if(animal.colors)
+                .aih-details-row-item
+                  ion-icon(name="color-filter-outline")
+                  .aih-details-text 
+                    each color in animal.colors
+                      -if(color === 'black')
+                        | • Черный 
+                      -if(color === 'white')
+                        | • Белый 
+                      -if(color === 'red')
+                        | • Красный 
+
+          .aih-actions-btn 
+            p ДОБАВИТЬ
+            span +
+
+        //.aih-actions-block
+          .aih-actions-column.herd-actions-column
+            .aih-actions-column-title ЖИВОТНЫЕ
+            -if(animal.gender === 'female')
+              a.aih-actions-item(href=`/herd/add-lactation/${animal._id}`)
+                .aih-actions-item-mark
+                img(src="/img/images/milking-cow-icon.png")
+                .aih-actions-item-title Лактация
+              -if(animal.lactations.length > 0)
+                a.aih-actions-item(href=`/herd/add-milking-result/${animal._id}`) 
+                  .aih-actions-item-mark
+                  img(src="/img/images/milk-icon.png")
+                  .aih-actions-item-title Результат доения
+              a.aih-actions-item(href=`/herd/add-insemination/${animal._id}`)
+                .aih-actions-item-mark
+                img(src="/img/images/needle-icon.png")
+                .aih-actions-item-title Осеменение
+            a.aih-actions-item(href=`/herd/add-weight-result/${animal._id}`) 
+              .aih-actions-item-mark
+              img(src="/img/images/weight-icon.png")
+              .aih-actions-item-title Взвешивание
+
+          -if(user.accessBlocks.includes('vet'))
+            .aih-actions-column.vet-actions-column
+              .aih-actions-column-title ВЕТЕРИНАРИЯ
+              a.aih-actions-item(href=`/vet/add-action/${animal._id}`) 
+                .aih-actions-item-mark
+                img(src="/img/images/med-cross-icon.png")
+                .aih-actions-item-title Вет. действие
+              a.aih-actions-item(href=`/vet/add-problem/${animal._id}`) 
+                .aih-actions-item-mark
+                img(src="/img/images/thermometer-icon.png")
+                .aih-actions-item-title Вет. проблема
+              a.aih-actions-item(href=`/vet/start-scheme/${animal._id}`) 
+                .aih-actions-item-mark
+                img(src="/img/images/vet-scheme-icon.png")
+                .aih-actions-item-title Начать схему
+
+          .aih-actions-column.other-actions-column
+            .aih-actions-column-title ДРУГОЕ
+            a.aih-actions-item(href=`/herd/write-off-animal/${animal._id}`) 
+              .aih-actions-item-mark
+              img(src="/img/images/butcher-icon.png")
+              .aih-actions-item-title Списать животное
+
     -if(animal.status !== 'alive')
       .ami-write-off-disclaimer
         ion-icon(name="warning")
@@ -25,129 +115,6 @@ block content
             .ami-write-off-label Дата списания:
             .ami-write-off-text= `${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
           .ami-bring-back-btn(data-animal-id=`${animal._id}`) Вернуть животное
-
-    .animal-main-info-block
-      .ami-header 
-        img.ami-main-photo(src=`/img/images/${animal.mainPhoto}`)
-        .ami-number= `#${animal.number}`
-        .ami-name= animal.name
-        -if(animal.photos.length > 0)
-          .ami-add-photos-box
-            each photo in animal.photos
-              img.ami-add-photo(src=`/img/images/${photo}`)
-            .ami-add-photos-btn
-              ion-icon(name="chevron-down-outline")
-
-      .ami-info-block
-        .ami-title-line
-          p ИНФОРМАЦИЯ
-          a(href=`/herd/edit-animal/${animal._id}`)
-            ion-icon(name="settings")
-
-        -if(animal.birthDate)
-          .ami-info-item
-            .ami-info-icon 
-              ion-icon(name="calendar-number")
-            .ami-info
-              //-.ami-label Дата Рождения
-              .ami-info-text= `${animal.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}`
-
-        -if(animal.gender)
-          .ami-info-item
-            .ami-info-icon 
-              ion-icon(name="male-female")
-            .ami-info
-              //-.ami-label Пол
-              .ami-info-text= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
-
-        -if(animal.buyCost)
-          .ami-info-item
-            .ami-info-icon 
-              ion-icon(name="pricetag")
-            .ami-info
-              //-.ami-label Стоимость Покупки
-              .ami-info-text= `${animal.buyCost}₽`
-
-        -if(animal.breedRussian)
-          .ami-info-item
-            .ami-info-icon 
-              ion-icon(name="paw")
-            .ami-info
-              //-.ami-label Порода
-              .ami-info-text= `${animal.breedRussian}`
-
-        -if(animal.colors)
-          .ami-info-item
-            .ami-info-icon 
-              ion-icon(name="color-filter")
-            .ami-info
-              //-.ami-label Окрас
-              .ami-info-text
-                each color in animal.colors
-                  -if(color === 'black')
-                    | • Черный 
-                  -if(color === 'white')
-                    | • Белый 
-                  -if(color === 'red')
-                    | • Красный 
-
-        .ami-devider
-
-        .ami-title-line
-          p КАТЕГОРИИ
-        .ami-categories-container
-          .ami-category#ami-category-herd РЕЗУЛЬТАТЫ
-          .ami-category#ami-category-vet ВЕТЕРИНАРИЯ
-          //-.ami-category#ami-category-vet.ami-category-unselected ВЕТЕРИНАРИЯ
-
-      -if(animal.status === 'alive')
-        .ami-action-btns-container
-          .ami-action-btns-block
-            -if(user.accessBlocks.includes('vet'))
-              a.ami-action-btn(href=`/vet/add-action/${animal._id}`) 
-                .ami-action-module-color.ami-action-module-color-vet
-                p Вет. действие
-                img(src="/img/images/med-cross-icon.png")
-              a.ami-action-btn(href=`/vet/add-problem/${animal._id}`) 
-                .ami-action-module-color.ami-action-module-color-vet
-                p Вет. проблема
-                img(src="/img/images/thermometer-icon.png")
-              //-a.ami-action-btn(href=`#`) 
-                .ami-action-module-color.ami-action-module-color-vet
-                p Вет. лечение
-                img(src="/img/images/bandage-icon.png")
-              a.ami-action-btn(href=`/vet/start-scheme/${animal._id}`) 
-                .ami-action-module-color.ami-action-module-color-vet
-                p Начать схему
-                img(src="/img/images/vet-scheme-icon.png")
-            -if(animal.gender === 'female')
-              a.ami-action-btn(href=`/herd/add-lactation/${animal._id}`)
-                .ami-action-module-color.ami-action-module-color-herd
-                p Лактация
-                img(src="/img/images/milking-cow-icon.png")
-              -if(animal.lactations.length > 0)
-                a.ami-action-btn(href=`/herd/add-milking-result/${animal._id}`) 
-                  .ami-action-module-color.ami-action-module-color-herd
-                  p Результат доения
-                  img(src="/img/images/milk-icon.png")
-              a.ami-action-btn(href=`/herd/add-insemination/${animal._id}`)
-                .ami-action-module-color.ami-action-module-color-herd
-                p Осеменение
-                img(src="/img/images/needle-icon.png")
-            a.ami-action-btn(href=`/herd/add-weight-result/${animal._id}`) 
-              .ami-action-module-color.ami-action-module-color-herd
-              p Взвешивание
-              img(src="/img/images/weight-icon.png")
-            //-a.ami-action-btn(href="") Конец лактации
-            //-a.ami-action-btn.ami-action-btn-hidden(href=`/herd/write-off-animal/${animal._id}`) 
-            a.ami-action-btn(href=`/herd/write-off-animal/${animal._id}`) 
-              .ami-action-module-color.ami-action-module-color-herd
-              p Списать животное
-              img(src="/img/images/butcher-icon.png")
-          .ami-action-btn-openner 
-            p ДОБАВИТЬ
-            ion-icon(name="add")
-
 
     .animal-card-body
 
@@ -397,7 +364,7 @@ block content
                           p= treatment.name
                           p.mp-scheme-point-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
           -if(scheme)
-            
+
 
             .mp-schemes-block.acb-schemes-block.shadow
               .mp-schemes-block-header Текущая схема

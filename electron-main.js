@@ -48,7 +48,6 @@ const createWindow = () => {
 
 
 
-  contentWindow.loadURL('http://127.0.0.1:604/vet/add-treatment/62f14e90d51a806f924b0298');
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
   contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
   contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
@@ -60,6 +59,7 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-action/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
 
 
   contentWindow.maximize();

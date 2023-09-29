@@ -3278,6 +3278,171 @@
 /* ///////////////////////// */
 /* ///////////////////////// */
 /* ///////////////////////// */
+.animal-card-section {
+    width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+.animal-info-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+.aih-image-block {
+    width: calc(300px - 10px);
+    height: calc(300px - 10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $lightOrange;
+    border: 5px solid $mainBlack;
+
+    img {
+        width: 50%;
+        height: 50%;
+    }
+}
+.aih-details-container {
+    width: calc(100% - 300px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.aih-details-info {
+    width: calc(100% - 40px);
+    height: calc(220px - 40px);
+    border: 5px solid $mainBlack;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: $lightOrange;
+}
+.aih-details-info-number {
+    font-size: 48px;
+    font-weight: 500;
+}
+.aih-details-info-name {
+    font-size: 24px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+.aih-edit-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    text-decoration: none;
+
+    ion-icon {
+        font-size: 175%;
+    }
+}
+.aih-details-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100% - 30px);
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+}
+.aih-details-row-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.aih-details-text {
+    font-size: 14px;
+    font-weight: 600;
+}
+.aih-actions-btn {
+    width: calc(100% - 10px);
+    height: calc(60px - 10px);
+    border: 5px solid $mainBlack;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+
+    p {
+        font-size: 16px;
+        font-weight: 700;
+    }
+    span {
+        font-size: 24px;
+        font-weight: 700;
+    }
+}
+.aih-actions-btn:hover {
+    background-color: $lightOrange;
+}
+.aih-actions-block {
+    width: calc(100% - 90px);
+    background-color: #f0f0f0;
+    border: 5px solid $mainBlack;
+    padding: 40px;
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    transform: translateY(100%);
+    z-index: 200;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.aih-actions-column {
+    width: 100%;
+    height: 100%;
+}
+.aih-actions-column-title {
+    font-size: 18px;
+    font-weight: 600;
+    opacity: 0.5;
+    margin-bottom: 40px;
+}
+.aih-actions-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    text-decoration: none;
+    cursor: pointer;
+
+    img {
+        width: 16px;
+        height: auto;
+    }
+}
+.aih-actions-item:hover {
+    background-color: #D9D9D9;
+}
+.aih-actions-item-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.herd-actions-column .aih-actions-item-mark {
+    background-color: $lightOrange;
+}
+.vet-actions-column .aih-actions-item-mark {
+    background-color: $cyan;
+}
+.other-actions-column .aih-actions-item-mark {
+    background-color: $redOrange;
+}
+.aih-actions-item-title {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+
+
 .ami-write-off-disclaimer {
     width: calc(100% - 80px);
     height: 50px;

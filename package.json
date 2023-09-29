@@ -1,6 +1,6 @@
 {
   "name": "farmme",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "farmme",
   "main": "electron-main.js",
   "scripts": {
