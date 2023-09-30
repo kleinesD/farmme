@@ -3235,57 +3235,11 @@ $(document).ready(async function () {
   /* ANIMAL CARD PAGE */
   ///////////////////////
   if (document.querySelector('.animal-card-body')) {
-    /* Showing large image */
-    $('.ami-header').find('img').click(function () {
-      $('body').prepend(`<div class="large-image-background"><img class="large-image" src="${$(this).attr('src')}"></div>`)
-    });
 
-    $('body').delegate('.large-image-background', 'click', function () {
-      $(this).remove();
-    });
-
-    /* Adding or removing edit block */
-    $('.acb-edit-info-btn').click(function () {
-      if ($(this).parent().find('.edit-blur-block').css('display') === 'none') {
-        $(this).parent().find('.edit-blur-block').css('display', 'flex');
-        $(this).find('ion-icon').attr('name', 'close-outline');
-      } else {
-        $(this).parent().find('.edit-blur-block').css('display', 'none');
-        $(this).find('ion-icon').attr('name', 'menu-outline');
-      }
-    });
-
-    /* Toggling additional images visibility */
-    $('.ami-add-photos-btn').click(function () {
-      if ($(this).parent().find('img').css('display') === 'none') {
-        $(this).parent().find('img').slideDown(1);
-        $(this).find('ion-icon').attr('name', 'chevron-up-outline')
-      } else {
-        $(this).parent().find('img').slideUp(1);
-        $(this).find('ion-icon').attr('name', 'chevron-down-outline')
-      }
-    });
-
-    /* Toggle action btns container */
-    $('.ami-action-btn-openner').click(function () {
-      $('.ami-action-btns-block').removeClass('animate__animated').removeClass('animate__fadeOut').removeClass('animate__fadeIn');
-      if (!$(this).hasClass('action-openned')) {
-        $('.ami-action-btns-container').animate({ 'height': '100%' }, 0);
-        $(this).find('ion-icon').css({ 'transform': 'rotate(45deg)' });
-        $('.ami-action-btns-block').addClass('animate__animated').addClass('animate__fadeIn').css('display', 'flex');
-        $('.ami-action-btn-openner p').text('СКРЫТЬ');
-      } else {
-        $(this).find('ion-icon').css({ 'transform': 'rotate(0deg)' });
-        $('.ami-action-btns-block').addClass('animate__animated').addClass('animate__fadeOut').addClass('animate__slow').css('display', 'none');
-        $('.ami-action-btns-container').animate({ 'height': '50px' }, 0);
-        $('.ami-action-btn-openner p').text('ДОБАВИТЬ');
-      }
-
-      $(this).toggleClass('action-openned');
-    });
 
     /* Projection milking tile graph */
     let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
+    console.log(milkingProjection)
     let milkingProjectionSorted = [];
 
     milkingProjection.forEach(data => {
@@ -4161,8 +4115,8 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD MAIN PAGE */
   ///////////////////////
-  const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
   if (document.querySelector('#mp-herd')) {
+    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     /* Working with projectrion data */
     await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
     let slideInterval;
@@ -4342,6 +4296,7 @@ $(document).ready(async function () {
   //////////////////////////
   //////////////////////////
   if (document.querySelector('#mp-results-graph')) {
+    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     let data = [];
     animals.cows.forEach((animal) => {
       animal.milkingResults.forEach(res => {
