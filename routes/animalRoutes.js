@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get('/', authController.protect, animalController.getAllAnimals)
 
+router.get('/:animalId', authController.protect, animalController.getOneAnimal)
+
 router.post('/', authController.protect, animalController.addOneAnimal);
 
 router.patch('/:animalId', authController.protect, animalController.updateOneAnimal);

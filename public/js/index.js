@@ -7,7 +7,7 @@ import moment, { max, months } from 'moment';
 import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
-import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph } from './animalHandler';
+import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph, getAnimalData } from './animalHandler';
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
 import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
@@ -3239,22 +3239,80 @@ $(document).ready(async function () {
 
     /* Projection milking tile graph */
     let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
-    console.log(milkingProjection)
-    let milkingProjectionSorted = [];
+    let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
+    let milkingDataByLact = [];
+
+    /* Getting the milking data and sorting it by lactations */
+    animalData.animal.milkingResults.forEach(res => {
+      if (!milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber)) {
+        milkingDataByLact.push({
+          lactationNumber: res.lactationNumber,
+          results: [res],
+          lactationStart: animalData.animal.lactations.find(lact => lact.number === res.lactationNumber).startDate
+        });
+      } else {
+        milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber).results.push(res);
+      }
+    });
+
+    /* Sorting projected data by lactations*/
+    let milkingProjectionByLact = [];
 
     milkingProjection.forEach(data => {
-      if (milkingProjectionSorted.find(el => el.lactation === data.lactation)) {
-        milkingProjectionSorted.find(el => el.lactation === data.lactation).results.push(data);
+      if (milkingProjectionByLact.find(el => el.lactation === data.lactation)) {
+        milkingProjectionByLact.find(el => el.lactation === data.lactation).results.push(data);
       } else {
-        milkingProjectionSorted.push({
+        milkingProjectionByLact.push({
           lactation: data.lactation,
           results: [data]
         });
       }
     });
 
+    /* Getting milking results by day */
+    let milkingDataByDay = [];
+    milkingDataByLact.forEach((lact, index, array) => {
+      let results = [];
+      lact.results.sort((a, b) => a.date - b.date);
+      lact.results.forEach((res, inx, arr) => {
+        results.push({
+          date: res.date,
+          result: res.result,
+          type: 'actual'
+        })
+        if (inx + 1 > arr.length - 1) return;
+        let daysSpan = (new Date(arr[inx + 1].date).getTime() - new Date(res.date).getTime()) / 24 / 60 / 60 / 1000;
+        let increment = parseFloat(((arr[inx + 1].result - res.result) / daysSpan).toFixed(2));
+
+        for (let i = 1; i <= daysSpan; i++) {
+          results.push({
+            date: new Date(moment(res.date).add(i, 'days')),
+            result: res.result + i * increment,
+            type: 'projected'
+          });
+        }
+
+      });
+
+      milkingDataByDay.push({
+        lactationNumber: lact.lactationNumber,
+        lactationStart: lact.lactationStart,
+        results
+      });
+
+    });
+
+    milkingDataByLact.sort((a, b) => a.lactationNumber - b.lactationNumber);
+    milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
+    milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
+    console.log(milkingDataByLact)
+    console.log(milkingProjectionByLact)
+    console.log(milkingDataByDay)
+
+
+
     $('.acb-tile-graph').empty();
-    milkingProjectionSorted.forEach(lact => {
+    milkingProjectionByLact.forEach(lact => {
       $('.acb-tile-graph').append(`
         <div class="acb-tile-graph-line" id="tile-graph-line-${lact.lactation}">
           <p>Лактация #${lact.lactation}</p>
@@ -4957,7 +5015,7 @@ $(document).ready(async function () {
       $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-off').css('height', parentHeight * ((el.writeOff.count / (max / 100)) / 100))
     });
 
-    $('.mp-projection-graph-item').on('mouseenter', function() {
+    $('.mp-projection-graph-item').on('mouseenter', function () {
       $('.span-success').removeClass('span-success');
       $('.span-fail').removeClass('span-fail');
 
@@ -4982,34 +5040,34 @@ $(document).ready(async function () {
       $('.mp-projection-info-item-off').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-off-change')) > 0 ? 'span-success' : 'span-fail');
     });
 
-    $('.mp-projection-graph-item-bar').on('mouseenter', function() {
+    $('.mp-projection-graph-item-bar').on('mouseenter', function () {
       $('.mp-projection-graph-item-bar').not($(this)).addClass('mp-projection-graph-item-bar-transp');
       let infoEl = $(this).attr('data-el');
       $('.mp-projection-info-item').not(infoEl).addClass('mp-projection-info-item-transp')
     });
-    $('.mp-projection-graph-item-bar').on('mouseleave', function() {
+    $('.mp-projection-graph-item-bar').on('mouseleave', function () {
       $('.mp-projection-graph-item-bar-transp').removeClass('mp-projection-graph-item-bar-transp');
       $('.mp-projection-info-item-transp').removeClass('mp-projection-info-item-transp')
     });
 
     $('.mp-projection-graph-item').first().trigger('mouseenter');
 
-    $('.mp-detail-btn').on('click', function() {
-      if($(this).find('ion-icon').attr('name') === 'help') {
+    $('.mp-detail-btn').on('click', function () {
+      if ($(this).find('ion-icon').attr('name') === 'help') {
 
         $('.mp-detail-text-block').show();
         $(this).find('ion-icon').attr('name', 'close');
       } else {
-        
+
         $('.mp-detail-text-block').hide();
         $(this).find('ion-icon').attr('name', 'help');
       }
     });
-    
-    $('.mp-detail-btn').on('mouseenter', function() {
+
+    $('.mp-detail-btn').on('mouseenter', function () {
       $('.mp-detail-text-block').show();
     });
-    $('.mp-detail-btn').on('mouseleave', function() {
+    $('.mp-detail-btn').on('mouseleave', function () {
       $('.mp-detail-text-block').hide();
     });
   }

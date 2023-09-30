@@ -170,3 +170,17 @@ export const getAnimalsForGraph = async(farmId) => {
     console.log(err);
   }
 }
+
+export const getAnimalData = async(animalId) => {
+  try {
+    let res = await axios({
+      method: 'GET',
+      url: `/api/animals/${animalId}`
+    });
+
+    if (res.data.status === 'success') return res.data.data;
+
+  } catch (err) {
+    console.log(err);
+  }
+}
