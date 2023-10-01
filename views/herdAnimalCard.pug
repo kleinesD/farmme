@@ -92,6 +92,15 @@ block content
               .aih-actions-item-mark
               img(src="/img/images/butcher-icon.png")
               .aih-actions-item-title Списать животное
+      -if(animal.milkingResults.length > 0)
+        .animal-card-graph-page#card-milking-graph
+          .mp-hg-btn-block.mp-hg-btn-block-1#milking-btns
+            .mp-hg-btn(data-graph="months") Результаты
+            .mp-hg-btn(data-graph="compare") Сравнение Лактаций
+            .mp-hg-btn(data-graph="days") По дням
+          .mp-herd-legend-btn#legend-btn  
+            ion-icon(name="settings")
+
 
     -if(animal.status !== 'alive')
       .ami-write-off-disclaimer
@@ -134,6 +143,7 @@ block content
 
 
       -if(animal.milkingResults.length > 0)
+
         .acb-graph-block
           //-.acb-graph-header
             p Результаты доения

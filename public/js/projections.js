@@ -66,102 +66,58 @@ export const getMilkingProjection = async (animalId) => {
 
   animalRes.forEach((res) => {
     let month = Math.round((res.date.getTime() - res.lactationStart.getTime()) / 30 / 24 / 60 / 60 / 1000);
-    let push = true;
-    if (animalResSorted.length === 0) {
+    if (!animalResSorted.find(el => el.lactation === res.lactation && el.monthIn === month)) {
       animalResSorted.push({
         lactation: res.lactation,
         monthIn: month,
+        date: res.date,
         results: [res],
         total: res.result,
-        average: res.result,
-        type: 'actual'
+        average: res.result
       });
     } else {
-      animalResSorted.forEach(resSort => {
-        if (resSort.lactation === res.lactation && resSort.monthIn === month) {
-          resSort.results.push(res);
-          resSort.total += res.result;
-          resSort.average = resSort.total / resSort.results.length
-          push = false;
-        }
-      });
-
-      if (push) {
-        animalResSorted.push({
-          lactation: res.lactation,
-          monthIn: month,
-          results: [res],
-          total: res.result,
-          average: res.result,
-          type: 'actual'
-        });
-      }
+      const element = animalResSorted.find(el => el.lactation === res.lactation && el.monthIn === month);
+      element.results.push(res);
+      element.total += res.result;
+      element.average = element.total / element.results.length
     }
   });
 
   farmAnimalsRes.forEach((res) => {
     let month = Math.round((res.date.getTime() - res.lactationStart.getTime()) / 30 / 24 / 60 / 60 / 1000);
-    let push = true;
-    if (farmAnimalsResSorted.length === 0) {
+    if (!farmAnimalsResSorted.find(el => el.lactation === res.lactation && el.monthIn === month)) {
       farmAnimalsResSorted.push({
         lactation: res.lactation,
         monthIn: month,
+        date: res.date,
         results: [res],
         total: res.result,
         average: res.result
       });
     } else {
-      farmAnimalsResSorted.forEach(resSort => {
-        if (resSort.lactation === res.lactation && resSort.monthIn === month) {
-          resSort.results.push(res);
-          resSort.total += res.result;
-          resSort.average = resSort.total / resSort.results.length
-          push = false;
-        }
-      });
-
-      if (push) {
-        farmAnimalsResSorted.push({
-          lactation: res.lactation,
-          monthIn: month,
-          results: [res],
-          total: res.result,
-          average: res.result
-        });
-      }
+      const element = farmAnimalsResSorted.find(el => el.lactation === res.lactation && el.monthIn === month);
+      element.results.push(res);
+      element.total += res.result;
+      element.average = element.total / element.results.length
     }
   });
 
   allAnimalsRes.forEach((res) => {
     let month = Math.round((res.date.getTime() - res.lactationStart.getTime()) / 30 / 24 / 60 / 60 / 1000);
-    let push = true;
-    if (allAnimalsResSorted.length === 0) {
+    if (!allAnimalsResSorted.find(el => el.lactation === res.lactation && el.monthIn === month)) {
       allAnimalsResSorted.push({
         lactation: res.lactation,
         monthIn: month,
+        date: res.date,
         results: [res],
         total: res.result,
         average: res.result
       });
     } else {
-      allAnimalsResSorted.forEach(resSort => {
-        if (resSort.lactation === res.lactation && resSort.monthIn === month) {
-          resSort.results.push(res);
-          resSort.total += res.result;
-          resSort.average = resSort.total / resSort.results.length
-          push = false;
-        }
-      });
-
-      if (push) {
-        allAnimalsResSorted.push({
-          lactation: res.lactation,
-          monthIn: month,
-          results: [res],
-          total: res.result,
-          average: res.result
-        });
-      }
+      const element = allAnimalsResSorted.find(el => el.lactation === res.lactation && el.monthIn === month);
+      element.results.push(res);
+      element.total += res.result;
+      element.average = element.total / element.results.length
     }
   });
 
@@ -306,7 +262,7 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
   }
 
   /* Counting an average between calvings based on lactations | ON HOLD | currently using only avearge data */
-  
+
   /* data.cows.forEach(cow => {
     if (cow.lactations.length <= 1) return;
 
@@ -332,7 +288,7 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
 
   /* Counting projected data for n amount of years */
   let years = [];
-  years.push({year: 0, animals: JSON.parse(JSON.stringify(animals))})
+  years.push({ year: 0, animals: JSON.parse(JSON.stringify(animals)) })
   for (let i = 1; i <= yearsAmount; i++) {
     let date = new Date(moment().add(i, 'year'));
 
@@ -397,6 +353,6 @@ export const getFarmProjections = async (farmId, yearsAmount) => {
       newBornsDied: year.animals.filter(animal => animal.status = 'diseased' && animal.cause === 'calving-death' && moment().add(year.year, 'year').isSame(animal.dateOfDeath, 'year') ),
     })
   }); */
-  
+
   return years;
 }

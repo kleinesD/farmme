@@ -3237,139 +3237,6 @@ $(document).ready(async function () {
   if (document.querySelector('.animal-card-body')) {
 
 
-    /* Projection milking tile graph */
-    let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
-    let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
-    let milkingDataByLact = [];
-
-    /* Getting the milking data and sorting it by lactations */
-    animalData.animal.milkingResults.forEach(res => {
-      if (!milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber)) {
-        milkingDataByLact.push({
-          lactationNumber: res.lactationNumber,
-          results: [res],
-          lactationStart: animalData.animal.lactations.find(lact => lact.number === res.lactationNumber).startDate
-        });
-      } else {
-        milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber).results.push(res);
-      }
-    });
-
-    /* Sorting projected data by lactations*/
-    let milkingProjectionByLact = [];
-
-    milkingProjection.forEach(data => {
-      if (milkingProjectionByLact.find(el => el.lactation === data.lactation)) {
-        milkingProjectionByLact.find(el => el.lactation === data.lactation).results.push(data);
-      } else {
-        milkingProjectionByLact.push({
-          lactation: data.lactation,
-          results: [data]
-        });
-      }
-    });
-
-    /* Getting milking results by day */
-    let milkingDataByDay = [];
-    milkingDataByLact.forEach((lact, index, array) => {
-      let results = [];
-      lact.results.sort((a, b) => a.date - b.date);
-      lact.results.forEach((res, inx, arr) => {
-        results.push({
-          date: res.date,
-          result: res.result,
-          type: 'actual'
-        })
-        if (inx + 1 > arr.length - 1) return;
-        let daysSpan = (new Date(arr[inx + 1].date).getTime() - new Date(res.date).getTime()) / 24 / 60 / 60 / 1000;
-        let increment = parseFloat(((arr[inx + 1].result - res.result) / daysSpan).toFixed(2));
-
-        for (let i = 1; i <= daysSpan; i++) {
-          results.push({
-            date: new Date(moment(res.date).add(i, 'days')),
-            result: res.result + i * increment,
-            type: 'projected'
-          });
-        }
-
-      });
-
-      milkingDataByDay.push({
-        lactationNumber: lact.lactationNumber,
-        lactationStart: lact.lactationStart,
-        results
-      });
-
-    });
-
-    milkingDataByLact.sort((a, b) => a.lactationNumber - b.lactationNumber);
-    milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
-    milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
-    console.log(milkingDataByLact)
-    console.log(milkingProjectionByLact)
-    console.log(milkingDataByDay)
-
-
-
-    $('.acb-tile-graph').empty();
-    milkingProjectionByLact.forEach(lact => {
-      $('.acb-tile-graph').append(`
-        <div class="acb-tile-graph-line" id="tile-graph-line-${lact.lactation}">
-          <p>Лактация #${lact.lactation}</p>
-          <div class="acb-tile-line-res-box"></div>
-        </div>
-      `)
-
-      lact.results.forEach((res, inx) => {
-        $(`#tile-graph-line-${lact.lactation}`).find('.acb-tile-line-res-box').append(`
-          <div class="acb-tile acb-tile-visible ${res.type === 'projected' ? 'acb-tile-projected' : ''}" data-number="${res.monthIn}" data-result="${res.average}">
-            <div class="acb-tile-title">#${res.monthIn}</div>
-            <div class="acb-tile-result">${res.average.toFixed(1)}</div>
-          </div>
-        `)
-      });
-    });
-
-    $('.acb-tile-line-res-box').each(function () {
-      let lastNumber = $(this).find('.acb-tile').last().attr('data-number');
-
-      if ($(this).find('.acb-tile').first().attr('data-number') != 0) {
-        $(this).prepend(`
-          <div class="acb-tile acb-tile-invis" data-number="0">
-            <div class="acb-tile-title">#0</div>
-            <div class="acb-tile-result">0.0</div>
-          </div>
-        `)
-      }
-
-      $('.acb-tile').each(function () {
-        if ($(this).next().length !== 0 && parseFloat($(this).next().attr('data-number')) !== parseFloat($(this).attr('data-number')) + 1) {
-          $(this).after(`
-          <div class="acb-tile acb-tile-invis" data-number="${parseFloat($(this).attr('data-number')) + 1}" data-result="0">
-            <div class="acb-tile-title">#${parseFloat($(this).attr('data-number')) + 1}</div>
-            <div class="acb-tile-result">0.0</div>
-          </div>
-        `)
-        }
-      });
-    });
-
-    $('.acb-tile-visible').mouseenter(function () {
-      $('.acb-tile-visible').css('opacity', '0.5');
-      $(this).css('opacity', '1');
-      $('#result').find('.acb-item-info').text(`${parseFloat($(this).attr('data-result')).toFixed(1)} л.`)
-
-      if ($(this).prev().length !== 0 && parseFloat($(this).prev().attr('data-result')) !== 0) {
-        $('#growth').find('.acb-item-info').text(`${(((parseFloat($(this).attr('data-result')) / parseFloat($(this).prev().attr('data-result'))) - 1) * 100).toFixed(1)} %`)
-      }
-    });
-    $('.acb-tile-visible').mouseleave(function () {
-      $('.acb-tile-visible').css('opacity', '1');
-      $('#result').find('.acb-item-info').text(`-`)
-      $('#growth').find('.acb-item-info').text(`-`)
-    });
-
-
     /////////////////////////////////////
     /* TO IMPLEMENT IN THE NEXT UPDATE */
     /////////////////////////////////////
@@ -3884,6 +3751,229 @@ $(document).ready(async function () {
     });
   }
 
+  /* Animal card milking graph */
+  if (document.querySelector('#card-milking-graph')) {
+    /* Projection milking tile graph */
+    let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
+    let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
+    let milkingDataByLact = [];
+
+    /* Getting the milking data and sorting it by lactations */
+    animalData.animal.milkingResults.forEach(res => {
+      if (!milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber)) {
+        milkingDataByLact.push({
+          lactationNumber: res.lactationNumber,
+          results: [res],
+          lactationStart: animalData.animal.lactations.find(lact => lact.number === res.lactationNumber).startDate
+        });
+      } else {
+        milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber).results.push(res);
+      }
+    });
+
+    /* Sorting projected data by lactations*/
+    let milkingProjectionByLact = [];
+
+    milkingProjection.forEach(data => {
+      if (milkingProjectionByLact.find(el => el.lactation === data.lactation)) {
+        milkingProjectionByLact.find(el => el.lactation === data.lactation).results.push(data);
+      } else {
+        milkingProjectionByLact.push({
+          lactation: data.lactation,
+          results: [data]
+        });
+      }
+    });
+
+    /* Getting milking results by day */
+    let milkingDataByDay = [];
+    milkingDataByLact.forEach((lact, index, array) => {
+      let results = [];
+      lact.results.sort((a, b) => a.date - b.date);
+      lact.results.forEach((res, inx, arr) => {
+        results.push({
+          date: res.date,
+          result: res.result,
+          type: 'actual'
+        })
+        if (inx + 1 > arr.length - 1) return;
+        let daysSpan = (new Date(arr[inx + 1].date).getTime() - new Date(res.date).getTime()) / 24 / 60 / 60 / 1000;
+        let increment = parseFloat(((arr[inx + 1].result - res.result) / daysSpan).toFixed(2));
+
+        for (let i = 1; i <= daysSpan; i++) {
+          results.push({
+            date: new Date(moment(res.date).add(i, 'days')),
+            result: res.result + i * increment,
+            type: 'projected'
+          });
+        }
+
+      });
+
+      milkingDataByDay.push({
+        lactationNumber: lact.lactationNumber,
+        lactationStart: lact.lactationStart,
+        results
+      });
+
+    });
+
+    milkingDataByLact.sort((a, b) => a.lactationNumber - b.lactationNumber);
+    milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
+    milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
+    console.log(milkingDataByLact)
+    console.log(milkingProjectionByLact)
+    console.log(milkingDataByDay)
+
+    /* Working with a graph */
+    $('#card-milking-graph .mp-hg-btn').on('click', function () {
+      if ($(this).hasClass('mp-hg-btn-active')) return;
+      $('.mp-hg-btn-active').removeClass('mp-hg-btn-active');
+      $(this).addClass('mp-hg-btn-active');
+
+      /* Cleaning previously created graph */
+      $('#main-column').find('.mp-herd-legend-item').remove();
+      $('#additional-column').find('.mp-herd-legend-item').remove();
+
+      $('.basic-graph-svg').remove();
+
+      /* Adding main SVG */
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      svg.classList.add('basic-graph-svg')
+      $('#card-milking-graph').append(svg);
+      svg.style.width = $('#card-milking-graph').width();
+      svg.style.height = $('#card-milking-graph').height();
+
+      /* Setting max and min */
+      let max, min;
+      max = 0;
+      min = 0;
+
+      if ($(this).attr('data-graph') === 'months') {
+        milkingDataByLact.forEach(lact => {
+          lact.results.forEach(res => { if (res.result > max) max = res.result })
+        });
+        max = Math.ceil(max / 10) * 10 * 1.5;
+
+        /* Creating showlines */
+        const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        showLineHor.classList.add('basic-graph-show-line')
+        showLineHor.setAttribute('id', 'graph-show-line-hor')
+        svg.append(showLineHor);
+
+        /* Creating ticks */
+        const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+        tickHor.classList.add('basic-graph-tick');
+        svg.append(tickHor);
+
+        /* Counting the horizontal gap */
+        let start = undefined;
+        let end = undefined;
+
+        milkingDataByLact.forEach(lact => {
+          lact.results.forEach(res => {
+            if (!start) start = res.date;
+            if (!end) end = res.date;
+
+            if (start > res.date) start = res.date;
+            if (end < res.date) end = res.date;
+          })
+        });
+
+        let daysSpan = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 1000 / 60 / 60 / 24);
+
+        let horGap = parseFloat($('#card-milking-graph').height()) / 12;
+
+        /* Adding horizontal grid lines and ticks */
+        for (let i = 11; i >= 1; i--) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', 0)
+          gridLine.setAttribute('y1', i * horGap)
+          gridLine.setAttribute('x2', parseFloat($('#card-milking-graph').width()))
+          gridLine.setAttribute('y2', i * horGap)
+        }
+
+        /* Adding the vertical grid lines */
+        for (let i = 1; i <= parseFloat($('#card-milking-graph').width()) / horGap; i++) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', i * horGap)
+          gridLine.setAttribute('y1', 0)
+          gridLine.setAttribute('x2', i * horGap)
+          gridLine.setAttribute('y2', parseFloat($('#card-milking-graph').height()))
+        }
+
+        /* Adding data */
+
+      } else if ($(this).attr('data-graph') === 'compare') {
+
+      } else if ($(this).attr('data-graph') === 'days') {
+
+      }
+    });
+
+
+    /* $('.acb-tile-graph').empty();
+    milkingProjectionByLact.forEach(lact => {
+      $('.acb-tile-graph').append(`
+        <div class="acb-tile-graph-line" id="tile-graph-line-${lact.lactation}">
+          <p>Лактация #${lact.lactation}</p>
+          <div class="acb-tile-line-res-box"></div>
+        </div>
+      `)
+
+      lact.results.forEach((res, inx) => {
+        $(`#tile-graph-line-${lact.lactation}`).find('.acb-tile-line-res-box').append(`
+          <div class="acb-tile acb-tile-visible ${res.type === 'projected' ? 'acb-tile-projected' : ''}" data-number="${res.monthIn}" data-result="${res.average}">
+            <div class="acb-tile-title">#${res.monthIn}</div>
+            <div class="acb-tile-result">${res.average.toFixed(1)}</div>
+          </div>
+        `)
+      });
+    });
+
+    $('.acb-tile-line-res-box').each(function () {
+      let lastNumber = $(this).find('.acb-tile').last().attr('data-number');
+
+      if ($(this).find('.acb-tile').first().attr('data-number') != 0) {
+        $(this).prepend(`
+          <div class="acb-tile acb-tile-invis" data-number="0">
+            <div class="acb-tile-title">#0</div>
+            <div class="acb-tile-result">0.0</div>
+          </div>
+        `)
+      }
+
+      $('.acb-tile').each(function () {
+        if ($(this).next().length !== 0 && parseFloat($(this).next().attr('data-number')) !== parseFloat($(this).attr('data-number')) + 1) {
+          $(this).after(`
+          <div class="acb-tile acb-tile-invis" data-number="${parseFloat($(this).attr('data-number')) + 1}" data-result="0">
+            <div class="acb-tile-title">#${parseFloat($(this).attr('data-number')) + 1}</div>
+            <div class="acb-tile-result">0.0</div>
+          </div>
+        `)
+        }
+      });
+    });
+
+    $('.acb-tile-visible').mouseenter(function () {
+      $('.acb-tile-visible').css('opacity', '0.5');
+      $(this).css('opacity', '1');
+      $('#result').find('.acb-item-info').text(`${parseFloat($(this).attr('data-result')).toFixed(1)} л.`)
+
+      if ($(this).prev().length !== 0 && parseFloat($(this).prev().attr('data-result')) !== 0) {
+        $('#growth').find('.acb-item-info').text(`${(((parseFloat($(this).attr('data-result')) / parseFloat($(this).prev().attr('data-result'))) - 1) * 100).toFixed(1)} %`)
+      }
+    });
+    $('.acb-tile-visible').mouseleave(function () {
+      $('.acb-tile-visible').css('opacity', '1');
+      $('#result').find('.acb-item-info').text(`-`)
+      $('#growth').find('.acb-item-info').text(`-`)
+    }); */
+  }
   ///////////////////////
   /* ALL EDIT PAGE */
   ///////////////////////
