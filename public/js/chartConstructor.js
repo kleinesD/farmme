@@ -95,7 +95,7 @@ export const renderLineGraph = (container, parameters) => {
         } else if (parameters.graphSettings.timelineType === 'day') {
           timeUnitIn = data.day;
         }
-        
+
         /* Adding line if allowed */
         if (dataset.showLine) {
           if (index === 0) {
@@ -120,7 +120,7 @@ export const renderLineGraph = (container, parameters) => {
         var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         circle.classList.add(`graph-point`)
         circle.classList.add(`graph-circle-${datasetIndex}`)
-        if(dataset.showPoint) {
+        if (dataset.showPoint) {
           circle.classList.add(`graph-point-visible`)
         } else {
           circle.classList.add(`graph-point-invisible`)
@@ -448,6 +448,398 @@ export const renderProgressChart = (container, parameters) => {
 
   $(window).trigger('resize');
 }
+// parent - class name or id of an element
+// start - date of the first element by date
+// end - date of the last element by date
+// showLineHorShow, showLineVerShow - boolean
+export const graphBase = (parent, min, max, start, end, showLineHorShow, showLineVerShow) => {
+  const graphObj = {};
+  $('.basic-graph-svg').remove()
+
+  /* Adding main SVG */
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+  svg.classList.add('basic-graph-svg')
+  $(parent).append(svg);
+  svg.style.width = $(parent).width();
+  svg.style.height = $(parent).height();
+  graphObj.svg = svg;
+  graphObj.min = min;
+  graphObj.max = max;
+  graphObj.start = start;
+  graphObj.end = end;
+
+  /* Creating showlines *//* Creating ticks */
+  let showLineHor, tickHor;
+  if (showLineHorShow) {
+    showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineHor.classList.add('basic-graph-show-line')
+    showLineHor.setAttribute('id', 'graph-show-line-hor')
+    svg.append(showLineHor);
+
+    tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickHor.classList.add('basic-graph-tick');
+    svg.append(tickHor);
+  }
+  let showLineVer, tickVer;
+  if (showLineVerShow) {
+    showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineVer.classList.add('basic-graph-show-line')
+    showLineVer.setAttribute('id', 'graph-show-line-ver')
+    svg.append(showLineVer);
+
+    tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickVer.classList.add('basic-graph-tick-date');
+    svg.append(tickVer);
+  }
+
+
+  /* Counting the horizontal gap */
+  let horGap = parseFloat($(parent).height()) / 12;
+
+  const workingAreaHeight = Math.round($(parent).height() - horGap * 2);
+  const workingAreaWidth = Math.round($(parent).width() - horGap * 2);
+
+  graphObj.horGap = horGap;
+  graphObj.workingAreaHeight = workingAreaHeight;
+  graphObj.workingAreaWidth = workingAreaWidth;
+
+  /* Adding horizontal grid lines*/
+  for (let i = 11; i >= 1; i--) {
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    gridLine.classList.add('basic-graph-grid-line')
+    svg.append(gridLine);
+    gridLine.setAttribute('x1', 0)
+    gridLine.setAttribute('y1', i * horGap)
+    gridLine.setAttribute('x2', parseFloat($(parent).width()))
+    gridLine.setAttribute('y2', i * horGap)
+  }
+
+  /* Adding the vertical grid lines */
+  for (let i = 1; i <= parseFloat($(parent).width()) / horGap; i++) {
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    gridLine.classList.add('basic-graph-grid-line')
+    svg.append(gridLine);
+    gridLine.setAttribute('x1', i * horGap)
+    gridLine.setAttribute('y1', 0)
+    gridLine.setAttribute('x2', i * horGap)
+    gridLine.setAttribute('y2', parseFloat($(parent).height()))
+  }
+
+  /* Adding data */
+
+  let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+  graphObj.daysSpan = daysSpan;
+
+  /* Adding all data dots */
+
+  $('.mp-herd-graph-info-item').remove();
+
+  /* Adding ticks on mousemove */
+  $(parent).off()
+  $(parent).on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
+    let point = svg.createSVGPoint();
+    point.x = clientX;
+    point.y = clientY;
+    point = point.matrixTransform(svg.getScreenCTM().inverse());
+
+    if (showLineVerShow) {
+      let xStop = false;
+      if (point.x < horGap) {
+        showLineVer.setAttribute('x1', horGap + 1);
+        showLineVer.setAttribute('x2', horGap + 1);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+        xStop = true;
+      }
+      if (point.x > parseFloat($(parent).width()) - horGap) {
+        showLineVer.setAttribute('x1', parseFloat($(parent).width()) - horGap);
+        showLineVer.setAttribute('x2', parseFloat($(parent).width()) - horGap);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+        xStop = true;
+      }
+      if (!xStop) {
+        showLineVer.setAttribute('x1', point.x);
+        showLineVer.setAttribute('x2', point.x);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+      }
+      tickVer.textContent = moment(start).add(Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100)), 'day').lang('ru').format('DD MMMM, YY')
+      tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
+      tickVer.setAttribute('y', $(parent).height() - 10)
+    }
+
+    if (showLineHorShow) {
+      let yStop = false;
+      if (point.y > parseFloat($(parent).height()) - horGap) {
+        showLineHor.setAttribute('y1', parseFloat($(parent).height()) - horGap - 1);
+        showLineHor.setAttribute('y2', parseFloat($(parent).height()) - horGap - 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+        yStop = true;
+      }
+      if (point.y < horGap) {
+        showLineHor.setAttribute('y1', horGap + 1);
+        showLineHor.setAttribute('y2', horGap + 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+        yStop = true;
+      }
+      if (!yStop) {
+        showLineHor.setAttribute('y1', point.y);
+        showLineHor.setAttribute('y2', point.y);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+      }
+
+      tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
+      tickHor.setAttribute('x', 10)
+      tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+    }
+
+  });
+
+  $(parent).on('mouseleave', '.basic-graph-svg', function () {
+    if (showLineVerShow) {
+      showLineVer.setAttribute('x1', 0);
+      showLineVer.setAttribute('x2', 0);
+      showLineVer.setAttribute('y1', 0);
+      showLineVer.setAttribute('y2', 0);
+      tickVer.textContent = '';
+    }
+
+    if (showLineHorShow) {
+      showLineHor.setAttribute('x1', 0);
+      showLineHor.setAttribute('x2', 0);
+      showLineHor.setAttribute('y1', 0);
+      showLineHor.setAttribute('y2', 0);
+      tickHor.textContent = '';
+    }
+  });
+
+ 
+
+  /* Making legend work */
+  $('#legend-btn').off('click')
+  $('#legend-btn').on('click', function () {
+    if ($('.mp-herd-legend').css('display') === 'flex') {
+      $('.mp-herd-legend').hide()
+    } else {
+      $('.mp-herd-legend').css('display', 'flex')
+    }
+  });
+
+  $(parent).off('click')
+  $(parent).on('click', '.mp-herd-legend-item', function () {
+    if ($(this).hasClass('mp-herd-legend-item-non-click')) return;
+
+    if (!$(this).hasClass('mp-herd-legend-item-off')) {
+      $(`.${$(this).attr('data-rel-element')}`).hide();
+
+      $(this).addClass('mp-herd-legend-item-off')
+    } else {
+      $(`.${$(this).attr('data-rel-element')}`).show();
+
+      $(this).removeClass('mp-herd-legend-item-off')
+    }
+  });
+
+  return graphObj;
+};
+
+export const graphBaseNoDate = (parent, min, max, maxDays, showLineHorShow, showLineVerShow) => {
+  const graphObj = {};
+  $('.basic-graph-svg').remove()
+
+  /* Adding main SVG */
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+  svg.classList.add('basic-graph-svg')
+  $(parent).append(svg);
+  svg.style.width = $(parent).width();
+  svg.style.height = $(parent).height();
+  graphObj.svg = svg;
+  graphObj.min = min;
+  graphObj.max = max;
+  graphObj.maxDays = maxDays;
+
+  /* Creating showlines *//* Creating ticks */
+  let showLineHor, tickHor;
+  if (showLineHorShow) {
+    showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineHor.classList.add('basic-graph-show-line')
+    showLineHor.setAttribute('id', 'graph-show-line-hor')
+    svg.append(showLineHor);
+
+    tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickHor.classList.add('basic-graph-tick');
+    svg.append(tickHor);
+  }
+  let showLineVer, tickVer;
+  if (showLineVerShow) {
+    showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineVer.classList.add('basic-graph-show-line')
+    showLineVer.setAttribute('id', 'graph-show-line-ver')
+    svg.append(showLineVer);
+
+    tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickVer.classList.add('basic-graph-tick-date');
+    svg.append(tickVer);
+  }
+
+
+  /* Counting the horizontal gap */
+  let horGap = parseFloat($(parent).height()) / 12;
+
+  const workingAreaHeight = Math.round($(parent).height() - horGap * 2);
+  const workingAreaWidth = Math.round($(parent).width() - horGap * 2);
+
+  graphObj.horGap = horGap;
+  graphObj.workingAreaHeight = workingAreaHeight;
+  graphObj.workingAreaWidth = workingAreaWidth;
+
+  /* Adding horizontal grid lines*/
+  for (let i = 11; i >= 1; i--) {
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    gridLine.classList.add('basic-graph-grid-line')
+    svg.append(gridLine);
+    gridLine.setAttribute('x1', 0)
+    gridLine.setAttribute('y1', i * horGap)
+    gridLine.setAttribute('x2', parseFloat($(parent).width()))
+    gridLine.setAttribute('y2', i * horGap)
+  }
+
+  /* Adding the vertical grid lines */
+  for (let i = 1; i <= parseFloat($(parent).width()) / horGap; i++) {
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    gridLine.classList.add('basic-graph-grid-line')
+    svg.append(gridLine);
+    gridLine.setAttribute('x1', i * horGap)
+    gridLine.setAttribute('y1', 0)
+    gridLine.setAttribute('x2', i * horGap)
+    gridLine.setAttribute('y2', parseFloat($(parent).height()))
+  }
+
+  /* Adding data */
+
+  let daysSpan = maxDays;
+  graphObj.daysSpan = daysSpan;
+
+  /* Adding all data dots */
+
+  $('.mp-herd-graph-info-item').remove();
+
+  /* Adding ticks on mousemove */
+  $(parent).off()
+  $(parent).on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
+    let point = svg.createSVGPoint();
+    point.x = clientX;
+    point.y = clientY;
+    point = point.matrixTransform(svg.getScreenCTM().inverse());
+
+    if (showLineVerShow) {
+      let xStop = false;
+      if (point.x < horGap) {
+        showLineVer.setAttribute('x1', horGap + 1);
+        showLineVer.setAttribute('x2', horGap + 1);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+        xStop = true;
+      }
+      if (point.x > parseFloat($(parent).width()) - horGap) {
+        showLineVer.setAttribute('x1', parseFloat($(parent).width()) - horGap);
+        showLineVer.setAttribute('x2', parseFloat($(parent).width()) - horGap);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+        xStop = true;
+      }
+      if (!xStop) {
+        showLineVer.setAttribute('x1', point.x);
+        showLineVer.setAttribute('x2', point.x);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($(parent).height()) - horGap)
+      }
+      tickVer.textContent =`${0 + Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100))} дн.`
+      tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
+      tickVer.setAttribute('y', $(parent).height() - 10)
+    }
+
+    if (showLineHorShow) {
+      let yStop = false;
+      if (point.y > parseFloat($(parent).height()) - horGap) {
+        showLineHor.setAttribute('y1', parseFloat($(parent).height()) - horGap - 1);
+        showLineHor.setAttribute('y2', parseFloat($(parent).height()) - horGap - 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+        yStop = true;
+      }
+      if (point.y < horGap) {
+        showLineHor.setAttribute('y1', horGap + 1);
+        showLineHor.setAttribute('y2', horGap + 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+        yStop = true;
+      }
+      if (!yStop) {
+        showLineHor.setAttribute('y1', point.y);
+        showLineHor.setAttribute('y2', point.y);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($(parent).width()));
+      }
+
+      tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
+      tickHor.setAttribute('x', 10)
+      tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+    }
+
+  });
+
+  $(parent).on('mouseleave', '.basic-graph-svg', function () {
+    if (showLineVerShow) {
+      showLineVer.setAttribute('x1', 0);
+      showLineVer.setAttribute('x2', 0);
+      showLineVer.setAttribute('y1', 0);
+      showLineVer.setAttribute('y2', 0);
+      tickVer.textContent = '';
+    }
+
+    if (showLineHorShow) {
+      showLineHor.setAttribute('x1', 0);
+      showLineHor.setAttribute('x2', 0);
+      showLineHor.setAttribute('y1', 0);
+      showLineHor.setAttribute('y2', 0);
+      tickHor.textContent = '';
+    }
+  });
+
+ 
+
+  /* Making legend work */
+  $('#legend-btn').off('click')
+  $('#legend-btn').on('click', function () {
+    if ($('.mp-herd-legend').css('display') === 'flex') {
+      $('.mp-herd-legend').hide()
+    } else {
+      $('.mp-herd-legend').css('display', 'flex')
+    }
+  });
+
+  $(parent).off('click')
+  $(parent).on('click', '.mp-herd-legend-item', function () {
+    if ($(this).hasClass('mp-herd-legend-item-non-click')) return;
+
+    if (!$(this).hasClass('mp-herd-legend-item-off')) {
+      $(`.${$(this).attr('data-rel-element')}`).hide();
+
+      $(this).addClass('mp-herd-legend-item-off')
+    } else {
+      $(`.${$(this).attr('data-rel-element')}`).show();
+
+      $(this).removeClass('mp-herd-legend-item-off')
+    }
+  });
+
+  return graphObj;
+};
 
 
 

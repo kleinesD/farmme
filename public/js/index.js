@@ -14,7 +14,7 @@ import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout, checkEmail } from './authHandler';
 import { editFarm, editUser, addCategory } from './manageHandler';
 import { addConfirmationEmpty } from './interaction';
-import { multiLinearChart, renderLineGraph, renderProgressChart } from './chartConstructor';
+import { multiLinearChart, renderLineGraph, renderProgressChart, graphBase, graphBaseNoDate } from './chartConstructor';
 import { getMilkingProjection, getFarmProjections } from './projections';
 import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts } from './distributionHandler';
 import { searchEngine } from './search';
@@ -3831,47 +3831,19 @@ $(document).ready(async function () {
       $('.mp-hg-btn-active').removeClass('mp-hg-btn-active');
       $(this).addClass('mp-hg-btn-active');
 
+      let colors = ['#fb8d34', '#ff5230', '#9d4b9f', '#606ae5', '#43d7e5', '#6DA34D', '#48A9A6', '#613F75', '#22333B', '#5E503F'];
+
       /* Cleaning previously created graph */
       $('#main-column').find('.mp-herd-legend-item').remove();
       $('#additional-column').find('.mp-herd-legend-item').remove();
-
-      $('.basic-graph-svg').remove();
-
-      /* Adding main SVG */
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-      svg.classList.add('basic-graph-svg')
-      $('#card-milking-graph').append(svg);
-      svg.style.width = $('#card-milking-graph').width();
-      svg.style.height = $('#card-milking-graph').height();
-
-      /* Setting max and min */
-      let max, min;
-      max = 0;
-      min = 0;
-
+      let maxDays;
+      let start, end;
+      let max = 0, min = 0;
       if ($(this).attr('data-graph') === 'months') {
         milkingDataByLact.forEach(lact => {
-          lact.results.forEach(res => { if (res.result > max) max = res.result })
-        });
-        max = Math.ceil(max / 10) * 10 * 1.5;
-
-        /* Creating showlines */
-        const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-        showLineHor.classList.add('basic-graph-show-line')
-        showLineHor.setAttribute('id', 'graph-show-line-hor')
-        svg.append(showLineHor);
-
-        /* Creating ticks */
-        const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-        tickHor.classList.add('basic-graph-tick');
-        svg.append(tickHor);
-
-        /* Counting the horizontal gap */
-        let start = undefined;
-        let end = undefined;
-
-        milkingDataByLact.forEach(lact => {
           lact.results.forEach(res => {
+            if (res.result > max) max = res.result
+
             if (!start) start = res.date;
             if (!end) end = res.date;
 
@@ -3879,39 +3851,320 @@ $(document).ready(async function () {
             if (end < res.date) end = res.date;
           })
         });
+        max = Math.ceil(max / 10) * 10 * 1.5;
 
-        let daysSpan = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 1000 / 60 / 60 / 24);
-
-        let horGap = parseFloat($('#card-milking-graph').height()) / 12;
-
-        /* Adding horizontal grid lines and ticks */
-        for (let i = 11; i >= 1; i--) {
-          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-          gridLine.classList.add('basic-graph-grid-line')
-          svg.append(gridLine);
-          gridLine.setAttribute('x1', 0)
-          gridLine.setAttribute('y1', i * horGap)
-          gridLine.setAttribute('x2', parseFloat($('#card-milking-graph').width()))
-          gridLine.setAttribute('y2', i * horGap)
-        }
-
-        /* Adding the vertical grid lines */
-        for (let i = 1; i <= parseFloat($('#card-milking-graph').width()) / horGap; i++) {
-          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-          gridLine.classList.add('basic-graph-grid-line')
-          svg.append(gridLine);
-          gridLine.setAttribute('x1', i * horGap)
-          gridLine.setAttribute('y1', 0)
-          gridLine.setAttribute('x2', i * horGap)
-          gridLine.setAttribute('y2', parseFloat($('#card-milking-graph').height()))
-        }
+        /* Adding graph base */
+        const graphObj = graphBase('#card-milking-graph', min, max, new Date(start), new Date(end), true, false);
 
         /* Adding data */
+        milkingDataByLact.forEach((lact, index) => {
+          let circleTimer = 0;
+          lact.results.forEach((res, inx) => {
+            let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(graphObj.start).getTime()) / 1000 / 60 / 60 / 24);
+
+            /* Adding data line */
+            let path;
+            if (inx === 0) {
+              path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+              path.classList.add('basic-graph-point-line');
+              path.classList.add('average-graph-data');
+              path.style.stroke = colors[index];
+              graphObj.svg.append(path);
+              path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+              path.setAttribute('id', `lact-months-${index}`);
+            } else {
+              path = document.getElementById(`lact-months-${index}`);
+              path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+            }
+
+            /* Adding data points */
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.classList.add('basic-graph-point')
+            circle.classList.add('average-graph-data');
+            circle.style.stroke = colors[index];
+            graphObj.svg.append(circle);
+            circle.setAttribute('cx', graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100)))
+            circle.setAttribute('cy', graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100)))
+
+            circle.setAttribute('r', 4);
+            circle.setAttribute('data-result', res.result);
+            circle.setAttribute('data-date', res.date);
+            circle.setAttribute('data-lact', lact.lactationNumber);
+            circle.setAttribute('id', `lact-months-${index}`);
+
+            circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+            circleTimer += 0.1;
+          });
+
+          $('#main-column').append(`
+            <div class="mp-herd-legend-item" data-rel-element='lact-months-${index}' id="legend-item-${index}">
+              <div class="mp-herd-li-mark">
+                <div class="mp-herd-li-mark-average"></div>
+              </div>
+              <div class="mp-herd-li-text">Лактация #${lact.lactationNumber}</div>
+            </div>
+            `)
+          $(`#legend-item-${index}`).find('.mp-herd-li-mark-average').css('border-color', colors[index]);
+        });
+
+
+        anime({
+          targets: '.basic-graph-point-line',
+          strokeDashoffset: [1000, 0],
+          easing: 'easeInOutSine',
+          duration: 1500,
+          delay: function (el, i) { return i * 250 },
+        });
+
+
+
+
+
+        $('.basic-graph-point').off()
+        $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+
+          $('.ac-graph-tooltip').empty();
+          $('.ac-graph-tooltip').append(`
+          <div class="ac-graph-tooltip-title">ЛАКТАЦИЯ:</div>
+          <div class="ac-graph-tooltip-res">#${$(this).attr('data-lact')}</div>
+          <div class="ac-graph-tooltip-title">РЕЗУЛЬТАТ:</div>
+          <div class="ac-graph-tooltip-res">${parseFloat($(this).attr('data-result')).toFixed(1)}</div>
+          <div class="ac-graph-tooltip-title">ДАТА:</div>
+          <div class="ac-graph-tooltip-res">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+          `)
+          $('.ac-graph-tooltip-res').css({ 'color': $(this).css('stroke') })
+
+          /* 350 is an average width of tooltip for this graph */
+          if (parseFloat($(this).attr('cx')) + 20 + 350 < $('#card-milking-graph').width()) {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%, -50%)' })
+          } else {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%, -50%)' })
+          }
+
+          $('.ac-graph-tooltip').css('display', 'flex');
+        });
+
+        $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+          $('.ac-graph-tooltip').hide();
+        });
 
       } else if ($(this).attr('data-graph') === 'compare') {
+        milkingDataByDay.forEach(lact => {
+          lact.results.forEach(res => {
+            if (res.result > max) max = res.result
 
+            let days = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 24 / 60 / 60 / 1000)
+            if (!maxDays) maxDays = days;
+
+            if (days > maxDays) maxDays = days;
+          })
+        });
+        max = Math.ceil(max / 10) * 10 * 1.5;
+
+        /* Adding graph base */
+        const graphObj = graphBaseNoDate('#card-milking-graph', min, max, maxDays, true, false);
+
+        /* Adding data */
+        milkingDataByLact.forEach((lact, index) => {
+          let circleTimer = 0;
+          lact.results.forEach((res, inx) => {
+            let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 1000 / 60 / 60 / 24);
+
+            /* Adding data line */
+            let path;
+            if (inx === 0) {
+              path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+              path.classList.add('basic-graph-point-line');
+              path.classList.add('average-graph-data');
+              path.style.stroke = colors[index];
+              graphObj.svg.append(path);
+              path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+              path.setAttribute('id', `lact-months-${index}`);
+            } else {
+              path = document.getElementById(`lact-months-${index}`);
+              path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+            }
+
+            /* Adding data points */
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.classList.add('basic-graph-point')
+            circle.classList.add('average-graph-data');
+            circle.style.stroke = colors[index];
+            graphObj.svg.append(circle);
+            circle.setAttribute('cx', graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100)))
+            circle.setAttribute('cy', graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100)))
+
+            circle.setAttribute('r', 4);
+            circle.setAttribute('data-result', res.result);
+            circle.setAttribute('data-date', res.date);
+            circle.setAttribute('data-lact', lact.lactationNumber);
+            circle.setAttribute('id', `lact-months-${index}`);
+
+            circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+            circleTimer += 0.1;
+          });
+
+          $('#main-column').append(`
+            <div class="mp-herd-legend-item" data-rel-element='lact-months-${index}' id="legend-item-${index}">
+              <div class="mp-herd-li-mark">
+                <div class="mp-herd-li-mark-average"></div>
+              </div>
+              <div class="mp-herd-li-text">Лактация #${lact.lactationNumber}</div>
+            </div>
+            `)
+          $(`#legend-item-${index}`).find('.mp-herd-li-mark-average').css('border-color', colors[index]);
+        });
+
+
+        anime({
+          targets: '.basic-graph-point-line',
+          strokeDashoffset: [1000, 0],
+          easing: 'easeInOutSine',
+          duration: 1500,
+          delay: function (el, i) { return i * 250 },
+        });
+
+        $('.basic-graph-point').off()
+        $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+
+          $('.ac-graph-tooltip').empty();
+          $('.ac-graph-tooltip').append(`
+          <div class="ac-graph-tooltip-title">ЛАКТАЦИЯ:</div>
+          <div class="ac-graph-tooltip-res">#${$(this).attr('data-lact')}</div>
+          <div class="ac-graph-tooltip-title">РЕЗУЛЬТАТ:</div>
+          <div class="ac-graph-tooltip-res">${parseFloat($(this).attr('data-result')).toFixed(1)}</div>
+          <div class="ac-graph-tooltip-title">ДАТА:</div>
+          <div class="ac-graph-tooltip-res">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+          `)
+          $('.ac-graph-tooltip-res').css({ 'color': $(this).css('stroke') })
+
+          /* 350 is an average width of tooltip for this graph */
+          if (parseFloat($(this).attr('cx')) + 20 + 350 < $('#card-milking-graph').width()) {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%, -50%)' })
+          } else {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%, -50%)' })
+          }
+
+          $('.ac-graph-tooltip').css('display', 'flex');
+        });
+
+        $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+          $('.ac-graph-tooltip').hide();
+        });
       } else if ($(this).attr('data-graph') === 'days') {
+        milkingDataByDay.forEach(lact => {
+          lact.results.forEach(res => {
+            if (res.result > max) max = res.result
 
+            let days = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 24 / 60 / 60 / 1000)
+            if (!maxDays) maxDays = days;
+
+            if (days > maxDays) maxDays = days;
+          })
+        });
+        max = Math.ceil(max / 10) * 10 * 1.5;
+
+        /* Adding graph base */
+        const graphObj = graphBaseNoDate('#card-milking-graph', min, max, maxDays, true, true);
+
+        /* Adding data */
+        milkingDataByDay.forEach((lact, index) => {
+          let circleTimer = 0;
+          lact.results.forEach((res, inx) => {
+            let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 1000 / 60 / 60 / 24);
+
+            /* Adding data line */
+            let path;
+            if (inx === 0) {
+              path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+              path.classList.add('basic-graph-point-line');
+              path.classList.add('average-graph-data');
+              path.style.stroke = colors[index];
+              graphObj.svg.append(path);
+              path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+              path.setAttribute('id', `lact-days-${index}`);
+            } else {
+              path = document.getElementById(`lact-days-${index}`);
+              path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+
+            }
+
+            /* Adding data points */
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+            circle.classList.add('basic-graph-average-dot')
+            circle.classList.add('average-graph-data');
+            circle.style.fill = `#a2a2a200`;
+            graphObj.svg.append(circle);
+            circle.setAttribute('cx', graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100)))
+            circle.setAttribute('cy', graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100)))
+
+            circle.setAttribute('r', 3);
+            circle.setAttribute('data-result', res.result);
+            circle.setAttribute('data-date', currentDaysSpan);
+            circle.setAttribute('data-lact', lact.lactationNumber);
+            circle.setAttribute('data-color', colors[index]);
+            circle.setAttribute('id', `lact-days-${index}`);
+
+            circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+            circleTimer += 0.01;
+          });
+
+          $('#main-column').append(`
+            <div class="mp-herd-legend-item" data-rel-element='lact-days-${index}' id="legend-item-${index}">
+              <div class="mp-herd-li-mark">
+                <div class="mp-herd-li-mark-average"></div>
+              </div>
+              <div class="mp-herd-li-text">Лактация #${lact.lactationNumber}</div>
+            </div>
+            `)
+          $(`#legend-item-${index}`).find('.mp-herd-li-mark-average').css('border-color', colors[index]);
+        });
+
+
+        anime({
+          targets: '.basic-graph-point-line',
+          strokeDashoffset: [1000, 0],
+          easing: 'easeInOutSine',
+          duration: 1500,
+          delay: function (el, i) { return i * 250 },
+        });
+
+
+
+
+
+        $('.basic-graph-average-dot').off()
+        $('.basic-graph-average-dot').on('mouseenter', function ({ clientX, clientY }) {
+
+          $('.ac-graph-tooltip').empty();
+          $('.ac-graph-tooltip').append(`
+          <div class="ac-graph-tooltip-title">ЛАКТАЦИЯ:</div>
+          <div class="ac-graph-tooltip-res">#${$(this).attr('data-lact')}</div>
+          <div class="ac-graph-tooltip-title">РЕЗУЛЬТАТ:</div>
+          <div class="ac-graph-tooltip-res">${parseFloat($(this).attr('data-result')).toFixed(1)}</div>
+          <div class="ac-graph-tooltip-title">ДАТА:</div>
+          <div class="ac-graph-tooltip-res">${$(this).attr('data-date')} день</div>
+          `)
+          $('.ac-graph-tooltip-res').css({ 'color': $(this).css('data-color') })
+
+          /* 350 is an average width of tooltip for this graph */
+          if (parseFloat($(this).attr('cx')) + 20 + 350 < $('#card-milking-graph').width()) {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(0%, -50%)' })
+          } else {
+            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(-100%, -50%)' })
+          }
+
+          $('.ac-graph-tooltip').css('display', 'flex');
+        });
+
+        $('.basic-graph-average-dot').on('mouseleave', function ({ clientX, clientY }) {
+          $('.ac-graph-tooltip').hide();
+        });
       }
     });
 
@@ -4943,7 +5196,7 @@ $(document).ready(async function () {
         $('.mp-graph-tooltip').hide();
       });
 
-      /* Working legend work */
+      /* Making legend work */
       $('#legend-btn').off('click')
       $('#legend-btn').on('click', function () {
         if ($('.mp-herd-legend').css('display') === 'flex') {

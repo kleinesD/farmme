@@ -101,6 +101,30 @@ block content
           .mp-herd-legend-btn#legend-btn  
             ion-icon(name="settings")
 
+          .ac-graph-tooltip
+            .ac-graph-tooltip-title РЕЗУЛЬТАТ:
+            .ac-graph-tooltip-res 28.1
+            .ac-graph-tooltip-title ДАТА:
+            .ac-graph-tooltip-res МАЙ 2022
+
+          .mp-herd-legend
+            .mp-herd-legend-column#main-column
+              .mp-herd-legend-column-title ГЛАВНОЕ
+              .mp-herd-legend-item
+                .mp-herd-li-mark
+                .mp-herd-li-text Результат
+              .mp-herd-legend-item.mp-herd-legend-item-off
+                .mp-herd-li-mark
+                .mp-herd-li-text Средние по лакт.
+            .mp-herd-legend-column#additional-column
+              .mp-herd-legend-column-title ДОПОЛНИТЕЛЬНОЕ
+            .mp-herd-legend-column#edit-column
+              .mp-herd-legend-column-title ИЗМЕНИТЬ
+              //-.mp-herd-legend-item.mp-herd-legend-item-non-click
+                .mp-herd-li-check
+                  ion-icon(name="checkmark")
+                .mp-herd-li-text Разбить по лактациям
+
 
     -if(animal.status !== 'alive')
       .ami-write-off-disclaimer
