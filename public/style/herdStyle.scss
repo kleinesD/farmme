@@ -3462,6 +3462,15 @@
     left: 300px;
     display: none;
 }
+.ac-graph-tooltip-inner-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.ac-graph-tooltip-inner {
+    display: flex;
+    align-items: center;
+}
 .ac-graph-tooltip-title {
     font-size: 14px;
     font-weight: 800;

@@ -4135,35 +4135,50 @@ $(document).ready(async function () {
         });
 
 
+        graphObj.svg.addEventListener('mousemove', function (evt) {
+          let point = graphObj.svg.createSVGPoint();
 
+          point.x = evt.clientX; point.y = evt.clientY;
+          point = point.matrixTransform(graphObj.svg.getScreenCTM().inverse());
 
+          let currentPoint = { dataPoints: [], diff: 0 };
 
-        $('.basic-graph-average-dot').off()
-        $('.basic-graph-average-dot').on('mouseenter', function ({ clientX, clientY }) {
+          $('.basic-graph-average-dot').each(function () {
+            const dataPointX = parseFloat($(this).attr('cx'));
+
+            let diff = Math.abs(dataPointX - point.x);
+            if (currentPoint.dataPoints.length === 0 || currentPoint.diff > diff) {
+              currentPoint.dataPoints = [];
+              currentPoint.dataPoints.push($(this));
+              currentPoint.diff = diff;
+            } else if (currentPoint.dataPoints.length > 0 && currentPoint.diff === diff) {
+              currentPoint.dataPoints.push($(this));
+            }
+          });
 
           $('.ac-graph-tooltip').empty();
-          $('.ac-graph-tooltip').append(`
-          <div class="ac-graph-tooltip-title">ЛАКТАЦИЯ:</div>
-          <div class="ac-graph-tooltip-res">#${$(this).attr('data-lact')}</div>
-          <div class="ac-graph-tooltip-title">РЕЗУЛЬТАТ:</div>
-          <div class="ac-graph-tooltip-res">${parseFloat($(this).attr('data-result')).toFixed(1)}</div>
-          <div class="ac-graph-tooltip-title">ДАТА:</div>
-          <div class="ac-graph-tooltip-res">${$(this).attr('data-date')} день</div>
-          `)
-          $('.ac-graph-tooltip-res').css({ 'color': $(this).css('data-color') })
+          $('.ac-graph-tooltip').append(`<div class="ac-graph-tooltip-inner-block"></div>`);
+          currentPoint.dataPoints.forEach((point) => {
+            $('.ac-graph-tooltip-inner-block').append(`
+            <div class="ac-graph-tooltip-inner">
+              <div class="ac-graph-tooltip-title">ЛАКТАЦИЯ:</div>
+              <div class="ac-graph-tooltip-res" style="color:${$(point).attr('data-color')}">#${$(point).attr('data-lact')}</div>
+              <div class="ac-graph-tooltip-title">РЕЗУЛЬТАТ:</div>
+              <div class="ac-graph-tooltip-res" style="color:${$(point).attr('data-color')}">${parseFloat($(point).attr('data-result')).toFixed(1)}</div>
+              <div class="ac-graph-tooltip-title">ДАТА:</div>
+              <div class="ac-graph-tooltip-res" style="color:${$(point).attr('data-color')}">${$(point).attr('data-date')} день</div>
+            </div>
+            `);
+          });
 
           /* 350 is an average width of tooltip for this graph */
-          if (parseFloat($(this).attr('cx')) + 20 + 350 < $('#card-milking-graph').width()) {
-            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(0%, -50%)' })
+          if (point.x + 20 + 350 < $('#card-milking-graph').width()) {
+            $('.ac-graph-tooltip').css({ 'top': '50%', 'left': point.x + 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(0%, -50%)' })
           } else {
-            $('.ac-graph-tooltip').css({ 'top': parseFloat($(this).attr('cy')), 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(-100%, -50%)' })
+            $('.ac-graph-tooltip').css({ 'top': '50%', 'left': point.x - 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(-100%, -50%)' })
           }
 
           $('.ac-graph-tooltip').css('display', 'flex');
-        });
-
-        $('.basic-graph-average-dot').on('mouseleave', function ({ clientX, clientY }) {
-          $('.ac-graph-tooltip').hide();
         });
       }
     });
