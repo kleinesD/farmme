@@ -635,10 +635,12 @@ export const graphBase = (parent, min, max, start, end, showLineHorShow, showLin
 
     if (!$(this).hasClass('mp-herd-legend-item-off')) {
       $(`.${$(this).attr('data-rel-element')}`).hide();
+      $(`#${$(this).attr('data-rel-element')}`).hide();
 
       $(this).addClass('mp-herd-legend-item-off')
     } else {
       $(`.${$(this).attr('data-rel-element')}`).show();
+      $(`#${$(this).attr('data-rel-element')}`).show();
 
       $(this).removeClass('mp-herd-legend-item-off')
     }

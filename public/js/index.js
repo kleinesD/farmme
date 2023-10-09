@@ -3756,8 +3756,10 @@ $(document).ready(async function () {
     /* Projection milking tile graph */
     let milkingProjection = await getMilkingProjection($('.main-section').attr('data-animal-id'));
     let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
+    let farmData = await getAnimalsForGraph($('.main-section').attr('data-farm-id'));
     let milkingDataByLact = [];
 
+    let firstRes, lastRes;
     /* Getting the milking data and sorting it by lactations */
     animalData.animal.milkingResults.forEach(res => {
       if (!milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber)) {
@@ -3769,6 +3771,32 @@ $(document).ready(async function () {
       } else {
         milkingDataByLact.find(el => el.lactationNumber === res.lactationNumber).results.push(res);
       }
+
+      if (!firstRes || firstRes > res.date) firstRes = res.date;
+      if (!lastRes || lastRes < res.date) lastRes = res.date;
+    });
+    /* Getting farm milking data and sorting it by lactations */
+    let milkingDataAverage = [];
+    farmData.cows.forEach(cow => {
+      cow.milkingResults.forEach(res => {
+        if (res.date < firstRes || res.date > lastRes) return;
+
+        if (!milkingDataAverage.find(el => moment(el.date).isSame(res.date, 'month'))) {
+          milkingDataAverage.push({
+            date: res.date,
+            results: [res]
+          });
+        } else {
+          milkingDataAverage.find(el => moment(el.date).isSame(res.date, 'month')).results.push(res);
+        }
+      });
+    });
+    milkingDataAverage.forEach(month => {
+      let total = 0;
+      month.results.forEach(res => {
+        total += res.result;
+      });
+      month.result = Math.round(total / month.results.length);
     });
 
     /* Sorting projected data by lactations*/
@@ -3821,9 +3849,11 @@ $(document).ready(async function () {
     milkingDataByLact.sort((a, b) => a.lactationNumber - b.lactationNumber);
     milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
     milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
+    milkingDataAverage.sort((a, b) => new Date(a.date) - new Date(b.date));
     console.log(milkingDataByLact)
     console.log(milkingProjectionByLact)
     console.log(milkingDataByDay)
+    console.log(milkingDataAverage)
 
     /* Working with a graph */
     $('#card-milking-graph .mp-hg-btn').on('click', function () {
@@ -3855,6 +3885,37 @@ $(document).ready(async function () {
 
         /* Adding graph base */
         const graphObj = graphBase('#card-milking-graph', min, max, new Date(start), new Date(end), true, false);
+
+        /* Adding average data */
+        milkingDataAverage.forEach((month, index) => {
+          let currentDaysSpan = Math.round((new Date(month.date).getTime() - new Date(graphObj.start).getTime()) / 1000 / 60 / 60 / 24);
+
+          let path;
+          if (index === 0) {
+            path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+            path.classList.add('basic-graph-point-line');
+            path.classList.add('average-graph-data');
+            path.style.stroke = '#d9d9d9';
+            graphObj.svg.append(path);
+            path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (month.result / (graphObj.max / 100) / 100))}`)
+
+            path.setAttribute('id', `graph-average-line`);
+          } else {
+            path = document.getElementById(`graph-average-line`);
+            path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (month.result / (graphObj.max / 100) / 100))}`)
+
+          }
+
+        });
+        $('#additional-column').append(`
+        <div class="mp-herd-legend-item" data-rel-element='graph-average-line' id="legend-item-average">
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-average"></div>
+          </div>
+          <div class="mp-herd-li-text">Средний результат</div>
+        </div>
+        `)
+        $(`#legend-item-average`).find('.mp-herd-li-mark-average').css('border-color', '#d9d9d9');
 
         /* Adding data */
         milkingDataByLact.forEach((lact, index) => {
@@ -3912,7 +3973,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1000, 0],
+          strokeDashoffset: [1500, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4022,7 +4083,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1000, 0],
+          strokeDashoffset: [1500, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4128,7 +4189,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1000, 0],
+          strokeDashoffset: [1500, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4179,6 +4240,10 @@ $(document).ready(async function () {
           }
 
           $('.ac-graph-tooltip').css('display', 'flex');
+        });
+
+        graphObj.svg.addEventListener('mouseleave', function () {
+          $('.ac-graph-tooltip').css('display', 'none');
         });
       }
     });
@@ -5033,21 +5098,21 @@ $(document).ready(async function () {
 
       anime({
         targets: '.basic-graph-point-line',
-        strokeDashoffset: [1000, 0],
+        strokeDashoffset: [1500, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
       });
       anime({
         targets: '.basic-graph-top-line',
-        strokeDashoffset: [1000, 0],
+        strokeDashoffset: [1500, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
       });
       anime({
         targets: '.basic-graph-bottom-line',
-        strokeDashoffset: [1000, 0],
+        strokeDashoffset: [1500, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },

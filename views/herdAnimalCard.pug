@@ -2,7 +2,7 @@ extends base
 
 block content
   include _rcmHerd
-  section.main-section(data-animal-id=`${animal._id}`)
+  section.main-section(data-animal-id=`${animal._id}` data-farm-id=`${animal.farm}`)
     .animal-card-section
       .animal-info-header
         .aih-image-block 
