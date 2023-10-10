@@ -4017,9 +4017,7 @@ $(document).ready(async function () {
             if (res.result > max) max = res.result
 
             let days = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 24 / 60 / 60 / 1000)
-            if (!maxDays) maxDays = days;
-
-            if (days > maxDays) maxDays = days;
+            if (!maxDays || days > maxDays) maxDays = days;
           })
         });
         max = Math.ceil(max / 10) * 10 * 1.5;
@@ -4196,7 +4194,7 @@ $(document).ready(async function () {
         });
 
 
-        graphObj.svg.addEventListener('mousemove', function (evt) {
+       $('.basic-graph-average-dot').on('mouseenter', function (evt) {
           let point = graphObj.svg.createSVGPoint();
 
           point.x = evt.clientX; point.y = evt.clientY;
@@ -4234,15 +4232,15 @@ $(document).ready(async function () {
 
           /* 350 is an average width of tooltip for this graph */
           if (point.x + 20 + 350 < $('#card-milking-graph').width()) {
-            $('.ac-graph-tooltip').css({ 'top': '50%', 'left': point.x + 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(0%, -50%)' })
+            $('.ac-graph-tooltip').css({ 'top': point.y, 'left': point.x + 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(0%, -50%)' })
           } else {
-            $('.ac-graph-tooltip').css({ 'top': '50%', 'left': point.x - 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(-100%, -50%)' })
+            $('.ac-graph-tooltip').css({ 'top': point.y, 'left': point.x - 20, 'border-color': $(this).css('data-color'), 'transform': 'translate(-100%, -50%)' })
           }
 
           $('.ac-graph-tooltip').css('display', 'flex');
         });
 
-        graphObj.svg.addEventListener('mouseleave', function () {
+        $('.basic-graph-average-dot').on('mouseleave', function () {
           $('.ac-graph-tooltip').css('display', 'none');
         });
       }
