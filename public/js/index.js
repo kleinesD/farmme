@@ -3235,487 +3235,129 @@ $(document).ready(async function () {
   /* ANIMAL CARD PAGE */
   ///////////////////////
   if (document.querySelector('.animal-card-body')) {
+    /* Working with problem block */
 
-
-    /////////////////////////////////////
-    /* TO IMPLEMENT IN THE NEXT UPDATE */
-    /////////////////////////////////////
-    /* Multiple lactations graph */
-    if (document.querySelector('#acb-lactations-result-chart')) {
-      let dataArr = [];
-      let graphColors = ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'];
-      let biggestArr = 0;
-
-      $('#acb-lactations-result-chart').parent().find('.acb-graph-lactations').each(function () {
-        let results = [];
-        let number = parseFloat($(this).attr('data-number'));
-
-        $('#acb-lactations-result-chart').parent().find('.acb-graph-results').each(function () {
-          if (number === parseFloat($(this).attr('data-lactation-number'))) {
-            results.push({ result: parseFloat($(this).attr('data-result')), date: new Date($(this).attr('data-date')) })
-          }
-        });
-
-        results.sort((a, b) => { return a.date - b.date });
-
-        dataArr.push({
-          number,
-          results,
-          resultsByDay: [],
-          startDate: new Date($(this).attr('data-start-date')),
-          finishDate: $(this).attr('data-finish-date') === 'null' ? new Date(Date.now()) : new Date($(this).attr('data-finish-date'))
-        });
-      });
-
-      let graphData = {
-        labels: [],
-        datasets: []
-      }
-
-      dataArr.forEach((lact, index, array) => {
-        let daysIntoLactation = Math.round((lact.finishDate.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24);
-
-        for (let i = 0; i <= daysIntoLactation; i++) {
-          let day = lact.startDate.getTime() + i * 24 * 60 * 60 * 1000;
-
-          lact.results.forEach((result, inx, arr) => {
-            if (result.date.getTime() > day && inx === 0) {
-              let daysPeriod = Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24);
-              if (arr[inx + 1]) {
-                let addNumber = parseFloat(((arr[inx + 1].result - result.result) / daysPeriod).toFixed(2))
-                if (lact.resultsByDay.length > 0) {
-
-                  if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                    lact.resultsByDay.push(result.result);
-                  } else {
-                    lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
-                  }
-                } else {
-                  lact.resultsByDay.push(parseFloat((result.result - (arr[inx + 1].result - result.result) + addNumber).toFixed(2)));
-                }
-              } else {
-                lact.resultsByDay.push(result.result);
-              }
-
-            } else if (result.date.getTime() > day && arr[inx - 1].date.getTime() <= day) {
-              let daysPeriod = Math.round((result.date.getTime() - arr[inx - 1].date.getTime()) / 1000 / 60 / 60 / 24);
-              let addNumber = parseFloat(((result.result - arr[inx - 1].result) / daysPeriod).toFixed(2))
-
-              if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                lact.resultsByDay.push(result.result);
-              } else {
-                lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
-              }
-
-            } else if (result.date.getTime() <= day && arr.length > 1 && inx === arr.length - 1) {
-              let daysPeriod = Math.round((result.date.getTime() - arr[inx - 1].date.getTime()) / 1000 / 60 / 60 / 24);
-              let addNumber = parseFloat(((result.result - arr[inx - 1].result) / daysPeriod).toFixed(2))
-
-              if (Math.round((result.date.getTime() - lact.startDate.getTime()) / 1000 / 60 / 60 / 24) === i + 1) {
-                lact.resultsByDay.push(result.result);
-              } else {
-                lact.resultsByDay.push(parseFloat((lact.resultsByDay[lact.resultsByDay.length - 1] + addNumber).toFixed(2)));
-              }
-            }
-          });
-
-        }
-
-
-        if (lact.resultsByDay.length > biggestArr) biggestArr = lact.resultsByDay.length;
-
-        graphData.datasets.push({
-          label: `Лактация # ${lact.number}`,
-          data: lact.resultsByDay,
-          borderColor: graphColors[lact.number - 1],
-          backgroundColor: 'rgb(0, 0, 0, 0)',
-          fill: false,
-          pointBorderColor: 'rgb(0, 0, 0, 0)',
-          pointBorderWidth: 0,
-          borderWidth: 1.5,
-        });
-      });
-
-      for (let i = 1; i <= biggestArr; i++) {
-        graphData.labels.push(`${i} День`);
-      }
-
-      multipleLinesChart($('#acb-lactations-result-chart'), 0, 0, graphData, false);
-    }
-
-    /* One lactation and average graph */
-    if (document.querySelector('#acb-milking-results-chart')) {
-
-      /* Function to change graphs between lactations */
-      const changeMilkingResultsGraph = (lactationNumber, startDate, finishDate) => {
-
-
-        let milkingData = [];
-        let averageData = [];
-
-        $('#acb-milking-results-chart').parent().find('.acb-graph-animal').each(function () {
-          if ($(this).attr('data-lact') == lactationNumber) {
-            milkingData.push({
-              number: parseFloat($(this).attr('data-result')),
-              date: new Date($(this).attr('data-date')),
-              lactation: lactationNumber,
-              monthIn: Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30)
-            });
-          }
-        });
-
-        milkingData.sort((a, b) => a.monthIn - b.monthIn);
-
-        /* $('#acb-milking-results-chart').parent().find('.acb-graph-average').each(function() {
-          if($(this).attr('data-lact') == lactationNumber) {
-            averageData.push({
-              number: parseFloat($(this).attr('data-result')),
-              date: new Date($(this).attr('data-date')),
-              lactation: lactationNumber,
-              monthIn: Math.round((new Date($(this).attr('data-date')).getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30)
-            });
-          }
-        });
-
-        averageData.sort((a, b) => a.monthIn - b.monthIn);
-
-        let averageDataSorted = [];
-
-        averageData.forEach(data => {
-          if(averageDataSorted.length === 0 || averageDataSorted.find(el => el.monthIn === data.monthIn) === undefined) {
-            averageDataSorted.push({
-              monthIn: data.monthIn,
-              total: data.number,
-              results: [data],
-              average: 0
-            });
-          } else {
-            averageDataSorted.find(el => el.monthIn === data.monthIn).total += data.number;
-            averageDataSorted.find(el => el.monthIn === data.monthIn).results.push(data);
-          }
-        }); */
-        const parameters = {
-          graphSettings: {
-            timelineType: 'date',
-            startDate: startDate,
-            finishDate: finishDate,
-            periodMonths: Math.round((finishDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 / 30),
-            min: 0,
-            max: 50,
-            showLegend: true,
-            boxHeight: false,
-            heightRatio: 0.75
-          },
-          tooltips: {
-            type: 'simple', // Detailed or simple
-            description: 'Результат',
-            unitText: 'л.',
-            dateUnit: 'month'
-          },
-          datasets: [
-            {
-              showPoint: true,
-              pointColor: '#f4a261',
-              showLine: true,
-              lineColor: '#264653',
-              averageGraph: false,
-              showAllResults: false,
-              breakLactations: false,
-              legendName: 'Результат',
-              tooltipName: `Лактация #${lactationNumber}`,
-              data: milkingData
-            }
-
-            /* showPoint: true,
-            pointColor: colors[index],
-            showLine: true,
-            lineColor: colors[index],
-            averageGraph: true,
-            showAllResults: false,
-            breakLactations: true,
-            legendName: `Лактация #${el.lactation}`,
-            tooltipName: `Лактация #${el.lactation}`,
-            data: el.data */
-          ]
-        };
-
-        const graph = renderLineGraph(document.getElementById('acb-milking-results-chart'), parameters);
-
-
-      }
-
-
-      /* Changing graph on buttons click */
-      $('#lactation-change').on('click change focus', function () {
-        let startDate = new Date($('#lactation-change option:selected').attr('data-start'));
-        let finishDate;
-        if ($('#lactation-change option:selected').attr('data-finish') != 'null') {
-          finishDate = new Date($('#lactation-change option:selected').attr('data-finish'));
-        } else {
-          finishDate = new Date();
-        }
-        let number = parseFloat($('#lactation-change option:selected').attr('data-number'));
-
-        changeMilkingResultsGraph(number, startDate, finishDate);
-      });
-
-      $('#lactation-change').find('option').last().prev().attr('selected', 'true');
-
-      $('#lactation-change').click();
-
-    }
-
-    /* Working with weight history graph */
-    if (document.querySelector('#acb-weight-history-chart')) {
-      /* Working with datas and creating a graph */
-      let animalData = [];
-      let avgBufData = [];
-      let averageData = [];
-
-      $('#acb-weight-history-chart').parent().find('.acb-graph-animal').each(function () {
-        let timeInYears = Math.round((new Date($(this).attr('data-date')).getTime() - new Date($(this).attr('data-birth-date')).getTime()) / 1000 / 60 / 60 / 24 / 30 / 12);
-        let result = parseFloat($(this).attr('data-result'));
-
-        animalData.push({ timeInYears, result });
-        animalData.sort((a, b) => a.timeInYears + b.timeInYears);
-      });
-
-      $('#acb-weight-history-chart').parent().find('.acb-graph-average').each(function () {
-        let timeInYears = Math.round((new Date($(this).attr('data-date')).getTime() - new Date($(this).attr('data-birth-date')).getTime()) / 1000 / 60 / 60 / 24 / 30 / 12);
-        let result = parseFloat($(this).attr('data-result'));
-
-        if (timeInYears <= animalData[animalData.length - 1].timeInYears) {
-          avgBufData.push({ timeInYears, result })
-          avgBufData.sort((a, b) => a.timeInYears - b.timeInYears)
-        }
-      });
-
-      avgBufData.forEach((el) => {
-        if (averageData.length < 1) {
-          averageData.push({ timeInYears: el.timeInYears, results: [el.result] })
-        } else {
-          let toPush = 0;
-          for (let i = 0; i < averageData.length; i++) {
-            if (averageData[i].timeInYears === el.timeInYears) {
-              averageData[i].results.push(el.result);
-              toPush++;
-            }
-          }
-
-          if (toPush === 0) {
-            averageData.push({ timeInYears: el.timeInYears, results: [el.result] });
-          }
-        }
-      });
-
-      averageData.forEach(el => {
-        let total = 0;
-        el.results.forEach(result => { total += result });
-        el.averageResult = total / el.results.length;
-      });
-
-      let graphData = {
-        labels: [],
-        datasets: []
-      };
-
-      let tempData = []
-      animalData.forEach(el => {
-        graphData.labels.push(`${el.timeInYears} Год`);
-        tempData.push(el.result);
-      });
-
-      graphData.datasets.push({
-        label: `Результат животного (кг.)`,
-        data: tempData,
-        borderColor: 'rgba(41, 112, 69, 0.25)',
-        backgroundColor: 'rgba(41, 112, 69, 0)',
-        fill: false,
-        pointBorderColor: 'rgb(0, 0, 0, 1)',
-        borderWidth: 1.5,
-      });
-
-      tempData = [];
-      averageData.forEach(el => {
-        tempData.push(el.averageResult);
-      });
-
-      graphData.datasets.push({
-        label: `Средний результат (кг.)`,
-        data: tempData,
-        borderColor: '#c8c8c8',
-        backgroundColor: 'rgb(0, 0, 0, 0)',
-        fill: false,
-        pointBorderColor: 'rgb(0, 0, 0, 0)',
-        pointBorderWidth: 0,
-        borderWidth: 1.5,
-      });
-
-      multipleLinesChartOneActive($('#acb-weight-history-chart'), 0, 0, 100, graphData, false);
-
-      /* Adding info to the header */
-      if (animalData.length >= 2) {
-        let yearDif = parseFloat((100 - (animalData[animalData.length - 2].result / animalData[animalData.length - 1].result * 100)).toFixed(2))
-        $('#last-year-growth-weight').find('.acb-half-item-info').text(`${yearDif}%`);
-      }
-
-      if (animalData.length > 0 && averageData.length > 0) {
-        let avgDif = parseFloat((100 - (averageData[averageData.length - 1].averageResult / animalData[animalData.length - 1].result * 100)).toFixed(2))
-        $('#diff-avg-weight').find('.acb-half-item-info').text(`${avgDif}%`);
-      }
-
-
-    }
-
-    /* Sitching insemination graphs */
-    $('.mp-animal-graphs-switch-btn').on('click', function () {
-      $(this).siblings().removeClass('mp-animal-graphs-switch-btn-active');
-      $(this).addClass('mp-animal-graphs-switch-btn-active');
-
-      $('.acb-graph-container-columns').hide();
-      $(`#${$(this).attr('id').replace('-btn', '')}`).show();
+    /* Formating dates */
+    $('.ac-vp-body-point-date').each(function () {
+      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD YYYY, HH:mm');
+      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
     });
-    /* Working with insemination successful rate graph */
-    if (document.querySelector('#acb-insemination-success-rate-chart')) {
-      let successful = 0;
-      let failure = 0;
+    $('.ac-vp-body-date').each(function () {
+      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD YYYY, HH:mm');
+      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
+    });
 
-      $('#acb-insemination-success-rate-chart').parent().find('.acb-graph-invisible').each(function () {
-        if ($(this).attr('data-success') === 'true') {
-          successful++;
-        } else {
-          failure++
+    /* Placing problems in date order */
+
+    /* $('.ac-vet-problems-item').each(function() {
+      let date = new Date($(this).attr('data-date'));
+      let el = $(this);
+      $('.ac-vet-problems-item').each(function() {
+        if($(this).is(el)) return;
+ 
+        if(date > new Date($(this).attr('data-date'))) {
+          el.detach();
+          $(this).before(el);
         }
       });
+    }); */
+    $('.ac-vet-problems-item').each(function () {
+      if ($(this).attr('data-cured') === 'true') return;
 
-      let data = {
-        labels: ['Успешно %', 'Не успешно %'],
-        datasets: [
-          {
-            label: 'Успешно',
-            data: [parseFloat((successful / (successful + failure) * 100).toFixed(1)), parseFloat((failure / (successful + failure) * 100).toFixed(1))],
-            backgroundColor: ['#0EAD69', '#D44D5C'],
-            weight: 0.5
-          }
-        ]
-      }
+      $(this).detach()
+      $('.ac-vet-problems-block').prepend($(this));
+    });
 
-      doughnutChart($('#acb-insemination-success-rate-chart'), true, 'Успешных осеменений', data)
-    }
+    /* Placing treatments in date order */
+    $('.ac-vp-body-point-block').each(function () {
+      let parent = $(this);
+      parent.find('.ac-vp-body-point').each(function () {
+        let date = new Date($(this).attr('data-date'));
+        let el = $(this);
+        parent.find('.ac-vp-body-point').each(function () {
+          if ($(this).is(el)) return;
 
-    /* Working with insemination attemps per lactation */
-    if (document.querySelector('#acb-insemination-try-rate-chart')) {
-      let insemData = [];
-      let bufferData = []
-      let finalData = [];
-      let labels = []
-      $('#acb-insemination-try-rate-chart').parent().find('.acb-graph-animal').each(function () {
-        if ($(this).attr('data-success') !== 'undefined') {
-          let result = $(this).attr('data-success') === 'true';
-          insemData.push(result);
-        }
-      });
-
-
-      let successCounter = 0;
-      insemData.forEach((insem, index, arr) => {
-        if (insem) {
-          let addIndex = 'NaN';
-          if (bufferData.length > 1) {
-            bufferData.forEach((el, ix) => {
-              if (el.number === successCounter + 1) {
-                addIndex = ix;
-              }
-            });
-          }
-          if (addIndex === 'NaN') {
-            bufferData.push({ number: successCounter + 1, counter: 1 });
-          } else {
-            bufferData[addIndex].counter += 1;
-          }
-          successCounter = 0;
-        } else {
-          successCounter++;
-        }
-      });
-
-      let allResults = 0;
-      bufferData.sort((a, b) => a.number - b.number);
-      bufferData.forEach(el => { allResults += el.counter });
-
-      bufferData.forEach(el => {
-        labels.push(`${el.number} (%)`);
-        finalData.push(parseFloat(((el.counter / allResults) * 100).toFixed(1)));
-      });
-
-      if (finalData.length === 0) {
-        $('#acb-insemination-try-rate-chart').parent().hide();
-        $('#acb-insemination-try-rate-chart').parent().parent().css('justify-content', 'center');
-      }
-
-      let data = {
-        labels,
-        datasets: [
-          {
-            data: finalData,
-            backgroundColor: ['#2a9d8f', '#264653', '#e9c46a', '#f4a261', '#e76f51'],
-            weight: 0.5
-          }
-        ]
-      }
-
-      doughnutChart($('#acb-insemination-try-rate-chart'), true, '', data)
-    }
-
-    /* Adding last insemination results */
-    if (document.querySelector('#insemination-results-block')) {
-      $('.acb-double-btn').click(async function () {
-        let date = new Date($(this).parent().attr('data-date'));
-        let success = $(this).attr('id') === 'insem-true';
-        let animalId = $(this).parent().attr('data-animal-id');
-        let index = $(this).parent().attr('data-index');
-
-        const response = await editAnimalResults('insemination', animalId, index, { date, success });
-
-        $('.acb-double-btn').css('pointer-events', 'none');
-
-        if (response) location.reload(true)
-      });
-    }
-
-    /* All items history block */
-    if (document.querySelector('.animal-all-items-block')) {
-      /* Sorting elements by date */
-      $('.aai-item').each(function () {
-        let thisEl = $(this);
-        let thisDate = new Date($(this).attr('data-date'));
-
-        $('.aai-item').each(function () {
-          let curDate = new Date($(this).attr('data-date'));
-
-          if (thisDate < curDate) {
-            let moveEl = thisEl;
-            thisEl.detach();
-            $(this).after(moveEl);
+          if (date < new Date($(this).attr('data-date'))) {
+            el.detach();
+            $(this).before(el);
           }
         });
       });
+    })
 
-      $('.aai-type-selector').change(function () {
-        let value = $(this).val()
-        if (value === 'all') {
-          $('.aai-item').css('display', 'flex');
-        } else {
-          $('.aai-item').each(function () {
-            if ($(this).attr('data-type') === value) {
-              $(this).css('display', 'flex');
-            } else {
-              $(this).hide();
-            }
-          });
-        }
-      });
-    }
+    /* Showing the problems body */
+    $('.ac-vp-header-more').on('click', function () {
+      if ($(this).attr('data-state') === 'closed') {
+        $('.ac-vp-header-more').attr('data-state', 'closed');
+        $('.ac-vp-header-more').css('transform', 'rotate(0deg)');
+        $('.ac-vp-body').css('display', 'none');
+
+        $(this).css('transform', 'rotate(180deg)');
+        $(this).parent().parent().find('.ac-vp-body').css('display', 'block');
+        $(this).attr('data-state', 'opened');
+      } else {
+        $(this).css('transform', 'rotate(0deg)');
+        $(this).parent().parent().find('.ac-vp-body').css('display', 'none');
+        $(this).attr('data-state', 'closed');
+
+      }
+    });
+
+    $('.ac-vet-problems-item').first().find('.ac-vp-header-more').trigger('click');
+
+    /* Working with scheme block */
+    $('.ac-big-point-date').each(function () {
+      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD YYYY, HH:mm');
+      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
+    });
+
+    /* Making the line work */
+    let last = 0
+    let width = $('.ac-vs-progress-line').width() / parseFloat($('.ac-vs-progress-line').attr('data-total'));
+    $('.ac-vs-progress-point').each(function () {
+      if (!$(this).hasClass('ac-vs-progress-point-over')) return;
+      last = parseFloat($(this).attr('data-index'));
+    });
+    $('.ac-vs-progress-line-inner').width(last * width);
+    $('.ac-big-points-block').scrollLeft((last + 1) * 370);
+
+    /* drag scroll */
+    const slider = document.querySelector('.ac-big-points-block');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true;
+      slider.classList.add('active');
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+      slider.style.cursor = "grabbing";
+    });
+    slider.addEventListener('mouseleave', () => {
+      isDown = false;
+      slider.classList.remove('active');
+    });
+    slider.addEventListener('mouseup', () => {
+      isDown = false;
+      slider.classList.remove('active');
+      slider.style.cursor = "pointer";
+    });
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 3; //scroll-fast
+      slider.scrollLeft = scrollLeft - walk;
+    });
+
+
+    /* Working with insem block */
+    $('.ac-insem-item-date').each(function () {
+      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD, YYYY');
+      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
+    });
+
 
     /* Working with bring back animal block */
     if (document.querySelector('.ami-write-off-container')) {
@@ -3738,17 +3380,6 @@ $(document).ready(async function () {
 
 
     }
-
-    /* Showing all treatments block */
-    $('.mp-scheme-item-header').on('click', function () {
-      if ($(this).parent().find('.mp-scheme-points-block').css('display') === 'none') {
-        $(this).parent().find('.mp-scheme-points-block').show()
-        $(this).parent().find('.mp-scheme-icon').css('transform', 'rotate(180deg)');
-      } else {
-        $(this).parent().find('.mp-scheme-points-block').hide()
-        $(this).parent().find('.mp-scheme-icon').css('transform', 'rotate(0deg)');
-      }
-    });
   }
 
   /* Animal card milking graph */
@@ -4194,7 +3825,7 @@ $(document).ready(async function () {
         });
 
 
-       $('.basic-graph-average-dot').on('mouseenter', function (evt) {
+        $('.basic-graph-average-dot').on('mouseenter', function (evt) {
           let point = graphObj.svg.createSVGPoint();
 
           point.x = evt.clientX; point.y = evt.clientY;

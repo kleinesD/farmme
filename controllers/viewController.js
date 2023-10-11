@@ -273,7 +273,6 @@ exports.renderAnimalCard = catchAsync(async (req, res, next) => {
   if (animal.lactations.length > 0) lastLact = animal.lactations[animal.lactations.length - 1];
   const scheme = await Vet.findOne({ animal: animal._id, schemeStarter: true, finished: { $ne: true } }).populate('otherPoints').populate('animal').populate('scheme');
   const problems = await Vet.find({ animal: animal._id, category: 'problem' }).populate('treatments');
-
   res.status(200).render('herdAnimalCard', {
     animal,
     allFarmAnimals,
