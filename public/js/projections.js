@@ -177,12 +177,17 @@ export const getMilkingProjection = async (animalId) => {
       })
 
       let prevNumber;
-      if (animalResSorted.find(el => el.lactation === lastActLact && el.monthIn === inx - 1) !== undefined) prevNumber = animalResSorted.find(el => el.lactation === lastActLact && el.monthIn === inx - 1).average;
+      let prevDate;
+      if (animalResSorted.find(el => el.lactation === lastActLact && el.monthIn === inx - 1) !== undefined) {
+        prevNumber = animalResSorted.find(el => el.lactation === lastActLact && el.monthIn === inx - 1).average;
+        prevDate = animalResSorted.find(el => el.lactation === lastActLact && el.monthIn === inx - 1).date;
+      }
       prevNumber = prevNumber + (prevNumber / 100 * (total / devider));
 
       animalResSorted.push({
         lactation: lastActLact,
         monthIn: inx,
+        date: new Date(moment(prevDate).add(1, 'month')),
         average: prevNumber,
         type: 'projected'
       });
@@ -204,6 +209,7 @@ export const getMilkingProjection = async (animalId) => {
         animalResSorted.push({
           lactation: i,
           monthIn: inx,
+          date: new Date(moment(animalResSorted[animalResSorted.length - 1].date).add(3, 'month')),
           average: nextNumber,
           type: 'projected'
         });
@@ -227,12 +233,17 @@ export const getMilkingProjection = async (animalId) => {
         })
 
         let prevNumber;
-        if (animalResSorted.find(el => el.lactation === i && el.monthIn === inx - 1) !== undefined) prevNumber = animalResSorted.find(el => el.lactation === i && el.monthIn === inx - 1).average;
+        let prevDate;
+        if (animalResSorted.find(el => el.lactation === i && el.monthIn === inx - 1) !== undefined) {
+          prevNumber = animalResSorted.find(el => el.lactation === i && el.monthIn === inx - 1).average;
+          prevDate = animalResSorted.find(el => el.lactation === i && el.monthIn === inx - 1).date;
+        }
         prevNumber = prevNumber + (prevNumber / 100 * (total / devider));
 
         animalResSorted.push({
           lactation: i,
           monthIn: inx,
+          date: new Date(moment(prevDate).add(1, 'month')),
           average: prevNumber,
           type: 'projected'
         });

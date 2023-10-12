@@ -44,11 +44,11 @@ block content
                       -if(color === 'red')
                         | • Красный 
 
-          .aih-actions-btn 
+          .aih-actions-btn(data-state="show") 
             p ДОБАВИТЬ
             span +
 
-        //.aih-actions-block
+        .aih-actions-block
           .aih-actions-column.herd-actions-column
             .aih-actions-column-title ЖИВОТНЫЕ
             -if(animal.gender === 'female')
@@ -93,42 +93,49 @@ block content
               img(src="/img/images/butcher-icon.png")
               .aih-actions-item-title Списать животное
       -if(animal.milkingResults.length > 0)
-        .animal-card-graph-page#card-milking-graph
-          .mp-hg-btn-block.mp-hg-btn-block-1#milking-btns
-            .mp-hg-btn(data-graph="months") Результаты
-            .mp-hg-btn(data-graph="compare") Сравнение Лактаций
-            .mp-hg-btn(data-graph="days") По дням
-          .mp-herd-legend-btn#legend-btn  
-            ion-icon(name="settings")
+        .animal-card-graph-block
+          .animal-card-graph-page#card-milking-graph
+            .mp-block-outside-header
+              .mp-block-outside-header-title Результаты доения
+            .mp-hg-btn-block.mp-hg-btn-block-1#milking-btns
+              .mp-hg-btn.mp-hg-btn-first(data-graph="months") Результаты
+              .mp-hg-btn(data-graph="compare") Сравнение лактаций
+              .mp-hg-btn(data-graph="days") По дням
+            .mp-herd-legend-btn#legend-btn  
+              ion-icon(name="settings")
 
-          .ac-graph-tooltip
-            .ac-graph-tooltip-title РЕЗУЛЬТАТ:
-            .ac-graph-tooltip-res 28.1
-            .ac-graph-tooltip-title ДАТА:
-            .ac-graph-tooltip-res МАЙ 2022
+            .ac-graph-tooltip
+              .ac-graph-tooltip-title РЕЗУЛЬТАТ:
+              .ac-graph-tooltip-res 28.1
+              .ac-graph-tooltip-title ДАТА:
+              .ac-graph-tooltip-res МАЙ 2022
 
-          .mp-herd-legend
-            .mp-herd-legend-column#main-column
-              .mp-herd-legend-column-title ГЛАВНОЕ
-              .mp-herd-legend-item
-                .mp-herd-li-mark
-                .mp-herd-li-text Результат
-              .mp-herd-legend-item.mp-herd-legend-item-off
-                .mp-herd-li-mark
-                .mp-herd-li-text Средние по лакт.
-            .mp-herd-legend-column#additional-column
-              .mp-herd-legend-column-title ДОПОЛНИТЕЛЬНОЕ
-            .mp-herd-legend-column#edit-column
-              .mp-herd-legend-column-title ИЗМЕНИТЬ
-              //-.mp-herd-legend-item.mp-herd-legend-item-non-click
-                .mp-herd-li-check
-                  ion-icon(name="checkmark")
-                .mp-herd-li-text Разбить по лактациям
+            .mp-herd-legend
+              .mp-herd-legend-column#main-column
+                .mp-herd-legend-column-title ГЛАВНОЕ
+                .mp-herd-legend-item
+                  .mp-herd-li-mark
+                  .mp-herd-li-text Результат
+                .mp-herd-legend-item.mp-herd-legend-item-off
+                  .mp-herd-li-mark
+                  .mp-herd-li-text Средние по лакт.
+              .mp-herd-legend-column#additional-column
+                .mp-herd-legend-column-title ДОПОЛНИТЕЛЬНОЕ
+              .mp-herd-legend-column#edit-column
+                .mp-herd-legend-column-title ИЗМЕНИТЬ
+                //-.mp-herd-legend-item.mp-herd-legend-item-non-click
+                  .mp-herd-li-check
+                    ion-icon(name="checkmark")
+                  .mp-herd-li-text Разбить по лактациям
+
+          .ac-results-block
 
       .ac-bouble-block
         .ac-bouble-block-column
           -if(animal.inseminations.length > 0)
             .ac-insem-graph-block
+              .mp-block-outside-header
+                .mp-block-outside-header-title Осеменение
               -if(!lastLact && Date.now() > animal.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000 )
                 .ac-insem-qi.acb-double-pos
                   img.acb-double-img(src="/img/images/cow-icon.png")
@@ -179,7 +186,7 @@ block content
               .ac-insem-graph-inside-columns
                 .ac-insem-list
                   each insem in animal.inseminations
-                    .ac-insem-item
+                    .ac-insem-item(data-res=`${insem.success}`)
                       -if(insem.success === undefined)
                         .ac-insem-item-icon
                           ion-icon(name="time-outline")
@@ -201,6 +208,8 @@ block content
         .ac-bouble-block-column
           -if(scheme)
             .ac-vet-scheme-block
+              .mp-block-outside-header
+                .mp-block-outside-header-title Текущая схема | #{scheme.scheme.name}
               .ac-vs-progress-line-block
                 .ac-vs-progress-line(data-total=`${scheme.otherPoints.length }`)
                   .ac-vs-progress-line-inner
@@ -229,37 +238,40 @@ block content
 
           -if(problems.length > 0)
             .ac-vet-problems-block
-              each problem in problems 
-                .ac-vet-problems-item(data-date=`${problem.date}` data-cured=`${problem.cured}`)
-                  .ac-vp-header 
-                    -if(!problem.cured)
-                      .ac-vp-header-icon.ac-vp-header-icon-not-cured
-                        ion-icon(name="medical")
-                    -else
-                      .ac-vp-header-icon
-                        ion-icon(name="checkmark-sharp")
-                    .ac-vp-problem= problem.name
-                    -if(!problem.cured)
-                      a.ac-vp-cure-btn(href=`/vet/add-treatment/${problem._id}`) 
-                        p ЛЕЧЕНИЕ
-                        ion-icon(name="add-sharp")
-                    .ac-vp-header-icon.ac-vp-header-more(data-state="closed")
-                      ion-icon(name="chevron-down")
-                  .ac-vp-body
-                    .ac-vp-body-text= problem.note 
-                    -if(problem.treatments.length > 0)
-                    .ac-vp-body-point-block
-                      each treatment in problem.treatments 
-                        .ac-vp-body-point(data-date=`${treatment.date}`)
-                          -if(treatment.cured)
-                            .ac-vp-body-icon.ac-vp-body-icon-cured
-                              ion-icon(name="checkmark-circle")
-                          -else
-                            .ac-vp-body-icon
-                              ion-icon(name="close-circle")
-                          .ac-vp-body-point-name= treatment.name
-                          .ac-vp-body-point-date(data-date=`${treatment.date}`)= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                    .ac-vp-body-text.ac-vp-body-date(data-date=`${problem.date}`)= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+              .mp-block-outside-header
+                .mp-block-outside-header-title Проблемы и болезни
+              .ac-vet-problems-container
+                each problem in problems 
+                  .ac-vet-problems-item(data-date=`${problem.date}` data-cured=`${problem.cured}`)
+                    .ac-vp-header 
+                      -if(!problem.cured)
+                        .ac-vp-header-icon.ac-vp-header-icon-not-cured
+                          ion-icon(name="medical")
+                      -else
+                        .ac-vp-header-icon
+                          ion-icon(name="checkmark-sharp")
+                      .ac-vp-problem= problem.name
+                      -if(!problem.cured)
+                        a.ac-vp-cure-btn(href=`/vet/add-treatment/${problem._id}`) 
+                          p ЛЕЧЕНИЕ
+                          ion-icon(name="add-sharp")
+                      .ac-vp-header-icon.ac-vp-header-more(data-state="closed")
+                        ion-icon(name="chevron-down")
+                    .ac-vp-body
+                      .ac-vp-body-text= problem.note 
+                      -if(problem.treatments.length > 0)
+                      .ac-vp-body-point-block
+                        each treatment in problem.treatments 
+                          .ac-vp-body-point(data-date=`${treatment.date}`)
+                            -if(treatment.cured)
+                              .ac-vp-body-icon.ac-vp-body-icon-cured
+                                ion-icon(name="checkmark-circle")
+                            -else
+                              .ac-vp-body-icon
+                                ion-icon(name="close-circle")
+                            .ac-vp-body-point-name= treatment.name
+                            .ac-vp-body-point-date(data-date=`${treatment.date}`)= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                      .ac-vp-body-text.ac-vp-body-date(data-date=`${problem.date}`)= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
 
     // -if(animal.status !== 'alive')
       .ami-write-off-disclaimer

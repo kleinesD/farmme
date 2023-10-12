@@ -3265,7 +3265,7 @@ $(document).ready(async function () {
       if ($(this).attr('data-cured') === 'true') return;
 
       $(this).detach()
-      $('.ac-vet-problems-block').prepend($(this));
+      $('.ac-vet-problems-container').prepend($(this));
     });
 
     /* Placing treatments in date order */
@@ -3358,7 +3358,45 @@ $(document).ready(async function () {
       $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
     });
 
+    /* Creating an event for unconfirmed insemination */
+    $('.acb-double-btn').on('click', async function () {
+      const animalId = $(this).parent().attr('data-animal-id');
+      const index = $(this).parent().attr('data-index');
+      let success = $(this).attr('id') === 'insem-true';
 
+      const response = await editAnimalResults('insemination', animalId, index, { success });
+
+      if (response) location.reload(true)
+    });
+
+    /* Making an insem graph works */
+    let totalInsem = $('.ac-insem-item').length;
+    let pos = 0, neg = 0;
+    $('.ac-insem-item').each(function () {
+      if ($(this).attr('data-res') === 'true') pos++
+      if ($(this).attr('data-res') === 'false') neg++
+    });
+    let posPer = Math.round(pos / (totalInsem / 100));
+    let negPer = 100 - posPer;
+    $('.ac-insem-graph-pos').css('height', `${posPer / 1.5}%`);
+    $('.ac-insem-graph-pos p').text(`${posPer}%`);
+    $('.ac-insem-graph-neg').css('height', `${negPer / 1.5}%`);
+    $('.ac-insem-graph-neg p').text(`${negPer}%`);
+
+    /* Showing action block */
+    $('.aih-actions-btn').on('click', function() {
+      if($(this).attr('data-state') === 'show') {
+        $('.aih-actions-block').css('display', 'grid');
+        $(this).find('p').text('Скрыть');
+        $(this).find('span').css('transform', 'rotate(45deg)');
+        $(this).attr('data-state', 'hide');
+      } else {
+        $('.aih-actions-block').css('display', 'none');
+        $(this).find('p').text('Добавить');
+        $(this).find('span').css('transform', 'rotate(0deg)');
+        $(this).attr('data-state', 'show');
+      }
+    });
     /* Working with bring back animal block */
     if (document.querySelector('.ami-write-off-container')) {
       $('.ami-write-off-close').click(function () {
@@ -3643,11 +3681,11 @@ $(document).ready(async function () {
         });
 
       } else if ($(this).attr('data-graph') === 'compare') {
-        milkingDataByDay.forEach(lact => {
-          lact.results.forEach(res => {
-            if (res.result > max) max = res.result
+        milkingProjectionByLact.forEach(lact => {
+          lact.results.forEach((res, inx, arr) => {
+            if (res.average > max) max = res.average
 
-            let days = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 24 / 60 / 60 / 1000)
+            let days = Math.round((new Date(res.date).getTime() - new Date(arr[0].date).getTime()) / 24 / 60 / 60 / 1000)
             if (!maxDays || days > maxDays) maxDays = days;
           })
         });
@@ -3657,10 +3695,10 @@ $(document).ready(async function () {
         const graphObj = graphBaseNoDate('#card-milking-graph', min, max, maxDays, true, false);
 
         /* Adding data */
-        milkingDataByLact.forEach((lact, index) => {
+        milkingProjectionByLact.forEach((lact, index) => {
           let circleTimer = 0;
-          lact.results.forEach((res, inx) => {
-            let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(lact.lactationStart).getTime()) / 1000 / 60 / 60 / 24);
+          lact.results.forEach((res, inx, arr) => {
+            let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(arr[0].date).getTime()) / 1000 / 60 / 60 / 24);
 
             /* Adding data line */
             let path;
@@ -3670,12 +3708,12 @@ $(document).ready(async function () {
               path.classList.add('average-graph-data');
               path.style.stroke = colors[index];
               graphObj.svg.append(path);
-              path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+              path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.average / (graphObj.max / 100) / 100))}`)
 
               path.setAttribute('id', `lact-months-${index}`);
             } else {
               path = document.getElementById(`lact-months-${index}`);
-              path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
+              path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.average / (graphObj.max / 100) / 100))}`)
 
             }
 
@@ -3683,15 +3721,16 @@ $(document).ready(async function () {
             const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
             circle.classList.add('basic-graph-point')
             circle.classList.add('average-graph-data');
+            if(res.type === 'projected') circle.classList.add('projected-graph-data');
             circle.style.stroke = colors[index];
             graphObj.svg.append(circle);
             circle.setAttribute('cx', graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100)))
-            circle.setAttribute('cy', graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100)))
+            circle.setAttribute('cy', graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.average / (graphObj.max / 100) / 100)))
 
             circle.setAttribute('r', 4);
-            circle.setAttribute('data-result', res.result);
+            circle.setAttribute('data-result', res.average);
             circle.setAttribute('data-date', res.date);
-            circle.setAttribute('data-lact', lact.lactationNumber);
+            circle.setAttribute('data-lact', lact.lactation);
             circle.setAttribute('id', `lact-months-${index}`);
 
             circle.style.animation = `fadeIn ${circleTimer}s ease-out`
@@ -3703,7 +3742,7 @@ $(document).ready(async function () {
               <div class="mp-herd-li-mark">
                 <div class="mp-herd-li-mark-average"></div>
               </div>
-              <div class="mp-herd-li-text">Лактация #${lact.lactationNumber}</div>
+              <div class="mp-herd-li-text">Лактация #${lact.lactation}</div>
             </div>
             `)
           $(`#legend-item-${index}`).find('.mp-herd-li-mark-average').css('border-color', colors[index]);
@@ -3876,6 +3915,8 @@ $(document).ready(async function () {
         });
       }
     });
+
+    $('.mp-hg-btn-first').trigger('click');
 
 
     /* $('.acb-tile-graph').empty();

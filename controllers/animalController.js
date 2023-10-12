@@ -205,10 +205,11 @@ exports.addInsemination = catchAsync(async (req, res, next) => {
 exports.updateInsemination = catchAsync(async (req, res, next) => {
   let animal = await Animal.findById(req.params.animalId);
 
-  animal.inseminations[req.params.index].date = req.body.date;
-  animal.inseminations[req.params.index].success = req.body.success;
-  animal.inseminations[req.params.index].type = req.body.type;
-  animal.inseminations[req.params.index].bull = req.body.bull;
+  if(req.body.date) animal.inseminations[req.params.index].date = req.body.date;
+  if(req.body.success) animal.inseminations[req.params.index].success = req.body.success;
+  if(req.body.type) animal.inseminations[req.params.index].type = req.body.type;
+  if(req.body.bull) animal.inseminations[req.params.index].bull = req.body.bull;
+  
 
   await animal.save();
 
