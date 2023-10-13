@@ -161,5 +161,13 @@ router.get('/distribution/edit-write-off/:id', authController.protect, authContr
 
 router.get('/distribution/', authController.protect, authController.isLoggedIn, viewController.renderDistMain);
 
+///////////////////////////
+///////////////////////////
+///////////////////////////
+/* FEEDING MODULE ROUTES */
+///////////////////////////
+///////////////////////////
+///////////////////////////
+router.get('/feed/add-feed', authController.protect, authController.isLoggedIn, viewController.renderAddFeed);
 
 module.exports = router;

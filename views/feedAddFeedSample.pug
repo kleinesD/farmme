@@ -1,0 +1,16 @@
+extends base
+
+block content
+  //include _rcmFeed
+  section.main-section 
+
+    .animal-results-window
+      -if(!forEdit)
+        .ai-form-container.ai-form-dist#feed-sample-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Корм
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#regular Травянной корм
+            .ai-switch-btn.ai-switch-btn-right#compound Комбикорм

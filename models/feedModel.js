@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const feedSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    required: true,
+    default: 'record',
+    enum: ['record', 'sample']
+  },
   status: {
     type: String,
     enum: ['increase', 'decrease']

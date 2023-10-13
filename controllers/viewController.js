@@ -970,3 +970,17 @@ exports.renderDistMain = catchAsync(async (req, res, next) => {
     endDate
   });
 });
+/////////////////
+/////////////////
+/////////////////
+/* FEEDING BLOCK */
+/////////////////
+/////////////////
+/////////////////
+exports.renderAddFeed = catchAsync(async(req, res, next) => {
+  const forEdit = false;
+
+  res.status(200).render('feedAddFeedSample', {
+    forEdit
+  });
+});
