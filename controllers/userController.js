@@ -28,6 +28,13 @@ exports.getUser = catchAsync(async (req, res, next) => {
 exports.editUser = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.params.id, req.body);
 
+  user.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await user.save();
+
   res.status(200).json({
     status: 'success',
     data: {

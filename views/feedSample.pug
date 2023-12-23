@@ -1,0 +1,150 @@
+extends base
+
+block content
+  //include _rcmFeed
+  section.main-section.feed-module 
+
+    .animal-results-window
+      -if(!forEdit)
+        .ai-form-container.ai-form-dist#feed-sample-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Корм
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#regular Травянной корм
+            .ai-switch-btn.ai-switch-btn-right#compound Комбикорм
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Наименование
+            input.ai-input.ai-input-text#name(type="text")
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Единица измерения
+            input.ai-input.ai-input-select(type="text" placeholder="")
+            .ai-select-block#unit.shadow
+              .ai-select-item(data-val=`kg`)
+                p.ai-select-name Килограммы
+              .ai-select-item(data-val=`bale`)
+                p.ai-select-name Тюки
+
+          .ai-input-block.ai-radio-block.compound-radio
+            .ai-radio#fixed-ratios 
+              .ai-radio-inner
+                ion-icon(name="checkmark")
+            .ai-radio-text Постоянные пропорции
+
+          .ai-combined-block.ai-combined-block-1(data-ingredient="1").compound-input
+            .ai-combined-block-title ИНГРЕДИЕНТ #1
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование ингредиента
+              input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Количество
+              input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+              .ai-inside-text %
+
+          .ai-combined-block.ai-combined-block-2(data-ingredient="2").compound-input
+            .ai-combined-block-title ИНГРЕДИЕНТ #2
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование ингредиента
+              input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Количество
+              input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+              .ai-inside-text %
+              
+          .ai-add-input-container.compound-input
+            .ai-add-input#add-ingredient-input
+              p
+                | Ингредиент
+                span +
+
+          .ai-input-submit-btn Сохранить
+
+      -if(forEdit)
+
+        .ai-form-container.ai-form-dist#edit-feed-sample-container
+          .ai-block-sub-title Редактировать
+          .ai-block-title Корм
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left#regular(class=`${feed.category === 'regular-feed' ? 'ai-switch-btn-click' : ''}`) Травянной корм
+            .ai-switch-btn.ai-switch-btn-right#compound(class=`${feed.category === 'compound-feed' ? 'ai-switch-btn-click' : ''}`) Комбикорм
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Наименование
+            input.ai-input.ai-input-text#name(type="text" value=`${feed.name}`)
+          
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Единица измерения
+            input.ai-input.ai-input-select(type="text" placeholder="")
+            .ai-select-block#unit.shadow
+              .ai-select-item(data-val=`kg` class=`${feed.unit === 'kg' ? 'ai-select-item-selected' : ''}`)
+                p.ai-select-name Килограммы
+              .ai-select-item(data-val=`bale` class=`${feed.unit === 'bale' ? 'ai-select-item-selected' : ''}`)
+                p.ai-select-name Тюки
+
+          .ai-input-block.ai-radio-block.compound-radio
+            .ai-radio#fixed-ratios(class=`${feed.ingredients.length > 0 ? 'ai-radio-active' : ''}`)
+              .ai-radio-inner
+                ion-icon(name="checkmark")
+            .ai-radio-text Постоянные пропорции
+
+          -if(feed.ingredients.length > 0)
+            each ingredient in feed.ingredients
+              .ai-combined-block.ai-combined-block-1(data-ingredient=`${feed.ingredients.indexOf(ingredient) + 1}`).compound-input
+                .ai-combined-block-title= `ИНГРЕДИЕНТ #${feed.ingredients.indexOf(ingredient) + 1}`
+                -if(feed.ingredients.indexOf(ingredient) >= 2)
+                  .ai-combined-block-remove
+                    ion-icon(name="close")
+                .ai-input-block.ai-input-block-text
+                  .ai-input-label Наименование ингредиента
+                  input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="" value=`${ingredient.name}`)
+
+                .ai-input-block.ai-input-block-text
+                  .ai-input-label Количество
+                  input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="" value=`${ingredient.percent}`)
+                  .ai-inside-text %
+          -else
+            .ai-combined-block.ai-combined-block-1(data-ingredient="1").compound-input
+              .ai-combined-block-title ИНГРЕДИЕНТ #1
+              //-.ai-combined-block-remove
+                ion-icon(name="close")
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Наименование ингредиента
+                input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Количество
+                input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+                .ai-inside-text %
+
+            .ai-combined-block.ai-combined-block-2(data-ingredient="2").compound-input
+              .ai-combined-block-title ИНГРЕДИЕНТ #2
+              //-.ai-combined-block-remove
+                ion-icon(name="close")
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Наименование ингредиента
+                input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Количество
+                input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+                .ai-inside-text %
+                
+          .ai-add-input-container.compound-input
+            .ai-add-input#add-ingredient-input
+              p
+                | Ингредиент
+                span +
+
+          .ai-input-submit-btn(data-id=`${feed._id}`) Сохранить
+

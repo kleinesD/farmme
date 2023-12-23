@@ -46,6 +46,13 @@ exports.createVetAction = catchAsync(async (req, res, next) => {
 exports.editVetAction = catchAsync(async (req, res, next) => {
   const action = await Vet.findByIdAndUpdate(req.params.actionId, req.body);
 
+  action.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await action.save();
+
   res.status(201).json({
     status: 'success',
     data: {
@@ -83,6 +90,13 @@ exports.createVetProblem = catchAsync(async (req, res, next) => {
 
 exports.editVetProblem = catchAsync(async (req, res, next) => {
   const problem = await Vet.findByIdAndUpdate(req.params.problemId, req.body);
+
+  problem.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await problem.save();
 
   res.status(201).json({
     status: 'success',
@@ -141,6 +155,13 @@ exports.addTreatment = catchAsync(async (req, res, next) => {
 
 exports.editVetTreatment = catchAsync(async (req, res, next) => {
   const treatment = await Vet.findByIdAndUpdate(req.params.treatmentId, req.body);
+
+  treatment.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await treatment.save();
 
   res.status(201).json({
     status: 'success',
@@ -250,7 +271,7 @@ exports.editStartedScheme = catchAsync(async (req, res, next) => {
   await firstAction.save();
 
   let prevPointDate = firstAction.date;
-  
+
   scheme.points.forEach(async (point, index, array) => {
     if (!point.firstPoint) {
       let date;
@@ -297,12 +318,39 @@ exports.editScheme = catchAsync(async (req, res, next) => {
   scheme.name = req.body.name;
   scheme.points = req.body.points;
 
+  scheme.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
   await scheme.save();
 
   res.status(200).json({
     status: 'success',
     data: {
       scheme
+    }
+  });
+});
+
+exports.getStartedScheme = catchAsync(async (req, res, next) => {
+  let scheme = await Vet.findById(req.params.schemeId).populate('otherPoints').populate('animal').populate('scheme');
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      scheme
+    }
+  });
+});
+
+exports.getVetProblem = catchAsync(async(req, res, next) => {
+  let problem = await Vet.findById(req.params.id).populate('animal').populate('treatments');
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      problem
     }
   });
 });

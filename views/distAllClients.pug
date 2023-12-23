@@ -3,9 +3,111 @@ extends base
 block content
   include _rcmDist
   section.main-section 
-    each product in products
-      .dist-client-info-hidden(data-client=`${product.client}` data-product=`${product.product}` data-size=`${product.size}` data-price=`${product.price}` data-price-per=`${product.pricePer}` data-unit=`${product.unit}` data-date=`${product.date}`)
     .dist-clients-page-section#all-clients-page
+      .main-page-header
+        .main-page-header-title КЛИЕНТЫ
+        .main-page-header-period-box
+          input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
+          .main-page-header-devider -
+          input(type="date" value=`${endDate.toLocaleString('ru-RU', {year: 'numeric'})}-${endDate.toLocaleString('ru-RU', {month: '2-digit'})}-${endDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#end-date
+
+      .all-clients-info-block
+        .all-clients-container
+          each client in clientsFormated
+            .client-item(data-id=`${client.client._id}` data-place=`${clientsFormated.indexOf(client) + 1}`)
+              .ci-header 
+                img(src="/img/images/user-default.png")
+                .ci-info 
+                  .ci-info-title= client.client.name 
+                  .ci-info-text= client.client.adress 
+              .ci-footer
+                .ci-footer-place= clientsFormated.indexOf(client) + 1
+                .ci-footer-line
+                  .ci-footer-line-inner(data-width=`${client.shareIndex}` data-index=`${clientsFormated.indexOf(client)}`)
+                .ci-footer-percent= `${client.shareIndex}%`
+
+
+        .client-detailed-block
+          .client-detailed-info
+            //-.loading-block
+              .loading-icon
+            .cdi-header
+              img(src="/img/images/user-default.png")
+              .cdi-header-title#name Имя и Фамилия
+            .cdi-main-info
+              .cdi-main-info-line
+                .cdi-main-info-line-img
+                  img(src="/img/icons/house.svg")
+                p#adress awdawdawdawd
+              .cdi-main-info-line
+                .cdi-main-info-line-img
+                  img(src="/img/icons/phone.svg")
+                p#phone awdawdawdawd
+              .cdi-main-info-line
+                .cdi-main-info-line-img
+                  img(src="/img/icons/envelope.svg")
+                p#email awdawdawdawd
+            .cdi-product-line
+              .cdi-product 
+                p Масло
+                p 450 Р
+              .cdi-product 
+                p Масло
+                p 450 Р
+              .cdi-product 
+                p Масло
+                p 450 Р
+              .cdi-product 
+                p Масло
+                p 450 Р
+              .cdi-product 
+                p Масло
+                p 450 Р
+            .cdi-footer
+              .cdi-footer-date#added-date Добавлен 12.21.2311
+              a.cdi-footer-edit#edit-client(href="#") Редактировать
+
+          .client-flex-block
+            .client-revenue-block#revenue-details
+              .mp-block-outside-header
+                .mp-block-outside-header-title Доход
+              //-.client-revenue-place
+                svg(xmlns="http://www.w3.org/2000/svg" width="86" height="90" viewBox="0 0 86 90" fill="none")
+                  path(d="M43 0L52.734 15.0417L69.4503 8.59423L68.484 26.4848L85.7975 31.0942L74.5 45L85.7975 58.9058L68.484 63.5152L69.4503 81.4058L52.734 74.9583L43 90L33.266 74.9583L16.5497 81.4058L17.516 63.5152L0.202457 58.9058L11.5 45L0.202457 31.0942L17.516 26.4848L16.5497 8.59423L33.266 15.0417L43 0Z" fill="#F0F0F0")
+                p 1
+              .client-revenue-details
+                .crd-header
+                  p 123,542.12 ₽
+                .crd-dropdown-block
+                  .crd-item
+                    .crd-item-title Молоко
+                    .crd-item-line
+                      p 13 %
+                      .crd-item-line-inner
+                      p 3,542 ₽
+            .client-revenue-block.client-size-block#size-details
+              .mp-block-outside-header
+                .mp-block-outside-header-title Количество
+              //-.client-revenue-place
+                svg(xmlns="http://www.w3.org/2000/svg" width="86" height="90" viewBox="0 0 86 90" fill="none")
+                  path(d="M43 0L52.734 15.0417L69.4503 8.59423L68.484 26.4848L85.7975 31.0942L74.5 45L85.7975 58.9058L68.484 63.5152L69.4503 81.4058L52.734 74.9583L43 90L33.266 74.9583L16.5497 81.4058L17.516 63.5152L0.202457 58.9058L11.5 45L0.202457 31.0942L17.516 26.4848L16.5497 8.59423L33.266 15.0417L43 0Z" fill="#F0F0F0")
+                p 1
+              .client-revenue-details
+                .crd-header
+                  p 123,542.12 ₽
+                .crd-dropdown-block
+                  .crd-item
+                    .crd-item-title Молоко
+                    .crd-item-line
+                      p 13 %
+                      .crd-item-line-inner
+                      p 3,542 ₽
+
+          .client-list-container
+            .mp-block-outside-header
+              .mp-block-outside-header-title Покупки клиента
+            .client-list-block#all-purchases
+    //-.dist-clients-page-section#all-clients-page
       .main-page-header
         .main-page-header-title КЛИЕНТЫ
         .main-page-header-period-box

@@ -58,9 +58,16 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
   contentWindow.loadURL('http://127.0.0.1:604/vet/add-action/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/add-feed');
-
+  contentWindow.loadURL('http://127.0.0.1:604/feed/sample/edit/652fd3a080804169f6efea4b');
+  contentWindow.loadURL('http://127.0.0.1:604/feed/record/edit/653224d737d09684fad2b4ec');
+  contentWindow.loadURL('http://127.0.0.1:604/feed/sample/');
+  contentWindow.loadURL('http://127.0.0.1:604/feed/record/');
+  contentWindow.loadURL('http://127.0.0.1:604/');
+  contentWindow.loadURL('http://127.0.0.1:604/feed/');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/add-animal/');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/edit-started-scheme/64ac40eb9effaba47b01d5d6');
+  contentWindow.loadURL('http://127.0.0.1:604/');
+  
 
   contentWindow.maximize();
   contentWindow.show();

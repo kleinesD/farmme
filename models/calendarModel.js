@@ -68,6 +68,7 @@ const calendarScheme = new mongoose.Schema({
   editedAtBy: [
     {
       date: Date,
+      message: String,
       user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'

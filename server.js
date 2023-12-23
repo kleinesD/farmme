@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const animalController = require('./controllers/animalController');
+const feedController = require('./controllers/feedController');
 const isDev = require('electron-is-dev');
 
 
@@ -24,8 +25,12 @@ server.listen(port, () => { console.log(`Server running on port: ${port}`) });
 if(isDev) console.log(`Mode: ${process.env.NODE_ENV}`);
 
 
-animalController.updateCurrentInfo()
+animalController.updateCurrentInfo();
+feedController.autoAction();
 setInterval(() => {
   animalController.updateCurrentInfo()
 }, 1 * 60 * 60 * 1000)
+setInterval(() => {
+  feedController.autoAction();
+}, 24 * 60 * 60 * 1000)
 module.exports = server;

@@ -9,9 +9,10 @@ const vetRouter = require('./routes/vetRoutes');
 const calendarRouter = require('./routes/calendarRoutes');
 const inventoryRouter = require('./routes/inventoryRoutes');
 const distributionRouter = require('./routes/distributionRoutes');
+const feedRouter = require('./routes/feedRoutes');
+const milkQualityRouter = require('./routes/milkQualityRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const errorController = require('./controllers/errorController')
-
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.use('/api/vet', vetRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/inventory', inventoryRouter);
 app.use('/api/distribution', distributionRouter);
+app.use('/api/feed', feedRouter);
+app.use('/api/milk-quality', milkQualityRouter);
 app.use('/', viewRouter);
 
 app.all('*', (req, res, next) => {

@@ -208,3 +208,30 @@ export const deleteVetDoc = async (type, docId) => {
     console.log(err);
   }
 }
+
+export const getStartedScheme = async(schemeId) => {
+  try{
+    let res = await axios({
+      method: 'GET',
+      url: `/api/vet/get-started-scheme/${schemeId}`
+    });
+
+    if(res.data.status === 'success') return res.data.data.scheme;
+    
+  } catch(err) {
+    console.log(err);
+  }
+}
+export const getVetProblem = async(id) => {
+  try{
+    let res = await axios({
+      method: 'GET',
+      url: `/api/vet/get-problem/${id}`
+    });
+
+    if(res.data.status === 'success') return res.data.data.problem;
+
+  } catch(err) {
+    console.log(err);
+  }
+}

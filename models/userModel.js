@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   accessBlocks: {
     type: [String],
     required: true,
-    enum: ['herd', 'vet', 'warehouse', 'hr']
+    enum: ['herd', 'vet', 'warehouse', 'hr', 'dist', 'feed']
   },
   editOther: {
     type: Boolean,
@@ -69,6 +69,7 @@ const userSchema = new mongoose.Schema({
   editedAtBy: [
     {
       date: Date,
+      message: String,
       user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'

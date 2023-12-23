@@ -34,6 +34,7 @@ const clientScheme = new mongoose.Schema({
     editedAtBy: [
         {
             date: Date,
+            message: String,
             user: {
                 type: mongoose.Schema.ObjectId,
                 ref: 'User'
@@ -42,6 +43,12 @@ const clientScheme = new mongoose.Schema({
         }
     ]
 });
+
+/* clientScheme.virtual('sales', {
+  ref: 'Product',
+  foreignField: 'client',
+  localField: '_id'
+}); */
 
 const Client = mongoose.model('Client', clientScheme);
 module.exports = Client;

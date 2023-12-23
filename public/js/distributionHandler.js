@@ -123,3 +123,18 @@ export const editProductReturn = async (id, data) => {
         console.log(err);
     }
 }
+
+export const getClient = async (id, start, end) => {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/distribution/client/get/${id}/${start}/${end}`
+        });
+
+        if(res.data.status === 'success') {
+            return res.data.data
+        }
+    } catch(err) {
+        console.log(err);
+    }
+}

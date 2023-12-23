@@ -1,0 +1,199 @@
+extends base
+
+block content
+  //include _rcmFeed
+  section.main-section.feed-module
+
+    .animal-results-window
+      -if(!forEdit)
+        .ai-form-container.ai-form-dist#feed-record-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Запись корма
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider.ai-inc-dec-slider
+            .ai-switch-btn.ai-switch-btn-left.ai-switch-btn-active#increase Добавить
+            .ai-switch-btn.ai-switch-btn-right#decrease Списать
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Корм
+            input.ai-input.ai-input-select#feed(type="text" placeholder="")
+            .ai-select-block.shadow
+              each sample in feedSamples
+                .ai-select-item(data-id=`${sample._id}` data-unit=`${sample.unit}` data-type=`${sample.category}` data-ing=`${sample.ingredients.length}`)
+                  p.ai-select-name= sample.name
+                  -if(sample.category === 'regular-feed')
+                    .ai-select-mark.ai-select-mark-reg(title="Травянной корм") Т
+                  -if(sample.category === 'compound-feed')
+                    .ai-select-mark.ai-select-mark-com(title="Комбинированный корм") К
+          .ai-additional-small-block
+            //-.ai-as-block-item
+              .ai-as-block-item-number 1
+              .ai-as-block-item-text Пшеница
+              .ai-as-block-item-sub-text 25%
+              .ai-as-block-item-text.ai-as-block-item-separate 450 кг.
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Количество
+            input.ai-input.ai-input-text#amount(type="number" placeholder="")
+            .ai-inside-text
+
+          .ai-combined-block.ai-combined-block-1(data-ingredient="1").compound-input
+            .ai-combined-block-title ИНГРЕДИЕНТ #1
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование ингредиента
+              input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Количество
+              input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+              .ai-inside-text %
+
+          .ai-combined-block.ai-combined-block-2(data-ingredient="2").compound-input
+            .ai-combined-block-title ИНГРЕДИЕНТ #2
+            //-.ai-combined-block-remove
+              ion-icon(name="close")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Наименование ингредиента
+              input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="")
+            .ai-input-block.ai-input-block-text
+              .ai-input-label Количество
+              input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="")
+              .ai-inside-text %
+
+          .ai-add-input-container.compound-input
+            .ai-add-input#add-ingredient-input
+              p
+                | Ингредиент
+                span +
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local")
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-radio-block
+            .ai-radio#auto-radio
+              .ai-radio-inner
+                ion-icon(name="checkmark")
+            .ai-radio-text Автопополнение
+
+          .ai-input-block.ai-input-block-small-select.auto-time-input
+            .ai-input-label Каждые
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-block-triple#auto-span(type="number")
+            .ai-small-select.ai-input-block-triple#span-unit
+              p Дней
+              .ai-select-line
+              .ai-small-select-block.shadow
+                .ai-small-select-item.ai-small-select-item-selected(data-val="day") Дней
+                .ai-small-select-item(data-val="week") Недель
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Группа животных
+            input.ai-input.ai-input-select#animal-group(type="text" placeholder="")
+            .ai-select-block.shadow
+              each category in farm.animalCategories
+                .ai-select-item(data-group=`${category}`)
+                  p.ai-select-name= category
+
+          .ai-input-submit-btn Сохранить
+
+      -if(forEdit)
+        .ai-form-container.ai-form-dist#edit-feed-record-container
+          .ai-block-sub-title Редактировать
+          .ai-block-title Запись корма
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider.ai-inc-dec-slider
+            .ai-switch-btn.ai-switch-btn-left#increase(class=`${feed.status === 'increase' ? 'ai-switch-btn-click' : ''}`) Добавить
+            .ai-switch-btn.ai-switch-btn-right#decrease(class=`${feed.status === 'decrease' ? 'ai-switch-btn-click' : ''}`) Списать
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Корм
+            input.ai-input.ai-input-select#feed(type="text" placeholder="")
+            .ai-select-block.shadow
+              each sample in feedSamples
+                .ai-select-item(data-id=`${sample._id}` data-type=`${sample.category}` data-ing=`${sample.ingredients.length}` class=`${sample._id.toString() == feed.feed._id.toString() ? 'ai-select-item-selected' : ''}`)
+                  p.ai-select-name= sample.name
+                  -if(sample.category === 'regular-feed')
+                    .ai-select-mark.ai-select-mark-reg(title="Травянной корм") Т
+                  -if(sample.category === 'compound-feed')
+                    .ai-select-mark.ai-select-mark-com(title="Комбинированный корм") К
+
+          .ai-additional-small-block
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Количество
+            input.ai-input.ai-input-text#amount(type="number" placeholder="" value=`${feed.amount}`)
+            -if(feed.feed.unit === 'kg')
+              .ai-inside-text кг.
+            -if(feed.feed.unit === 'bale')
+              .ai-inside-text тюк.
+
+          -if(feed.feed.ingredients.length === 0)
+            each ingredient in feed.ingredients
+              .ai-combined-block.ai-combined-block-1(data-ingredient=`${feed.ingredients.indexOf(ingredient) + 1}`).compound-input
+                .ai-combined-block-title= `ИНГРЕДИЕНТ #${feed.ingredients.indexOf(ingredient) + 1}`
+                -if(feed.ingredients.indexOf(ingredient) >= 2)
+                  .ai-combined-block-remove
+                    ion-icon(name="close")
+                .ai-input-block.ai-input-block-text
+                  .ai-input-label Наименование ингредиента
+                  input.ai-input.ai-input-text.ai-input-validation.ingredient(type="text" placeholder="" value=`${ingredient.name}`)
+
+                .ai-input-block.ai-input-block-text
+                  .ai-input-label Количество
+                  input.ai-input.ai-input-text.ai-input-validation.amount(type="number" placeholder="" value=`${ingredient.percent}`)
+                  .ai-inside-text %
+
+            .ai-add-input-container.compound-input
+              .ai-add-input#add-ingredient-input
+                p
+                  | Ингредиент
+                  span +
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата и время
+            input.ai-input.ai-input-date#date(type="datetime-local" value=`${feed.date.toLocaleString('ru-RU', {year: 'numeric'})}-${feed.date.toLocaleString('ru-RU', {month: '2-digit'})}-${feed.date.toLocaleString('ru-RU', {day: '2-digit'})}T${feed.date.toLocaleString('ru-RU', {hour: '2-digit'})}:${feed.date.toLocaleString('ru-RU', {minute: '2-digit'}).length < 2 ? `0${feed.date.toLocaleString('ru-RU', {minute: '2-digit'})}` : feed.date.toLocaleString('ru-RU', {minute: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-radio-block
+            .ai-radio#auto-radio(class=`${feed.autoAction ? 'ai-radio-active' : ''}`)
+              .ai-radio-inner
+                ion-icon(name="checkmark")
+            .ai-radio-text Автопополнение
+
+          .ai-input-block.ai-input-block-small-select.auto-time-input
+            .ai-input-label Каждые
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-block-triple#auto-span(type="number" value=`${feed.autoTimeSpan}`)
+            .ai-small-select.ai-input-block-triple#span-unit
+              p Дней
+              .ai-select-line
+              .ai-small-select-block.shadow
+                .ai-small-select-item(data-val="day" class=`${feed.autoTimeSpanUnit === 'day' ? 'ai-small-select-item-selected' : ''}`) Дней
+                .ai-small-select-item(data-val="week" class=`${feed.autoTimeSpanUnit === 'week' ? 'ai-small-select-item-selected' : ''}`) Недель
+
+          .ai-input-block.ai-input-block-select
+            .ai-select-line
+            .ai-input-label Группа животных
+            input.ai-input.ai-input-select#animal-group(type="text" placeholder="")
+            .ai-select-block.shadow
+              each category in farm.animalCategories
+                .ai-select-item(data-group=`${category}` class=`${category === feed.animalGroup ? 'ai-select-item-selected' : ''}`)
+                  p.ai-select-name= category
+
+          .ai-input-submit-btn(data-id=`${feed._id}`) Сохранить
+

@@ -168,6 +168,25 @@ router.get('/distribution/', authController.protect, authController.isLoggedIn, 
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////
-router.get('/feed/add-feed', authController.protect, authController.isLoggedIn, viewController.renderAddFeed);
+router.get('/feed/sample', authController.protect, authController.isLoggedIn, viewController.renderAddFeed);
+
+router.get('/feed/sample/edit/:id', authController.protect, authController.isLoggedIn, viewController.renderEditFeed);
+
+router.get('/feed/record', authController.protect, authController.isLoggedIn, viewController.renderAddFeedRecord);
+
+router.get('/feed/record/edit/:id', authController.protect, authController.isLoggedIn, viewController.renderEditFeedRecord);
+
+router.get('/feed/', authController.protect, authController.isLoggedIn, viewController.renderFeedMain);
+
+///////////////////////////
+///////////////////////////
+///////////////////////////
+/* MILK QUALITY ROUTES */
+///////////////////////////
+///////////////////////////
+///////////////////////////
+router.get('/milk-quality/add', authController.protect, authController.isLoggedIn, viewController.renderAddMilkQuality);
+
+router.get('/milk-quality/edit/:id', authController.protect, authController.isLoggedIn, viewController.renderEditMilkQuality);
 
 module.exports = router;

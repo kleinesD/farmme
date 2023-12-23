@@ -32,4 +32,8 @@ router.patch('/edit-started-scheme/:firstSchemeAction', authController.protect, 
 
 router.post('/edit-scheme/:schemeId', authController.protect, vetController.editScheme);
 
+router.get('/get-started-scheme/:schemeId', authController.protect, vetController.getStartedScheme);
+
+router.get('/get-problem/:id', authController.protect, vetController.getVetProblem);
+
 module.exports = router;

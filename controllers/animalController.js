@@ -58,6 +58,13 @@ exports.addOneAnimal = catchAsync(async (req, res, next) => {
 exports.updateOneAnimal = catchAsync(async (req, res, next) => {
   const animal = await Animal.findByIdAndUpdate(req.params.animalId, req.body);
 
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await animal.save();
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -85,6 +92,11 @@ exports.updateLactation = catchAsync(async (req, res, next) => {
   animal.lactations[req.params.index].startDate = req.body.startDate;
   animal.lactations[req.params.index].finishDate = req.body.finishDate;
   animal.lactations[req.params.index].number = req.body.number;
+
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
 
   await animal.save();
 
@@ -130,6 +142,11 @@ exports.updateMilkingResult = catchAsync(async (req, res, next) => {
   animal.milkingResults[req.params.index].date = req.body.date;
   animal.milkingResults[req.params.index].result = req.body.result;
 
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
   await animal.save();
 
   res.status(200).json({
@@ -168,6 +185,11 @@ exports.updateWeightResult = catchAsync(async (req, res, next) => {
   animal.weightResults[req.params.index].date = req.body.date;
   animal.weightResults[req.params.index].result = req.body.result;
 
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
   await animal.save();
 
   res.status(200).json({
@@ -205,11 +227,15 @@ exports.addInsemination = catchAsync(async (req, res, next) => {
 exports.updateInsemination = catchAsync(async (req, res, next) => {
   let animal = await Animal.findById(req.params.animalId);
 
-  if(req.body.date) animal.inseminations[req.params.index].date = req.body.date;
-  if(req.body.success) animal.inseminations[req.params.index].success = req.body.success;
-  if(req.body.type) animal.inseminations[req.params.index].type = req.body.type;
-  if(req.body.bull) animal.inseminations[req.params.index].bull = req.body.bull;
-  
+  if (req.body.date) animal.inseminations[req.params.index].date = req.body.date;
+  if (req.body.success) animal.inseminations[req.params.index].success = req.body.success;
+  if (req.body.type) animal.inseminations[req.params.index].type = req.body.type;
+  if (req.body.bull) animal.inseminations[req.params.index].bull = req.body.bull;
+
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
 
   await animal.save();
 
@@ -390,7 +416,7 @@ exports.checkAnimalByField = catchAsync(async (req, res, next) => {
   if (req.params.field === 'name') animal = await Animal.findOne({ name: req.params.value });
 
   let exist = false;
-  if(animal) exist = true;
+  if (animal) exist = true;
 
   res.status(200).json({
     status: 'success',
@@ -398,5 +424,20 @@ exports.checkAnimalByField = catchAsync(async (req, res, next) => {
       exist
     }
   })
+});
+
+exports.getAnimalByCategory = catchAsync(async (req, res, next) => {
+  let animals;
+  if (req.params.category !== 'all') {
+    animals = await Animal.find({ farm: req.user.farm, category: req.params.category });
+  } else {
+    animals = await Animal.find({farm: req.user.farm, $or: [{ category: { $exists: false } }, { category: 'all' }, { catrgory: null }] })
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      animals
+    }
+  });
 });
 

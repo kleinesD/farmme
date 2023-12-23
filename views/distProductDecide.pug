@@ -2,7 +2,7 @@ extends base
 
 block content
   include _rcmDist
-  section.main-section 
+  section.main-section.dist-module
     
     .animal-results-window
       .ai-decide-block
@@ -11,18 +11,8 @@ block content
             | ДОБАВИТЬ 
             span СЫРОЙ ПРОДУКТ
           img.ai-decide-block-item-img(src="/img/icons/dist-raw.png")
-        a.ai-decide-block-item#consumption(href="/distribution/add-process")
+        a.ai-decide-block-item#consumption(href="/distribution/add-process/milk")
           .ai-decide-block-item-text
             | ДОБАВИТЬ 
             span ПЕРЕРАБОТКУ
           img.ai-decide-block-item-img(src="/img/icons/dist-processing.png")
-
-    .animal-results-window
-      .animal-distribution-decide-container
-        .addc-title ДОБАВИТЬ...
-        a.addc-item(href="/distribution/add-product")
-          img(src="/img/images/milk-bottle-icon.png")
-          .addc-item-text Сырье
-        a.addc-item(href="/distribution/add-process")
-          img(src="/img/images/cheese-icon.png")
-          .addc-item-text Переработка

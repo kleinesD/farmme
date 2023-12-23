@@ -3,158 +3,180 @@ extends base
 block content
   include _rcmVet
   section.main-section 
+    .dist-main-section#mp-vet-container
+      .main-page-header
+        .main-page-header-title ВЕТЕРИНАРИЯ
 
-    .main-page-container#mp-vet-container
-      .mp-title ВЕТЕРИНАРИЯ
-      .mp-info-box
-        .mp-calendar-block.shadow
-          .mp-calendar-day-block
-            .mp-calendar-day-number 03
-            .mp-calendar-day-month ФЕВРАЛЬ, 2023
-            .mp-calendar-day-reminder-block
-              .mp-calendar-day-reminder • Сделать укол
-              .mp-calendar-day-reminder • Сделать укол Сделать укол Сделать укол Сделать укол
-              .mp-calendar-day-reminder-more Еще 3 напоминания
-            .mp-calendar-add-reminder
-              p Напоминание
-              ion-icon(name="add")
-          .mp-calendar-table
-            .mp-calendar-title-line 
-              p Февраль 2023
-              a.mp-calendar-btn#prev-month(data-state="first-click")
-                ion-icon(name="chevron-back")
-              a.mp-calendar-btn#next-month
-                ion-icon(name="chevron-forward")
-            .mp-calendar-main-block
-              .mp-calendar-weekday-line
-                .mp-calendar-weekday ПН
-                .mp-calendar-weekday ВТ
-                .mp-calendar-weekday СР
-                .mp-calendar-weekday ЧТ
-                .mp-calendar-weekday ПТ
-                .mp-calendar-weekday СБ
-                .mp-calendar-weekday ВС
-              .mp-calendar-dates-block
-                .mp-calendar-dates-column#mp-calendar-column-1
-                  .mp-calendar-date.mp-calendar-other 1
-                  .mp-calendar-date.mp-calendar-today 8
-                  .mp-calendar-date.mp-calendar-full 15
-                  .mp-calendar-date 21
-                  .mp-calendar-date 28
-                .mp-calendar-dates-column#mp-calendar-column-2
-                .mp-calendar-dates-column#mp-calendar-column-3
-                .mp-calendar-dates-column#mp-calendar-column-4
-                .mp-calendar-dates-column#mp-calendar-column-5
-                .mp-calendar-dates-column#mp-calendar-column-6
-                .mp-calendar-dates-column#mp-calendar-column-0
+      -if(problemsFormated.length > 0)
+        .main-flex-block
+          .mp-block-outside-header
+            .mp-block-outside-header-title Не вылеченные проблемы
+          .vet-most-problems-block
+            .vmp-animals-row.vmp-animals-row-first
+              each prob in problemsFormated
+                a.vmp-animals-row-item(href=`/herd/animal-card/${prob.animal._id}`)
+                  img(src="/img/images/default-cow-image.png")
+                  p ##{prob.animal.number}
 
-        -if(actions.length > 0 || problems.length > 0 || treatments.length > 0 || schemes.length > 0)
-          .mp-history-block#mp-vet-history-block.shadow
-            .mp-history-block-header Ветеринарная история
-            select.mph-type-selector
-              option(value="all" selected) Все
-              option(value="actions") Действия
-              option(value="problems") Проблемы
-              option(value="treatments") Лечения
-              option(value="schemes") Схемы
-            .mp-history-container
-              each action in actions
-                a.mp-history-item(data-type=`actions` data-date=`${action.date}` href=`/vet/edit-action/${action._id}`)
-                  .mp-history-item-image 
-                    ion-icon(name="medical")
-                  .mp-history-item-info-block
-                    .mp-history-item-main-info
-                      p= action.name
-                      p= `${Math.round((Date.now() - action.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад` 
 
-              each problem in problems
-                a.mp-history-item(data-type=`problems` data-date=`${problem.date}` href=`/vet/edit-problem/${problem._id}`)
-                  .mp-history-item-image 
-                    ion-icon(name="thermometer")
-                  .mp-history-item-info-block
-                    .mp-history-item-main-info
-                      p= problem.name
-                      p= `${Math.round((Date.now() - problem.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+            .vmp-title= sickAnimalsCount
+            -if(rusEndChange)
+              .vmp-sub-title ЖИВОТНОЕ
+              .vmp-text ИМЕЕТ НЕ ВЫЛЕЧЕННУЮ ПРОБЛЕМУ ИЛИ БОЛЕЗНЬ
+            -else
+              .vmp-sub-title ЖИВОТНЫХ
+              .vmp-text ИМЕЮТ НЕ ВЫЛЕЧЕННУЮ ПРОБЛЕМУ ИЛИ БОЛЕЗНЬ
 
-              each treatment in treatments
-                a.mp-history-item(data-type=`treatments` data-date=`${treatment.date}` href=`/vet/edit-treatment/${treatment._id}`)
-                  .mp-history-item-image 
-                    ion-icon(name="bandage")
-                  .mp-history-item-info-block
-                    .mp-history-item-main-info
-                      p= treatment.name
-                      p= `${Math.round((Date.now() - treatment.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
 
-              each scheme in schemes
-                a.mp-history-item(data-type=`schemes` data-date=`${scheme.date}` href=`/vet/edit-started-scheme/${scheme._id}`)
-                  .mp-history-item-image 
-                    ion-icon(name="calendar")
-                  .mp-history-item-info-block
-                    .mp-history-item-main-info
-                      p= `${scheme.scheme.name}`
-                      p= `${Math.round((Date.now() - scheme.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`
+          .vet-list-block
+            .vet-list-block-header
+              .vlbh-item.vlc-item-number Номер
+              .vlbh-item.vlc-item-prob Проблема
+              .vlbh-item.vlc-item-date Дата
+              .vlbh-item.vlc-item-treat
+            .vet-list-container.problems-container
 
-      .mp-two-list-blocks
-        -if(schemes.length > 0)
-          .mp-schemes-block.shadow
-            .mp-schemes-block-header Текущие схемы
-            .mp-schemes-container
-              each scheme in schemes 
-                .mp-scheme-item.mp-scheme-i(data-date=`${scheme.date}`)
-                  .mp-scheme-item-header
-                    img(src='/img/images/default-cow-image.png')
-                    p= `#${scheme.animal.number}`
-                    ion-icon.mp-scheme-icon(name="chevron-down")
-                    p.mp-scheme-name= scheme.scheme.name  
-                  .mp-scheme-points-block
-                    .mp-scheme-points-line
-                    .mp-scheme-point(data-date=`${scheme.date}`)
-                      .mp-scheme-point-number.mp-scheme-point-done
-                        ion-icon(name="checkmark-sharp")
-                        //p 1
-                      p= scheme.name
-                      p.mp-scheme-point-date= `${scheme.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                    each point in scheme.otherPoints 
-                      .mp-scheme-point(data-date=`${point.date}` data-finished=`${new Date(point.date) < new Date()}`)
-                        .mp-scheme-point-number(class=`${new Date(point.date) < new Date() ? 'mp-scheme-point-done' : ''}`)
-                          -if(new Date(point.date) > new Date())
-                            -if(scheme.otherPoints.indexOf(point) !== scheme.otherPoints.length - 1)
-                              p= `${scheme.otherPoints.indexOf(point) + 2}`
-                            -else
-                              ion-icon(name="flash")
-                          -else
-                            ion-icon(name="checkmark-sharp")
-                        p= point.name
-                        p.mp-scheme-point-date= `${point.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-
-        -if(uncuredProblems.length > 0)
-          .mp-schemes-block.shadow
-            .mp-schemes-block-header Невылеченные пробемы
-            .mp-schemes-container
               each problem in uncuredProblems
-                .mp-scheme-item.mp-problem-i(data-date=`${problem.date}`)
-                  .mp-scheme-item-header
-                    img(src='/img/images/default-cow-image.png')
-                    p= `#${problem.animal.number}`
-                    ion-icon.mp-scheme-icon(name="chevron-down")
-                    p.mp-scheme-name= problem.name
-                  .mp-scheme-points-block
-                    .mp-scheme-points-line
-                    .mp-scheme-point(data-date=`${problem.date}`)
-                      .mp-scheme-point-number
-                        ion-icon(name="thermometer")
-                      p Проблема добавлена
-                      p.mp-scheme-point-date= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
-                    each treatment in problem.treatments 
-                      .mp-scheme-point(data-date=`${treatment.date}`)
-                        .mp-scheme-point-number
-                          ion-icon(name="close")
-                        p= treatment.name
-                        p.mp-scheme-point-date= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                .vlc-item(data-id=`${problem._id}`)
+                  .vlc-item-info.vlc-item-number ##{problem.animal.number}
+                  .vlc-item-info.vlc-item-prob.vlc-item-prob-color.run-text 
+                    p= problem.name
+                  .vlc-item-info.vlc-item-date.format-date(data-date=`${problem.date}`)
+                  a.vlc-item-info.vlc-item-treat(href=`/vet/add-treatment/${problem._id}`) 
+                    i.ph-fill.ph-first-aid
+
+      -if(tableData.soonToInsem.length !== 0 || tableData.firstInsem.length !== 0 || tableData.soonToCalv.length !== 0)
+        .herd-mp-flex-block
+          .herd-mp-list-block-combined
+
+            .mp-block-outside-header
+              .mp-block-outside-header-title#table-title Список коров на осеменение
+              .mp-block-outside-header-btn-block#table-btns
+                .mp-block-outside-header-btn.mp-block-outside-header-btn-active#insem Осеменение
+                .mp-block-outside-header-btn#calv Отел
+            .herd-mp-list-block.herd-mp-list-block-insem
+              -if(tableData.soonToInsem.length === 0 && tableData.firstInsem.length === 0)
+                .no-info-block
+                  .no-info-block-background
+                  h3 Недостаточно данных
+                  p Информация появится когда будет добавленно больше данных
+              -else
+                .herd-mp-list-block-header
+                  .herd-mp-li-header-item Номер
+                  .herd-mp-li-header-item Кличка
+                  .herd-mp-li-header-item Лактация
+                  .herd-mp-li-header-item Осеменение
+                  .herd-mp-li-header-item
+                .herd-mp-list-container
+                  each cow in tableData.soonToInsem
+                    a.herd-mp-list-line(data-first="false" href=`/herd/animal-card/${cow._id}`)
+                      .herd-mp-list-line-item ##{cow.number}
+                      .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                      .herd-mp-list-line-item.date-format(data-date=`${cow.lactations[cow.lactations.length - 1].startDate}`) 
+                      .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                      .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+                  each cow in tableData.firstInsem
+                    a.herd-mp-list-line(data-first="true" href=`/herd/animal-card/${cow._id}`)
+                      .herd-mp-list-line-item ##{cow.number}
+                      .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                      .herd-mp-list-line-item.date-format(data-date=`${cow.birthDate}`) -
+                      .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text 
+                      .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+
+            .herd-mp-list-block.herd-mp-list-block-calv
+              -if(tableData.soonToCalv.length === 0)
+                .no-info-block
+                  .no-info-block-background
+                  h3 Недостаточно данных
+                  p Информация появится когда будет добавленно больше данных
+              -else
+                .herd-mp-list-block-header
+                  .herd-mp-li-header-item Номер
+                  .herd-mp-li-header-item Кличка
+                  .herd-mp-li-header-item Осеменение
+                  .herd-mp-li-header-item Отел
+                  .herd-mp-li-header-item
+                .herd-mp-list-container
+                  each cow in tableData.soonToCalv
+                    a.herd-mp-list-line(href=`/herd/animal-card/${cow._id}`)
+                      .herd-mp-list-line-item ##{cow.number}
+                      .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                      .herd-mp-list-line-item.date-format(data-date=`${cow.inseminations[cow.inseminations.length - 1].date}`) 
+                      .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                      .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text
+
+          .vet-insem-stat-block
+            .vis-uninsem-block
+              .vis-uninsem-number= `${tableData.soonToInsem.length + tableData.firstInsem.length}`
+              .vis-uninsem-title КОРОВ НА ОСЕМЕНЕНИЕ
+            .vis-count-block
+              .vis-count-title УСПЕШНОСТЬ ПОПЫТОК
+              each insemData in insemFormated
+                .vis-count-block-inner(class=`${insemFormated.indexOf(insemData) === 0 ? 'vis-count-block-inner-active' : ''}` data-index=`${insemFormated.indexOf(insemData)}` data-last=`${insemFormated.indexOf(insemData) === insemFormated.length - 1 ? true : false}`)
+                  .vis-count-block-number= insemData.attemps
+                  .vis-count-block-percent= `${insemData.percent}%`
+      -if(schemes.length !== 0)
+        .main-flex-block
+          .mp-block-outside-header
+            .mp-block-outside-header-title Схемы
+
+          .vet-list-block
+            .vet-list-block-header
+              .vlbh-item.vlc-item-number Номер
+              .vlbh-item.vlc-item-prob Схема
+              .vlbh-item.vlc-item-date Дата
+            .vet-list-container.scheme-list
+              each scheme in schemes
+                .vlc-item(data-id=`${scheme._id}`)
+                  .vlc-item-info.vlc-item-number ##{scheme.animal.number}
+                  .vlc-item-info.vlc-item-prob.run-text(class=`${new Date(scheme.otherPoints[scheme.otherPoints.length - 1].date) > new Date() ? 'vlc-item-prob-scheme' : ''}`) 
+                    p= scheme.scheme.name
+                  .vlc-item-info.vlc-item-date.format-date(data-date=`${scheme.date}`)
+
+          .vet-scheme-dropdown-block
+
+            .vsd-header
+              .vsd-header-body
+                .vsd-header-body-title#scheme-title Тестовая схема #2 (5 шагов)
+                .vsd-header-body-bottom
+                  a.vsd-animal#scheme-animal(href="") #50261488
+                  .vsd-header-date#scheme-date Ноябрь 27, 2023
+              a.vsd-header-edit#scheme-edit(href="")
+                i.ph.ph-pencil
+            .vsd-items-container
+              .vsd-item
+                .vsd-item-body
+                  .vsd-item-body-name Первый укол ацепитицын
+                  .vsd-item-body-date Ноябрь 27, 2023 
+                .vsd-item-number.vsd-item-number-current 1
 
 
-    -if(actions.length === 0 && problems.length === 0 && treatments.length === 0 && schemes.length === 0, uncuredProblems.length === 0)
-      .to-show-empty-block
-      .mp-empty-block 
-        img(src='/img/images/no-data-image.png')
-        .mp-empty-title Нет актуальных данных
+  //-.detailed-info-window
+    .detailed-info-block
+
+      .dib-header
+        img.dib-header-image(src="/img/images/default-cow-image.png")
+        .dib-header-body  
+          .dib-header-upper
+            .dib-header-text-big #50261488
+            .dib-header-text-big Березка
+            a.dib-edit-btn(href="") Карта
+          .dib-header-lower
+        .dib-close 
+          i.ph.ph-x
+
+      .dib-body.dib-body-with-btn 
+        .dib-body-title Ноет постоянно
+        .dib-body-text Заебала просто пиздец, ноет и ноет каждый день
+        .dib-body-container-devider
+        .dib-body-container-text Лечения: 
+
+        .dib-body-container-line
+          .dib-line-indi.dib-line-indi-neg
+          .dib-line-text Опять подзатыльник в общем то
+          a.dib-line-edit(href="") Редактировать
+        
+      a.dib-big-btn.dib-big-btn-vet(href="") Добавить лечение
+      .dib-footer
+        .dib-footer-date Ноябрь 26, 2023
+        a.dib-footer-edit(href="") Редактировать

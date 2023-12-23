@@ -7,21 +7,21 @@ import moment, { max, months } from 'moment';
 import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
-import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph, getAnimalData } from './animalHandler';
-import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc } from './vetHandler';
+import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph, getAnimalData, getAnimalsByCategory, addMilkQuality, editMilkQuality, getMilkQuality } from './animalHandler';
+import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc, getStartedScheme, getVetProblem } from './vetHandler';
 import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout, checkEmail } from './authHandler';
 import { editFarm, editUser, addCategory } from './manageHandler';
-import { addConfirmationEmpty } from './interaction';
+import { addConfirmationEmpty, askAus, emptyBlock, removeEmptyBlock, loadingBlock, removeloadingBlock } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart, graphBase, graphBaseNoDate } from './chartConstructor';
 import { getMilkingProjection, getFarmProjections } from './projections';
-import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts } from './distributionHandler';
+import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts, getClient } from './distributionHandler';
+import { addFeedSampleOrRecord, editFeedSampleOrRecord, getOneRecord, getFeedRecords } from './feedHandler';
 import { searchEngine } from './search';
 
 
 $(document).ready(async function () {
-
   /////////////////////////
   /////////////////////////
   /////////////////////////
@@ -32,6 +32,11 @@ $(document).ready(async function () {
 
   /* Remove title from every ion-icon */
   $('ion-icon').each(function () { $(this).find('title').text('') });
+
+  /* Closing detailed info */
+  $('body').on('click', '.dib-close', function () {
+    $('.detailed-info-window').remove();
+  });
   ///////////////////////
   /* MENU */
   /////////////////////// 
@@ -3384,8 +3389,8 @@ $(document).ready(async function () {
     $('.ac-insem-graph-neg p').text(`${negPer}%`);
 
     /* Showing action block */
-    $('.aih-actions-btn').on('click', function() {
-      if($(this).attr('data-state') === 'show') {
+    $('.aih-actions-btn').on('click', function () {
+      if ($(this).attr('data-state') === 'show') {
         $('.aih-actions-block').css('display', 'grid');
         $(this).find('p').text('Скрыть');
         $(this).find('span').css('transform', 'rotate(45deg)');
@@ -3519,10 +3524,10 @@ $(document).ready(async function () {
     milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
     milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
     milkingDataAverage.sort((a, b) => new Date(a.date) - new Date(b.date));
-    console.log(milkingDataByLact)
+    /* console.log(milkingDataByLact)
     console.log(milkingProjectionByLact)
     console.log(milkingDataByDay)
-    console.log(milkingDataAverage)
+    console.log(milkingDataAverage) */
 
     /* Working with a graph */
     $('#card-milking-graph .mp-hg-btn').on('click', function () {
@@ -3721,7 +3726,7 @@ $(document).ready(async function () {
             const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
             circle.classList.add('basic-graph-point')
             circle.classList.add('average-graph-data');
-            if(res.type === 'projected') circle.classList.add('projected-graph-data');
+            if (res.type === 'projected') circle.classList.add('projected-graph-data');
             circle.style.stroke = colors[index];
             graphObj.svg.append(circle);
             circle.setAttribute('cx', graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100)))
@@ -4270,6 +4275,7 @@ $(document).ready(async function () {
     const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     /* Working with projectrion data */
     await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
+    removeloadingBlock($('.herd-mp-quick-info-block'));
     let slideInterval;
     /* Working with quick info */
     $('.herd-mp-quick-info-counter').on('click', function () {
@@ -4338,6 +4344,26 @@ $(document).ready(async function () {
     });
     $('.herd-mp-quick-info-counter-active').trigger('click');
 
+
+    $('.mp-recent-item').each(function () {
+      anime({
+        targets: $(this).find('.mp-recent-number')[0],
+        innerText: [0, parseFloat($(this).find('.mp-recent-number').attr('data-number'))],
+        round: true,
+        delay: parseFloat($(this).attr('data-counter')) * 200,
+        duration: 1000
+      });
+    });
+  }
+
+  //////////////////////////
+  //////////////////////////
+  //////////////////////////
+  /* INSEM AND CALV LISTS */
+  //////////////////////////
+  //////////////////////////
+  if (document.querySelector('.herd-mp-list-block-combined')) {
+
     /* Working with lists */
     $('.herd-mp-list-block-insem').find('.herd-mp-list-line').each(function () {
       if ($(this).attr('data-first') === 'false') {
@@ -4360,8 +4386,6 @@ $(document).ready(async function () {
       $(this).find('.date').text(moment(date).add(283, 'days').format('DD.MM.YYYY'));
       $(this).find('.day').text(`${Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000)} дн.`);
       $(this).find('.day').attr('data-days', Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000));
-
-
     });
 
     $('.herd-mp-list-line').each(function () {
@@ -4437,9 +4461,7 @@ $(document).ready(async function () {
     });
 
     $('#table-btns').find('.mp-block-outside-header-btn-active').trigger('click');
-
   }
-
   //////////////////////////
   //////////////////////////
   //////////////////////////
@@ -4448,12 +4470,14 @@ $(document).ready(async function () {
   //////////////////////////
   if (document.querySelector('#mp-results-graph')) {
     const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
+    removeloadingBlock($('.mp-herd-graph-block'));
     let data = [];
     animals.cows.forEach((animal) => {
       animal.milkingResults.forEach(res => {
         data.push({ result: res.result, date: new Date(res.date), lactationNumber: res.lactationNumber, animal: animal._id, number: animal.number, name: animal.name });
       });
     });
+    if (data.length < 5) emptyBlock($('.mp-herd-graph-block'), 'Недостаточно данных', 'Добавьте больше результатов для отображения статистики')
 
     /* Counting average and total by each month */
     let dataByMonth = [];
@@ -4587,7 +4611,7 @@ $(document).ready(async function () {
       $('#main-column').find('.mp-herd-legend-item').remove();
       $('#additional-column').find('.mp-herd-legend-item').remove();
 
-      $('.basic-graph-svg').remove()
+      $('#mp-results-graph').find('.basic-graph-svg').remove()
 
       /* Adding main SVG */
       const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -5030,8 +5054,10 @@ $(document).ready(async function () {
   /* Herd main page PROJECTION graph */
   //////////////////////////
   //////////////////////////
+  //////////////////////////
   if (document.querySelector('#mp-herd-projection-chart')) {
     const projData = await getFarmProjections($('#mp-herd').attr('data-farm-id'), 5);
+    removeloadingBlock($('.mp-projection-block'));
     const projDataFormat = [];
 
     projData.forEach((el, inx, arr) => {
@@ -5064,6 +5090,7 @@ $(document).ready(async function () {
         writeOff
       });
     });
+    if (projDataFormat[0].animals.count < 10) emptyBlock($('.mp-projection-block'), 'Проекция не возможна', 'Добавьте минимум 10 животных чтобы увидеть результат')
 
     projDataFormat.forEach((el, inx, arr) => {
       let prevYear = inx === 0 ? undefined : arr[inx - 1];
@@ -5078,92 +5105,592 @@ $(document).ready(async function () {
     });
 
     /* WORKING WITH CHART */
-    let max = 0;
-    projDataFormat.forEach(el => { if (el.animals.count > max) max = el.animals.count })
+    let maxes = {
+      animals: 0,
+      cows: 0,
+      bulls: 0,
+      milkingCows: 0,
+      writeOff: 0,
+    }
+    projDataFormat.forEach(el => {
+      if (el.animals.count > maxes.animals) maxes.animals = el.animals.count
+      if (el.cows.count > maxes.cows) maxes.cows = el.cows.count
+      if (el.bulls.count > maxes.bulls) maxes.bulls = el.bulls.count
+      if (el.milkingCows.count > maxes.milkingCows) maxes.milkingCows = el.milkingCows.count
+      if (el.writeOff.count > maxes.writeOff) maxes.writeOff = el.writeOff.count
+    })
 
-    $('.mp-projection-graph-working-area').empty();
-    projDataFormat.forEach((el, inx) => {
-      if (inx === 0) return;
-      const animals = el.animals.count > 0 ? '' : ''
-      const cows = el.cows.count > 0 ? '' : ''
-      const bulls = el.bulls.count > 0 ? '' : ''
-      const milkingCows = el.milkingCows.count > 0 ? '' : ''
-      const writeOff = el.writeOff.count > 0 ? '' : ''
+    $('.mp-projection-graph-working-area').on('mouseenter', '.mp-projection-graph-item', function () {
+      $(`.mp-projection-info-item-active`).find('.mp-projection-info-item-res').text($(this).attr('data-count'));
+      $(`.mp-projection-info-item-active`).find('.mp-projection-info-item-title span').text($(this).attr('data-change')).removeClass().addClass(parseFloat($(this).attr('data-change')) < 0 ? 'span-fail' : 'span-success');
 
-      $('.mp-projection-graph-working-area').append(`
-        <div class="mp-projection-graph-item" id="mp-projection-graph-item-${el.year}" data-animals="${el.animals.count}" data-animals-change="${el.animals.change}" data-female="${el.cows.count}" data-female-change="${el.cows.change}" data-male="${el.bulls.count}" data-male-change="${el.bulls.change}" data-milking="${el.milkingCows.count}" data-milking-change="${el.milkingCows.change}" data-off="${el.writeOff.count}" data-off-change="${el.writeOff.change}">
-          <div class="mp-projection-graph-item-title">${el.year} г.</div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-off" data-el=".mp-projection-info-item-off"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-milking" data-el=".mp-projection-info-item-milking"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-male" data-el=".mp-projection-info-item-male"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-female" data-el=".mp-projection-info-item-female"></div>
-          <div class="mp-projection-graph-item-bar mp-projection-graph-item-bar-animals" data-el=".mp-projection-info-item-animals"></div>
+      $(this).find('.mp-projection-graph-item-bar').css('opacity', '1');
+      $(this).siblings().find('.mp-projection-graph-item-bar').css('opacity', '0.5');
+    });
+
+    $('.mp-projection-graph-working-area').on('mouseleave', '.mp-projection-graph-item', function () {
+      $('.mp-projection-graph-item-bar').css('opacity', '1')
+    });
+
+    $('.mp-projection-info-item').on('click', function () {
+      if ($(this).hasClass('mp-projection-info-item-active')) return;
+
+      $(this).siblings().addClass('mp-projection-info-item-transp');
+      $(this).siblings().removeClass('mp-projection-info-item-active');
+      $(this).removeClass('mp-projection-info-item-transp');
+      $(this).addClass('mp-projection-info-item-active');
+      const unit = $(this).attr('data-unit');
+      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).animals.count)
+      $(`.mp-projection-info-item-animals`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).animals.change).removeClass().addClass(projDataFormat.at(-1).animals.change < 0 ? 'span-fail' : 'span-success');
+      $('.mp-projection-info-item-cows').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).cows.count)
+      $(`.mp-projection-info-item-cows`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).cows.change).removeClass().addClass(projDataFormat.at(-1).cows.change < 0 ? 'span-fail' : 'span-success');
+      $('.mp-projection-info-item-bulls').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).bulls.count)
+      $(`.mp-projection-info-item-bulls`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).bulls.change).removeClass().addClass(projDataFormat.at(-1).bulls.change < 0 ? 'span-fail' : 'span-success');
+      $('.mp-projection-info-item-milkingCows').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).milkingCows.count)
+      $(`.mp-projection-info-item-milkingCows`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).milkingCows.change).removeClass().addClass(projDataFormat.at(-1).milkingCows.change < 0 ? 'span-fail' : 'span-success');
+      $('.mp-projection-info-item-writeOff').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).writeOff.count)
+      $(`.mp-projection-info-item-writeOff`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).writeOff.change).removeClass().addClass(projDataFormat.at(-1).writeOff.change < 0 ? 'span-fail' : 'span-success');
+
+
+      $('.mp-projection-graph-working-area').empty();
+      projDataFormat.forEach((year, inx) => {
+        if (year.year === 0) return;
+        $('.mp-projection-graph-working-area').append(`
+        <div class="mp-projection-graph-item" data-count="${year[unit].count}" data-change="${year[unit].change}">
+        <div class="mp-projection-graph-item-title">${year.year} г.</div>
+        <div class="mp-projection-graph-item-bar">
+        <div class="mp-projection-graph-item-bar-inside mp-projection-graph-item-bar-inside-${year.year}"></div>
         </div>
-      `)
-      let parentHeight = $('.mp-projection-graph-working-area').height();
-      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-animals').css('height', parentHeight * ((el.animals.count / (max / 100)) / 100))
-      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-female').css('height', parentHeight * ((el.cows.count / (max / 100)) / 100))
-      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-male').css('height', parentHeight * ((el.bulls.count / (max / 100)) / 100))
-      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-milking').css('height', parentHeight * ((el.milkingCows.count / (max / 100)) / 100))
-      $(`#mp-projection-graph-item-${el.year}`).find('.mp-projection-graph-item-bar-off').css('height', parentHeight * ((el.writeOff.count / (max / 100)) / 100))
+        </div>
+        `)
+
+        anime({
+          targets: $(`.mp-projection-graph-item-bar-inside-${year.year}`)[0],
+          height: `${year[unit].count / (maxes[unit] / 100)}%`,
+          easing: 'easeInOutSine',
+          duration: 200,
+          delay: (year.year - 1) * 100,
+        });
+      });
+      $('.mp-projection-graph-working-area').find('.mp-projection-graph-item').last().trigger('mouseenter');
     });
 
-    $('.mp-projection-graph-item').on('mouseenter', function () {
-      $('.span-success').removeClass('span-success');
-      $('.span-fail').removeClass('span-fail');
+    $('#mp-herd-projection-chart').on('mouseleave', function () {
+      $('.mp-projection-graph-working-area').find('.mp-projection-graph-item').last().trigger('mouseenter');
+    })
 
-      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-res').text($(this).attr('data-animals'));
-      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-animals-change')) > 0 ? '+' : ''}${$(this).attr('data-animals-change')}`);
-      $('.mp-projection-info-item-animals').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-animals-change')) > 0 ? 'span-success' : 'span-fail');
-
-      $('.mp-projection-info-item-female').find('.mp-projection-info-item-res').text($(this).attr('data-female'));
-      $('.mp-projection-info-item-female').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-female-change')) > 0 ? '+' : ''}${$(this).attr('data-female-change')}`);
-      $('.mp-projection-info-item-female').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-female-change')) > 0 ? 'span-success' : 'span-fail');
-
-      $('.mp-projection-info-item-male').find('.mp-projection-info-item-res').text($(this).attr('data-male'));
-      $('.mp-projection-info-item-male').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-male-change')) > 0 ? '+' : ''}${$(this).attr('data-male-change')}`);
-      $('.mp-projection-info-item-male').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-male-change')) > 0 ? 'span-success' : 'span-fail');
-
-      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-res').text($(this).attr('data-milking'));
-      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-milking-change')) > 0 ? '+' : ''}${$(this).attr('data-milking-change')}`);
-      $('.mp-projection-info-item-milking').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-milking-change')) > 0 ? 'span-success' : 'span-fail');
-
-      $('.mp-projection-info-item-off').find('.mp-projection-info-item-res').text($(this).attr('data-off'));
-      $('.mp-projection-info-item-off').find('.mp-projection-info-item-title span').text(`${parseFloat($(this).attr('data-off-change')) > 0 ? '+' : ''}${$(this).attr('data-off-change')}`);
-      $('.mp-projection-info-item-off').find('.mp-projection-info-item-title span').addClass(parseFloat($(this).attr('data-off-change')) > 0 ? 'span-success' : 'span-fail');
-    });
-
-    $('.mp-projection-graph-item-bar').on('mouseenter', function () {
-      $('.mp-projection-graph-item-bar').not($(this)).addClass('mp-projection-graph-item-bar-transp');
-      let infoEl = $(this).attr('data-el');
-      $('.mp-projection-info-item').not(infoEl).addClass('mp-projection-info-item-transp')
-    });
-    $('.mp-projection-graph-item-bar').on('mouseleave', function () {
-      $('.mp-projection-graph-item-bar-transp').removeClass('mp-projection-graph-item-bar-transp');
-      $('.mp-projection-info-item-transp').removeClass('mp-projection-info-item-transp')
-    });
-
-    $('.mp-projection-graph-item').first().trigger('mouseenter');
-
-    $('.mp-detail-btn').on('click', function () {
-      if ($(this).find('ion-icon').attr('name') === 'help') {
-
+    $('#detail').on('click', function () {
+      if ($(this).text() === 'Подробнее') {
+        $(this).text('Скрыть')
         $('.mp-detail-text-block').show();
-        $(this).find('ion-icon').attr('name', 'close');
       } else {
-
+        $(this).text('Подробнее')
         $('.mp-detail-text-block').hide();
-        $(this).find('ion-icon').attr('name', 'help');
       }
     });
 
-    $('.mp-detail-btn').on('mouseenter', function () {
-      $('.mp-detail-text-block').show();
-    });
-    $('.mp-detail-btn').on('mouseleave', function () {
-      $('.mp-detail-text-block').hide();
-    });
+    $('.mp-projection-info-item').first().trigger('click');
+
   }
+
+  //////////////////////////
+  //////////////////////////
+  //////////////////////////
+  /* MILKING QUALITY GRAPH */
+  //////////////////////////
+  //////////////////////////
+  //////////////////////////
+  if (document.querySelector('#milk-quality-graph')) {
+    /* Get the milking quality data */
+    const records = await getMilkQuality();
+    removeloadingBlock($('.milk-quality-graph-container'));
+    if (records.length === 0) emptyBlock($('.milk-quality-graph-container'), 'Недостаточно данных', 'Информация появится когда будет добавленно больше данных')
+
+    if (records.length > 0) {
+
+      records.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      $('#water').find('.milk-quality-info-res').text(`${records[0].water ? records[0].water : '-'}%`)
+      $('#fat').find('.milk-quality-info-res').text(`${records[0].fat ? records[0].fat : '-'}%`)
+      $('#dryResidue').find('.milk-quality-info-res').text(`${records[0].dryResidue ? records[0].dryResidue : '-'}%`)
+      $('#casein').find('.milk-quality-info-res').text(`${records[0].casein ? records[0].casein : '-'}%`)
+      $('#sugar').find('.milk-quality-info-res').text(`${records[0].sugar ? records[0].sugar : '-'}%`)
+      $('#phosphatides').find('.milk-quality-info-res').text(`${records[0].phosphatides ? records[0].phosphatides : '-'}%`)
+      $('#sterols').find('.milk-quality-info-res').text(`${records[0].sterols ? records[0].sterols : '-'}%`)
+      $('#albumen').find('.milk-quality-info-res').text(`${records[0].albumen ? records[0].albumen : '-'}%`)
+      $('#otherProteins').find('.milk-quality-info-res').text(`${records[0].otherProteins ? records[0].otherProteins : '-'}%`)
+      $('#nonProteinCompounds').find('.milk-quality-info-res').text(`${records[0].nonProteinCompounds ? records[0].nonProteinCompounds : '-'}%`)
+      $('#saltsOfInorganicAcids').find('.milk-quality-info-res').text(`${records[0].saltsOfInorganicAcids ? records[0].saltsOfInorganicAcids : '-'}%`)
+      $('#ash').find('.milk-quality-info-res').text(`${records[0].ash ? records[0].ash : '-'}%`)
+      $('#pigments').find('.milk-quality-info-res').text(`${records[0].pigments ? records[0].pigments : '-'}%`)
+
+      /* Making an event for parameter change */
+      $('.milk-quality-info-item').on('click', function () {
+        if ($(this).hasClass('milk-quality-info-item-active')) return;
+        removeEmptyBlock($('#milk-quality-graph'))
+
+        $('.milk-quality-info-item-active').removeClass('milk-quality-info-item-active');
+        $(this).addClass('milk-quality-info-item-active');
+
+        const component = $(this).attr('id');
+
+        let hide = true;
+
+        let max = 0;
+        let min = 50;
+        records.forEach(el => {
+          if (max < el[component]) max = el[component];
+          if (min > el[component]) min = el[component];
+
+          if (el[component]) hide = false
+        });
+        max = Math.ceil(max / 10) * 10;
+
+        if (hide) return emptyBlock($('#milk-quality-graph'), 'Недостаточно данных', 'Данные этого компонента отсутствуют')
+
+        $('#milk-quality-graph').find('.basic-graph-svg').remove()
+
+        /* Adding main SVG */
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+        svg.classList.add('basic-graph-svg')
+        $('#milk-quality-graph').append(svg);
+        svg.style.height = $('#milk-quality-graph').height();
+        let expandedWidth = 0;
+        records.forEach(rec => {
+          if (rec[component] !== null) {
+            expandedWidth += 200
+          }
+        });
+        svg.style.width = $('#milk-quality-graph').width() > expandedWidth ? $('#milk-quality-graph').width() : expandedWidth;
+        /* Counting the horizontal gap */
+        let horGap = parseFloat($('#milk-quality-graph').height()) / 12;
+
+        const workingAreaHeight = Math.round($('#milk-quality-graph').height() - horGap * 2);
+        const workingAreaWidth = Math.round($('#milk-quality-graph').find('.basic-graph-svg').width() - horGap * 2);
+
+        /* Adding horizontal grid lines and ticks */
+        for (let i = 11; i >= 1; i--) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', 0)
+          gridLine.setAttribute('y1', i * horGap)
+          gridLine.setAttribute('x2', parseFloat($('#milk-quality-graph').find('.basic-graph-svg').width()))
+          gridLine.setAttribute('y2', i * horGap)
+        }
+
+        /* Adding the vertical grid lines */
+        for (let i = 1; i <= parseFloat($('#milk-quality-graph').find('.basic-graph-svg').width()) / horGap; i++) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', i * horGap)
+          gridLine.setAttribute('y1', 0)
+          gridLine.setAttribute('x2', i * horGap)
+          gridLine.setAttribute('y2', parseFloat($('#milk-quality-graph').height()))
+        }
+
+        /* Adding data */
+
+
+
+        let timer = 0;
+        records.forEach((data, inx, arr) => {
+
+          /* Adding data line */
+          let path;
+          if (inx === 0) {
+            path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+            path.classList.add('basic-graph-point-line-trans');
+            path.classList.add('milking-quality-line');
+            svg.append(path);
+            path.setAttribute('d', `M ${horGap + ((inx) * 200)} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data[component] / (max / 100) / 100))}`)
+
+            path.setAttribute('id', `milking-quality-line`);
+          } else {
+            path = document.getElementById(`milking-quality-line`);
+            path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + ((inx) * 200)} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data[component] / (max / 100) / 100))}`)
+
+          }
+
+          /* Adding DATA text */
+          const textTitle = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+          textTitle.classList.add('basic-graph-text')
+          svg.append(textTitle);
+          textTitle.setAttribute('x', horGap + ((inx) * 200))
+          textTitle.setAttribute('y', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data[component] / (max / 100) / 100)))
+          textTitle.setAttribute('fill', '#fb8d34')
+          textTitle.textContent = `${data[component]}%`
+          textTitle.setAttribute(`data-number`, inx)
+
+          textTitle.style.animation = `fadeIn ${timer}s ease-out`
+          timer += 0.1;
+
+          /* Adding date text */
+          const textDate = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+          textDate.classList.add('basic-graph-text-date')
+          svg.append(textDate);
+          textDate.setAttribute('x', horGap + ((inx) * 200))
+          textDate.setAttribute('y', workingAreaHeight + (horGap * 2) - Math.round(workingAreaHeight * (data[component] / (max / 100) / 100)))
+          textDate.textContent = moment(data.date).lang('ru').format('MMMM DD, YY').charAt(0).toUpperCase() + moment(data.date).lang('ru').format('MMMM DD, YY').slice(1)
+          textDate.classList.add(`milking-date-${inx}`)
+
+        });
+
+        anime({
+          targets: '.milking-quality-line',
+          strokeDashoffset: [1500, 0],
+          easing: 'easeInOutSine',
+          duration: 1500,
+          delay: function (el, i) { return i * 250 },
+        });
+
+        $('#milk-quality-graph').find('.basic-graph-text').off();
+        $('#milk-quality-graph').find('.basic-graph-text').on('mouseenter', function () {
+          $(`.milking-date-${$(this).attr('data-number')}`).css('opacity', 1);
+        });
+        $('#milk-quality-graph').find('.basic-graph-text').on('mouseleave', function () {
+          $(`.milking-date-${$(this).attr('data-number')}`).css('opacity', 0);
+        });
+
+
+
+      });
+
+
+      $('#fat').trigger('click');
+    }
+  }
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  /* WEIGHT GRAPH */
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  if (document.querySelector('#weight-graph')) {
+    loadingBlock($('#weight-graph'));
+    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
+    removeloadingBlock($('#weight-graph'))
+    const weightAverage = [];
+    const weightCows = [];
+    const weightBulls = [];
+
+    animals.animals.forEach((animal) => {
+      if (animal.weightResults.length === 0) return;
+
+      animal.weightResults.forEach(result => {
+        if (weightAverage.find(el => moment(el.date).isSame(result.date, 'month'))) {
+          let res = weightAverage.find(el => moment(el.date).isSame(result.date, 'month'));
+          res.results.push(result);
+          res.total += result.result;
+          res.average = parseFloat((res.total / res.results.length).toFixed(1));
+        } else {
+          weightAverage.push({
+            results: [result],
+            total: result.result,
+            average: result.result,
+            date: new Date(result.date)
+          })
+        }
+      });
+    });
+    animals.cows.forEach((animal) => {
+      if (animal.weightResults.length === 0) return;
+
+      animal.weightResults.forEach(result => {
+        if (weightCows.find(el => moment(el.date).isSame(result.date, 'month'))) {
+          let res = weightCows.find(el => moment(el.date).isSame(result.date, 'month'));
+          res.results.push(result);
+          res.total += result.result;
+          res.average = parseFloat((res.total / res.results.length).toFixed(1));
+        } else {
+          weightCows.push({
+            results: [result],
+            total: result.result,
+            average: result.result,
+            date: new Date(result.date)
+          })
+        }
+      });
+    });
+    animals.bulls.forEach((animal) => {
+      if (animal.weightResults.length === 0) return;
+
+      animal.weightResults.forEach(result => {
+        if (weightBulls.find(el => moment(el.date).isSame(result.date, 'month'))) {
+          let res = weightBulls.find(el => moment(el.date).isSame(result.date, 'month'));
+          res.results.push(result);
+          res.total += result.result;
+          res.average = parseFloat((res.total / res.results.length).toFixed(1));
+        } else {
+          weightBulls.push({
+            results: [result],
+            total: result.result,
+            average: result.result,
+            date: new Date(result.date)
+          })
+        }
+      });
+    });
+
+    //console.log(weightAverage, weightCows, weightBulls);
+
+    /* Working with graph */
+    /* Setting max and min */
+    let max, min;
+    max = 0;
+    min = 0;
+    let start, end;
+
+    [weightAverage, weightCows, weightBulls].forEach(el => {
+      el.forEach(subEl => {
+        if (max < subEl.average) max = subEl.average;
+        if (min > subEl.average) min = subEl.average;
+
+        if (!start || new Date(subEl.date) < start) start = new Date(subEl.date);
+        if (!end || new Date(subEl.date) > end) end = new Date(subEl.date);
+      })
+    });
+    max = Math.ceil(max / 10) * 10 * 1.5;
+
+
+    $('#weight-graph').find('.basic-graph-svg').remove()
+
+    /* Adding main SVG */
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+    svg.classList.add('basic-graph-svg')
+    $('#weight-graph').append(svg);
+    svg.style.height = $('#weight-graph').height();
+
+    const expWidth = $('#weight-graph').width() > ((end.getTime() - start.getTime()) / 30 / 24 / 60 / 60 / 1000) * 100 ? $('#weight-graph').width() : ((end.getTime() - start.getTime()) / 30 / 24 / 60 / 60 / 1000) * 100;
+    svg.style.width = expWidth;
+
+    /* Creating showlines */
+    const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineHor.classList.add('basic-graph-show-line')
+    showLineHor.setAttribute('id', 'graph-show-line-hor')
+    svg.append(showLineHor);
+
+    const showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    showLineVer.classList.add('basic-graph-show-line')
+    showLineVer.setAttribute('id', 'graph-show-line-ver')
+    svg.append(showLineVer);
+
+    /* Creating ticks */
+    const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickHor.classList.add('basic-graph-tick');
+    svg.append(tickHor);
+    const tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    tickVer.classList.add('basic-graph-tick-date');
+    svg.append(tickVer);
+
+    /* Counting the horizontal gap */
+    let horGap = parseFloat($('#weight-graph').height()) / 12;
+
+    const workingAreaHeight = Math.round($('#weight-graph').find('.basic-graph-svg').height() - horGap * 2);
+    const workingAreaWidth = Math.round($('#weight-graph').find('.basic-graph-svg').width() - horGap * 2);
+
+    /* Adding horizontal grid lines and ticks */
+    for (let i = 11; i >= 1; i--) {
+      const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      gridLine.classList.add('basic-graph-grid-line')
+      svg.append(gridLine);
+      gridLine.setAttribute('x1', 0)
+      gridLine.setAttribute('y1', i * horGap)
+      gridLine.setAttribute('x2', parseFloat($('#weight-graph').find('.basic-graph-svg').width()))
+      gridLine.setAttribute('y2', i * horGap)
+    }
+
+    /* Adding the vertical grid lines */
+    for (let i = 1; i <= parseFloat($('#weight-graph').find('.basic-graph-svg').width()) / horGap; i++) {
+      const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      gridLine.classList.add('basic-graph-grid-line')
+      svg.append(gridLine);
+      gridLine.setAttribute('x1', i * horGap)
+      gridLine.setAttribute('y1', 0)
+      gridLine.setAttribute('x2', i * horGap)
+      gridLine.setAttribute('y2', parseFloat($('#weight-graph').find('.basic-graph-svg').height()))
+    }
+
+    /* Adding data */
+
+    let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+
+    let circleTimer = 0;
+    weightAverage.forEach((data, inx, arr) => {
+      let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+      /* Adding data line */
+      let path;
+      if (inx === 0) {
+        path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+        path.classList.add('basic-graph-point-line');
+        path.classList.add('average-weight-data');
+        svg.append(path);
+        path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+        path.setAttribute('id', `weight-line-average`);
+      } else {
+        path = document.getElementById(`weight-line-average`);
+        path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+      }
+
+      /* Adding data points */
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+      circle.classList.add('basic-graph-point')
+      circle.classList.add('average-graph-data');
+      svg.append(circle);
+      circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100)))
+      circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100)))
+
+      circle.setAttribute('r', 4);
+      circle.setAttribute('data-average', data.average);
+      circle.setAttribute('data-total', data.total);
+      circle.setAttribute('data-results', data.results.length);
+      circle.setAttribute('data-date', data.date);
+
+      circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+      circleTimer += 0.1;
+    });
+
+    anime({
+      targets: '#weight-line-average',
+      strokeDashoffset: [1500, 0],
+      easing: 'easeInOutSine',
+      duration: 1500,
+      delay: function (el, i) { return i * 250 },
+    });
+    /* anime({
+      targets: '.basic-graph-top-line',
+      strokeDashoffset: [1500, 0],
+      easing: 'easeInOutSine',
+      duration: 1500,
+      delay: function (el, i) { return i * 250 },
+    });
+    anime({
+      targets: '.basic-graph-bottom-line',
+      strokeDashoffset: [1500, 0],
+      easing: 'easeInOutSine',
+      duration: 1500,
+      delay: function (el, i) { return i * 250 },
+    }); */
+
+
+    /* Adding ticks on mousemove */
+    $('#weight-graph').off()
+    $('#weight-graph').on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
+      let point = svg.createSVGPoint();
+      point.x = clientX;
+      point.y = clientY;
+      point = point.matrixTransform(svg.getScreenCTM().inverse());
+
+
+      let xStop = false;
+      let yStop = false;
+      if (point.x < horGap) {
+        showLineVer.setAttribute('x1', horGap + 1);
+        showLineVer.setAttribute('x2', horGap + 1);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
+        xStop = true;
+      }
+      if (point.y < horGap) {
+        showLineHor.setAttribute('y1', horGap + 1);
+        showLineHor.setAttribute('y2', horGap + 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
+        yStop = true;
+      }
+      if (point.x > parseFloat($('#weight-graph').width()) - horGap) {
+        showLineVer.setAttribute('x1', parseFloat($('#weight-graph').width()) - horGap);
+        showLineVer.setAttribute('x2', parseFloat($('#weight-graph').width()) - horGap);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
+        xStop = true;
+      }
+      if (point.y > parseFloat($('#weight-graph').height()) - horGap) {
+        showLineHor.setAttribute('y1', parseFloat($('#weight-graph').height()) - horGap - 1);
+        showLineHor.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap - 1);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
+        yStop = true;
+      }
+
+
+      if (!yStop) {
+        showLineHor.setAttribute('y1', point.y);
+        showLineHor.setAttribute('y2', point.y);
+        showLineHor.setAttribute('x1', horGap);
+        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
+      }
+
+      if (!xStop) {
+        showLineVer.setAttribute('x1', point.x);
+        showLineVer.setAttribute('x2', point.x);
+        showLineVer.setAttribute('y1', 0)
+        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
+      }
+
+
+      tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
+      tickHor.setAttribute('x', 10)
+      tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+
+      tickVer.textContent = moment(start).add(Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100)), 'day').lang('ru').format('DD MMMM, YY')
+      tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
+      tickVer.setAttribute('y', $('#weight-graph').height() - 10)
+
+    });
+
+    $('#weight-graph').on('mouseleave', '.basic-graph-svg', function () {
+      showLineVer.setAttribute('x1', 0);
+      showLineVer.setAttribute('x2', 0);
+      showLineVer.setAttribute('y1', 0);
+      showLineVer.setAttribute('y2', 0);
+      showLineHor.setAttribute('x1', 0);
+      showLineHor.setAttribute('x2', 0);
+      showLineHor.setAttribute('y1', 0);
+      showLineHor.setAttribute('y2', 0);
+      tickHor.textContent = '';
+      tickVer.textContent = '';
+    });
+
+    /* Adding tooltips on mouse hover */
+/*     $('.basic-graph-point').off()
+    $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+      $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
+
+      if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('#weight-graph').width()) {
+        $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
+      } else {
+        $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
+      }
+
+      $('.mp-graph-tooltip').empty();
+      $('.mp-graph-tooltip').append(`
+          <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
+          <div class="mp-graph-tooltip-title">Средний результат</div>
+          <div class="mp-graph-tooltip-gap"></div>
+          <div class="mp-graph-tooltip-sub-res">${Math.round(parseFloat($(this).attr('data-total')))}</div>
+          <div class="mp-graph-tooltip-title">Всего молока</div>
+          <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
+          <div class="mp-graph-tooltip-title">Кол-во результатов</div>
+          <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+        `)
+
+
+      $('.mp-graph-tooltip').show();
+    });
+
+    $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+      $('.mp-graph-tooltip').hide();
+    }); */
+
+  }
+
 
   ///////////////////////
   /* HERD LIST INSEMINATIONS */
@@ -6091,230 +6618,127 @@ $(document).ready(async function () {
   /* VET MAIN PAGE*/
   ///////////////////////
   if (document.querySelector('#mp-vet-container')) {
-    /* Show empty text if needed*/
-    if (document.querySelector('.to-show-empty-block')) {
-      $('.mp-empty-block').css('display', 'flex');
-    }
+    /* Formating dates */
+    $('.format-date').each(function () {
+      let date = moment($(this).attr('data-date')).lang('ru').format('MMM DD')
+      $(this).text(date.charAt(0).toUpperCase() + date.slice(1))
+    });
 
-    /* Working with a calendar */
-    /* Working with a big calendar */
-    let selectedMonth = moment();
-    $('.mp-calendar-btn').on('click', async function () {
-      if ($(this).attr('data-state') !== 'first-click') {
-        if ($(this).attr('id') === 'prev-month') {
-          selectedMonth = moment(selectedMonth).subtract(1, 'months')
-        } else if ($(this).attr('id') === 'next-month') {
-          selectedMonth = moment(selectedMonth).add(1, 'months')
-        }
+    /* Insem statistic sliding */
+    setInterval(() => {
+      const current = $('.vis-count-block-inner-active');
+      let next;
+      if (current.attr('data-last') === 'false') {
+        next = current.next();
       } else {
-        $(this).attr('data-state', 'not-first-click');
+        next = $('.vis-count-block-inner').first();
+      }
+      current.addClass(`animate__animated animate__slideOutLeft`);
+      setTimeout(() => {
+        current.css('display', 'none')
+        next.addClass(`animate__animated animate__slideInRight`).css('display', 'flex');
+        current.removeClass('vis-count-block-inner-active')
+        next.addClass('vis-count-block-inner-active')
+        current.removeClass('animate__animated animate__slideInRight animate__slideOutLeft')
+      }, 500)
+    }, 5000)
+
+    /* Working with scheme container */
+    $('.scheme-list').find('.vlc-item').on('click', async function () {
+      loadingBlock($('.vet-scheme-dropdown-block'));
+      const scheme = await getStartedScheme($(this).attr('data-id'));
+      if (scheme) {
+        removeloadingBlock($('.vet-scheme-dropdown-block'));
+      } else {
+        emptyBlock($('.vet-scheme-dropdown-block'), 'Схема не найдена', 'Попробуйте позже')
       }
 
-
-      /* Set current month and year */
-      let curRusMonth = moment(selectedMonth).locale('ru').format('MMMM');
-      let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
-      const curYear = moment(selectedMonth).format('YYYY');
-      $('.mp-calendar-title-line p').text(`${rusMonth} ${curYear}`);
-
-      /* Clearing the calendar from previous month */
-      $('.mp-calendar-dates-column').each(function () { $(this).empty() });
-
-      /* Adding days of the month */
-      let daysInMonth = moment(selectedMonth).daysInMonth();
-      let daysBeforeMonth = moment(selectedMonth).date(1).day() === 0 ? 6 : moment(selectedMonth).date(1).day() - 1;
-      let daysAfterMonth = 7 - moment(selectedMonth).date(daysInMonth).day()
-      let totalDays = daysInMonth + daysBeforeMonth + daysAfterMonth;
-
-      let visCalStart = moment(selectedMonth).date(1 - daysBeforeMonth);
-
-      for (let i = 0; i < totalDays; i++) {
-        let date = moment(visCalStart).add(i, 'days');
-        let monthDay = moment(date).date();
-        let weekDay = moment(date).day();
-
-        let otherMonth = moment(date).month() !== moment(selectedMonth).month() ? 'mp-calendar-other' : '';
-        //let pastDay = moment(date) < moment() ? 'bc-date-past' : '';
-
-        let isToday = date.startOf('day').isSame(moment().startOf('day')) ? 'mp-calendar-today' : '';
-
-        $(`#mp-calendar-column-${weekDay}`).append(`
-        <div class="mp-calendar-date ${otherMonth} ${isToday}" data-date="${new Date(date)}">${monthDay}</div>
-      `)
-      }
-
-      let allDates = $('.mp-calendar-date');
-      let from = new Date(moment($(allDates[0]).attr('data-date')).startOf('day'));
-      let to = new Date(moment($(allDates[allDates.length - 1]).attr('data-date')).endOf('day'));
-
-      const reminders = await getModuleAndPeriod('vet', from, to);
-
-      let allActions = [...reminders];
-      allActions.sort((a, b) => a.date - b.date);
-
-      /* Adding quick info about each day reminders */
-      $('.mp-calendar-date').each(async function () {
-        const date = moment($(this).attr('data-date'));
-
-        let start = new Date(date.startOf('day'));
-        let end = new Date(date.endOf('day'));
-
-        let dayActions = [];
-        allActions.forEach((action) => {
-          let actionDate = new Date(action.date);
-          if (start <= actionDate && actionDate <= end) {
-            dayActions.push(action)
-          }
-        });
+      $('#scheme-title').text(scheme.scheme.name);
+      $('#scheme-animal').text(`#${scheme.animal.number}`);
+      $('#scheme-animal').attr('href', `/herd/animal-card/${scheme.animal._id}`);
+      $('#scheme-date').text(moment(scheme.date).lang('ru').format('MMMM DD, YYYY').charAt(0).toUpperCase() + moment(scheme.date).lang('ru').format('MMMM DD, YYYY').slice(1));
+      $('#scheme-edit').attr('href', `/vet/edit-started-scheme/${scheme._id}`)
 
 
-        if (dayActions.length > 0) {
-          $(this).addClass('mp-calendar-full')
-          dayActions.forEach(action => {
-            $(this).append(`
-            <div class="mp-calendar-quick">
-              <div class="mp-calendar-quick-time">${moment(action.date).format('HH:mm')}</div>
-              <div class="mp-calendar-quick-title">${action.name}</div>
+      $('.vsd-items-container').empty();
+      $('.vsd-items-container').append(`
+        <div class="vsd-item">
+          <div class="vsd-item-body">
+            <div class="vsd-item-body-name">${scheme.name}</div>
+            <div class="vsd-item-body-date">${moment(scheme.date).lang('ru').format('MMMM DD, YYYY').charAt(0).toUpperCase() + moment(scheme.date).lang('ru').format('MMMM DD, YYYY').slice(1)} </div>
+          </div>
+          <div class="vsd-item-number vsd-item-number-past">1</div>
+        </div>
+      `);
+
+      scheme.otherPoints.forEach((point) => {
+        $('.vsd-items-container').append(`
+          <div class="vsd-item">
+            <div class="vsd-item-body">
+              <div class="vsd-item-body-name">${point.name}</div>
+              <div class="vsd-item-body-date">${moment(point.date).lang('ru').format('MMMM DD, YYYY').charAt(0).toUpperCase() + moment(point.date).lang('ru').format('MMMM DD, YYYY').slice(1)} </div>
             </div>
-          `);
-          });
-
-        }
+            <div class="vsd-item-number ${new Date(point.date) < new Date ? 'vsd-item-number-past' : ''}">${scheme.otherPoints.indexOf(point) + 2}</div>
+          </div>
+        `);
 
       });
 
-    });
+      $('.vsd-item').each(function () {
+        if ($(this).prev().length === 0) return;
 
-    $('#prev-month').trigger('click');
-
-    $('.mp-calendar-dates-column').on('click', '.mp-calendar-date', function () {
-
-      $('.mp-calendar-date-active').removeClass('mp-calendar-date-active');
-      $(this).addClass('mp-calendar-date-active');
-
-      $('.mp-calendar-day-number').text(moment($(this).attr('data-date')).format('DD'));
-      $('.mp-calendar-day-month').text(moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase());
-    });
-
-    /* Working with a history block */
-    /* Sorting elements by date */
-    $('.mp-history-item').each(function () {
-      let thisEl = $(this);
-      let thisDate = new Date($(this).attr('data-date'));
-
-      $('.mp-history-item').each(function () {
-        let curDate = new Date($(this).attr('data-date'));
-
-        if (thisDate < curDate) {
-          let moveEl = thisEl;
-          thisEl.detach();
-          $(this).after(moveEl);
-        }
+        if ($(this).prev().find('.vsd-item-number').hasClass('vsd-item-number-past') && !$(this).find('.vsd-item-number').hasClass('vsd-item-number-past')) $(this).find('.vsd-item-number').addClass('vsd-item-number-current')
       });
     });
 
-    $('.mph-type-selector').on('change', function () {
-      let value = $(this).val()
-      if (value === 'all') {
-        $('.mp-history-item').css('display', 'flex');
-      } else {
-        $('.mp-history-item').each(function () {
-          if ($(this).attr('data-type') === value) {
-            $(this).css('display', 'flex');
-          } else {
-            $(this).hide();
-          }
-        });
-      }
-    });
+    $('.scheme-list').find('.vlc-item').first().trigger('click');
 
-    $('.mp-scheme-i').each(function () {
-      let thisEl = $(this);
-      let thisDate = new Date($(this).attr('data-date'));
 
-      $('.mp-scheme-i').each(function () {
-        let curDate = new Date($(this).attr('data-date'));
+    /* Showing detailed block on problem click */
+    $('.problems-container').find('.vlc-item').on('click', async function () {
+      const problem = await getVetProblem($(this).attr('data-id'));
 
-        if (thisDate < curDate) {
-          let moveEl = thisEl;
-          thisEl.detach();
-          $(this).after(moveEl);
-        }
+      $('body').prepend(`
+        <div class="detailed-info-window">
+          <div class="detailed-info-block">
+            <div class="dib-header">
+              <img class="dib-header-image" src="/img/images/default-cow-image.png"/>
+              <div class="dib-header-body"> 
+                <div class="dib-header-upper">
+                  <div class="dib-header-text-big">#${problem.animal.number}</div>
+                  <div class="dib-header-text-big">${problem.animal.name ? problem.animal.name : ''}</div>
+                  <a class="dib-edit-btn" href="/herd/animal-card/${problem.animal._id}">Карта</a>
+                </div>
+                <div class="dib-header-lower"></div>
+              </div>
+              <div class="dib-close"> <i class="ph ph-x"></i></div>
+            </div>
+            <div class="dib-body dib-body-with-btn"> 
+              <div class="dib-body-title">${problem.name}</div>
+              <div class="dib-body-text">${problem.note ? problem.note : ''}</div>
+              ${problem.treatments.length > 0 ? '<div class="dib-body-container-devider"></div>' : ''}
+              ${problem.treatments.length > 0 ? '<div class="dib-body-container-text">Лечения: </div>' : ''}
+              
+              
+        
+            </div><a class="dib-big-btn dib-big-btn-vet" href="/vet/add-treatment/${problem._id}">Добавить лечение</a>
+            <div class="dib-footer">
+              <div class="dib-footer-date">${moment(problem.date).lang('ru').format('MMMM DD, YYYY').charAt(0).toUpperCase() + moment(problem.date).lang('ru').format('MMMM DD, YYYY').slice(1)}</div>
+              <a class="dib-footer-edit" href="/vet/edit-problem/${problem._id}">Редактировать</a>
+            </div>
+          </div>
+        </div>
+      `)
+
+      problem.treatments.forEach(treat => {
+        $('.dib-body').append(`
+          <div class="dib-body-container-line">
+            <div class="dib-line-indi ${treat.cured ? 'dib-line-indi-pos' : 'dib-line-indi-neg'}"></div>
+            <div class="dib-line-text">${treat.name}</div><a class="dib-line-edit" href="/vet/edit-treatment/${treat._id}">Редактировать</a>
+          </div>
+        `)
       });
     });
-
-    $('.mp-problem-i').each(function () {
-      let thisEl = $(this);
-      let thisDate = new Date($(this).attr('data-date'));
-
-      $('.mp-problem-i').each(function () {
-        let curDate = new Date($(this).attr('data-date'));
-
-        if (thisDate < curDate) {
-          let moveEl = thisEl;
-          thisEl.detach();
-          $(this).after(moveEl);
-        }
-      });
-    });
-
-    $('.mp-scheme-item').on('click', function () {
-      if ($(this).find('.mp-scheme-points-block').css('display') === 'none') {
-        $(this).find('.mp-scheme-points-block').show()
-        $(this).find('.mp-scheme-icon').css('transform', 'rotate(180deg)');
-      } else {
-        $(this).find('.mp-scheme-points-block').hide()
-        $(this).find('.mp-scheme-icon').css('transform', 'rotate(0deg)');
-      }
-    });
-
-
-
-
-
-    /* Working with scheme block */
-    /* $('.mp-scheme-points-block').each(function () {
-      //Sorting elements in scheme points blocks
-      let parentEl = $(this);
-
-      $(this).find('.mp-scheme-point').each(function () {
-        let currentEl = $(this);
-        let currectDate = new Date($(this).attr('data-date'));
-
-        $(this).siblings().each(function () {
-          let date = new Date($(this).attr('data-date'));
-
-          if (currectDate > date) {
-            let newEl = currentEl;
-            currentEl.detach();
-            $(this).after(newEl);
-          }
-        });
-      });
-    }); */
-
-
-    /* Working with problems and treatments */
-    /* $('.mp-problem-treatments-block').each(function () {
-      //Sorting elements in scheme points blocks
-      let parentEl = $(this);
-
-      $(this).find('.mp-problem-treatment').each(function () {
-        let currentEl = $(this);
-        let currectDate = new Date($(this).attr('data-date'));
-
-        $(this).siblings().each(function () {
-          let date = new Date($(this).attr('data-date'));
-
-          if (currectDate > date) {
-            let newEl = currentEl;
-            currentEl.detach();
-            $(this).after(newEl);
-          }
-        });
-      });
-
-    }); */
 
 
   }
@@ -7883,188 +8307,173 @@ $(document).ready(async function () {
   }
 
   if (document.querySelector('#all-clients-page')) {
-    const data = [];
-    $('.dist-client-info-hidden').each(function () {
-      data.push({
-        client: $(this).attr('data-client'),
-        product: $(this).attr('data-product'),
-        size: parseFloat($(this).attr('data-size')),
-        date: new Date($(this).attr('data-date')),
-        unit: $(this).attr('data-unit'),
-        price: parseFloat($(this).attr('data-price')),
-        pricePer: parseFloat($(this).attr('data-price-per')),
+    /* Animating each clients line */
+    $('.ci-footer-line-inner').each(function() {
+      if (parseFloat($(this).attr('data-width')) < 5) $(this).css('background-color', '#D44D5C');
+      if (parseFloat($(this).attr('data-width')) >= 5 && parseFloat($(this).attr('data-width')) < 15) $(this).css('background-color', '#f6b91d');
+      if (parseFloat($(this).attr('data-width')) >= 15) $(this).css('background-color', '#0EAD69');
+
+      anime({
+        targets: $(this)[0],
+        delay: parseFloat($(this).attr('data-index')) * 200 + 1000,
+        duration: 1000,
+        width: `${parseFloat($(this).attr('data-width'))}%`
       });
     });
 
-    let generalTotal = 0;
-    data.forEach(el => generalTotal += el.price);
+    /* Picking a client */
+    $('.client-item').on('click', async function() {
+      if($(this).hasClass('client-item-active')) return;
 
-    let clientsData = [];
+      /* Adding loading blocks for multiple elements */
+      loadingBlock($('.client-detailed-info'))
+      loadingBlock($('.client-revenue-block'))
+      loadingBlock($('.client-list-block'))
+      $('.client-item-active').removeClass('client-item-active');
+      $(this).addClass('client-item-active');
+      const clientData = await getClient($(this).attr('data-id'), new Date($('#start-date').val()), new Date($('#end-date').val()));
 
-    $('.dist-client-item').each(function () {
-      let clientTotal = 0;
-      data.forEach(el => {
-        if (el.client === $(this).attr('data-id')) {
-          clientTotal += el.price;
-        }
-      });
+      removeloadingBlock($('.client-detailed-info'));
+      removeloadingBlock($('.client-revenue-block'));
+      removeloadingBlock($('.client-list-block'));
 
-      $(this).attr('data-client-total', clientTotal);
-
-      let clientPercent = parseFloat((clientTotal / (generalTotal / 100)).toFixed(1));
-      let clientColor;
-
-      if (clientPercent <= 10) {
-        clientColor = '#D44D5C';
-      } else if (clientPercent > 10 && clientPercent <= 40) {
-        clientColor = '#FFD700';
-      } else if (clientPercent > 40) {
-        clientColor = '#0EAD69';
+      /* Hiding block if there is no sales */
+      if(clientData.sales.length === 0) {
+        $('.client-revenue-block').hide();
+        $('.client-list-block').hide();
+      } else {
+        $('.client-revenue-block').css('display', 'flex');
+        $('.client-list-block').css('display', 'flex');
       }
-      $(this).find('.dcir-line-inner').css({
-        "width": `${clientPercent}%`,
-        "background-color": clientColor
-      });
-      $(this).find('.dist-client-item-result').find('p').text(`${clientPercent}%`)
 
-      clientsData.push({
-        client: $(this).attr('data-id'),
-        total: clientTotal
-      });
+      /* Setting basic info */
+      $('#name').text(clientData.client.name);
+      if(clientData.client.adress) $('#adress').text(clientData.client.adress);
+      if(clientData.client.phoneNumber) $('#phone').text(`+7 ${clientData.client.phoneNumber}`);
+      if(clientData.client.email) $('#email').text(clientData.client.email);
 
-    });
-
-    clientsData.sort((a, b) => b.total - a.total);
-
-    /* Changing info on click */
-    $('.dist-client-item').on('click', function () {
-      let clientId = $(this).attr('data-id');
-      let clientTotal = $(this).attr('data-client-total');
-
-      $('.dist-client-item-active').removeClass('dist-client-item-active');
-      $(this).addClass('dist-client-item-active');
-
-      /* Adding key info in animal card */
-      $('#name').text($(this).attr('data-name'));
-      $('#adress').text($(this).attr('data-adress') !== 'undefined' ? $(this).attr('data-adress') : '');
-      $('#phone').text($(this).attr('data-phone') !== 'undefined' ? $(this).attr('data-phone') : '');
-      $('#email').text($(this).attr('data-email') !== 'undefined' ? $(this).attr('data-email') : '');
-
-      $('.dist-client-card-edit').attr('href', `/distribution/edit-client/${clientId}`)
-
-      $('.dist-client-card-product-box').empty();
-      $(this).find('.dist-client-item-hidden').each(function () {
-        let rusName = $(this).attr('data-product');
-        let price = $(this).attr('data-price');
-        $('.dist-client-card-product-box').append(`<div class="dist-client-card-product">${productsToRus[rusName.replace('-', '')]} - ${price}₽</div>`)
-      });
-
-      /* Working with products */
-      clientsData.forEach((el, inx) => {
-        if (el.client === clientId) {
-          $('#place').text(inx + 1)
-        }
-      });
-
-      let selClientData = []
-
-      data.forEach((el) => {
-        if (el.client === clientId) selClientData.push(el);
-      });
-      selClientData.sort((a, b) => b.date - a.date)
-
-      /* Adding historical info */
-      $('.dcd-purchases-block').empty();
-      selClientData.forEach((el, inx, arr) => {
-
-        if (inx === 0 || moment(el.date).dayOfYear() !== moment(arr[inx - 1].date).dayOfYear() || moment(el.date).year() !== moment(arr[inx - 1].date).year()) {
-          if (moment().year() === moment(el.date).year()) {
-            $('.dcd-purchases-block').append(`<div class="dcd-purchases-date">${moment(el.date).lang('ru').format('DD MMMM')}</div>`)
-          } else {
-            $('.dcd-purchases-block').append(`<div class="dcd-purchases-date">${moment(el.date).lang('ru').format('DD MMMM YYYY')}</div>`)
-          }
-        }
-        $('.dcd-purchases-block').append(`
-          <div class="dcd-purchases-item">      
-            <div class="dcd-purchases-item-info">     
-              <div class="dcd-purchases-item-title">${productsToRus[el.product.replace('-', '')]}</div>
-              <div class="dcd-purchases-item-size">${el.size} ${el.unit === 'l' ? 'л.' : 'кг.'}</div>
-            </div>
-            <div class="dcd-purchases-item-sum">+ ${el.price} ₽</div>
+      /* Adding listed products */
+      $('.cdi-product-line').empty()
+      clientData.client.products.forEach(prod => {
+        $('.cdi-product-line').append(`
+          <div class="cdi-product">
+            <p>${productsToRus[prod.productName.replace('-', '')]}</p>
+            <p>${prod.pricePer} ₽</p>
           </div>
-          `)
-
+        `);
       });
 
-      let selClientDataSorted = [];
+      /* Adding added date and edit button */
+      $('#added-date').text(`Добавлен: ${moment(clientData.client.creationDate).locale('ru').format('DD MMMM, YYYY')}`)
 
-      selClientData.forEach(el => {
-        if (!selClientDataSorted.find(prod => prod.product === el.product)) {
-          selClientDataSorted.push({
-            product: el.product,
-            unit: el.unit,
-            allData: [el]
-          })
+      $('#edit-client').attr('href', `/distribution/edit-client/${clientData.client._id}`)
+
+      /* Adding revenue block */
+      $('#revenue-details').find('.client-revenue-place p').text($(this).attr('data-place'));
+      let totalRev = 0;
+      let totalSize = 0;
+      clientData.sales.forEach(sale => {
+        totalSize += sale.size;
+        totalRev += sale.price;
+      });
+      $('#revenue-details').find('.crd-header p').text(`${(totalRev.toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₽`);
+      $('#size-details').find('.crd-header p').text(`${(totalSize).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} кг./л.`);
+
+      const salesFormated = [];
+      clientData.sales.forEach(sale => {
+        if(salesFormated.find(el => el.product === sale.product)) {
+          let el = salesFormated.find(el => el.product === sale.product);
+
+          el.size += sale.size;
+          el.sizeShare = el.size / totalSize;
+          el.revenue += sale.price;
+          el.revenueShare = el.revenue / totalRev;
         } else {
-          selClientDataSorted.find(prod => prod.product === el.product).allData.push(el)
+          salesFormated.push({
+            product: sale.product,
+            size: sale.size,
+            sizeShare: sale.size / totalSize,
+            revenue: sale.price,
+            revenueShare: sale.price / totalRev,
+            unit: sale.unit
+          });
         }
       });
 
-      let clientTotalStr = clientTotal.split('').reverse().join('').replace(/.{3}/g, '$&,').split('').reverse().join('');
-      if (clientTotalStr.startsWith(',')) clientTotalStr = clientTotalStr.split('').slice(1).join('');
-      $('.dcd-total-block-header p').text(`${clientTotalStr} ₽`)
+      salesFormated.sort((a, b) => b.revenueShare - a.revenueShare);
 
-      $('.dcd-products-break-box').empty();
-      $('.dcd-total-products-box').empty();
-      selClientDataSorted.forEach((data, inx) => {
-        let totalSize = 0;
-        let totalPrice = 0;
-        let totalMoney = 0;
-
-        data.allData.forEach(allEl => {
-          totalSize += allEl.size;
-          totalPrice += allEl.pricePer;
-          totalMoney += allEl.price;
-        })
-        $('.dcd-products-break-box').append(`
-            <div class="dcd-break-product" data-inx="${inx}">
-            <div class="dcd-break-product-title">${productsToRus[data.product.replace('-', '')]}</div>
-            <div class="dcd-break-product-info-box">
-            <div class="dcd-break-product-info">
-            <div class="dcd-break-product-info-title">Кол-во</div>
-            <div class="dcd-break-product-info-text">${totalSize} ${data.unit === 'l' ? 'л.' : 'кг.'}</div>
-            </div>
-            <div class="dcd-break-product-info">
-            <div class="dcd-break-product-info-title">Цена</div>
-            <div class="dcd-break-product-info-text">${Math.round(totalPrice / data.allData.length)}₽</div>
-              </div>
-            </div>
-            </div>
-            `);
-
-        $('.dcd-total-products-box').append(`
-          <div class="dcd-total-product" data-percent="${totalMoney / (clientTotal / 100)}">
-            <div class="dcd-total-product-line"></div>
-            <div class="dcd-total-product-title">${productsToRus[data.product.replace('-', '')]}</div>
-            <div class="dcd-total-product-info">${(totalMoney / (clientTotal / 100)).toFixed(1)}%
-              <div class="dcd-total-product-info-hidden">${totalMoney} ₽</div>
+      $('#revenue-details').find('.crd-dropdown-block').empty();
+      
+      salesFormated.forEach((sale, index) => {
+        $('#revenue-details').find('.crd-dropdown-block').append(`
+          <div class="crd-item">
+            <div class="crd-item-title">${productsToRus[sale.product.replace('-', '')]}</div>
+            <div class="crd-item-line">
+              <p>${(sale.revenueShare * 100).toFixed(1)} %</p>
+              <div class="crd-item-line-inner" data-rev="${sale.revenueShare}" data-index="${index + 1}"></div>
+              <p>${sale.revenue > 1000 ? `${Math.round(sale.revenue / 1000)}к` : sale.revenue} ₽</p>
             </div>
           </div>
         `);
       });
 
-      const breakProductColors = ['#fb8d34', '#ff5230', '#9d4b9f', '#606ae5', '#43d7e5']
-      $('.dcd-break-product').each(function () {
-        $(this).find('.dcd-break-product-title').css('color', breakProductColors[parseFloat($(this).attr('data-inx'))]);
+      $('#revenue-details').find('.crd-item-line-inner').each(function () {
+        anime({
+          targets: $(this)[0],
+          delay: 200 * parseFloat($(this).attr('data-index')),
+          duration: 200,
+          width: `${(parseFloat($(this).attr('data-rev')) * 100) / 2.5}%`
+        })
       });
 
-      $('.dcd-total-product').each(function () {
-        $(this).find('.dcd-total-product-line').css('width', `${parseFloat($(this).attr('data-percent'))}%`);
+      salesFormated.sort((a, b) => b.sizeShare - a.sizeShare);
+
+      $('#size-details').find('.crd-dropdown-block').empty();
+      
+      salesFormated.forEach((sale, index) => {
+        $('#size-details').find('.crd-dropdown-block').append(`
+          <div class="crd-item">
+            <div class="crd-item-title">${productsToRus[sale.product.replace('-', '')]}</div>
+            <div class="crd-item-line">
+              <p>${(sale.sizeShare * 100).toFixed(1)} %</p>
+              <div class="crd-item-line-inner" data-rev="${sale.sizeShare}" data-index="${index + 1}"></div>
+              <p>${sale.size > 1000 ? `${Math.round(sale.size / 1000)}к` : sale.size} ${sale.unit === 'kg' ? 'кг.' : 'л.'}</p>
+            </div>
+          </div>
+        `);
       });
 
+      $('#size-details').find('.crd-item-line-inner').each(function () {
+        anime({
+          targets: $(this)[0],
+          delay: 200 * parseFloat($(this).attr('data-index')),
+          duration: 200,
+          width: `${(parseFloat($(this).attr('data-rev')) * 100) / 2.5}%`
+        })
+      });
+
+      /* Adding all purchases to a list */
+      $('#all-purchases').empty();
+      clientData.sales.sort((a, b) => new Date(b.date) - new Date(a.date));
+      clientData.sales.forEach(sale => {
+        $('#all-purchases').append(`
+          <div class="dist-info-list-item">
+            <div class="dist-info-list-item-header">
+              <div class="dist-info-list-item-img">
+                <img src="/img/icons/sale-small-icon.png">
+              </div>
+              <div class="dist-info-list-item-product">${productsToRus[sale.product.replace('-', '')]}</div>
+              <div class="dist-info-list-item-date">${moment(sale.date).format('DD.MM.YYYY')}</div>
+              <div class="dist-info-list-item-product">${sale.size > 1000 ? `${Math.round(sale.size / 1000)}к` : sale.size} ${sale.unit === 'kg' ? 'кг.' : 'л.'}</div>
+              <div class="dist-info-list-item-size dist-info-list-item-size-inc">+${sale.price}</div>
+            </div>
+          </div>
+        `);
+      });
+      console.log(clientData);
     });
 
-    $('.dist-client-item-active').trigger('click');
+    $('.client-item').first().trigger('click');
 
     /* Changing the time period */
     $('.main-page-header-period').on('change', function () {
@@ -8201,6 +8610,8 @@ $(document).ready(async function () {
         pricePer: parseFloat($(this).attr('data-price-per'))
       });
     });
+
+    if (productData.length === 0) emptyBlock($('.dist-main-columns-block'), 'Недостаточно данных', 'Информация за данный период отсутсвует')
 
     $('.dmm-btn').on('click', function () {
       $('.dmm-btn-active').removeClass('dmm-btn-active');
@@ -8577,6 +8988,880 @@ $(document).ready(async function () {
       location.assign(`/distribution/?start=${startDate}&end=${endDate}`)
     });
 
+  }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* FEED MODULE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* ADD FEED SAMPLE PAGE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  if (document.querySelector('#feed-sample-container') || document.querySelector('#edit-feed-sample-container')) {
+    /* Switching between two types of feed */
+    $('#fixed-ratios').on('click', function () {
+      if ($(this).hasClass('ai-radio-active')) {
+        $('.compound-input').css('display', 'flex');
+      } else {
+        $('.compound-input').hide();
+      }
+    });
+    $('.ai-switch-btn').on('click', function () {
+      if ($(this).attr('id') === 'compound') {
+        $('.compound-radio').css('display', 'flex');
+        $('#fixed-ratios').trigger('click');
+        $('#fixed-ratios').trigger('click');
+      } else {
+        $('.compound-input').hide();
+        $('.compound-radio').hide();
+      }
+    });
+
+    /* Adding more ingredients */
+    $('#add-ingredient-input').on('click', function () {
+      const number = parseFloat($('.ai-combined-block ').last().attr('data-ingredient'))
+      $(this).parent().before(`
+        <div class="ai-combined-block ai-combined-block-${number + 1} compound-input" data-ingredient="${number + 1}" style="display:flex">
+          <div class="ai-combined-block-title">Ингредиент #${number + 1}</div>
+          <div class="ai-combined-block-remove">
+            <ion-icon name="close"></ion-icon>
+          </div>
+          <div class="ai-input-block ai-input-block-text">
+            <div class="ai-input-label">Наименование ингредиента</div>
+            <input class="ai-input ai-input-text ai-input-validation ingredient" type="text" placeholder=""/>
+          </div>
+          <div class="ai-input-block ai-input-block-text">
+            <div class="ai-input-label">Количество</div>
+            <input class="ai-input ai-input-text ai-input-validation amount" type="number" placeholder=""/>
+            <div class="ai-inside-text">%</div>
+          </div>
+        </div>
+      `)
+    });
+
+
+
+    /* Removing ingredient */
+    $('.ai-form-container').on('click', '.ai-combined-block-remove', function () {
+      $(this).parent().remove();
+
+      $('.ai-combined-block').each(function () {
+        if ($(this).prev() && $(this).prev().hasClass('ai-combined-block') && parseFloat($(this).prev().attr('data-ingredient')) + 1 !== parseFloat($(this).attr('data-ingredient'))) {
+          $(this).attr('data-ingredient', parseFloat($(this).prev().attr('data-ingredient')) + 1);
+          $(this).find('.ai-combined-block-title').text(`ИНГРЕДИЕНТ #${parseFloat($(this).prev().attr('data-ingredient')) + 1}`)
+        } else if ($(this).prev() && !$(this).prev().hasClass('ai-combined-block')) {
+          $(this).attr('data-ingredient', 1);
+          $(this).find('.ai-combined-block-title').text(`ИНГРЕДИЕНТ #1`)
+        }
+      });
+    });
+
+    /* Validating amounts so it will always be 100% total */
+    let left = 100;
+    $('.ai-form-container').on('keyup change', '.amount', function (e) {
+      let elVal = $(this).val().length > 0 ? parseFloat($(this).val()) : 0;
+      $(this).val(Math.abs(elVal));
+      if (e.which === 8) {
+        left = 100
+        $('.amount').each(function () {
+          let val = parseFloat($(this).val())
+          if ($(this).val().length === 0) val = 0;
+          left -= val;
+        });
+        left += elVal
+        return;
+      }
+      if (elVal > left) $(this).val(left);
+    });
+
+    $('.ai-form-container').on('blur', '.amount', function () {
+      left = 100
+      $('.amount').each(function () {
+        let val = parseFloat($(this).val())
+        if ($(this).val().length === 0) val = 0;
+        left -= val;
+      });
+    });
+
+    /* Validation form */
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-combined-block').each(function () {
+        if ($(this).find('.ingredient').val().length > 0 && $(this).find('.amount').val().length > 0) {
+          $(this).addClass('ai-combined-block-valid')
+        } else {
+          $(this).removeClass('ai-combined-block-valid')
+        }
+      });
+
+      if ($('.ai-switch-btn-active').attr('id') === 'regular' && $('#name').hasClass('ai-valid-input') && $('#unit').find('.ai-select-item-selected').length > 0 || $('.ai-switch-btn-active').attr('id') === 'compound' && $('#name').hasClass('ai-valid-input') && $('#unit').find('.ai-select-item-selected').length > 0 && !$('#fixed-ratios').hasClass('ai-radio-active') || $('.ai-switch-btn-active').attr('id') === 'compound' && $('#name').hasClass('ai-valid-input') && $('#unit').find('.ai-select-item-selected').length > 0 && $('#fixed-ratios').hasClass('ai-radio-active') && $('.ai-combined-block-valid').length >= 2 && $('body').find('.ai-warning-text').length === 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    if (document.querySelector('#edit-feed-sample-container')) {
+      $('.ai-switch-btn-click').trigger('click');
+      $('.ai-input').trigger('keyup');
+
+      $('.ai-select-item-selected').trigger('click').trigger('click');
+    }
+
+    /* Submiting data */
+    $('.ai-input-submit-btn').on('click', async function () {
+      if (document.querySelector('#feed-sample-container')) {
+        const type = 'sample';
+        const name = $('#name').val();
+        const unit = $('#unit').find('.ai-select-item-selected').attr('data-val');
+        const category = `${$('.ai-switch-btn-active').attr('id')}-feed`;
+        const ingredients = [];
+        $('.ai-combined-block-valid').each(function () {
+          ingredients.push({ name: $(this).find('.ingredient').val(), percent: $(this).find('.amount').val() })
+        })
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await addFeedSampleOrRecord({ type, name, category, unit, ingredients });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      } else if (document.querySelector('#edit-feed-sample-container')) {
+        const id = $(this).attr('data-id');
+        const type = 'sample';
+        const name = $('#name').val();
+        const unit = $('#unit').find('.ai-select-item-selected').attr('data-val');
+        const category = `${$('.ai-switch-btn-active').attr('id')}-feed`;
+        const ingredients = [];
+        $('.ai-combined-block-valid').each(function () {
+          ingredients.push({ name: $(this).find('.ingredient').val(), percent: $(this).find('.amount').val() })
+        })
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await editFeedSampleOrRecord(id, { type, name, category, unit, ingredients });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      }
+
+    });
+  }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* ADD FEED RECORD PAGE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  if (document.querySelector('#feed-record-container') || document.querySelector('#edit-feed-record-container')) {
+    /* Changing switch button */
+    $('.ai-switch-btn').on('click', function () {
+      if ($(this).hasClass('ai-switch-btn-left')) {
+        $('.ai-switch-btn-slider').css('background-color', '#0EAD69')
+        $('.ai-radio-block').find('.ai-radio-text').text('Автопополнение');
+      } else {
+        $('.ai-switch-btn-slider').css('background-color', '#D44D5C')
+        $('.ai-radio-block').find('.ai-radio-text').text('Автосписание');
+      }
+    });
+
+    /* Showing the auto time period */
+    $('#auto-radio').on('click', function () {
+      if ($(this).hasClass('ai-radio-active')) {
+        $('.auto-time-input').css('display', 'flex');
+      } else {
+        $('.auto-time-input').css('display', 'none');
+      }
+    });
+
+    /* Show ingredients on compound feed selection */
+    let feedSample;
+    $('#feed').parent().find('.ai-select-item').on('click', async function () {
+      feedSample = await getOneRecord($(this).attr('data-id'));
+      $('.ai-additional-small-block').css('display', 'none');
+      $('.compound-input').css('display', 'none');
+
+      if (feedSample.category === 'compound-feed' && feedSample.ingredients.length > 0) {
+        $('.ai-additional-small-block').css('display', 'flex');
+        $('.ai-additional-small-block').empty();
+        feedSample.ingredients.forEach((ing, i, arr) => {
+          $('.ai-additional-small-block').append(`
+          <div class="ai-as-block-item" data-name="${ing.name}" data-percent="${ing.percent}">
+          <div class="ai-as-block-item-number">${i + 1}</div>
+          <div class="ai-as-block-item-text">${ing.name}</div>
+          <div class="ai-as-block-item-sub-text">${ing.percent}%</div>
+          <div class="ai-as-block-item-text ai-as-block-item-separate total"></div>
+          </div>
+          `);
+        })
+      } else if (feedSample.category === 'compound-feed' && feedSample.ingredients.length === 0) {
+        $('.compound-input').css('display', 'flex');
+      }
+
+      if (feedSample.unit === 'kg') $('#amount').parent().find('.ai-inside-text').text('кг.');
+      if (feedSample.unit === 'bale') $('#amount').parent().find('.ai-inside-text').text('тюк.');
+
+      $('#amount').trigger('keyup');
+    });
+
+    /* Counting percentages */
+    $('#amount').on('keyup change', function () {
+      if ($(this).val().length === 0) return $('.total').text('');
+      let total = parseFloat($(this).val());
+      $('.ai-as-block-item').each(function () {
+        $(this).find('.total').text(`${Math.round(total * (parseFloat($(this).attr('data-percent')) / 100))} кг.`)
+      })
+    });
+
+    /* Adding more ingredients */
+    $('#add-ingredient-input').on('click', function () {
+      const number = parseFloat($('.ai-combined-block ').last().attr('data-ingredient'))
+      $(this).parent().before(`
+        <div class="ai-combined-block ai-combined-block-${number + 1} compound-input" data-ingredient="${number + 1}" style="display:flex">
+          <div class="ai-combined-block-title">Ингредиент #${number + 1}</div>
+          <div class="ai-combined-block-remove">
+            <ion-icon name="close"></ion-icon>
+          </div>
+          <div class="ai-input-block ai-input-block-text">
+            <div class="ai-input-label">Наименование ингредиента</div>
+            <input class="ai-input ai-input-text ai-input-validation ingredient" type="text" placeholder=""/>
+          </div>
+          <div class="ai-input-block ai-input-block-text">
+            <div class="ai-input-label">Количество</div>
+            <input class="ai-input ai-input-text ai-input-validation amount" type="number" placeholder=""/>
+            <div class="ai-inside-text">%</div>
+          </div>
+        </div>
+      `)
+    });
+
+    /* Removing ingredient */
+    $('.ai-form-container').on('click', '.ai-combined-block-remove', function () {
+      $(this).parent().remove();
+
+      $('.ai-combined-block').each(function () {
+        if ($(this).prev() && $(this).prev().hasClass('ai-combined-block') && parseFloat($(this).prev().attr('data-ingredient')) + 1 !== parseFloat($(this).attr('data-ingredient'))) {
+          $(this).attr('data-ingredient', parseFloat($(this).prev().attr('data-ingredient')) + 1);
+          $(this).find('.ai-combined-block-title').text(`ИНГРЕДИЕНТ #${parseFloat($(this).prev().attr('data-ingredient')) + 1}`)
+        } else if ($(this).prev() && !$(this).prev().hasClass('ai-combined-block')) {
+          $(this).attr('data-ingredient', 1);
+          $(this).find('.ai-combined-block-title').text(`ИНГРЕДИЕНТ #1`)
+        }
+      });
+    });
+
+    /* Validating amounts so it will always be 100% total */
+    let left = 100;
+    $('.ai-form-container').on('keyup change', '.amount', function (e) {
+      let elVal = $(this).val().length > 0 ? parseFloat($(this).val()) : 0;
+      $(this).val(Math.abs(elVal));
+      if (e.which === 8) {
+        left = 100
+        $('.amount').each(function () {
+          let val = parseFloat($(this).val())
+          if ($(this).val().length === 0) val = 0;
+          left -= val;
+        });
+        left += elVal
+        return;
+      }
+      if (elVal > left) $(this).val(left);
+    });
+
+    $('.ai-form-container').on('blur', '.amount', function () {
+      left = 100
+      $('.amount').each(function () {
+        let val = parseFloat($(this).val())
+        if ($(this).val().length === 0) val = 0;
+        left -= val;
+      });
+    });
+
+    /* Validation form */
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-combined-block').each(function () {
+        if ($(this).find('.ingredient').val().length > 0 && $(this).find('.amount').val().length > 0) {
+          $(this).addClass('ai-combined-block-valid')
+        } else {
+          $(this).removeClass('ai-combined-block-valid')
+        }
+      });
+      let pass = true;
+      if ($('#feed').parent().find('.ai-select-item-selected').attr('data-type') === 'compound-feed' && parseFloat($('#feed').parent().find('.ai-select-item-selected').attr('data-ing')) === 0) {
+        if ($('.ai-combined-block-valid').length < 2) pass = false;
+      }
+      if ($('#auto-radio').hasClass('ai-radio-active') && $('#auto-span').val().length === 0) pass = false;
+
+
+      if (pass && $('#feed').parent().find('.ai-select-item-selected').length > 0 && $('#date').hasClass('ai-valid-input') && $('#amount').hasClass('ai-valid-input')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    if (document.querySelector('#edit-feed-record-container')) {
+      $('.ai-switch-btn-click').trigger('click');
+      $('.ai-input').trigger('keyup');
+
+      $('.ai-select-item-selected').trigger('click').trigger('click');
+      $('.ai-small-select-item-selected').trigger('click').trigger('click');
+      $('.ai-radio').trigger('click').trigger('click');
+    }
+
+
+    /* Submiting data */
+    $('.ai-input-submit-btn').on('click', async function () {
+      if (document.querySelector('#feed-record-container')) {
+        const type = 'record';
+        const status = $('.ai-switch-btn-active').attr('id');
+        const feed = $('#feed').parent().find('.ai-select-item-selected').attr('data-id');
+        const amount = parseFloat($('#amount').val());
+        const unit = $('#feed').parent().find('.ai-select-item-selected').attr('data-unit');
+        const date = new Date($('#date').val());
+        const autoAction = $('#auto-radio').hasClass('ai-radio-active');
+        const autoTimeSpan = parseFloat($('#auto-span').val())
+        const autoTimeSpanUnit = $('#span-unit').find('.ai-small-select-item-selected').attr('data-val');
+        let nextAutoAction;
+        if (autoAction) nextAutoAction = new Date(moment(date).add(autoTimeSpan, autoTimeSpanUnit));
+        const ingredients = [];
+        if (feedSample.category === 'compound-feed') {
+          if (feedSample.ingredients.length === 0) {
+            $('.ai-combined-block-valid').each(function () {
+              ingredients.push({ name: $(this).find('.ingredient').val(), percent: $(this).find('.amount').val() })
+            })
+          } else {
+            $('.ai-as-block-item').each(function () {
+              ingredients.push({ name: $(this).attr('data-name'), percent: parseFloat($(this).attr('data-percent')) })
+            })
+          }
+        }
+        const animalGroup = $('#animal-group').parent().find('.ai-select-item-selected').attr('data-group');
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await addFeedSampleOrRecord({ type, status, feed, amount, unit, date, autoAction, autoTimeSpan, autoTimeSpanUnit, nextAutoAction, ingredients, animalGroup });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      } else if (document.querySelector('#edit-feed-record-container')) {
+        const id = $(this).attr('data-id');
+        const type = 'record';
+        const status = $('.ai-switch-btn-active').attr('id');
+        const feed = $('#feed').parent().find('.ai-select-item-selected').attr('data-id');
+        const amount = parseFloat($('#amount').val());
+        const unit = $('#feed').parent().find('.ai-select-item-selected').attr('data-unit');
+        const date = new Date($('#date').val());
+        const autoAction = $('#auto-radio').hasClass('ai-radio-active');
+        const autoTimeSpan = parseFloat($('#auto-span').val())
+        const autoTimeSpanUnit = $('#span-unit').find('.ai-small-select-item-selected').attr('data-val');
+        let nextAutoAction;
+        if (autoAction) nextAutoAction = new Date(moment(date).add(autoTimeSpan, autoTimeSpanUnit));
+        const ingredients = [];
+        if (feedSample.category === 'compound-feed') {
+          if (feedSample.ingredients.length === 0) {
+            $('.ai-combined-block-valid').each(function () {
+              ingredients.push({ name: $(this).find('.ingredient').val(), percent: $(this).find('.amount').val() })
+            })
+          } else {
+            $('.ai-as-block-item').each(function () {
+              ingredients.push({ name: $(this).attr('data-name'), percent: parseFloat($(this).attr('data-percent')) })
+            })
+          }
+        }
+        const animalGroup = $('#animal-group').parent().find('.ai-select-item-selected').attr('data-group');
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await editFeedSampleOrRecord(id, { type, status, feed, amount, unit, date, autoAction, autoTimeSpan, autoTimeSpanUnit, nextAutoAction, ingredients, animalGroup });
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      }
+
+    });
+
+
+
+  }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* FEED MAIN PAGE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* FEED HISROTY AND PROJECTION BLOCK */
+  if (document.querySelector('.fm-history-block ')) {
+    $('.mp-row-btn').on('click', async function () {
+      removeEmptyBlock($('.feed-main-graph-block'))
+      const records = await getFeedRecords($(this).attr('data-id'));
+      if (records.length === 0) return emptyBlock($('.feed-main-graph-block'), 'Недостаточно данных', 'Добавьте записи этого вида корма чтобы увидеть результаты')
+      const projData = await getFarmProjections($('#mp-feed').attr('data-farm-id'), 5);
+      const recordsFormatedBalance = [];
+      records.forEach(rec => {
+        let total = 0;
+        records.forEach(recTot => {
+          if ((new Date(rec.date) > new Date(recTot.date))) {
+            if (recTot.status === 'increase') total += recTot.amount;
+            if (recTot.status === 'decrease') total -= recTot.amount;
+          }
+        })
+        if (rec.status === 'increase') total += rec.amount;
+        if (rec.status === 'decrease') total -= rec.amount;
+        recordsFormatedBalance.push({ record: rec, total });
+      });
+      recordsFormatedBalance.sort((a, b) => new Date(a.record.date) - new Date(b.record.date));
+
+      $('.fm-history-block').find('.mp-hg-btn').off('click');
+      $('.fm-history-block').find('.mp-hg-btn').on('click', function () {
+        let workingArr
+        if ($(this).attr('data-months') !== 'all') {
+          let startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'months'));
+          workingArr = recordsFormatedBalance.filter(el => new Date(el.record.date) >= startDate);
+        } else {
+          workingArr = recordsFormatedBalance;
+        }
+
+        /* Setting max and min */
+        let max, min;
+        max = 0;
+        min = 0;
+
+        workingArr.forEach(el => {
+          if (max < el.total) max = el.total;
+          if (min > el.total) min = el.total;
+        });
+        max = Math.ceil(max / 10) * 10 * 1.5;
+
+        $('.basic-graph-svg').remove()
+
+        /* Adding main SVG */
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+        svg.classList.add('basic-graph-svg')
+        $('.fm-history-block').append(svg);
+        svg.style.width = $('.fm-history-block').width();
+        svg.style.height = $('.fm-history-block').height();
+
+        /* Counting the horizontal gap */
+        let horGap = parseFloat($('.fm-history-block').height()) / 12;
+
+        const workingAreaHeight = Math.round($('.fm-history-block').height() - horGap * 2);
+        const workingAreaWidth = Math.round($('.fm-history-block').width() - horGap * 2);
+
+        /* Adding horizontal grid lines and ticks */
+        for (let i = 11; i >= 1; i--) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', 0)
+          gridLine.setAttribute('y1', i * horGap)
+          gridLine.setAttribute('x2', parseFloat($('.fm-history-block').width()))
+          gridLine.setAttribute('y2', i * horGap)
+        }
+
+        /* Adding the vertical grid lines */
+        for (let i = 1; i <= parseFloat($('.fm-history-block').width()) / horGap; i++) {
+          const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+          gridLine.classList.add('basic-graph-grid-line')
+          svg.append(gridLine);
+          gridLine.setAttribute('x1', i * horGap)
+          gridLine.setAttribute('y1', 0)
+          gridLine.setAttribute('x2', i * horGap)
+          gridLine.setAttribute('y2', parseFloat($('.fm-history-block').height()))
+        }
+
+        /* Adding data */
+        let start = new Date(workingArr[0].record.date);
+        let end = new Date(workingArr[workingArr.length - 1].record.date);
+
+        let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+
+
+        workingArr.forEach((data, inx, arr) => {
+          let currentDaysSpan = Math.round((new Date(data.record.date).getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+          /* Adding data line */
+          let path;
+          if (inx === 0) {
+            path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+            path.classList.add('basic-graph-point-line');
+            path.classList.add('history-graph-data');
+            path.style.stroke = `#8ED081`;
+            svg.append(path);
+
+            path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.total / (max / 100) / 100))}`)
+            path.setAttribute('id', `graph-line-history`);
+          } else {
+            path = document.getElementById(`graph-line-history`);
+            path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.total / (max / 100) / 100))}`)
+          }
+
+        });
+
+        anime({
+          targets: '.history-graph-data',
+          strokeDashoffset: [1500, 0],
+          easing: 'easeInOutSine',
+          duration: 1500,
+          delay: function (el, i) { return i * 250 },
+        });
+
+
+
+
+
+      });
+      $('.fm-history-block').find('.mp-hg-btn').trigger('click');
+    });
+  };
+
+  /* FEED / RESULT RELATION GRAPH */
+  /* if(document.querySelector('#feed-result-graph ')) {
+    $('.mp-row-btn').on('click', async function (){
+      const animals = await getAnimalsByCategory('all');
+    });
+  }; */
+
+  if (document.querySelector('#mp-feed')) {
+    /* Warning block */
+    /* Change blocks */
+    $('.feed-warning-block').hide();
+    $('.feed-warning-block').first().addClass('feed-warning-active').css('display', 'flex');
+
+    if ($('.feed-warning-block').length > 1) {
+      setInterval(() => {
+        $('.feed-warning-active').addClass('animate__animated animate__slideOutDown');
+
+        let el;
+        if ($('.feed-warning-active').next().length > 0 && $('.feed-warning-active').next().hasClass('feed-warning-block')) {
+          el = $('.feed-warning-active').next();
+        } else {
+          el = $('.feed-warning-block').first();
+        }
+
+        el.removeClass('animate__animated animate__slideOutDown animate__slideInDown');
+        el.addClass('animate__animated animate__slideInDown').css('display', 'flex');
+
+        setTimeout(() => {
+          $('.feed-warning-active').hide();
+          $('.feed-warning-active').removeClass('animate__animated animate__slideOutDown animate__slideInDown feed-warning-active');
+          el.addClass('feed-warning-active')
+        }, 1000)
+
+
+      }, 5000);
+    }
+    /* Formating dates */
+    $('.feed-history-date').each(function () {
+      $(this).text(moment($(this).attr('data-date')).lang('ru').format('MMMM DD').toUpperCase())
+    });
+    /* Change size of history block items */
+    $('.feed-history-item').each(function () {
+      let el = $(this);
+      if (parseFloat($(this).attr('data-num')) < parseFloat($(this).attr('data-max')) * 0.01) {
+        $(this).css('width', 100);
+        $(this).addClass('feed-history-small');
+        $(this).attr('data-size', 'small');
+        $(this).find('.feed-hide').css('opacity', 0);
+        $(this).find('.feed-history-date').text(moment($(this).find('.feed-history-date').attr('data-date')).lang('ru').format('MMM DD').toUpperCase())
+      } else {
+        $(this).css('width', 300 + (parseFloat($(this).attr('data-num')) / (parseFloat($(this).attr('data-max')) / 100) * 2));
+      }
+
+      $('.feed-history-item').each(function () {
+        if (new Date(el.attr('data-date')) < new Date($(this).attr('data-date'))) {
+          el.detach();
+          $(this).after(el);
+        }
+      });
+    });
+
+    $('.feed-history-item').on('click', function () {
+      if ($(this).hasClass('feed-history-small') && $(this).attr('data-size') === 'small') {
+        $(this).css('width', 225);
+        $(this).find('.feed-hide').css('opacity', 1);
+        $(this).attr('data-size', 'full')
+        $(this).find('.feed-history-date').text(moment($(this).find('.feed-history-date').attr('data-date')).lang('ru').format('MMMM DD').toUpperCase())
+      } else if ($(this).hasClass('feed-history-small') && $(this).attr('data-size') === 'full') {
+        $(this).css('width', 100);
+        $(this).find('.feed-hide').css('opacity', 0);
+        $(this).attr('data-size', 'small')
+        $(this).find('.feed-history-date').text(moment($(this).find('.feed-history-date').attr('data-date')).lang('ru').format('MMM DD').toUpperCase())
+      }
+    });
+
+    /* Switching between feeds */
+    $('.mp-row-btn').on('click', async function () {
+      if ($(this).hasClass('mp-row-btn-active')) return;
+
+      $('.mp-row-btn-active').removeClass('mp-row-btn-active');
+      $(this).addClass('mp-row-btn-active');
+
+      /* Showing the auto block once in a while */
+      const id = $(this).attr('data-id');
+      $('.auto-action-block').each(function () {
+        if ($(this).attr('data-id') === id) {
+          $(this).css('display', 'flex');
+        } else {
+          $(this).css('display', 'none');
+        }
+      });
+
+      /* Showing the tile blocks */
+      const records = await getFeedRecords(id);
+      const recordsFormatedBalance = [];
+      const recordsFormatedUse = [];
+      let startSpan = new Date(moment().subtract(6, 'month'));
+      let currentBalance = 0;
+      let balanceMin = undefined;
+      let balanceMax = undefined;
+      let useMin = undefined;
+      let useMax = undefined;
+
+      records.forEach(rec => {
+        if (new Date(rec.date) > startSpan) {
+          let total = 0;
+          records.forEach(recTot => {
+            if ((new Date(rec.date) > new Date(recTot.date))) {
+              if (recTot.status === 'increase') total += recTot.amount;
+              if (recTot.status === 'decrease') total -= recTot.amount;
+            }
+          })
+          if (rec.status === 'increase') total += rec.amount;
+          if (rec.status === 'decrease') total -= rec.amount;
+          recordsFormatedBalance.push({ record: rec, total });
+          if (!balanceMax || total > balanceMax) balanceMax = total;
+          if (!balanceMin || total < balanceMin) balanceMin = total;
+        }
+        if (rec.status === 'increase') currentBalance += rec.amount;
+        if (rec.status === 'decrease') currentBalance -= rec.amount;
+        $('#left-text').text(currentBalance);
+        $('#left-unit').text($(this).attr('data-unit') === 'kg' ? 'кг.' : 'тюк.');
+
+        if (rec.status === 'decrease' && new Date(moment().subtract(6, 'month')) < new Date(rec.date)) {
+          if (recordsFormatedUse.find(el => moment(rec.date).day() === el.day)) {
+            let element = recordsFormatedUse.find(el => moment(rec.date).day() === el.day);
+
+            element.total += rec.amount;
+            element.counter++;
+            element.result = element.total / element.counter
+
+
+            if (!useMax || element.result > useMax) useMax = element.result;
+            if (!useMin || element.result < useMin) useMin = element.result;
+          } else {
+            recordsFormatedUse.push({
+              day: moment(rec.date).day(),
+              total: rec.amount,
+              counter: 1,
+              result: rec.amount
+            });
+
+            if (!useMax || rec.amount > useMax) useMax = rec.amount;
+            if (!useMin || rec.amount < useMin) useMin = rec.amount;
+          }
+        }
+      });
+      recordsFormatedBalance.sort((a, b) => new Date(a.record.date) - new Date(b.record.date));
+      recordsFormatedUse.sort((a, b) => a.day - b.day);
+
+
+      /* BALANCE GRAPH */
+      /* Adding main SVG */
+      $('#tile-graph-left').find('.basic-mini-graph-svg').remove()
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      svg.classList.add('basic-mini-graph-svg')
+      $('#tile-graph-left').append(svg);
+      svg.style.width = $('#tile-graph-left').width();
+      svg.style.height = $('#tile-graph-left').height();
+      const width = $('#tile-graph-left').width();
+      const height = $('#tile-graph-left').height();
+
+      /* Adding info */
+      let circleTimer = 0;
+      recordsFormatedBalance.forEach((rec, inx, arr) => {
+        /* Adding data line */
+        let path;
+        if (inx === 0) {
+          path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+          path.classList.add('basic-graph-point-line');
+          svg.append(path);
+          path.setAttribute('d', `M ${(width / arr.length) * inx} ${height - ((height / balanceMax) * rec.total)}`)
+          path.style.stroke = `#8ED081`;
+
+          path.setAttribute('id', `graph-line-average`);
+        } else {
+          path = document.getElementById(`graph-line-average`);
+          path.setAttribute('d', `${path.getAttribute('d')} L ${(width / arr.length) * inx} ${height - ((height / balanceMax) * rec.total)}`)
+        }
+      });
+      anime({
+        targets: '.basic-graph-point-line',
+        strokeDashoffset: [1500, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+
+      /* DAILY USE GRAPH */
+      useMax = Math.round(useMax * 1.5);
+      useMin = Math.round(useMin / 1.5);
+      let weekTotal = 0;
+      recordsFormatedUse.forEach(weekday => {
+        weekTotal += weekday.result;
+        anime({
+          targets: $(`.fm-use-graph-item-${weekday.day}`).find('.fm-use-graph-item-inner')[0],
+          height: `${weekday.result / (useMax / 100)}%`,
+          easing: 'easeOutSine',
+          duration: 1500,
+          delay: weekday.day * 150,
+        });
+      });
+      $('#use-text').text(Math.round(weekTotal));
+      $('#use-unit').text($(this).attr('data-unit') === 'kg' ? 'кг.' : 'тюк.');
+
+    });
+
+    $('.mp-row-btn').first().trigger('click');
+
+    /* Making the auto action */
+    $('.auto-stop').on('click', function () {
+      askAus($('.main-section '), `Вы уверены что хотите остановить автоматическое ${$(this).parent().attr('data-action')}?`, 'Остановить', 'Продолжить', true, $(this).parent().attr('data-record-id'));
+    });
+
+    $('.main-section').on('click', '#aus-btn-2', function () {
+      $(this).parent().parent().parent().remove();
+    });
+
+    $('.main-section').on('click', '#aus-btn-1', async function () {
+      const res = await editFeedSampleOrRecord($(this).parent().parent().parent().attr('data-data'), { autoActionStop: true, autoActionStopDate: new Date() });
+
+      if (res) {
+        $(this).parent().parent().parent().remove();
+        location.reload(true);
+      }
+
+    });
+  }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* MILK QUALITY PAGE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  if (document.querySelector('#milk-quality-container') || document.querySelector('#edit-milk-quality-container')) {
+    /* Validating form */
+    $('.ai-table-line-input').on('keyup change', function () {
+      if ($(this).val().length > 0) {
+        $(this).addClass('ai-table-line-input-valid');
+      } else {
+        $(this).removeClass('ai-table-line-input-valid');
+      }
+    });
+
+    $('*').on('click mousemove change keyup', function () {
+      if ($('#date').hasClass('ai-valid-input') && $('.ai-table-line-input-valid').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    if (document.querySelector('#edit-milk-quality-container')) {
+      $('input').trigger('change');
+    }
+
+    /* Submiting data */
+    $('.ai-input-submit-btn').on('click', async function () {
+      if (document.querySelector('#milk-quality-container')) {
+        const data = {
+          date: new Date($('#date').val()),
+          water: parseFloat($('#water').val()),
+          dryResidue: parseFloat($('#dryResidue').val()),
+          fat: parseFloat($('#fat').val()),
+          casein: parseFloat($('#casein').val()),
+          sugar: parseFloat($('#sugar').val()),
+          phosphatides: parseFloat($('#phosphatides').val()),
+          sterols: parseFloat($('#sterols').val()),
+          albumen: parseFloat($('#albumen').val()),
+          otherProteins: parseFloat($('#otherProteins').val()),
+          nonProteinCompounds: parseFloat($('#nonProteinCompounds').val()),
+          saltsOfInorganicAcids: parseFloat($('#saltsOfInorganicAcids').val()),
+          ash: parseFloat($('#ash').val()),
+          pigments: parseFloat($('#pigments').val()),
+        }
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await addMilkQuality(data);
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      } else if (document.querySelector('#edit-milk-quality-container')) {
+        const id = $(this).attr('data-id');
+        const data = {
+          date: new Date($('#date').val()),
+          water: parseFloat($('#water').val()),
+          dryResidue: parseFloat($('#dryResidue').val()),
+          fat: parseFloat($('#fat').val()),
+          casein: parseFloat($('#casein').val()),
+          sugar: parseFloat($('#sugar').val()),
+          phosphatides: parseFloat($('#phosphatides').val()),
+          sterols: parseFloat($('#sterols').val()),
+          albumen: parseFloat($('#albumen').val()),
+          otherProteins: parseFloat($('#otherProteins').val()),
+          nonProteinCompounds: parseFloat($('#nonProteinCompounds').val()),
+          saltsOfInorganicAcids: parseFloat($('#saltsOfInorganicAcids').val()),
+          ash: parseFloat($('#ash').val()),
+          pigments: parseFloat($('#pigments').val()),
+        }
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        const response = await editMilkQuality(id, data);
+
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      }
+
+    });
   }
 
 

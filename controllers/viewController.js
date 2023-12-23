@@ -10,6 +10,8 @@ const Calendar = require('../models/calendarModel');
 const Inventory = require('../models/inventoryModel');
 const Client = require('../models/clientModel');
 const Product = require('../models/productModel');
+const Feed = require('../models/feedModel');
+const MilkQuality = require('../models/milkQualityModel');
 
 exports.renderLogin = catchAsync(async (req, res, next) => {
   //-const cows = await Animal.find({ farm: '628c8bc53108dae81ddad028', gender: 'female' });
@@ -92,6 +94,10 @@ exports.renderAllEmployees = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderDataHandler = catchAsync(async (req, res, next) => {
+
+});
+
 /////////////////
 /////////////////
 /////////////////
@@ -146,7 +152,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
     let lastInsemRes = false;
     let lastInsem;
     let lastLact;
-     if (insemAmount > 0) {
+    if (insemAmount > 0) {
       lastInsemRes = cow.inseminations[cow.inseminations.length - 1].success;
       lastInsem = cow.inseminations[cow.inseminations.length - 1];
     }
@@ -157,19 +163,66 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
     if (lactAmount === 0 && !lastInsemRes && new Date() > new Date(moment(cow.birthDate).add(18, 'months'))) tableData.firstInsem.push(cow)
 
     // Adding soon to calv
-    if(lactAmount === 0 && lastInsemRes || lactAmount > 0 && insemAmount > 0 && lastInsem.date > lastLact.startDate && lastInsemRes) tableData.soonToCalv.push(cow); 
+    if (lactAmount === 0 && lastInsemRes || lactAmount > 0 && insemAmount > 0 && lastInsem.date > lastLact.startDate && lastInsemRes) tableData.soonToCalv.push(cow);
 
     // Adding soon to insem
-    if(lactAmount > 0 && insemAmount > 0 && !lastInsemRes && new Date() > new Date(moment(lastLact.startDate).add(60, 'days')) || lactAmount > 0 && lastInsemRes && lastInsem.date < lastLact.date) tableData.soonToInsem.push(cow);
+    if (lactAmount > 0 && insemAmount > 0 && !lastInsemRes && new Date() > new Date(moment(lastLact.startDate).add(60, 'days')) || lactAmount > 0 && lastInsemRes && lastInsem.date < lastLact.date) tableData.soonToInsem.push(cow);
 
   });
+
+  /* Getting top animals */
+  const topAnimals = [];
+
+  cows.forEach(cow => {
+    if(cow.milkingResults.length === 0) return;
+    let total = 0;
+    cow.milkingResults.forEach(result => {
+      total += result.result;
+    });
+
+    topAnimals.push({
+      cow,
+      result: parseFloat((total / cow.milkingResults.length).toFixed(1))
+    });
+  }); 
+
+  topAnimals.sort((a, b) => b.result - a.result);
+  let topAnimalsFormated = topAnimals.slice(0, 10);
+
+  /* Getting recent results */
+  let monthsResults = [];
+
+  cows.forEach(cow => {
+    cow.milkingResults.forEach(result => {
+      if(monthsResults.find(el => moment(el.date).isSame(result.date, 'month'))) {
+        let monthRes = monthsResults.find(el => moment(el.date).isSame(result.date, 'month'));
+
+        monthRes.results.push(result.result);
+        monthRes.dayTotal += result.result;
+        monthRes.monthTotal = monthRes.dayTotal * 30
+        monthRes.average = parseFloat((monthRes.dayTotal / monthRes.results.length).toFixed(1))
+      } else {
+        monthsResults.push({
+          date: result.date,
+          results: [result.result],
+          dayTotal: result.result,
+          average: result.result,
+          monthTotal: result.result
+        })
+      }
+    });
+  }); 
+  monthsResults.sort((a, b) => b.date - a.date);
+  let lastMonthsResult = monthsResults[0];
 
   res.status(200).render('herdMain', {
     animals,
     cows,
     bulls,
     data,
-    tableData
+    tableData,
+    topAnimalsFormated,
+    lastMonthsResult
   });
 });
 
@@ -184,7 +237,7 @@ exports.renderHerdAddAnimal = catchAsync(async (req, res, next) => {
 });
 
 exports.renderEditAnimal = catchAsync(async (req, res, next) => {
-  const animal = await Animal.findById(req.params.animalId);
+  const animal = await Animal.findById(req.params.animalId).populate('mother').populate('father');
   const farm = await Farm.findById(animal.farm);
 
   const potMother = await Animal.find({ farm: req.user.farm, gender: 'female', _id: { $ne: animal._id } });
@@ -552,18 +605,110 @@ exports.renderEditStartedVetScheme = catchAsync(async (req, res, next) => {
 
 exports.renderVetMain = catchAsync(async (req, res, next) => {
   let actions = await Vet.find({ farm: req.user.farm, category: 'action' });
-  let problems = await Vet.find({ farm: req.user.farm, category: 'problem' });
+  let problems = await Vet.find({ farm: req.user.farm, category: 'problem' }).populate('animal');
   let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment' });
 
   let schemes = await Vet.find({ farm: req.user.farm, schemeStarter: true }).populate('otherPoints').populate('animal').populate('scheme');
-  let uncuredProblems = await Vet.find({ farm: req.user.farm, category: 'problem', cured: false }).populate('treatments').populate('animal');
+  let uncuredProblems = await Vet.find({ farm: req.user.farm, category: 'problem', cured: false }).populate('animal');
+  let sickAnimalsCount = 0;
+  let rusEndChange = false;
+  let problemsFormated = []
+  problems.forEach(prob => {
+    if (new Date(prob.date) < new Date(moment().subtract(1, 'year'))) return;
+
+    if (problemsFormated.find(probBuf => probBuf.animal.number === prob.animal.number)) {
+      problemsFormated.find(probBuf => probBuf.animal.number === prob.animal.number).count++;
+    } else {
+      problemsFormated.push({
+        animal: prob.animal,
+        count: 1
+      })
+      sickAnimalsCount++;
+    }
+  });
+
+  if (sickAnimalsCount.toString().split('')[sickAnimalsCount.toString().length - 1] == 1) rusEndChange = true;
+
+
+  /* From HERD BLOCK */
+  const cows = await Animal.find({ farm: req.user.farm, gender: 'female', status: 'alive' });
+  const tableData = {
+    soonToCalv: [],
+    soonToInsem: [],
+    firstInsem: []
+  };
+
+  cows.forEach(cow => {
+    const lactAmount = cow.lactations.length;
+    const insemAmount = cow.inseminations.length;
+    let lastInsemRes = false;
+    let lastInsem;
+    let lastLact;
+    if (insemAmount > 0) {
+      lastInsemRes = cow.inseminations[cow.inseminations.length - 1].success;
+      lastInsem = cow.inseminations[cow.inseminations.length - 1];
+    }
+    if (lactAmount > 0) {
+      lastLact = cow.lactations[cow.lactations.length - 1];
+    }
+    // Adding firts calv
+    if (lactAmount === 0 && !lastInsemRes && new Date() > new Date(moment(cow.birthDate).add(18, 'months'))) tableData.firstInsem.push(cow)
+
+    // Adding soon to calv
+    if (lactAmount === 0 && lastInsemRes || lactAmount > 0 && insemAmount > 0 && lastInsem.date > lastLact.startDate && lastInsemRes) tableData.soonToCalv.push(cow);
+
+    // Adding soon to insem
+    if (lactAmount > 0 && insemAmount > 0 && !lastInsemRes && new Date() > new Date(moment(lastLact.startDate).add(60, 'days')) || lactAmount > 0 && lastInsemRes && lastInsem.date < lastLact.date) tableData.soonToInsem.push(cow);
+  });
+
+  /* counting animal insemination attemps */
+  let totalInsem = 0;
+  let insemFormated = [];
+  cows.forEach((cow) => {
+    let streak = 1;
+    cow.inseminations.forEach((insem, inx, arr) => {
+      if (insem.success) {
+        if (insemFormated.find(el => el.attemps === streak)) {
+          insemFormated.find(el => el.attemps === streak).count++;
+        } else {
+          insemFormated.push({
+            attemps: streak,
+            count: 1
+          })
+        }
+        streak = 1;
+        totalInsem++;
+      } else {
+        streak++;
+      }
+
+    });
+  });
+
+  insemFormated.forEach(insem => {
+    insem.percent = Math.round(insem.count * (100 / totalInsem));
+  });
+  insemFormated.sort((a, b) => a.attemps - b.attemps);
+
+  /* Getting current schemes */
+  let currentSchemes = [];
+  schemes.forEach(scheme => {
+    if(new Date(scheme.otherPoints[scheme.otherPoints.length - 1].date) > new Date()) currentSchemes.push(scheme)
+  });
+  schemes.sort((a, b) => b.date - a.date)
 
   res.status(200).render('vetMain', {
     actions,
     problems,
     treatments,
     schemes,
-    uncuredProblems
+    uncuredProblems,
+    problemsFormated,
+    sickAnimalsCount,
+    rusEndChange,
+    tableData,
+    insemFormated,
+    currentSchemes
   });
 });
 
@@ -885,20 +1030,55 @@ exports.renderAllProducts = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAllClients = catchAsync(async (req, res, next) => {
-  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'month'));
+  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'year'));
   let endDate = req.query.end ? new Date(req.query.end) : new Date();
 
   const clients = await Client.find({ farm: req.user.farm });
   const products = await Product.find({ client: { $exists: true }, farm: req.user.farm, date: { $gte: startDate, $lte: endDate } });
+  const sales = await Product.find({ client: { $exists: true }, distributionResult: 'sold', farm: req.user.farm, date: { $gte: startDate, $lte: endDate } });
 
+  let quantityTotal = 0;
+  let revenueTotal = 0;
+  const clientsFormated = [];
+  clients.forEach(client => {
+    if(clientsFormated.find(el => el.client.id.toString() === client.id.toString())) return;
 
+    let quantity = {total: 0, count: 0};
+    let revenue = {total: 0, count: 0};
+    sales.forEach(sale => {
+      if(sale.client.toString() !== client._id.toString()) return;
+
+      if(sale.size) {
+        quantity.total += sale.size;
+      }
+      if(sale.price) {
+        revenue.total += sale.price;
+      }
+    });
+
+    quantityTotal += quantity.total;
+    revenueTotal += revenue.total;
+
+    clientsFormated.push({
+      client,
+      quantity: parseFloat((quantity.total).toFixed(1)),
+      revenue: parseFloat((revenue.total).toFixed(1)),
+    })
+  });
+
+  clientsFormated.forEach(client => {
+    client.shareIndex = parseFloat((((client.quantity / quantityTotal) + (client.revenue / revenueTotal)) * 100 / 2 ).toFixed(1));
+  });
+
+  clientsFormated.sort((a, b) => b.shareIndex - a.shareIndex);
 
 
   res.status(200).render('distAllClients', {
     clients,
     products,
     startDate,
-    endDate
+    endDate,
+    clientsFormated
   });
 });
 
@@ -954,7 +1134,7 @@ exports.renderEditWriteOff = catchAsync(async (req, res, next) => {
 });
 
 exports.renderDistMain = catchAsync(async (req, res, next) => {
-  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'month'));
+  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'year'));
   let endDate = req.query.end ? new Date(req.query.end) : new Date();
   let endDateOrder = req.query.end ? new Date(Date.now(req.query.end)) : new Date(moment().add(1, 'month'));
 
@@ -977,10 +1157,115 @@ exports.renderDistMain = catchAsync(async (req, res, next) => {
 /////////////////
 /////////////////
 /////////////////
-exports.renderAddFeed = catchAsync(async(req, res, next) => {
+exports.renderAddFeed = catchAsync(async (req, res, next) => {
   const forEdit = false;
 
-  res.status(200).render('feedAddFeedSample', {
+  res.status(200).render('feedSample', {
     forEdit
+  });
+});
+
+exports.renderEditFeed = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const feed = await Feed.findById(req.params.id);
+
+  res.status(200).render('feedSample', {
+    forEdit,
+    feed
+  });
+});
+
+exports.renderAddFeedRecord = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+  const feedSamples = await Feed.find({ farm: req.user.farm, type: 'sample' });
+  const farm = await Farm.findById(req.user.farm);
+
+  res.status(200).render('feedRecord', {
+    forEdit,
+    feedSamples,
+    farm
+  });
+});
+
+exports.renderEditFeedRecord = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const feed = await Feed.findById(req.params.id).populate('feed');
+  const feedSamples = await Feed.find({ farm: req.user.farm, type: 'sample' });
+  const farm = await Farm.findById(req.user.farm);
+
+  res.status(200).render('feedRecord', {
+    forEdit,
+    feed,
+    feedSamples,
+    farm
+  });
+});
+
+exports.renderFeedMain = catchAsync(async (req, res, next) => {
+  const records = await Feed.find({ farm: req.user.farm, type: 'record' });
+  const feeds = await Feed.find({ farm: req.user.farm, type: 'sample' })
+  const formated = [];
+
+  feeds.forEach(feed => {
+    let obj = {
+      id: feed._id,
+      name: feed.name,
+      type: feed.type,
+      category: feed.category,
+      unit: feed.unit,
+      balance: 0,
+      last6Balance: 0,
+      max: 0,
+      autoAction: undefined,
+      records: []
+    }
+
+    records.forEach(record => {
+      if (record.feed.toString() !== feed._id.toString()) return;
+
+      if (record.status === 'increase') obj.balance += record.amount;
+      if (record.status === 'decrease') obj.balance -= record.amount;
+
+      if (record.autoAction && !record.autoActionStop) obj.autoAction = record;
+
+      if (record.date >= new Date(moment().subtract(6, 'month'))) {
+        if (record.status === 'increase') obj.last6Balance += record.amount;
+        if (record.status === 'decrease') obj.last6Balance -= record.amount;
+      }
+
+      if (obj.last6Balance > obj.max) obj.max = obj.last6Balance;
+      obj.records.push(record);
+    });
+
+    formated.push(obj);
+  });
+
+  res.status(200).render('feedMain', {
+    records,
+    feeds,
+    formated
+  })
+});
+/////////////////
+/////////////////
+/////////////////
+/* MILK QUALITY PAGE */
+/////////////////
+/////////////////
+/////////////////
+exports.renderAddMilkQuality = catchAsync(async (req, res, next) => {
+  const forEdit = false;
+
+  res.status(200).render('milkQuality', {
+    forEdit
+  });
+});
+exports.renderEditMilkQuality = catchAsync(async (req, res, next) => {
+  const forEdit = true;
+  const quality = await MilkQuality.findById(req.params.id);
+
+  res.status(200).render('milkQuality', {
+    forEdit,
+    quality
   });
 });

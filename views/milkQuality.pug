@@ -1,0 +1,129 @@
+extends base
+
+block content
+  //-include _rcmVet
+  section.main-section
+
+    -if(!forEdit)
+      .animal-results-window
+        .ai-form-container#milk-quality-container
+          .ai-block-sub-title ДОБАВИТЬ
+          .ai-block-title Качество молока
+
+          .ai-input-table-block
+            .ai-input-label Таблица качества (в %)
+            .ai-table-line
+              .ai-table-line-text Вода
+              input.ai-table-line-input#water(type="number")
+            .ai-table-line
+              .ai-table-line-text Жир
+              input.ai-table-line-input#fat(type="number")
+            .ai-table-line
+              .ai-table-line-text Сухой остаток
+              input.ai-table-line-input#dryResidue(type="number")
+            .ai-table-line
+              .ai-table-line-text Казеин
+              input.ai-table-line-input#casein(type="number")
+            .ai-table-line
+              .ai-table-line-text Сахар
+              input.ai-table-line-input#sugar(type="number")
+            .ai-table-line
+              .ai-table-line-text Фосфатиды
+              input.ai-table-line-input#phosphatides(type="number")
+            .ai-table-line
+              .ai-table-line-text Стерины
+              input.ai-table-line-input#sterols(type="number")
+            .ai-table-line
+              .ai-table-line-text Альбумин
+              input.ai-table-line-input#albumen(type="number")
+            .ai-table-line
+              .ai-table-line-text Другие белки
+              input.ai-table-line-input#otherProteins(type="number")
+            .ai-table-line
+              .ai-table-line-text Небелковые соединения
+              input.ai-table-line-input#nonProteinCompounds(type="number")
+            .ai-table-line
+              .ai-table-line-text Соли неорган. кислот
+              input.ai-table-line-input#saltsOfInorganicAcids(type="number")
+            .ai-table-line
+              .ai-table-line-text Зола
+              input.ai-table-line-input#ash(type="number")
+            .ai-table-line
+              .ai-table-line-text Пигменты
+              input.ai-table-line-input#pigments(type="number")
+
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата
+            input.ai-input.ai-input-date#date(type="date" )
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          a.ai-input-submit-btn Сохранить
+
+
+    -if(forEdit)
+      .animal-results-window
+        .ai-form-container#edit-milk-quality-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Качество молока
+
+          .ai-input-table-block
+            .ai-input-label Таблица качества (в %)
+            .ai-table-line
+              .ai-table-line-text Вода
+              input.ai-table-line-input#water(type="number" value=`${quality.water}`)
+            .ai-table-line
+              .ai-table-line-text Жир
+              input.ai-table-line-input#fat(type="number" value=`${quality.fat}`)
+            .ai-table-line
+              .ai-table-line-text Сухой остаток
+              input.ai-table-line-input#dryResidue(type="number" value=`${quality.dryResidue}`)
+            .ai-table-line
+              .ai-table-line-text Казеин
+              input.ai-table-line-input#casein(type="number" value=`${quality.casein}`)
+            .ai-table-line
+              .ai-table-line-text Сахар
+              input.ai-table-line-input#sugar(type="number" value=`${quality.sugar}`)
+            .ai-table-line
+              .ai-table-line-text Фосфатиды
+              input.ai-table-line-input#phosphatides(type="number" value=`${quality.phosphatides}`)
+            .ai-table-line
+              .ai-table-line-text Стерины
+              input.ai-table-line-input#sterols(type="number" value=`${quality.sterols}`)
+            .ai-table-line
+              .ai-table-line-text Альбумин
+              input.ai-table-line-input#albumen(type="number" value=`${quality.albumen}`)
+            .ai-table-line
+              .ai-table-line-text Другие белки
+              input.ai-table-line-input#otherProteins(type="number" value=`${quality.otherProteins}`)
+            .ai-table-line
+              .ai-table-line-text Небелковые соединения
+              input.ai-table-line-input#nonProteinCompounds(type="number" value=`${quality.nonProteinCompounds}`)
+            .ai-table-line
+              .ai-table-line-text Соли неорган. кислот
+              input.ai-table-line-input#saltsOfInorganicAcids(type="number" value=`${quality.saltsOfInorganicAcids}`)
+            .ai-table-line
+              .ai-table-line-text Зола
+              input.ai-table-line-input#ash(type="number" value=`${quality.ash}`)
+            .ai-table-line
+              .ai-table-line-text Пигменты
+              input.ai-table-line-input#pigments(type="number" value=`${quality.pigments}`)
+
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Дата
+            input.ai-input.ai-input-date#date(type="date" value=`${quality.date.toLocaleString('ru-RU', {year: 'numeric'})}-${quality.date.toLocaleString('ru-RU', {month: '2-digit'})}-${quality.date.toLocaleString('ru-RU', {day: '2-digit'})}`)
+            .ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            .ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          a.ai-input-submit-btn(data-id=`${quality._id}`) Сохранить
+
+
+

@@ -1,0 +1,88 @@
+extends base
+
+block content
+  //include _rcmFeed
+  section.main-section.feed-module
+    .dist-main-section#mp-feed(data-farm-id=`${user.farm}`)
+      .main-page-header
+        .main-page-header-title КОРМЛЕНИЕ
+
+      .feed-warning-container
+        each feed in formated
+          -if(feed.balance < feed.max * 0.1)
+            .feed-warning-block
+              .feed-warning-text= `${feed.type === 'compound-feed' ? 'КОМБИКОРМ:' : ''} ${feed.name.toUpperCase()} - СКОРО ЗАКОНЧИТСЯ (ОСТАЛОСЬ: ${feed.balance} ${feed.unit === 'kg' ? 'кг.' : 'тюк.'})`
+              .feed-marker-block
+                .feed-animated-marker
+                .feed-animated-marker.feed-animated-marker-delay
+
+      .feed-history-block
+        each feed in formated   
+          each record in feed.records
+            .feed-history-item(class=`${record.status === 'increase' ? 'feed-history-item-pos' : 'feed-history-item-neg'}` data-max=`${feed.max}` data-num=`${record.amount}` data-date=`${record.date}`)
+              -if(record.autoAction || record.firstAction)
+                ion-icon(name="time-outline")
+              -else
+                ion-icon(name="hand-right-outline")
+              .feed-history-date(data-date=`${record.date}`)
+              .feed-history-marker.feed-hide= `${feed.category === 'regular-feed' ? 'Т' : 'К'}`
+              .feed-history-name.feed-hide= feed.name
+              .feed-history-num.feed-hide= `${record.status === 'increase' ? '+' : '-'}${record.amount}`
+      .main-page-buttons-row
+        each feed in formated
+          .mp-row-btn.mp-row-btn-1(data-feed=`${feed.name}` data-id=`${feed.id}` data-unit=`${feed.unit}`)
+            | #{feed.name}
+            span= `${feed.category === 'regular-feed' ? 'Т' : 'К'}`
+      each feed in formated
+        -if(feed.autoAction)
+          .auto-action-block(data-id=`${feed.id}` data-record-id=`${feed.autoAction.id}` data-action=`${feed.autoAction.status === 'increase' ? 'пополнение' : 'списание'}`)
+            .auto-action-text= `Автоматическое ${feed.autoAction.status === 'increase' ? 'пополнение' : 'списание'} ${feed.autoAction.amount} ${feed.autoAction.unit === 'kg' ? 'кг.' : 'тюк.'} каждые ${feed.autoAction.autoTimeSpan} ${feed.autoAction.autoTimeSpanUnit === 'day' ? 'дн.' : 'нед.'}`
+            .auto-action-btn.auto-action-btn-highlighted.auto-stop Остановить
+      .feed-main-graph-block
+        .fm-tiles-block
+          .fm-tile
+            .fm-tile-body
+              .fm-tile-body-unit#left-unit тюк.
+              .fm-tile-body-number#left-text 1273
+            .fm-tile-body-title Осталось
+            .fm-tile-graph-box#tile-graph-left(title=`Изменение количества за последние 6 месяцев`)
+          .fm-tile
+            .fm-tile-body
+              .fm-tile-body-unit#use-unit тюк.
+              .fm-tile-body-number#use-text 12
+            .fm-tile-body-title Расход в неделю
+            .fm-tile-graph-box#tile-graph-use(title=`Расход по дням за последние 6 месяцев`)
+              .fm-use-graph-item.fm-use-graph-item-0
+                .fm-use-graph-item-title п
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-1
+                .fm-use-graph-item-title в
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-2
+                .fm-use-graph-item-title с
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-3
+                .fm-use-graph-item-title ч
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-4
+                .fm-use-graph-item-title п
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-5
+                .fm-use-graph-item-title с
+                .fm-use-graph-item-inner
+              .fm-use-graph-item.fm-use-graph-item-6
+                .fm-use-graph-item-title в
+                .fm-use-graph-item-inner
+
+        .fm-history-block 
+          .mp-hg-btn-block.mp-hg-btn-block-2
+            .mp-hg-btn(data-months="6") 6м
+            .mp-hg-btn(data-months="12") 12м
+            .mp-hg-btn(data-months="24") 24м
+            .mp-hg-btn(data-months="60") 5г
+            .mp-hg-btn(data-months="all")
+              ion-icon(name="infinite")  
+
+
+      //-.feed-main-graph-block#feed-result-graph  
+        .fm-change-feed-block

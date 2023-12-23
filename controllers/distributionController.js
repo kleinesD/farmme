@@ -32,6 +32,13 @@ exports.createClient = catchAsync(async (req, res, next) => {
 exports.editProduct = catchAsync(async(req, res, next) => {
   const product = await Product.findByIdAndUpdate(req.params.id, req.body);
 
+  product.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await product.save();
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -41,6 +48,13 @@ exports.editProduct = catchAsync(async(req, res, next) => {
 })
 exports.editClient = catchAsync(async(req, res, next) => {
   const client = await Client.findByIdAndUpdate(req.params.id, req.body);
+
+  client.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await client.save();
 
   res.status(200).json({
     status: 'success',
@@ -65,3 +79,16 @@ exports.deleteSubIdProducts = catchAsync(async(req, res, next) => {
     status: 'success'
   });
 });
+
+exports.getClient = catchAsync(async(req, res, next) => {
+  const client = await Client.findById(req.params.clientId);
+  const sales = await Product.find({ client: req.params.clientId, distributionResult: 'sold', date: { $gte: req.params.start, $lte: req.params.end } });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      client,
+      sales
+    }
+  })
+}); 

@@ -20,8 +20,9 @@ block content
             .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
 
       .herd-mp-flex-block 
-
         .herd-mp-quick-info-block
+          .loading-block 
+            .loading-icon
           .herd-mp-quick-info-counter-block
             .herd-mp-quick-info-counter.herd-mp-quick-info-counter-first.herd-mp-quick-info-counter-active(data-index="0")
             .herd-mp-quick-info-counter(data-index="1")
@@ -67,53 +68,104 @@ block content
             .herd-mp-quick-info-item-res= data.calves
 
         .herd-mp-list-block-combined
+
           .mp-block-outside-header
             .mp-block-outside-header-title#table-title Список коров на осеменение
             .mp-block-outside-header-btn-block#table-btns
               .mp-block-outside-header-btn.mp-block-outside-header-btn-active#insem Осеменение
               .mp-block-outside-header-btn#calv Отел
           .herd-mp-list-block.herd-mp-list-block-insem
-            .herd-mp-list-block-header
-              .herd-mp-li-header-item Номер
-              .herd-mp-li-header-item Кличка
-              .herd-mp-li-header-item Лактация
-              .herd-mp-li-header-item Осеменение
-              .herd-mp-li-header-item
-            .herd-mp-list-container
-              each cow in tableData.soonToInsem
-                a.herd-mp-list-line(data-first="false" href=`/herd/animal-card/${cow._id}`)
-                  .herd-mp-list-line-item ##{cow.number}
-                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
-                  .herd-mp-list-line-item.date-format(data-date=`${cow.lactations[cow.lactations.length - 1].startDate}`) 
-                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
-                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
-              each cow in tableData.firstInsem
-                a.herd-mp-list-line(data-first="true" href=`/herd/animal-card/${cow._id}`)
-                  .herd-mp-list-line-item ##{cow.number}
-                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
-                  .herd-mp-list-line-item.date-format(data-date=`${cow.birthDate}`) -
-                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text 
-                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+            -if(tableData.soonToInsem.length === 0 && tableData.firstInsem.length === 0)
+              .no-info-block
+                .no-info-block-background
+                h3 Недостаточно данных
+                p Информация появится когда будет добавленно больше данных
+            -else
+              .herd-mp-list-block-header
+                .herd-mp-li-header-item Номер
+                .herd-mp-li-header-item Кличка
+                .herd-mp-li-header-item Лактация
+                .herd-mp-li-header-item Осеменение
+                .herd-mp-li-header-item
+              .herd-mp-list-container
+                each cow in tableData.soonToInsem
+                  a.herd-mp-list-line(data-first="false" href=`/herd/animal-card/${cow._id}`)
+                    .herd-mp-list-line-item ##{cow.number}
+                    .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                    .herd-mp-list-line-item.date-format(data-date=`${cow.lactations[cow.lactations.length - 1].startDate}`) 
+                    .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                    .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+                each cow in tableData.firstInsem
+                  a.herd-mp-list-line(data-first="true" href=`/herd/animal-card/${cow._id}`)
+                    .herd-mp-list-line-item ##{cow.number}
+                    .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                    .herd-mp-list-line-item.date-format(data-date=`${cow.birthDate}`) -
+                    .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text 
+                    .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
 
           .herd-mp-list-block.herd-mp-list-block-calv
-            .herd-mp-list-block-header
-              .herd-mp-li-header-item Номер
-              .herd-mp-li-header-item Кличка
-              .herd-mp-li-header-item Осеменение
-              .herd-mp-li-header-item Отел
-              .herd-mp-li-header-item
-            .herd-mp-list-container
-              each cow in tableData.soonToCalv
-                a.herd-mp-list-line(href=`/herd/animal-card/${cow._id}`)
-                  .herd-mp-list-line-item ##{cow.number}
-                  .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
-                  .herd-mp-list-line-item.date-format(data-date=`${cow.inseminations[cow.inseminations.length - 1].date}`) 
-                  .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
-                  .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+            -if(tableData.soonToCalv.length === 0)
+              .no-info-block
+                .no-info-block-background
+                h3 Недостаточно данных
+                p Информация появится когда будет добавленно больше данных
+            -else
+              .herd-mp-list-block-header
+                .herd-mp-li-header-item Номер
+                .herd-mp-li-header-item Кличка
+                .herd-mp-li-header-item Осеменение
+                .herd-mp-li-header-item Отел
+                .herd-mp-li-header-item
+              .herd-mp-list-container
+                each cow in tableData.soonToCalv
+                  a.herd-mp-list-line(href=`/herd/animal-card/${cow._id}`)
+                    .herd-mp-list-line-item ##{cow.number}
+                    .herd-mp-list-line-item= `${cow.name ? cow.name : '-'}`
+                    .herd-mp-list-line-item.date-format(data-date=`${cow.inseminations[cow.inseminations.length - 1].date}`) 
+                    .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
+                    .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
+
+      -if(topAnimalsFormated.length >= 2)
+        .mp-results-flex-block
+          .mp-block-outside-header
+            .mp-block-outside-header-title Лучшие результаты доения
+          .mp-top-results-block
+            each res in topAnimalsFormated
+              a.mp-top-result(class=`mp-top-result-${topAnimalsFormated.indexOf(res) + 1}` href=`/herd/animal-card/${res.cow._id}`)
+                .mp-tr-line
+                  img(src="/img/images/default-cow-image.png")
+                  .mp-tr-body
+                    .mp-tr-number ##{res.cow.number}
+                    -if(res.cow.name)
+                      .mp-tr-name= res.cow.name
+                  .mp-tr-place= topAnimalsFormated.indexOf(res) + 1
+                  .mp-tr-result= res.result
+
+          .mp-recent-results-block
+            .mp-recent-item(data-counter="0")
+              //-.mp-recent-marker-block
+                .mp-recent-marker
+              .mp-recent-number(data-number=`${lastMonthsResult.average}`) 0
+              .mp-recent-title СРЕДНИЙ РЕЗУЛЬТАТ
+            .mp-recent-item(data-counter="1")
+              //-.mp-recent-marker-block
+                .mp-recent-marker
+                .mp-recent-marker
+              .mp-recent-number(data-number=`${lastMonthsResult.dayTotal}`) 0
+              .mp-recent-title ВСЕГО ЗА ДЕНЬ
+            .mp-recent-item(data-counter="2")
+              //-.mp-recent-marker-block
+                .mp-recent-marker
+                .mp-recent-marker
+                .mp-recent-marker
+              .mp-recent-number(data-number=`${lastMonthsResult.monthTotal}`) 0
+              .mp-recent-title ВСЕГО ЗА МЕСЯЦ
 
       #mp-herd-graph(data-farm-id=`${user.farm}`)  
 
       .mp-herd-graph-block
+        .loading-block  
+          .loading-icon
         .mp-block-outside-header
           .mp-block-outside-header-title Результаты доения
         .mp-herd-graph-container#mp-results-graph
@@ -175,102 +227,134 @@ block content
               .mp-herd-graph-info-sub-text 13.06
               .mp-herd-graph-info-text 17.2
 
+      //-.mp-projection-block#organic-growth-projection
       .mp-projection-block
+        .loading-block
+          .loading-icon
         .mp-block-outside-header
           .mp-block-outside-header-title Проекция изменения поголовья на следующие 5 лет
+          .mp-block-outside-header-btn-block#projection-btns
+            .mp-block-outside-header-btn.mp-block-outside-header-btn-active#detail Подробнее
+        .mp-detail-text-block
+          .mp-detail-text-title ОСНОВАНО НА:
+          .mp-detail-text-sub-title Данная проекция изменения поголовья стада основана на средне статистических данных полученных в открытом доступе.
+          .mp-detail-text-text 
+            | Каждый год из-за болезней списывается
+            span 1.67% 
+            | животных.
+          .mp-detail-text-text 
+            | Каждая корова телится с переодичностью в 
+            span 13
+            | месяцев.
+          .mp-detail-text-text 
+            | При рождении или в первые несколько месяцев 
+            span 12%
+            | телят умирает.
+          .mp-detail-text-text 
+            | Быки после  
+            span 2
+            | лет, а коровы после
+            span 6
+            | списываются на забой.
         .mp-projection-info-block
-          .mp-projection-info-item.mp-projection-info-item-animals
+          .mp-projection-info-item.mp-projection-info-item-animals(data-unit="animals")
+            .mp-projection-info-item-res 107 
             .mp-projection-info-item-title 
               | ВСЕГО ЖИВОТНЫХ
               span.span-success +12
-            .mp-projection-info-item-res 107 
-            .mp-projection-info-item-mark
-          .mp-projection-info-item.mp-projection-info-item-female
+            img.mp-projection-image(src="/img/icons/herd-animal.png")
+          .mp-projection-info-item.mp-projection-info-item-cows(data-unit="cows")
+            .mp-projection-info-item-res 34
             .mp-projection-info-item-title 
               | КОРОВЫ
               span.span-fail -10
-            .mp-projection-info-item-res 34
-            .mp-projection-info-item-mark
-          .mp-projection-info-item.mp-projection-info-item-male
+            img.mp-projection-image(src="/img/icons/herd-cow.png")
+          .mp-projection-info-item.mp-projection-info-item-bulls(data-unit="bulls")
+            .mp-projection-info-item-res 56
             .mp-projection-info-item-title 
               | БЫКИ
               span.span-success +12
-            .mp-projection-info-item-res 56
-            .mp-projection-info-item-mark
-          .mp-projection-info-item.mp-projection-info-item-milking
+            img.mp-projection-image(src="/img/icons/herd-bull.png")
+          .mp-projection-info-item.mp-projection-info-item-milkingCows(data-unit="milkingCows")
+            .mp-projection-info-item-res 12 
             .mp-projection-info-item-title 
               | ДОЯЩИЕСЯ КОРОВЫ
               span.span-success +17
-            .mp-projection-info-item-res 12 
-            .mp-projection-info-item-mark
-          .mp-projection-info-item.mp-projection-info-item-off
+            img.mp-projection-image(src="/img/icons/herd-milking-cow.png")
+          .mp-projection-info-item.mp-projection-info-item-writeOff(data-unit="writeOff")
+            .mp-projection-info-item-res 30 
             .mp-projection-info-item-title 
               | СПИСАНО ЖИВОТНЫХ
               span.span-fail -8
-            .mp-projection-info-item-res 30 
-            .mp-projection-info-item-mark
+            img.mp-projection-image(src="/img/icons/herd-ready-bull.png")
         .mp-projection-graph#mp-herd-projection-chart
-          .mp-detail-btn  
-            ion-icon(name="help")
-          .mp-detail-text-block
-            .mp-detail-text-title ОСНОВАНО НА:
-            .mp-detail-text-sub-title Данная проекция изменения поголовья стада основана на средне статистических данных полученных в открытом доступе.
-            .mp-detail-text-text 
-              | Каждый год из-за болезней списывается
-              span 1.67% 
-              | животных.
-            .mp-detail-text-text 
-              | Каждая корова телится с переодичностью в 
-              span 13
-              | месяцев.
-            .mp-detail-text-text 
-              | При рождении или в первые несколько месяцев 
-              span 12%
-              | телят умирает.
-            .mp-detail-text-text 
-              | Быки после  
-              span 2
-              | лет, а коровы после
-              span 6
-              | списываются на забой.
           .mp-projection-graph-working-area
             .mp-projection-graph-item
-              .mp-projection-graph-item-title 1Г
+              .mp-projection-graph-item-title 1 г.
+              .mp-projection-graph-item-bar
+                .mp-projection-graph-item-bar-inside
+            .mp-projection-graph-item
+              .mp-projection-graph-item-title 2 г.
               .mp-projection-graph-item-bar
             .mp-projection-graph-item
-              .mp-projection-graph-item-title 2 ГОД
+              .mp-projection-graph-item-title 3 г.
               .mp-projection-graph-item-bar
             .mp-projection-graph-item
-              .mp-projection-graph-item-title 3Г
+              .mp-projection-graph-item-title 4 г.
               .mp-projection-graph-item-bar
             .mp-projection-graph-item
-              .mp-projection-graph-item-title 4Г
+              .mp-projection-graph-item-title 5 г.
               .mp-projection-graph-item-bar
 
 
+      .milk-quality-graph-container
+        .loading-block
+          .loading-icon
+        .mp-block-outside-header
+          .mp-block-outside-header-title Качество молока
+        .milk-quality-graph#milk-quality-graph
+        .milk-quality-info-block
+          .milk-quality-info-item#water
+            .milk-quality-info-title Вода
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#fat
+            .milk-quality-info-title Жиры
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#dryResidue
+            .milk-quality-info-title Сухой остаток
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#casein
+            .milk-quality-info-title Казеин
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#sugar
+            .milk-quality-info-title Сахар
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#phosphatides
+            .milk-quality-info-title Фосфатиды
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#sterols
+            .milk-quality-info-title Стерины
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#albumen
+            .milk-quality-info-title Альбумин
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#otherProteins
+            .milk-quality-info-title Другие белки
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#nonProteinCompounds
+            .milk-quality-info-title Небелковые соединения
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#saltsOfInorganicAcids
+            .milk-quality-info-title Соли неорган. кислот
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#ash
+            .milk-quality-info-title Зола
+            .milk-quality-info-res 4.8%
+          .milk-quality-info-item#pigments
+            .milk-quality-info-title Пигменты
+            .milk-quality-info-res 4.8%
 
-      //-.mp-herd-top-results-block
-        .mp-herd-tr-podium
-          .mp-herd-tr-podium-step-block.mp-herd-tr-podium-step-1
-            .mp-herd-tr-podium-step-res 27.4
-            .mp-herd-tr-podium-step-number #50260604
-            .mp-herd-tr-podium-step-name Березка
-            img(src="/img/icons/medal-1.png")
-          .mp-herd-tr-podium-step-block.mp-herd-tr-podium-step-2
-            .mp-herd-tr-podium-step-res 22.3
-            .mp-herd-tr-podium-step-number #50260604
-            .mp-herd-tr-podium-step-name Березка
-            img(src="/img/icons/medal-2.png")
-          .mp-herd-tr-podium-step-block.mp-herd-tr-podium-step-3
-            .mp-herd-tr-podium-step-res 19.7
-            .mp-herd-tr-podium-step-number #50260604
-            .mp-herd-tr-podium-step-name Березка
-            img(src="/img/icons/medal-3.png")
 
-        .mp-herd-tr-list
-          .mp-herd-tr-list-item
-            .mp-herd-tr-list-item-place.mp-herd-tr-list-item-place-1 1.
-            .mp-herd-tr-list-item-number #50260604
-            .mp-herd-tr-list-item-block-right
-              .mp-herd-tr-list-item-per-top 10%
-              .mp-herd-tr-list-item-res 27.4
+      //-.weight-graph-container#weight-graph
+        
+      

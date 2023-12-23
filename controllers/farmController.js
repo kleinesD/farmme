@@ -30,6 +30,13 @@ exports.createFarm = catchAsync(async (req, res, next) => {
 exports.editFarm = catchAsync(async (req, res, next) => {
   const farm = await Farm.findByIdAndUpdate(req.params.farmId, req.body);
 
+  farm.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await farm.save();
+
   res.status(200).json({
     status: 'success',
     data: {

@@ -20,6 +20,13 @@ exports.editReminder = catchAsync(async (req, res, next) => {
   req.body.farm = req.user.farm;
   const reminder = await Calendar.findByIdAndUpdate(req.params.id, req.body);
 
+  reminder.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await reminder.save();
+
   res.status(200).json({
     status: 'success',
     data: {

@@ -44,7 +44,7 @@ block content
           input.ai-input.ai-input-select#mother(type="text" placeholder="Номер или имя коровы")
           .ai-select-block.shadow
             each mother in potMother
-              .ai-select-item(data-id=`${mother._id}` class=`${animal.mother.number === mother.number ? 'ai-select-item-selected' : ''}`)
+              .ai-select-item(data-id=`${mother._id}` class=`${animal.mother && animal.mother.number === mother.number ? 'ai-select-item-selected' : ''}`)
                 p.ai-select-name= `#${mother.number}`
                 -if(mother.name)
                   p.ai-select-sub-name= mother.name
@@ -55,7 +55,7 @@ block content
           input.ai-input.ai-input-select#father(type="text" placeholder="Номер или имя быка")
           .ai-select-block.shadow
             each father in potFather
-              .ai-select-item(data-id=`${father._id}` class=`${animal.father.number === father.number ? 'ai-select-item-selected' : ''}`)
+              .ai-select-item(data-id=`${father._id}` class=`${animal.father && animal.father.number === father.number ? 'ai-select-item-selected' : ''}`)
                 p.ai-select-name= `#${father.number}`
                 -if(father.name)
                   p.ai-select-sub-name= father.name

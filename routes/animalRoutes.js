@@ -47,6 +47,8 @@ router.patch('/bring-back-animal/:animalId', authController.protect, animalContr
 
 router.get('/milking-projection/:animalId', authController.protect, animalController.milkingProjectionData);
 
-router.get('/check-by-field/:field/:value', authController.protect, animalController.checkAnimalByField)
+router.get('/check-by-field/:field/:value', authController.protect, animalController.checkAnimalByField);
+
+router.get('/category/:category', authController.protect, animalController.getAnimalByCategory);
 
 module.exports = router;

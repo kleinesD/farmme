@@ -16,4 +16,6 @@ router.delete('/product/:id', authController.protect, distributionController.del
 
 router.delete('/subIdProducts/:subId', authController.protect, distributionController.deleteSubIdProducts);
 
+router.get('/client/get/:clientId/:start/:end', authController.protect, distributionController.getClient);
+
 module.exports = router;

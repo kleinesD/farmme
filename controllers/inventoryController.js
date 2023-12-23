@@ -17,6 +17,13 @@ exports.addInventory = catchAsync(async(req, res, next) => {
 exports.editInventory = catchAsync(async (req, res, next) => {
   const inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body);
 
+  inventory.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await inventory.save();
+
   res.status(200).json({
     status: 'success',
     data: {

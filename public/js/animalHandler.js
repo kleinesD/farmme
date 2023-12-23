@@ -184,3 +184,57 @@ export const getAnimalData = async(animalId) => {
     console.log(err);
   }
 }
+
+export const getAnimalsByCategory = async(category) => {
+  try {
+    let res = await axios({
+      method: 'GET',
+      url: `/api/animals/category/${category}`
+    });
+    if (res.data.status === 'success') return res.data.data.animals;
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const addMilkQuality = async(data) => {
+  try {
+    const res = await axios({
+      method: 'POST',
+      url: `/api/milk-quality/`,
+      data
+    });
+
+    if(res.data.status === 'success') return true;
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const editMilkQuality = async(id, data) => {
+  try {
+    const res = await axios({
+      method: 'PATCH',
+      url: `/api/milk-quality/${id}`,
+      data
+    });
+
+    if(res.data.status === 'success') return true;
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+export const getMilkQuality = async() => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: `/api/milk-quality/`
+    });
+
+    if(res.data.status === 'success') return res.data.data.records;
+  } catch(err) {
+    console.log(err);
+  }
+}

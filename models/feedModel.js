@@ -4,7 +4,6 @@ const feedSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    default: 'record',
     enum: ['record', 'sample']
   },
   status: {
@@ -17,26 +16,41 @@ const feedSchema = new mongoose.Schema({
   },
   name: String,
   amount: Number,
+  unit: {
+    type: String,
+    enum: ['kg', 'bale']
+  },
   ingredients: [
     {
       name: String,
-      amount: Number,
-      percent: NUmber
+      percent: Number
     }
   ],
   animalGroup: {
-    type: String,
-    default: 'all'
+    type: String
   },
-  autoRefill: Boolean,
-  autoWriteOff: Boolean,
+  autoAction: Boolean,
+  autoActionStop: Boolean,
+  autoActionStopDate: Date,
   autoTimeSpan: Number,
+  autoTimeSpanUnit: {
+    type: String,
+    enum: ['day', 'week']
+  },
   nextAutoAction: Date,
   date: Date,
   creationDate: {
     type: Date,
     required: true,
     default: Date.now()
+  },
+  firstAction: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Feed'
+  },
+  feed: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Feed'
   },
   farm: {
     type: mongoose.Schema.ObjectId,
@@ -46,6 +60,7 @@ const feedSchema = new mongoose.Schema({
   editedAtBy: [
     {
       date: Date,
+      message: String,
       user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
