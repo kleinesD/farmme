@@ -14,7 +14,7 @@ block content
       .all-clients-info-block
         .all-clients-container
           each client in clientsFormated
-            .client-item(data-id=`${client.client._id}` data-place=`${clientsFormated.indexOf(client) + 1}`)
+            .client-item(data-id=`${client.client._id}` data-place=`${clientsFormated.indexOf(client) + 1}` rc-title="Редактировать клиента" rc-link=`/distribution/edit-client/${client.client._id}`)
               .ci-header 
                 img(src="/img/images/user-default.png")
                 .ci-info 
@@ -36,15 +36,15 @@ block content
               .cdi-header-title#name Имя и Фамилия
             .cdi-main-info
               .cdi-main-info-line
-                .cdi-main-info-line-img
+                .cdi-main-info-line-img(qt="Адрес")
                   img(src="/img/icons/house.svg")
                 p#adress awdawdawdawd
               .cdi-main-info-line
-                .cdi-main-info-line-img
+                .cdi-main-info-line-img(qt="Телефон")
                   img(src="/img/icons/phone.svg")
                 p#phone awdawdawdawd
               .cdi-main-info-line
-                .cdi-main-info-line-img
+                .cdi-main-info-line-img(qt="Почта")
                   img(src="/img/icons/envelope.svg")
                 p#email awdawdawdawd
             .cdi-product-line

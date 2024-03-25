@@ -18,5 +18,7 @@ router.get('/check-email/:email', userController.checkEmail)
 
 router.get('/:id', userController.getUser)
 
+router.get('/icons/get', userController.getIconsForSelection);
+
 
 module.exports = router;

@@ -35,6 +35,23 @@ export const addCategory = async (farmId, category) => {
     console.log(err);
   }
 }
+export const addBuilding = async (farmId, building) => {
+  try {
+    const res = await axios({
+      method: 'PATCH',
+      url: `/api/farms/add-building/${farmId}`,
+      data: {
+        building
+      }
+    });
+
+    if (res.data.status === 'success') {
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export const editUser = async (userId, data) => {
   try {
@@ -51,3 +68,4 @@ export const editUser = async (userId, data) => {
     console.log(err);
   }
 }
+

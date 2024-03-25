@@ -267,6 +267,7 @@ exports.editStartedScheme = catchAsync(async (req, res, next) => {
   firstAction.name = scheme.points[0].action;
   firstAction.scheme = scheme._id;
   firstAction.date = new Date(req.body.date);
+  firstAction.finished = false;
 
   await firstAction.save();
 
@@ -354,5 +355,18 @@ exports.getVetProblem = catchAsync(async(req, res, next) => {
     }
   });
 });
+
+exports.autoFinishScheme = catchAsync(async(req, res, next) => {
+  const schemes = await Vet.find({ schemeStarter: true, finished: { $ne: true } }).populate('otherPoints').populate('animal').populate('scheme');
+
+  schemes.forEach(async (scheme) => {
+    scheme.otherPoints.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+    if(new Date() < new Date(scheme.otherPoints[0].date)) return;
+
+    scheme.finished = true;
+    await scheme.save();
+  });
+}); 
 
 

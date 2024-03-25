@@ -10,6 +10,8 @@ router.patch('/edit-farm/:farmId', authController.protect, farmController.editFa
 
 router.patch('/add-category/:farmId', authController.protect, farmController.addCategory);
 
+router.patch('/add-building/:farmId', authController.protect, farmController.addBuilding);
+
 router.get('/get-projection-data/:farmId', authController.protect, farmController.getProjectionData);
 
 

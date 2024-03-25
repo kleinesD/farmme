@@ -47,7 +47,7 @@ block content
           .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
 
       -if(forEdit)
-        .ai-form-container.ai-form-container-headerful#edit-insemination-container
+         .ai-form-container.ai-form-container-headerful#edit-insemination-container
           .ai-block-sub-title РЕДАКТИРОВАТЬ
           .ai-block-title Осеменение
 
@@ -72,18 +72,24 @@ block content
               input.ai-input.ai-input-select#bull(type="text" placeholder="Номер или имя быка")
               .ai-select-block.shadow
                 each animal in bulls
-                  .ai-select-item(data-id=`${animal._id}` data-bull=`${insemination.bull}` class=`${insemination.bull.number === animal.number ? 'ai-select-item-selected' : ''}`)
-                    p.ai-select-name= `#${animal.number}`
-                    -if(animal.name)
-                      p.ai-select-sub-name= animal.name
+                  -if(insemination.bull)
+                    .ai-select-item(data-id=`${animal._id}` data-bull=`${insemination.bull}` class=`${insemination.bull.number === animal.number ? 'ai-select-item-selected' : ''}`)
+                      p.ai-select-name= `#${animal.number}`
+                      -if(animal.name)
+                        p.ai-select-sub-name= animal.name
+                  -else
+                    .ai-select-item(data-id=`${animal._id}`)
+                      p.ai-select-name= `#${animal.number}`
+                      -if(animal.name)
+                        p.ai-select-sub-name= animal.name
 
           .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
             .ai-input-label Результат
-            .ai-pick#success(class=`${insemination.success === true ? 'ai-to-pick' : ''}`) Успешно
-            .ai-pick#fail(class=`${insemination.success === false ? 'ai-to-pick' : ''}`) Не успешно
+            -if(insemination.success)
+              .ai-pick#success(class=`${insemination.success === true ? 'ai-to-pick' : ''}`) Успешно
+              .ai-pick#fail(class=`${insemination.success === false ? 'ai-to-pick' : ''}`) Не успешно
+            -else
+              .ai-pick#success Успешно
+              .ai-pick#fail Не успешно
 
           .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
-
-
-
-

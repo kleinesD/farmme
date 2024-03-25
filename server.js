@@ -1,6 +1,8 @@
 const dotenv = require('dotenv');
 const animalController = require('./controllers/animalController');
 const feedController = require('./controllers/feedController');
+const vetController = require('./controllers/vetController');
+const notificationController = require('./controllers/notificationController');
 const isDev = require('electron-is-dev');
 
 
@@ -27,6 +29,8 @@ if(isDev) console.log(`Mode: ${process.env.NODE_ENV}`);
 
 animalController.updateCurrentInfo();
 feedController.autoAction();
+vetController.autoFinishScheme();
+notificationController.notificationCreator();
 setInterval(() => {
   animalController.updateCurrentInfo()
 }, 1 * 60 * 60 * 1000)

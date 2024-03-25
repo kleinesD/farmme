@@ -16,6 +16,7 @@ const calendarScheme = new mongoose.Schema({
   name: {
     type: String
   },
+  icon: String,
   note: String,
   date: {
     type: Date
@@ -25,8 +26,7 @@ const calendarScheme = new mongoose.Schema({
     default: false
   },
   recuringDay: Number,
-  recuringHour: Number,
-  recuringMinute: Number, 
+  recuringTime: String, 
   creationDate: {
     type: Date,
     required: true,
@@ -35,7 +35,7 @@ const calendarScheme = new mongoose.Schema({
   module: {
     type: String,
     required: true,
-    enum: ['general', 'herd', 'vet', 'warehouse', 'distribution', 'order']
+    enum: ['general', 'herd', 'vet', 'warehouse', 'distribution', 'feed', 'order']
   },
   notified: {
     type: Boolean,
@@ -50,7 +50,6 @@ const calendarScheme = new mongoose.Schema({
       }
     }
   ],
-  subId: String,
   client: {
     type: mongoose.Schema.ObjectId,
     ref: 'Client'

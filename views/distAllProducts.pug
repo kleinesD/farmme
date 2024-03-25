@@ -65,17 +65,17 @@ block content
               .dist-info-list-item-header
                 .dist-info-list-item-img
                   -if(product.distributionResult === 'waiting')
-                    img(src="/img/icons/increase-small-icon.png" title="Прибытие")
+                    img(src="/img/icons/increase-small-icon.png" qt="Прибытие")
                   -if(product.distributionResult === 'sold')
-                    img(src="/img/icons/sale-small-icon.png" title="Продажа") 
+                    img(src="/img/icons/sale-small-icon.png" qt="Продажа") 
                   -if(product.distributionResult === 'personal-use')
-                    img(src="/img/icons/consumption-small-icon.png" title="Личное использование")
+                    img(src="/img/icons/consumption-small-icon.png" qt="Личное использование")
                   -if(product.distributionResult === 'processed')
-                    img(src="/img/icons/process-small-icon.png" title="Переработка")
+                    img(src="/img/icons/process-small-icon.png" qt="Переработка")
                   -if(product.distributionResult === 'calf-feeding')
-                    img(src="/img/icons/feed-small-icon.png" title="Кормление")
+                    img(src="/img/icons/feed-small-icon.png" qt="Кормление")
                   -if(product.distributionResult === 'write-off')
-                    img(src="/img/icons/trash-small-icon.png" title="Списание")
+                    img(src="/img/icons/trash-small-icon.png" qt="Списание")
 
 
                 -if(product.product === 'milk')

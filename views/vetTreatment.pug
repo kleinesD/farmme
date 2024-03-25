@@ -12,7 +12,7 @@ block content
         .ai-block-sub-title ДОБАВИТЬ
         .ai-block-title Лечение
 
-        .ai-problem-block(data-state='show')
+        .ai-problem-block(rc-title="Редактировать проблему" rc-link=`/vet/edit-problem/${disease._id}` data-state='show')
           .ai-input-label Проблема
           .ai-select-line
           //-ion-icon.ai-problem-icon(name="close-circle")
@@ -75,7 +75,7 @@ block content
         .ai-block-sub-title РЕДАКТИРОВАТЬ
         .ai-block-title Лечение
 
-        .ai-problem-block(data-state='show')
+        .ai-problem-block(rc-title="Редактировать проблему" rc-link=`/vet/edit-problem/${disease._id}` data-state='show')
           .ai-input-label Проблема
           .ai-select-line
           //-ion-icon.ai-problem-icon(name="close-circle")

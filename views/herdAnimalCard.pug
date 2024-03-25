@@ -4,36 +4,43 @@ block content
   include _rcmHerd
   section.main-section(data-animal-id=`${animal._id}` data-farm-id=`${animal.farm}`)
     .animal-card-section
+      -if(animal.status !== 'alive')
+        .animal-write-off-disclaimer
+          .animal-write-off-disclaimer-inner
+            ion-icon(name="alert-circle")
+            .awo-title Животное было списано!
+            .awo-date(data-date=`${animal.writeOffDate}`) 21.213.232
+            .awo-btn#bring-back(data-animal-id=`${animal._id}`) Вернуть
       .animal-info-header
-        .aih-image-block 
+        .aih-image-block
           img(src="/img/images/default-cow-image.png")
         .aih-details-container
           .aih-details-info
             .aih-details-info-number= `#${animal.number}`
             .aih-details-info-name= `${animal.name ? animal.name : ''}`
 
-            a.aih-edit-btn(href=`/herd/edit-animal/${animal._id}`) 
+            a.aih-edit-btn(href=`/herd/edit-animal/${animal._id}` qt="Редактировать") 
               ion-icon(name="settings-outline")
 
             .aih-details-row
               -if(animal.birthDate)
-                .aih-details-row-item
+                .aih-details-row-item(qt="Дата рождения")
                   ion-icon(name="calendar-number-outline")
                   .aih-details-text= `${animal.birthDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.birthDate.toLocaleString('ru-RU', {year: 'numeric'})}`
               -if(animal.gender)
-                .aih-details-row-item
+                .aih-details-row-item(qt="Пол")
                   ion-icon(name="male-female-outline")
                   .aih-details-text= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
-              -if(animal.buyCost)
-                .aih-details-row-item
+              //-if(animal.buyCost)
+                .aih-details-row-item(qt="Цена покупки")
                   ion-icon(name="pricetag-outline")
                   .aih-details-text= `${animal.buyCost}₽`
               -if(animal.breedRussian)
-                .aih-details-row-item
+                .aih-details-row-item(qt="Порода")
                   ion-icon(name="paw-outline")
                   .aih-details-text= `${animal.breedRussian}`
               -if(animal.colors)
-                .aih-details-row-item
+                .aih-details-row-item(qt="Окрас")
                   ion-icon(name="color-filter-outline")
                   .aih-details-text 
                     each color in animal.colors
@@ -47,6 +54,34 @@ block content
           .aih-actions-btn(data-state="show") 
             p ДОБАВИТЬ
             span +
+
+        .aih-additional-info-block
+          .aih-ai-item(qt="Группа")
+            img(src="/img/svgs/exclude.svg")
+            p.aih-ai-item-text= `${animal.category ? animal.category : 'Группа'}`
+            img.invis-div(src="/img/svgs/caret-down.svg")
+            .aih-ai-select-block#category
+              each cat in farm.animalCategories
+                .aih-ai-select-item 
+                  p= cat
+              .aih-ai-select-item.aih-ai-select-item-add
+                input.aih-input(type="text" placeholder="Добавить")
+                .aih-ai-select-item-btn +
+          .aih-ai-item(qt="Корпус")
+            img(src="/img/svgs/garage.svg")
+            p.aih-ai-item-text= `${animal.building ? animal.building : 'Корпус'}`
+            img.invis-div(src="/img/svgs/caret-down.svg")
+            .aih-ai-select-block#building
+              each building in farm.buildings
+                .aih-ai-select-item 
+                  p= building
+              .aih-ai-select-item.aih-ai-select-item-add
+                input.aih-input(type="text" placeholder="Добавить")
+                .aih-ai-select-item-btn +
+          .aih-ai-item(qt="Место")
+            img(src="/img/svgs/map-pin.svg")
+            div.aih-ai-item-text#spot-input(contenteditable="true")= `${animal.spot ? animal.spot : 'Место'}`
+            .invis-div
 
         .aih-actions-block
           .aih-actions-column.herd-actions-column
@@ -92,8 +127,13 @@ block content
               .aih-actions-item-mark
               img(src="/img/images/butcher-icon.png")
               .aih-actions-item-title Списать животное
+
+
+
       -if(animal.milkingResults.length > 0)
         .animal-card-graph-block
+          .loading-block 
+            .loading-icon
           .animal-card-graph-page#card-milking-graph
             .mp-block-outside-header
               .mp-block-outside-header-title Результаты доения
@@ -101,7 +141,7 @@ block content
               .mp-hg-btn.mp-hg-btn-first(data-graph="months") Результаты
               .mp-hg-btn(data-graph="compare") Сравнение лактаций
               .mp-hg-btn(data-graph="days") По дням
-            .mp-herd-legend-btn#legend-btn  
+            .mp-herd-legend-btn.legend-btn  
               ion-icon(name="settings")
 
             .ac-graph-tooltip
@@ -129,6 +169,15 @@ block content
                   .mp-herd-li-text Разбить по лактациям
 
           .ac-results-block
+            .ac-rb-title Лактация #1
+            .ac-rb-container
+              .ac-rb-result
+                .ac-rb-result-number #1
+                .ac-rb-result-data 24.7
+                .ac-rb-result-month 14.23.2023
+
+
+            
 
       .ac-bouble-block
         .ac-bouble-block-column
@@ -186,7 +235,7 @@ block content
               .ac-insem-graph-inside-columns
                 .ac-insem-list
                   each insem in animal.inseminations
-                    .ac-insem-item(data-res=`${insem.success}`)
+                    .ac-insem-item(data-res=`${insem.success}` rc-title="Редактировать осеменение" rc-link=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(insem)}`)
                       -if(insem.success === undefined)
                         .ac-insem-item-icon
                           ion-icon(name="time-outline")
@@ -198,10 +247,10 @@ block content
                           ion-icon(name="close-sharp")
                       .ac-insem-item-date(data-date=`${insem.date}`)= insem.date
                 .ac-insem-graph
-                  .ac-insem-graph-pos
+                  .ac-insem-graph-pos(qt="Успешно")
                     p 63%
                   .ac-insem-graph-splitbar
-                  .ac-insem-graph-neg
+                  .ac-insem-graph-neg(qt="Не успешно")
                     p 37%
 
 
@@ -250,7 +299,7 @@ block content
                       -else
                         .ac-vp-header-icon
                           ion-icon(name="checkmark-sharp")
-                      .ac-vp-problem= problem.name
+                      .ac-vp-problem(rc-title="Редактировать проблему" rc-link=`/vet/edit-problem/${problem._id}`)= problem.name
                       -if(!problem.cured)
                         a.ac-vp-cure-btn(href=`/vet/add-treatment/${problem._id}`) 
                           p ЛЕЧЕНИЕ
@@ -260,20 +309,20 @@ block content
                     .ac-vp-body
                       .ac-vp-body-text= problem.note 
                       -if(problem.treatments.length > 0)
-                      .ac-vp-body-point-block
-                        each treatment in problem.treatments 
-                          .ac-vp-body-point(data-date=`${treatment.date}`)
-                            -if(treatment.cured)
-                              .ac-vp-body-icon.ac-vp-body-icon-cured
-                                ion-icon(name="checkmark-circle")
-                            -else
-                              .ac-vp-body-icon
-                                ion-icon(name="close-circle")
-                            .ac-vp-body-point-name= treatment.name
-                            .ac-vp-body-point-date(data-date=`${treatment.date}`)= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
+                        .ac-vp-body-point-block
+                          each treatment in problem.treatments 
+                            .ac-vp-body-point(data-date=`${treatment.date}` rc-title="Редактировать лечение" rc-link=`/vet/edit-treatment/${treatment._id}`)
+                              -if(treatment.cured)
+                                .ac-vp-body-icon.ac-vp-body-icon-cured
+                                  ion-icon(name="checkmark-circle")
+                              -else
+                                .ac-vp-body-icon
+                                  ion-icon(name="close-circle")
+                              .ac-vp-body-point-name= treatment.name
+                              .ac-vp-body-point-date(data-date=`${treatment.date}`)= `${treatment.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
                       .ac-vp-body-text.ac-vp-body-date(data-date=`${problem.date}`)= `${problem.date.toLocaleString('ru-RU', {minutes: 'numeric'})}`
 
-    // -if(animal.status !== 'alive')
+    //-if(animal.status !== 'alive')
       .ami-write-off-disclaimer
         ion-icon(name="warning")
         p ЖИВОТНОЕ СПИСАНО

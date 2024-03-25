@@ -22,40 +22,43 @@ export const getMilkingProjection = async (animalId) => {
 
   /* MOVING ACTUALL RESULTS TO ARRAYS */
   data.animal.milkingResults.forEach(res => {
-    if (res.lactationNumber) {
-      animalRes.push({
-        result: parseFloat(res.result),
-        date: new Date(res.date),
-        lactation: parseFloat(res.lactationNumber),
-        lactationStart: new Date(data.animal.lactations.find(el => el.number === res.lactationNumber).startDate),
-        lactationFinish: new Date(data.animal.lactations.find(el => el.number === res.lactationNumber).finishDate)
-      });
-    }
+    if (!res.lactationNumber) return;
+
+    animalRes.push({
+      result: parseFloat(res.result),
+      date: new Date(res.date),
+      lactation: parseFloat(res.lactationNumber),
+      lactationStart: new Date(data.animal.lactations.find(el => el.number === res.lactationNumber).startDate),
+      lactationFinish: new Date(data.animal.lactations.find(el => el.number === res.lactationNumber).finishDate)
+    });
+
   });
 
   data.allAnimals.forEach(animal => {
     animal.milkingResults.forEach(res => {
-      if (res.lactationNumber) {
-        allAnimalsRes.push({
-          result: parseFloat(res.result),
-          date: new Date(res.date),
-          lactation: parseFloat(res.lactationNumber),
-          lactationStart: new Date(animal.lactations.find(el => el.number === res.lactationNumber).startDate)
-        });
-      }
+      if (!res.lactationNumber) return;
+
+      allAnimalsRes.push({
+        result: parseFloat(res.result),
+        date: new Date(res.date),
+        lactation: parseFloat(res.lactationNumber),
+        lactationStart: new Date(animal.lactations.find(el => el.number === res.lactationNumber).startDate)
+      });
+
     });
   });
 
   data.farmAnimals.forEach(animal => {
     animal.milkingResults.forEach(res => {
-      if (res.lactationNumber) {
-        farmAnimalsRes.push({
-          result: parseFloat(res.result),
-          date: new Date(res.date),
-          lactation: parseFloat(res.lactationNumber),
-          lactationStart: new Date(animal.lactations.find(el => el.number === res.lactationNumber).startDate)
-        });
-      }
+      if (!res.lactationNumber) return;
+
+      farmAnimalsRes.push({
+        result: parseFloat(res.result),
+        date: new Date(res.date),
+        lactation: parseFloat(res.lactationNumber),
+        lactationStart: new Date(animal.lactations.find(el => el.number === res.lactationNumber).startDate)
+      });
+
     });
   });
 
@@ -145,6 +148,9 @@ export const getMilkingProjection = async (animalId) => {
       arr[inx + 1].diffPercent = 100 * ((arr[inx + 1].average - res.average) / ((res.average + arr[inx + 1].average) / 2))
     }
   });
+  /* console.log(animalResSorted);
+  console.log(farmAnimalsResSorted);
+  console.log(allAnimalsResSorted); */
 
   /* PROJECTING THE DATA */
   let baseChangeDuringLactation = [0, 50, 33, -11, -12, -13, -14, -15, -16, -17, -18]

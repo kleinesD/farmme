@@ -55,6 +55,16 @@ exports.addCategory = catchAsync(async (req, res, next) => {
     }
   });
 });
+exports.addBuilding = catchAsync(async (req, res, next) => {
+  const farm = await Farm.findByIdAndUpdate(req.params.farmId, { $addToSet: { buildings: req.body.building } })
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      farm
+    }
+  });
+});
 
 exports.getProjectionData = catchAsync(async(req, res, next) => {
   const cows = await Animal.find({farm: req.params.farmId, gender: 'female'});

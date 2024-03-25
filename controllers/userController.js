@@ -1,3 +1,4 @@
+const fs = require('fs');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -43,14 +44,29 @@ exports.editUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.checkEmail = catchAsync(async(req, res, next) => {
+exports.checkEmail = catchAsync(async (req, res, next) => {
   let response = true;
-  if(await User.findOne({email: req.params.email})) response = false;
+  if (await User.findOne({ email: req.params.email })) response = false;
 
   res.status(200).json({
     status: 'success',
     data: {
       response
+    }
+  });
+});
+
+exports.getIconsForSelection = catchAsync(async (req, res, next) => {
+  const files = fs.readdirSync('./public/img/svgs/', { withFileTypes: true })
+    .filter(item => !item.isDirectory())
+    .map(item => item.name);
+
+  files.splice(0, 1);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      files
     }
   });
 });

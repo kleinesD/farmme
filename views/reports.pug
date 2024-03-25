@@ -1,0 +1,38 @@
+extends base
+
+block content
+  include _rcmMain
+  section.reports-page-section#reports-page(data-farm-id=`${user.farm}`)
+    .main-page-header
+      .main-page-header-title ОТЧЕТЫ
+    .reports-modules-container
+      .rm-item.rm-item-herd
+        .rm-text-block
+          h3 Животные
+          p Отчеты о стаде и результатах животных
+        .rm-img
+          img(src="/img/icons/herd-s.svg")
+        .rm-list-block  
+          .rml-item#milking-report Результаты доения
+
+      .rm-item.rm-item-vet
+        .rm-text-block
+          h3 Ветеринария
+          p Отчеты о болезнях, осеменениях и др.
+        .rm-img
+          img(src="/img/icons/vet-s.svg")
+        .rm-list-block  
+          .rml-item#insemination-report Осеменение
+
+  .report-time-span-container
+    .report-time-span-block
+      .rts-title Результаты доения
+      .rts-dates-line 
+        input#from(type="date")
+        p &dash;
+        input#to(type="date")
+      .rts-sug-line 
+        .rtss-item ГОД
+        .rtss-item КВАРТАЛ
+        .rtss-item МЕСЯЦ
+      .rts-btn Создать отчет

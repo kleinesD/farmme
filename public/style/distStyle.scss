@@ -707,12 +707,38 @@
     background-color: #ffffff;
     z-index: 5000;
 }
-
+.main-page-header-sub-section {
+    justify-content: space-between;
+}
 .main-page-header-title {
     font-size: 300%;
     font-weight: 600;
 }
+.mph-actions-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.mph-action-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
+    &:hover {
+        background-color: #d9d9d9;
+    }
+
+    img {
+        width: 60%;
+        height: auto;
+    }
+}
 .main-page-header-period-box {
     display: flex;
     align-items: center;

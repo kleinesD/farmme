@@ -82,128 +82,21 @@ block content
               .ai-input-eb-tri
               .ai-input-eb-text Обязательно
 
-          .ai-input-block.ai-input-block-small-select
+          .ai-input-block.ai-input-block-small-select#recuring-date
             .ai-input-label День и время
-            .ai-small-select.step-unit.ai-input-block-triple
+            .ai-small-select.step-unit.ai-weekday-select
               p Понедельник
               .ai-select-line
-              .ai-small-select-block.shadow
-                .ai-small-select-item.ai-small-select-item-selected(data-val="1") Понедельник
-                .ai-small-select-item(data-val="2") Вторник
-                .ai-small-select-item(data-val="3") Среда
-                .ai-small-select-item(data-val="4") Четверг
-                .ai-small-select-item(data-val="5") Пятница
-                .ai-small-select-item(data-val="6") Суббота
-                .ai-small-select-item(data-val="7") Воскресенье
+              .ai-small-select-block.shadow#weekday
+                .ai-small-select-item.ai-small-select-item-selected(data-value="1") Понедельник
+                .ai-small-select-item(data-value="2") Вторник
+                .ai-small-select-item(data-value="3") Среда
+                .ai-small-select-item(data-value="4") Четверг
+                .ai-small-select-item(data-value="5") Пятница
+                .ai-small-select-item(data-value="6") Суббота
+                .ai-small-select-item(data-value="0") Воскресенье
 
-            input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.hour(type="number" value="09")
-            .ai-inside-text :
-            input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.minute(type="number" value="00")
-            //-.ai-small-select.step-count.ai-input-block-triple
-              p От начала
-              .ai-select-line
-              .ai-small-select-block.shadow
-                .ai-small-select-item.ai-small-select-item-selected(data-val="start") От начала
-                .ai-small-select-item(data-val="last-point") От пред. действия
-
-          //-.aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
-            label.aa-label(for="date")
-              p День и время
-            select.aa-triple-date-input-big#rec-date
-              option(value="1") Понедельник
-              option(value="2") Вторник
-              option(value="3") Среда
-              option(value="4") Четверг
-              option(value="5") Пятница
-              option(value="6") Суббота
-              option(value="0") Воскресенье
-            select.aa-triple-date-input#rec-hour
-              option(value="0") 00
-              option(value="1") 01
-              option(value="2") 02
-              option(value="3") 03
-              option(value="4") 04
-              option(value="5") 05
-              option(value="6") 06
-              option(value="7") 07
-              option(value="8") 08
-              option(value="9") 09
-              option(value="10") 10
-              option(value="11") 11
-              option(value="12") 12
-              option(value="13") 13
-              option(value="14") 14
-              option(value="15") 15
-              option(value="16") 16
-              option(value="17") 17
-              option(value="18") 18
-              option(value="19") 19
-              option(value="20") 20
-              option(value="21") 21
-              option(value="22") 22
-              option(value="23") 23     
-            .aa-triple-date-divider :
-            select.aa-triple-date-input#rec-minute
-              option(value="0") 00
-              option(value="1") 01
-              option(value="2") 02
-              option(value="3") 03
-              option(value="4") 04
-              option(value="5") 05
-              option(value="6") 06
-              option(value="7") 07
-              option(value="8") 08
-              option(value="9") 09
-              option(value="10") 10
-              option(value="11") 11
-              option(value="12") 12
-              option(value="13") 13
-              option(value="14") 14
-              option(value="15") 15
-              option(value="16") 16
-              option(value="17") 17
-              option(value="18") 18
-              option(value="19") 19
-              option(value="20") 20
-              option(value="21") 21
-              option(value="22") 22
-              option(value="23") 23
-              option(value="24") 24
-              option(value="25") 25
-              option(value="26") 26
-              option(value="27") 27
-              option(value="28") 28
-              option(value="29") 29
-              option(value="30") 30
-              option(value="31") 31
-              option(value="32") 32
-              option(value="33") 33
-              option(value="34") 34
-              option(value="35") 35
-              option(value="36") 36
-              option(value="37") 37
-              option(value="38") 38
-              option(value="39") 39
-              option(value="40") 40
-              option(value="41") 41
-              option(value="42") 42
-              option(value="43") 43
-              option(value="44") 44
-              option(value="45") 45
-              option(value="46") 46
-              option(value="47") 47
-              option(value="48") 48
-              option(value="49") 49
-              option(value="50") 50
-              option(value="51") 51
-              option(value="52") 52
-              option(value="53") 53
-              option(value="54") 54
-              option(value="55") 55
-              option(value="56") 56
-              option(value="57") 57
-              option(value="58") 58
-              option(value="59") 59
+            input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.ai-time-input#time(type="time")
 
           .ai-input-block.ai-input-block-text.ai-input-block-textarea
             .ai-input-label Заметка
@@ -213,291 +106,122 @@ block content
           .ai-input-submit-btn Сохранить
 
       -if(forEdit)
-        .animal-results-container.animal-results-big#edit-order-container
-          //-img.ar-image-back(src="/img/images/milk-icon.png")
-          .ar-block-sub-title РЕДАКТИРОВАТЬ
-          .ar-block-title Заказ
-          .ar-switch-btn-box
-            .ar-switch-btn#once(class=`${orders[0].recuring !== true ? 'ar-switch-btn-first' : ''}` data-el="once-date") Разовый
-            .ar-switch-btn#recuring(class=`${orders[0].recuring !== true ? '' : 'ar-switch-btn-first'}` data-el="recuring-date") Повторяющийся
+        .ai-form-container.ai-form-dist#edit-dist-order-container
+          .ai-block-sub-title РЕДАКТИРОВАТЬ
+          .ai-block-title Заказ
+
+          .ai-switch-btn-box
+            .ai-switch-btn-slider
+            .ai-switch-btn.ai-switch-btn-left#once(data-el="once-date" class=`${!orders[0].recuring ? 'ai-switch-btn-to-active' : ''}`) Разовый
+            .ai-switch-btn.ai-switch-btn-right#recuring(data-el="recuring-date" class=`${orders[0].recuring ? 'ai-switch-btn-to-active' : ''}`) Повторяющийся
+
 
           -if(clients.length > 0)
-            -if(orders[0].client)
-              .aa-input-block.info-birth-items
-                lable.aa-label(for="client") 
-                  p Клиент
-                input.aa-search-input.aa-animal-search#client(data-id=`${orders[0].client._id}` value=`${orders[0].client.name}` data-placeholder="Имя | Наименование")
-                .animal-search-block#client-search-block
-                  each client in clients
-                    .animal-search-item(data-id=`${client._id}`)
-                      img(src=`/img/images/user-default.png`)
-                      .animal-search-name= client.name 
-            -else
-              .aa-input-block.info-birth-items
-                lable.aa-label(for="client") 
-                  p Клиент
-                input.aa-search-input.aa-animal-search#client(data-id="" data-placeholder="Имя | Наименование")
-                .animal-search-block#client-search-block
-                  each client in clients
-                    .animal-search-item(data-id=`${client._id}`)
-                      img(src=`/img/images/user-default.png`)
-                      .animal-search-name= client.name 
-
-          each order in orders
-            .aa-input-united-block.aa-input-united-block-valid(data-id=`${order._id}` data-new="false")
-              .aa-input-block 
-                label.aa-label(for="type")
-                  p Продукт
-                .aa-select-box.aa-select-box-one
-                  .aa-select-text Выберите продукт
-                  ion-icon(name="chevron-down")
-                  .aa-select-options-box
-                    .aa-select-option(class=`${order.product === 'milk' ? 'aa-select-option-selected' : ''}`  data-val="milk") Молоко
-                    .aa-select-option(class=`${order.product === 'cottage-cheese' ? 'aa-select-option-selected' : ''}`  data-val="cottage-cheese") Творог
-                    .aa-select-option(class=`${order.product === 'butter' ? 'aa-select-option-selected' : ''}`  data-val="butter") Масло 
-                    .aa-select-option(class=`${order.product === 'cream' ? 'aa-select-option-selected' : ''}`  data-val="cream") Сливки 
-                    .aa-select-option(class=`${order.product === 'cheese' ? 'aa-select-option-selected' : ''}`  data-val="cheese") Сыр 
-                    .aa-select-option(class=`${order.product === 'whey' ? 'aa-select-option-selected' : ''}`  data-val="whey") Сыворотка 
-                    .aa-select-option(class=`${order.product === 'sour-cream' ? 'aa-select-option-selected' : ''}`  data-val="sour-cream") Сметана 
-                    .aa-select-option(class=`${order.product === 'meat' ? 'aa-select-option-selected' : ''}`  data-val="meat") Мясо 
-              .aa-input-block
-                lable.aa-label(for="price") 
-                  p Вес | Объем
-                .aa-double-input-block
-                  input.aa-double-input.size-input(type="number" value=`${order.size}`)
-                  select.aa-double-input.unit-input
-                    -if(order.unit === 'l')
-                      option(value="l" selected hidden) Л.
-                    -if(order.unit === 'kg')
-                      option(value="kg" selected hidden) Кг.  
-                    option(value="l") Л.
-                    option(value="kg") Кг.  
-              .aa-iu-remove   
+            .ai-input-block.ai-input-block-select
+              .ai-select-line
+              .ai-input-label Клиент
+              input.ai-input.ai-input-select(type="text" placeholder="Имя или наименование клиента")
+              .ai-select-block.shadow#client
+                each client in clients
+                  .ai-select-item(data-id=`${client._id}` class=`${orders[0].client.toString() === client._id.toString() ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name= client.name
+                    each product in client.products
+                      .asi-hidden(data-product=`${product.productName}` data-price=`${product.pricePer}`)  
+          
+          each order in orders 
+            .ai-combined-block.ai-combined-block-1(data-product=`${orders.indexOf(order) + 1}`)
+              .ai-combined-block-title ПРОДУКТ ##{orders.indexOf(order) + 1}
+              //-.ai-combined-block-remove
                 ion-icon(name="close")
-          .aa-add-more-container
-            .aa-add-more#add-product-input
-              p Добавить продукт
-              ion-icon.aa-add-more-icon(name="add")
-          -if(orders[0].date)
-            .aa-input-block
-              label.aa-label(for="date")
-                p Дата
-              input.aa-text-input.aa-date-input#date(type="date" value=`${orders[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${orders[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${orders[0].date.toLocaleString('ru-RU', {day: '2-digit'})}`)
-          -else
-            .aa-input-block.date-block#once-date(data-display="block")
-              label.aa-label(for="date")
-                p Дата
-              input.aa-text-input.aa-date-input#date(type="date")
+              .ai-input-block.ai-input-block-text
+                .ai-input-label Наименование продукта
+                input.ai-input.ai-input-select.ai-input-validation.product-input(type="text" placeholder="Выберите продукт")
+                .ai-select-block.shadow.ai-input-validation.product
+                  .ai-select-item(data-value="milk" class=`${order.product === 'milk' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Молоко
+                  .ai-select-item(data-value="meat" class=`${order.product === 'meat' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Мясо
+                  .ai-select-item(data-value="cottage-cheese" class=`${order.product === 'cottage-cheese' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Творог
+                  .ai-select-item(data-value="cheese" class=`${order.product === 'cheese' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сыр
+                  .ai-select-item(data-value="butter" class=`${order.product === 'butter' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Масло
+                  .ai-select-item(data-value="whey" class=`${order.product === 'whey' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сыворотка
+                  .ai-select-item(data-value="cream" class=`${order.product === 'cream' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сливки
+                  .ai-select-item(data-value="sour-cream" class=`${order.product === 'sour-cream' ? 'ai-select-item-selected' : ''}`)
+                    p.ai-select-name Сметана
+
+              .ai-input-block.ai-input-block-small-select
+                .ai-input-label Вес | Объем
+                .ai-input-text-wraper
+                  input.ai-input.ai-input-text.ai-input-small-select.ai-input-validation.size(type="number" value=`${order.size}`)
+                  .ai-inside-text.range-text
+                .ai-small-select.unit
+                  p л.
+                  .ai-select-line
+                  .ai-small-select-block.shadow
+                    .ai-small-select-item(data-val="kg" class=`${order.unit === 'kg' ? 'ai-small-select-item-selected' : ''}`) кг.
+                    .ai-small-select-item(data-val="l" class=`${order.unit === 'l' ? 'ai-small-select-item-selected' : ''}`) л. 
 
 
           -if(orders[0].recuring)
-            .aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
-              label.aa-label(for="date")
-                p День и время
-              select.aa-triple-date-input-big#rec-date(data-val=`${orders[0].recuringDay}`)
-                option(value="1") Понедельник
-                option(value="2") Вторник
-                option(value="3") Среда
-                option(value="4") Четверг
-                option(value="5") Пятница
-                option(value="6") Суббота
-                option(value="0") Воскресенье
-              select.aa-triple-date-input#rec-hour
-                option(selected hidden value=`${orders[0].recuringHour}`)= `${orders[0].recuringHour}`
-                option(value="0") 00
-                option(value="1") 01
-                option(value="2") 02
-                option(value="3") 03
-                option(value="4") 04
-                option(value="5") 05
-                option(value="6") 06
-                option(value="7") 07
-                option(value="8") 08
-                option(value="9") 09
-                option(value="10") 10
-                option(value="11") 11
-                option(value="12") 12
-                option(value="13") 13
-                option(value="14") 14
-                option(value="15") 15
-                option(value="16") 16
-                option(value="17") 17
-                option(value="18") 18
-                option(value="19") 19
-                option(value="20") 20
-                option(value="21") 21
-                option(value="22") 22
-                option(value="23") 23     
-              .aa-triple-date-divider :
-              select.aa-triple-date-input#rec-minute
-                option(selected hidden value=`${orders[0].recuringMinute}`)= `${orders[0].recuringMinute}`
-                option(value="0") 00
-                option(value="1") 01
-                option(value="2") 02
-                option(value="3") 03
-                option(value="4") 04
-                option(value="5") 05
-                option(value="6") 06
-                option(value="7") 07
-                option(value="8") 08
-                option(value="9") 09
-                option(value="10") 10
-                option(value="11") 11
-                option(value="12") 12
-                option(value="13") 13
-                option(value="14") 14
-                option(value="15") 15
-                option(value="16") 16
-                option(value="17") 17
-                option(value="18") 18
-                option(value="19") 19
-                option(value="20") 20
-                option(value="21") 21
-                option(value="22") 22
-                option(value="23") 23
-                option(value="24") 24
-                option(value="25") 25
-                option(value="26") 26
-                option(value="27") 27
-                option(value="28") 28
-                option(value="29") 29
-                option(value="30") 30
-                option(value="31") 31
-                option(value="32") 32
-                option(value="33") 33
-                option(value="34") 34
-                option(value="35") 35
-                option(value="36") 36
-                option(value="37") 37
-                option(value="38") 38
-                option(value="39") 39
-                option(value="40") 40
-                option(value="41") 41
-                option(value="42") 42
-                option(value="43") 43
-                option(value="44") 44
-                option(value="45") 45
-                option(value="46") 46
-                option(value="47") 47
-                option(value="48") 48
-                option(value="49") 49
-                option(value="50") 50
-                option(value="51") 51
-                option(value="52") 52
-                option(value="53") 53
-                option(value="54") 54
-                option(value="55") 55
-                option(value="56") 56
-                option(value="57") 57
-                option(value="58") 58
-                option(value="59") 59
+            .ai-input-block.ai-input-block-text#once-date
+              .ai-input-label Дата
+              input.ai-input.ai-input-date#date(type="datetime-local")
+              .ai-input-marker.ai-input-marker-r
+                ion-icon(name="alert")
+              .ai-input-explain-block.ai-input-explain-block-required
+                .ai-input-eb-tri
+                .ai-input-eb-text Обязательно      
+
+            .ai-input-block.ai-input-block-small-select#recuring-date
+              .ai-input-label День и время
+              .ai-small-select.step-unit.ai-weekday-select
+                p Понедельник
+                .ai-select-line
+                .ai-small-select-block.shadow#weekday
+                  .ai-small-select-item(data-value="1" class=`${orders[0].recuringDay === 1 ? 'ai-small-select-item-selected' : ''}`) Понедельник
+                  .ai-small-select-item(data-value="2" class=`${orders[0].recuringDay === 2 ? 'ai-small-select-item-selected' : ''}`) Вторник
+                  .ai-small-select-item(data-value="3" class=`${orders[0].recuringDay === 3 ? 'ai-small-select-item-selected' : ''}`) Среда
+                  .ai-small-select-item(data-value="4" class=`${orders[0].recuringDay === 4 ? 'ai-small-select-item-selected' : ''}`) Четверг
+                  .ai-small-select-item(data-value="5" class=`${orders[0].recuringDay === 5 ? 'ai-small-select-item-selected' : ''}`) Пятница
+                  .ai-small-select-item(data-value="6" class=`${orders[0].recuringDay === 6 ? 'ai-small-select-item-selected' : ''}`) Суббота
+                  .ai-small-select-item(data-value="0" class=`${orders[0].recuringDay === 0 ? 'ai-small-select-item-selected' : ''}`) Воскресенье
+
+              input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.ai-time-input#time(type="time" value=`${orders[0].recuringTime}`)
+
           -else
-            .aa-input-block.date-block.aa-triple-date-block#recuring-date(data-display="flex")
-              label.aa-label(for="date")
-                p День и время
-              select.aa-triple-date-input-big#rec-date
-                option(value="1") Понедельник
-                option(value="2") Вторник
-                option(value="3") Среда
-                option(value="4") Четверг
-                option(value="5") Пятница
-                option(value="6") Суббота
-                option(value="0") Воскресенье
-              select.aa-triple-date-input#rec-hour
-                option(value="0") 00
-                option(value="1") 01
-                option(value="2") 02
-                option(value="3") 03
-                option(value="4") 04
-                option(value="5") 05
-                option(value="6") 06
-                option(value="7") 07
-                option(value="8") 08
-                option(value="9") 09
-                option(value="10") 10
-                option(value="11") 11
-                option(value="12") 12
-                option(value="13") 13
-                option(value="14") 14
-                option(value="15") 15
-                option(value="16") 16
-                option(value="17") 17
-                option(value="18") 18
-                option(value="19") 19
-                option(value="20") 20
-                option(value="21") 21
-                option(value="22") 22
-                option(value="23") 23     
-              .aa-triple-date-divider :
-              select.aa-triple-date-input#rec-minute
-                option(value="0") 00
-                option(value="1") 01
-                option(value="2") 02
-                option(value="3") 03
-                option(value="4") 04
-                option(value="5") 05
-                option(value="6") 06
-                option(value="7") 07
-                option(value="8") 08
-                option(value="9") 09
-                option(value="10") 10
-                option(value="11") 11
-                option(value="12") 12
-                option(value="13") 13
-                option(value="14") 14
-                option(value="15") 15
-                option(value="16") 16
-                option(value="17") 17
-                option(value="18") 18
-                option(value="19") 19
-                option(value="20") 20
-                option(value="21") 21
-                option(value="22") 22
-                option(value="23") 23
-                option(value="24") 24
-                option(value="25") 25
-                option(value="26") 26
-                option(value="27") 27
-                option(value="28") 28
-                option(value="29") 29
-                option(value="30") 30
-                option(value="31") 31
-                option(value="32") 32
-                option(value="33") 33
-                option(value="34") 34
-                option(value="35") 35
-                option(value="36") 36
-                option(value="37") 37
-                option(value="38") 38
-                option(value="39") 39
-                option(value="40") 40
-                option(value="41") 41
-                option(value="42") 42
-                option(value="43") 43
-                option(value="44") 44
-                option(value="45") 45
-                option(value="46") 46
-                option(value="47") 47
-                option(value="48") 48
-                option(value="49") 49
-                option(value="50") 50
-                option(value="51") 51
-                option(value="52") 52
-                option(value="53") 53
-                option(value="54") 54
-                option(value="55") 55
-                option(value="56") 56
-                option(value="57") 57
-                option(value="58") 58
-                option(value="59") 59
+            .ai-input-block.ai-input-block-text#once-date
+              .ai-input-label Дата
+              input.ai-input.ai-input-date#date(type="datetime-local" value=`${orders[0].date.toLocaleString('ru-RU', {year: 'numeric'})}-${orders[0].date.toLocaleString('ru-RU', {month: '2-digit'})}-${orders[0].date.toLocaleString('ru-RU', {day: '2-digit'})}T${orders[0].date.toLocaleString('ru-RU', {hour: '2-digit'})}:${orders[0].date.toLocaleString('ru-RU', {minute: '2-digit'}).length < 2 ? `0${orders[0].date.toLocaleString('ru-RU', {minute: '2-digit'})}` : orders[0].date.toLocaleString('ru-RU', {minute: '2-digit'})}`)
+              .ai-input-marker.ai-input-marker-r
+                ion-icon(name="alert")
+              .ai-input-explain-block.ai-input-explain-block-required
+                .ai-input-eb-tri
+                .ai-input-eb-text Обязательно 
 
-          .aa-input-block
-            lable.aa-label(for="note") 
-              p Заметка
-            textarea.aa-textarea-input#note(type="text")= `${orders[0].note !== undefined ? orders[0].note : ''}`
+            .ai-input-block.ai-input-block-small-select#recuring-date
+              .ai-input-label День и время
+              .ai-small-select.step-unit.ai-weekday-select
+                p Понедельник
+                .ai-select-line
+                .ai-small-select-block.shadow#weekday
+                  .ai-small-select-item.ai-small-select-item-selected(data-value="1") Понедельник
+                  .ai-small-select-item(data-value="2") Вторник
+                  .ai-small-select-item(data-value="3") Среда
+                  .ai-small-select-item(data-value="4") Четверг
+                  .ai-small-select-item(data-value="5") Пятница
+                  .ai-small-select-item(data-value="6") Суббота
+                  .ai-small-select-item(data-value="0") Воскресенье
 
-          .ar-btn-box          
-            a.ar-add-button(data-order-id=`${orders[0].subId}`) Сохранить
+              input.ai-input.ai-input-text.ai-input-small-select.ai-input-center.ai-time-input#time(type="time")
 
+          .ai-input-submit-btn(data-sub-id=`${orders[0].subId}`) Сохранить
+  
+
+          
 
 

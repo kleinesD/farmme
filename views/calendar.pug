@@ -5,16 +5,19 @@ block content
   section.main-section
 
     .big-calendar-container
+      .loading-block 
+        .loading-icon
       .bc-navigation-block
         .bc-nav-user-block
-          img(src="/img/images/cows-login-2.jpg")
+          .bc-nav-user-img
+            img.bc-nav-user-img-default(src="/img/icons/user-default.svg")
           .bc-nav-user-info
-            .bc-nav-user-name Даниил Коробко
-            .bc-nav-user-title Создатель
-          ion-icon.bc-nav-user-more(name="chevron-down")
+            .bc-nav-user-name #{user.firstName} #{user.lastName}
+            //.bc-nav-user-title Создатель
+          //ion-icon.bc-nav-user-more(name="chevron-down")
         a.bc-add-event-btn(href="/add-reminder")
+          .bc-add-event-btn-text Добавить Напоминание
           .bc-add-event-btn-icon +
-          .bc-add-event-btn-text Добавить Мероприятие
 
         .bc-small-calendar-block
           .bc-small-calendar-header
@@ -60,10 +63,18 @@ block content
           .bc-category-checkbox.bc-category-checked#bc-category-vet
             ion-icon(name="checkmark-sharp")
           .bc-category-text Ветеринария
-        .bc-category
+        //-.bc-category
           .bc-category-checkbox.bc-category-checked#bc-category-warehouse
             ion-icon(name="checkmark-sharp")
           .bc-category-text Склад
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-distribution
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Продукция
+        .bc-category
+          .bc-category-checkbox.bc-category-checked#bc-category-feed
+            ion-icon(name="checkmark-sharp")
+          .bc-category-text Кормление
 
 
       .bc-full-calendar-block
@@ -74,7 +85,7 @@ block content
               ion-icon.bc-small-calendar-btn(name="chevron-back")
             .bc-big-move-btn#next-big-month
               ion-icon.bc-small-calendar-btn(name="chevron-forward")
-          .bc-full-calendar-small-btn Сегодня
+          .bc-full-calendar-small-btn#today-btn Сегодня
           //-.bc-full-calendar-search
         .bc-main-calendar-box
           .bc-main-calendar-column#weekday-column-1
@@ -147,10 +158,10 @@ block content
                 ion-icon(name="person-outline")
               .bc-info-detailed-text-box
                 .bc-info-detailed-double
-                  img(src="/img/images/cows-login-2.jpg")
+                  //img(src="/img/icons/user-default.svg")
                   .bc-info-detailed-double-info
                     .bc-info-detailed-double-title#reminder-user-name Даниил Коробко
-                    .bc-info-detailed-double-sub-title#reminder-user-title Создатель
+                    //.bc-info-detailed-double-sub-title#reminder-user-title Создатель
             .bc-info-detailed-group
               .bc-info-detailed-icon  
                 ion-icon(name="paw-outline")

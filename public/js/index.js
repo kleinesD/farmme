@@ -3,22 +3,25 @@ import '../style/main.scss';
 import 'animate.css';
 import anime from 'animejs/lib/anime.es.js';
 import * as d3 from "d3";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import moment, { max, months } from 'moment';
 import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
 import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph, getAnimalData, getAnimalsByCategory, addMilkQuality, editMilkQuality, getMilkQuality } from './animalHandler';
 import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc, getStartedScheme, getVetProblem } from './vetHandler';
-import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders } from './calendarHandler';
+import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders, deleteSubIdReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout, checkEmail } from './authHandler';
-import { editFarm, editUser, addCategory } from './manageHandler';
-import { addConfirmationEmpty, askAus, emptyBlock, removeEmptyBlock, loadingBlock, removeloadingBlock } from './interaction';
+import { editFarm, editUser, addCategory, addBuilding } from './manageHandler';
+import { addConfirmationEmpty, askAus, emptyBlock, removeEmptyBlock, loadingBlock, removeloadingBlock, quickTitle, getIcons } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart, graphBase, graphBaseNoDate } from './chartConstructor';
 import { getMilkingProjection, getFarmProjections } from './projections';
 import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts, getClient } from './distributionHandler';
 import { addFeedSampleOrRecord, editFeedSampleOrRecord, getOneRecord, getFeedRecords } from './feedHandler';
 import { searchEngine } from './search';
+import { getNotifications, updateNotification, deleteNotification } from './notifications';
 
 
 $(document).ready(async function () {
@@ -30,6 +33,7 @@ $(document).ready(async function () {
   /////////////////////////
   /////////////////////////
 
+
   /* Remove title from every ion-icon */
   $('ion-icon').each(function () { $(this).find('title').text('') });
 
@@ -37,6 +41,140 @@ $(document).ready(async function () {
   $('body').on('click', '.dib-close', function () {
     $('.detailed-info-window').remove();
   });
+
+  /* Quick titles */
+  quickTitle();
+
+
+  ///////////////////////
+  /* NOTIFICATIONS */
+  /////////////////////// 
+  if (document.querySelector('.notification-btn')) {
+    const notifications = await getNotifications();
+
+    $('.notifications-block').empty();
+
+    if (notifications.length === 0) $('.notification-background').append(`<div class="notifications-empty">Уведомления отсутствуют</div>`);
+
+    notifications.forEach(notif => {
+      if (notif.module !== 'calendar') {
+        let append = true;
+
+        $('.notification-item').each(function () {
+          if ($(this).attr('data-sub-id') === notif.subId.toString()) {
+            $(this).find('.ni-list-line').append(`<a class="ni-ll-item" data-id="${notif._id}" href="${notif.link}">#${notif.animal.number}</a>`)
+            append = false;
+          }
+        });
+
+        if (!append) return;
+
+        let daysAgo = (Date.now() - new Date(notif.notifyAt).getTime()) / 24 / 60 / 60 / 1000;
+        let textDate = daysAgo < 1 ? 'Сегодня' : `${Math.floor(daysAgo)} дн. назад`;
+
+        $('.notifications-block').append(`
+          <div class="notification-item" data-sub-id="${notif.subId}" data-seen="${notif.seen}">
+            <div class="ni-btn ni-btn-delete">Удалить</div>
+            <div class="ni-btn ni-btn-later">Позже</div>
+            <div class="ni-header"><img class="ni-icon" src="/img/icons/${notif.icon}"/>
+              <div class="ni-header-title">${notif.title}</div>
+              <div class="ni-header-date">${textDate}</div>
+            </div>
+            <div class="ni-list-line">
+              <a class="ni-ll-item" data-id="${notif._id}" href="${notif.link}">#${notif.animal.number}</a>
+            </div>
+          </div>
+        `);
+      } else if (notif.module === 'calendar') {
+        let daysAgo = (Date.now() - new Date(notif.notifyAt).getTime()) / 24 / 60 / 60 / 1000;
+        let textDate = daysAgo < 1 ? 'Сегодня' : `${Math.floor(daysAgo)} дн. назад`;
+
+        $('.notifications-block').append(`
+          <div class="notification-item" data-sub-id="${notif.subId}" data-seen="${notif.seen}">
+            <div class="ni-btn ni-btn-delete">Удалить</div>
+            <div class="ni-btn ni-btn-later">Позже</div>
+            <div class="ni-header"><img class="ni-icon" src="/img/icons/${notif.icon}"/>
+              <div class="ni-header-title">${notif.title}</div>
+              <div class="ni-header-date">${textDate}</div>
+            </div>
+            <div class="ni-list-line">
+              <a class="ni-ll-item" data-id="${notif._id}" href="${notif.link}">Напоминание</a>
+            </div>
+          </div>
+        `);
+
+      }
+
+    });
+
+    let seenCount = 0;
+    $('.notification-item').each(function () { if ($(this).attr('data-seen') === 'false') seenCount++ });
+
+    if (seenCount > 0) $('.notification-btn').append(`<div class="notif-count">${seenCount}</div>`);
+
+
+    $('.notification-btn').on('click', async function () {
+      if ($(this).find('i').hasClass('ph-bell')) {
+        if ($('.notifications-block').children().length === 0) return;
+
+        $(this).find('i').removeClass('ph-bell').addClass('ph-x');
+
+        $('.notification-background').show();
+        $('.notifications-block').css('display', 'flex');
+        $('.notification-item').each(function () {
+          $(this).find('.ni-ll-item').each(async function () {
+            await updateNotification({ seen: true }, $(this).attr('data-id'));
+          });
+        });
+        $('.notif-count').remove();
+      } else {
+        $(this).find('i').removeClass('ph-x').addClass('ph-bell');
+
+        $('.notification-background').hide();
+        $('.notifications-block').css('display', 'none');
+      }
+    });
+
+    $('.notifications-block').on('click', '.ni-btn-later', function () {
+      $(this).parent().find('.ni-ll-item').each(async function () {
+        await updateNotification({ notifyAt: new Date(moment().add(3, 'day')), seen: false }, $(this).attr('data-id'));
+      });
+
+      $(this).parent().remove();
+      if ($('.notifications-block').children().length === 0) $('.notification-btn').trigger('click');
+    });
+
+    $('.notifications-block').on('click', '.ni-btn-delete', function () {
+      $(this).parent().find('.ni-ll-item').each(async function () {
+        await updateNotification({ deleteAt: new Date(moment().add(1, 'month')), show: false }, $(this).attr('data-id'));
+      });
+
+      $(this).parent().remove();
+      if ($('.notifications-block').children().length === 0) $('.notification-btn').trigger('click');
+    });
+
+    /* $('.notification-item').on('click', function() {
+      $('.notification-background').append(`
+        <div class="notification-detailed">
+          <div class="nd-header"><img class="nd-icon" src="${$(this).find('.ni-icon').attr('src')}"/>
+            <div class="nd-header-title">${$(this).find('.ni-header-title').text()}</div>
+            <div class="nd-header-date">${$(this).find('.ni-header-date').text()}</div>
+          </div>
+          <div class="nd-items-container"></div>
+          <div class="nd-footer">
+            <div class="nd-footer-btn nd-footer-later">Позже</div>
+            <div class="nd-footer-btn nd-footer-delete">Удалить</div>
+          </div>
+        </div>
+      `);
+
+      $(this).find('.ni-ll-item').each(function() {
+        $('.nd-items-container').append(`<a class="nd-item" data-id="${$(this).attr('data-id')}" href="${$(this).attr('href')}">${$(this).text()}</a>`);
+      });
+    }); */
+
+  }
+
   ///////////////////////
   /* MENU */
   /////////////////////// 
@@ -55,15 +193,15 @@ $(document).ready(async function () {
     });
 
     /* Working with menu title */
-    $('.menu-item-title').on('click', function () {
-      if (!$(this).parent().hasClass('menu-item-box-openned')) {
+    $('.mit-btn').on('click', function () {
+      if (!$(this).parent().parent().hasClass('menu-item-box-openned')) {
         $('.menu-item-link').removeClass('animate__animated animate__fadeIn animate__fadeOut');
         $('.menu-item-link').hide();
         $('.menu-item-box-openned').removeClass('menu-item-box-openned');
-        $(this).parent().addClass('menu-item-box-openned');
-        $(this).parent().find('.menu-item-link').addClass('animate__animated animate__fadeIn').show();
+        $(this).parent().parent().addClass('menu-item-box-openned');
+        $(this).parent().parent().find('.menu-item-link').addClass('animate__animated animate__fadeIn').show();
       } else {
-        $(this).parent().removeClass('menu-item-box-openned');
+        $(this).parent().parent().removeClass('menu-item-box-openned');
         $('.menu-item-link').addClass('animate__animated animate__fadeOut').hide();
       }
     });
@@ -79,8 +217,15 @@ $(document).ready(async function () {
 
     /* Back button */
     $('.main-menu-back-btn').on('click', function () {
-      history.back(-1)
+      history.back(-1);
+
+      localStorage.setItem('to-reload', 'true');
     });
+
+    if (localStorage.getItem('to-reload') === 'true') {
+      localStorage.setItem('to-reload', 'false');
+      location.reload(true);
+    }
 
   }
 
@@ -94,34 +239,70 @@ $(document).ready(async function () {
   ///////////////////////
   /* RIGHT CLICK MENU */
   /////////////////////// 
-  if (document.querySelector('.rc-menu')) {
+  if (document.querySelector('#rcm')) {
     $('body').on('mousedown', function (e) {
       if (e.which === 3) {
         let hor = '0%';
         let ver = '0%';
-        if (e.pageX + parseFloat($('.rc-menu').width()) > parseFloat($(window).width())) {
+        if (e.pageX + parseFloat($('#rcm').width()) > parseFloat($(window).width())) {
           hor = '-100%'
         }
-        if (e.pageY + parseFloat($('.rc-menu').height()) > parseFloat($(window).height())) {
+        if (e.pageY + parseFloat($('#rcm').height()) > parseFloat($(window).height())) {
           ver = '-100%'
         }
-        $('.rc-menu').css({
+        $('#rcm').css({
           'top': e.pageY,
           'left': e.pageX,
           'transform': `translate(${hor}, ${ver})`
         }).show(0);
+
       }
     });
 
     $(window).on('scroll', function () {
-      $('.rc-menu').hide()
+      $('#rcm').hide()
     });
 
     $('body').click(function (e) {
-      if (e.target.id !== 'rcm' && e.target.parentElement.id !== 'rcm' && e.target.parentElement.parentElement.id !== 'rcm') {
-        $('.rc-menu').hide()
+      let toHide = false;
+      if (e.target.id !== 'rcm') toHide = true;
+      if (e.target.parentElement && e.target.parentElement.id !== 'rcm') toHide = true;
+      if (e.target.parentElement.parentElement && e.target.parentElement.parentElement.id !== 'rcm') toHide = true;
+
+      if (toHide) {
+        $('#rcm').hide()
+        $('#rcm').find('.rc-one-time').remove();
       }
     });
+
+    /* Adding specific data to some objects */
+    $('body').on('mousedown', '*', function (e) {
+      if (e.which !== 3) return;
+
+
+      if ($(this).attr('rc-title') === undefined) return;
+
+      $('#rcm').find('.rc-one-time').remove();
+
+      if ($(this).attr('rc-link') === undefined) {
+        $('#rcm').append(`
+              <div class="rc-menu-devider rc-one-time"></div>
+              <div class="rc-menu-item rc-one-time" id="${$(this).attr('rc-id')}"> 
+                <ion-icon name="caret-forward"></ion-icon>
+                <p>${$(this).attr('rc-title')}</p>
+              </div>
+        `);
+      } else {
+        $('#rcm').append(`
+              <div class="rc-menu-devider rc-one-time"></div>
+              <a class="rc-menu-item rc-one-time" href="${$(this).attr('rc-link')}"> 
+                <ion-icon name="caret-forward"></ion-icon>
+                <p>${$(this).attr('rc-title')}</p>
+              </a>
+        `);
+      }
+    });
+
   }
 
   ///////////////////////
@@ -321,32 +502,35 @@ $(document).ready(async function () {
   /////////////////////// */
   if (document.querySelector('.ai-form-container')) {
     /* Select block */
-    $('.ai-form-container').on('click', '.ai-input-select', function () {
-      if ($(this).parent().attr('data-state') !== 'show') {
-        $(this).parent().find('.ai-select-block').show();
-        $(this).parent().attr('data-state', 'show');
-        anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
-      } else {
-        $(this).parent().find('.ai-select-block').hide();
-        $(this).parent().attr('data-state', 'hide');
-        anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
+    $('.ai-form-container').on('click keyup change', '.ai-input-select', function () {
+      $('.ai-input-block-select').each(function () {
+        $(this).find('.ai-select-block').hide();
+        $(this).attr('data-state', 'hide');
+        anime({ targets: $(this).find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
+      });
 
-        /* if ($(this).val().length === 0) {
-          $(this).parent().find('.ai-select-item-selected').removeClass('ai-select-item-selected');
-
-          $(this).parent().find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
-          setTimeout(() => { $(this).parent().find('.ai-input-marker-s').remove() }, 800)
-        } */
-      }
+      $(this).parent().find('.ai-select-block').show();
+      $(this).parent().attr('data-state', 'show');
+      anime({ targets: $(this).parent().find('.ai-select-line')[0], width: ['80%'], opacity: 0, easing: 'easeOutQuint' });
 
     });
 
+    $('body').on('click', function (e) {
+      if (!e.target.classList.value.includes('ai-input-select')) {
+        $('.ai-input-block-select').each(function () {
+          $(this).find('.ai-select-block').hide();
+          $(this).attr('data-state', 'hide');
+          anime({ targets: $(this).find('.ai-select-line')[0], width: ['10%'], opacity: 1, easing: 'easeOutQuint', duration: 200 });
+        });
+      }
+    });
+
     $('.ai-form-container').on('keyup change', '.ai-input-select', function () {
-      let val = $(this).val();
+      let val = $(this).val().toLowerCase();
       let container = $(this).parent().find('.ai-select-block');
       $(this).parent().find('.ai-select-item').each(function () {
-        let name = $(this).find('.ai-select-name').text().replace('#', '')
-        let subName = $(this).find('.ai-select-sub-name').text().replace('#', '')
+        let name = $(this).find('.ai-select-name').text().replace('#', '').toLowerCase();
+        let subName = $(this).find('.ai-select-sub-name').text().replace('#', '').toLowerCase()
 
         if (name.includes(val) || subName.includes(val)) {
           $(this).detach().prependTo(container);
@@ -574,6 +758,16 @@ $(document).ready(async function () {
       $(this).toggleClass('ai-radio-active');
     });
 
+    /* Pre-setting selected animals */
+    setTimeout(() => {
+      $('.ai-selected-animals-pre-set').each(function () {
+        let number = $(this).attr('data-number');
+        $('.ai-select-item').each(function () {
+          if ($(this).attr('data-number') === number) $(this).trigger('click');
+        });
+      });
+    }, 0)
+
   }
 
   ///////////////////////
@@ -630,13 +824,15 @@ $(document).ready(async function () {
       `)
       }
 
-      //console.log(moment(selectedMonth).startOf('month'), moment(selectedMonth).endOf('month'));
       let allDates = $('.bc-reminder-container');
       let from = moment($(allDates[0]).attr('data-date')).startOf('day');
       let to = moment($(allDates[allDates.length - 1]).attr('data-date')).endOf('day');
       let farmId = $('.big-calendar-container').attr('data-farm-id');
 
+      loadingBlock($('.bc-main-calendar-box'));
       const reminders = await getFarmReminders(from, to);
+      removeloadingBlock($('.bc-main-calendar-box'));
+      removeloadingBlock($('.big-calendar-container'));
 
       let allActions = [...reminders];
       allActions.sort((a, b) => a.date - b.date);
@@ -656,31 +852,97 @@ $(document).ready(async function () {
           }
         });
 
+        dayActions.forEach((action) => {
+          $(this).append(`
+            <div class="bc-date-quick bc-date-quick-${action.module}">
+              <div class="bc-date-quick-title">
+              ${action.name}
+              <span>${moment(action.date).format('HH:mm')}</span>
+              </div>
+            </div>
+          `);
+        });
 
-        if (dayActions.length > 0) {
-          let isMore = dayActions.length > 2 ? `<div class="bc-date-more-btn">+ ${dayActions.length - 2}</div>` : '';
-          if (dayActions.length < 2) {
-            $(this).append(`
-            <div class="bc-date-quick bc-date-quick-${dayActions[0].module}">
-              <div class="bc-date-quick-time">${moment(dayActions[0].date).format('HH:mm')}</div>
-              <div class="bc-date-quick-title">${dayActions[0].name}</div>
-            </div>
-          `);
-          } else if (dayActions.length >= 2) {
-            $(this).append(`
-            <div class="bc-date-quick bc-date-quick-${dayActions[0].module}">
-              <div class="bc-date-quick-time">${moment(dayActions[0].date).format('HH:mm')}</div>
-              <div class="bc-date-quick-title">${dayActions[0].name}</div>
-            </div>
-            <div class="bc-date-quick bc-date-quick-${dayActions[1].module}">
-              <div class="bc-date-quick-time">${moment(dayActions[1].date).format('HH:mm')}</div>
-              <div class="bc-date-quick-title">${dayActions[1].name}</div>
-            </div>
-            ${isMore}
-          `);
+      });
+
+    });
+
+    /* Today button */
+    $('#today-btn').on('click', async function () {
+      selectedMonth = moment();
+
+      /* Set current month and year */
+      let curRusMonth = moment(selectedMonth).locale('ru').format('MMMM');
+      let rusMonth = curRusMonth.replace(`${curRusMonth.split('')[0]}`, curRusMonth.split('')[0].toUpperCase())
+      const curYear = moment(selectedMonth).format('YYYY');
+      $('.bc-full-calendar-title').text(`${rusMonth} ${curYear}`);
+
+      /* Clearing the calendar from previous month */
+      $('.bc-main-calendar-column').each(function () { $(this).empty() });
+
+      /* Adding days of the month */
+      let daysInMonth = moment(selectedMonth).daysInMonth();
+      let daysBeforeMonth = moment(selectedMonth).date(1).day() === 0 ? 6 : moment(selectedMonth).date(1).day() - 1;
+      let daysAfterMonth = 7 - moment(selectedMonth).date(daysInMonth).day()
+      let totalDays = daysInMonth + daysBeforeMonth + daysAfterMonth;
+
+      let visCalStart = moment(selectedMonth).date(1 - daysBeforeMonth);
+
+      for (let i = 0; i < totalDays; i++) {
+        let date = moment(visCalStart).add(i, 'days');
+        let monthDay = moment(date).date();
+        let weekDay = moment(date).day();
+
+        let otherMonth = moment(date).month() !== moment(selectedMonth).month() ? 'bc-date-other' : '';
+        let pastDay = moment(date) < moment() ? 'bc-date-past' : '';
+
+        let isToday = date.startOf('day').isSame(moment().startOf('day')) ? 'bc-date-now' : '';
+
+        $(`#weekday-column-${weekDay}`).append(`
+        <div class="bc-main-calendar-day ${otherMonth} ${pastDay} ${isToday}" data-date="${new Date(date)}">
+          <div class="bc-main-calendar-day-number">${monthDay}</div>
+          <div class="bc-reminder-container" data-date="${new Date(date)}"></div>
+        </div>
+      `)
+      }
+
+      let allDates = $('.bc-reminder-container');
+      let from = moment($(allDates[0]).attr('data-date')).startOf('day');
+      let to = moment($(allDates[allDates.length - 1]).attr('data-date')).endOf('day');
+      let farmId = $('.big-calendar-container').attr('data-farm-id');
+
+      loadingBlock($('.bc-main-calendar-box'));
+      const reminders = await getFarmReminders(from, to);
+      removeloadingBlock($('.bc-main-calendar-box'));
+
+      let allActions = [...reminders];
+      allActions.sort((a, b) => a.date - b.date);
+
+      /* Adding quick info about each day reminders */
+      $('.bc-reminder-container').each(async function () {
+        const date = moment($(this).attr('data-date'));
+
+        let start = new Date(date.startOf('day'));
+        let end = new Date(date.endOf('day'));
+
+        let dayActions = [];
+        allActions.forEach((action) => {
+          let actionDate = new Date(action.date);
+          if (start <= actionDate && actionDate <= end) {
+            dayActions.push(action)
           }
+        });
 
-        }
+        dayActions.forEach((action) => {
+          $(this).append(`
+            <div class="bc-date-quick bc-date-quick-${action.module}">
+              <div class="bc-date-quick-title">
+              ${action.name}
+              <span>${moment(action.date).format('HH:mm')}</span>
+              </div>
+            </div>
+          `);
+        });
 
       });
 
@@ -767,24 +1029,30 @@ $(document).ready(async function () {
       let rusDate = moment(date).lang('ru').format('MMMM DD, YYYY');
       rusDate = rusDate.charAt(0).toUpperCase() + rusDate.slice(1);
       $('.bc-info-block-title').text(rusDate)
-      allActions.forEach((action, index) => {
-        let note = '';
-        if (action.note) note = action.note
-        $('.bc-info-reminders-conatiner').append(`
-          <div class="bc-info-reminder" data-index="${index}">
-            <div class="bc-info-reminder-time bc-info-reminder-time-${action.module}">${moment(action.date).format('HH:mm')}</div>
-            <div class="bc-info-reminder-title">${action.name}</div>
-            <div class="bc-info-reminder-sub-title">${note}</div>
-          </div>
-        `);
+      if (allActions.length > 0) {
+        $('.bc-info-reminders-conatiner').css({ 'display': 'block' });
 
-      });
+        allActions.forEach((action, index) => {
+          let note = '';
+          if (action.note) note = action.note
+          $('.bc-info-reminders-conatiner').append(`
+            <div class="bc-info-reminder" data-index="${index}">
+              <div class="bc-info-reminder-time bc-info-reminder-time-${action.module}">${moment(action.date).format('HH:mm')}</div>
+              <div class="bc-info-reminder-title">${action.name}</div>
+              <div class="bc-info-reminder-sub-title">${note}</div>
+            </div>
+          `);
+        });
+      } else {
+        $('.bc-info-reminders-conatiner').css({ 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' });
+        $('.bc-info-reminders-conatiner').append('<div class="bc-info-empty-text">Нет напоминаний</div>')
+      }
     });
 
     /* Showing detailed reminder */
     $('.bc-info-reminders-conatiner').on('click', '.bc-info-reminder', function () {
       $('.bc-info-detailed').show();
-      $('.bc-info-detailed').css('background-color', $(this).find('.bc-info-reminder-time').css('color'));
+      $('.bc-info-detailed').css('background-color', $(this).find('.bc-info-reminder-time').css('color') !== 'rgb(84, 84, 84)' ? $(this).find('.bc-info-reminder-time').css('color') : '#d9d9d9');
       let reminder = allActions[parseFloat($(this).attr('data-index'))];
 
       $('#reminder-title').text(reminder.name)
@@ -1103,261 +1371,136 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* ADD GENERAL REMINDER */
+  /* ADD AND EDIT GENERAL REMINDER */
   ///////////////////////
-  if (document.querySelector('#add-general-reminder-container')) {
-    /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
+  if (document.querySelector('#general-reminder-container') || document.querySelector('#edit-general-reminder-container')) {
 
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()).length === 0 || new Date($(this).val()).getTime() < Date.now()) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $(this).parent().find('.aa-label-warning').remove();
-          $(this).parent().find('.aa-label').append(`<div class="aa-label-warning">-&nbsp; Введите правильную дату</div>`);
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $(this).parent().find('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
+    /* Adding multiple animals */
+    $('#multiple-animals').find('.ai-select-item').on('click', function () {
+      $(this).addClass('ai-select-item-unvail');
+      $('.ai-selected-animals-block').append(`
+        <div class="ai-selected-animals-item" data-id="${$(this).attr('data-id')}">${$(this).find('.ai-select-name').text()}
+          <div class="ai-selected-animals-remove"> 
+            <ion-icon name="close"></ion-icon>
+          </div>
+        </div>
+      `)
+      if ($('.ai-selected-animals-block').css('display') === 'none') {
+        $('.ai-selected-animals-block').css({ 'display': 'block', 'opacity': '0' });
+        anime({ targets: $('.ai-selected-animals-block')[0], opacity: 1, easing: 'easeInOutQuad', duration: 500 })
       }
     });
 
-    $('*').on('click focus blur change', function () {
-      if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#type').find('.aa-select-option-selected').length > 0) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#f4a261' });
-      } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-      }
-    });
-
-    let inputMarkup = `<div class="aa-input-block aa-triple-date-block reminder">
-    <div class="additional-delete-btn"><ion-icon name="close-circle"></ion-icon></div>
-    <label class="aa-label" for="date">
-      <p>Уведомление</p>
-    </label>
-    <input class="aa-triple-date-input-big date" type="date"/>
-    <select class="aa-triple-date-input hour">
-      <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option>
-    </select>
-    <div class="aa-triple-date-divider">:</div>
-    <select class="aa-triple-date-input minute">
-      <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option><option value="51">51</option><option value="52">52</option><option value="53">53</option><option value="54">54</option><option value="55">55</option><option value="56">56</option><option value="57">57</option><option value="58">58</option><option value="59">59</option>
-    </select>
-  </div>`
-
-    let addReminderBtn = `
-    <div class="aa-add-more-container">
-      <div class="aa-add-more" id="add-reminder">
-        <ion-icon class="aa-add-more-icon" name="calendar-number-outline"></ion-icon>
-        <p>Добавить уведомление</p>
-      </div>
-    </div>
-    `
-
-
-    $('#date').on('click change keyup focus blur', function () {
-      if ($(this).val() !== '' && new Date($(this).val()) > new Date() && $('#add-reminder').length === 0) {
-        $('#date').parent().after(addReminderBtn);
-      }
-    });
-
-    $('.main-section').delegate('#add-reminder', 'click', function () {
-      $(this).parent().before(inputMarkup);
-    });
-
-    $('.main-section').delegate('.additional-delete-btn', 'click', function () {
+    $('.ai-selected-animals-block').on('click', '.ai-selected-animals-remove', function () {
+      const id = $(this).parent().attr('data-id');
+      $('#multiple-animals').find('.ai-select-item').each(function () { if ($(this).attr('data-id') === id) $(this).removeClass('ai-select-item-unvail') });
       $(this).parent().remove();
+
+      if ($('.ai-selected-animals-block').find('.ai-selected-animals-item').length === 0) {
+        $('.ai-selected-animals-block').hide();
+      }
     });
 
-    $('.ar-add-button').click(async function () {
-      $('.ar-add-button').append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
-      if ($('#multiple-animals-container').children().length > 0) {
-        let doneAnimals = 0;
+    /* Adding icons */
+    $('.icon-selected-box').on('click', async function () {
+      let files;
+      if ($('.ai-input-icons-container').children().length === 0) {
+        files = await getIcons();
 
-        let subId = randomstring.generate(12);
-
-        $('#multiple-animals-container').children().each(async function () {
-          let animal = $(this).attr('data-id');
-          let name = $('#name').val();
-          let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-          let note = $('#note').val() === '' ? undefined : $('#note').val();
-          let module = $('#type').attr('data-value');
-          let reminders = [];
-          $('.reminder').each(function () {
-            reminders.push({
-              date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
-            });
-          });
-
-          const response = await addReminder({ name, date, note, subId, animal, module, reminders });
-
-          if (response) doneAnimals++;
-
-          if (doneAnimals === $('#multiple-animals-container').children().length) {
-            $('.mini-loader').hide();
-            addConfirmationEmpty($('.animal-results-container'));
-            setTimeout(() => {
-              location.reload(true);
-            }, 1500)
-
-            /* location.assign('/herd/all-animals'); */
-          }
+        files.forEach(file => {
+          $('.ai-input-icons-container').append(`<div class="ai-input-icon-selector select-icon"><img src="/img/svgs/${file}"></div>`)
         });
-      } else {
-        let subId = randomstring.generate(12);
-
-        let name = $('#name').val();
-        let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-        let note = $('#note').val() === '' ? undefined : $('#note').val();
-        let module = $('#type').attr('data-value');
-        let reminders = [];
-        $('.reminder').each(function () {
-          reminders.push({
-            date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
-          });
-        });
-
-        const response = await addReminder({ name, date, note, subId, module, reminders });
-        //console.log({ name, date, note, subId, module, reminders });
-
-        if (response) {
-          $('.mini-loader').hide();
-          addConfirmationEmpty($('.animal-results-container'));
-          setTimeout(() => {
-            location.reload(true);
-          }, 1500)
-
-          /* location.assign('/herd/all-animals'); */
-        }
       }
+      $('.ai-input-icons-container').toggle();
+    });
 
-    })
-  }
+    $('.ai-input-icons-container').on('click', '.select-icon', function () {
+      $('.icon-selected-box').find('img').attr('src', $(this).find('img').attr('src'));
+      $('.ai-input-icons-container').hide();
+    });
 
-  ///////////////////////
-  /* EDIT GENERAL REMINDER */
-  ///////////////////////
-  if (document.querySelector('#edit-general-reminder-container')) {
+
     /* Validating form */
-    $('input').on('keyup change blur click', function () {
-      if ($(this).val().length > 0) {
-        $(this).addClass('valid-aa-input');
+    $('*').on('click change keyup mouseenter', function () {
+      if ($('#name').hasClass('ai-valid-input') && $('#date').hasClass('ai-valid-input')) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        $(this).removeClass('valid-aa-input');
-      }
-
-      if ($(this).attr('id') === 'date') {
-        if (new Date($(this).val()).length === 0) {
-          $(this).parent().find('.aa-label *').css('color', '#D44D5C');
-          $(this).parent().find('.aa-label-warning').remove();
-          $(this).parent().find('.aa-label').append(`<div class="aa-label-warning">-&nbsp; Введите правильную дату</div>`);
-          $(this).removeClass('valid-aa-input');
-        } else {
-          $(this).parent().find('.aa-label *').css('color', '#000000');
-          $(this).parent().find('.aa-label-warning').remove();
-          $(this).addClass('valid-aa-input');
-        }
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
 
-    $('*').on('click focus blur change', function () {
-      if ($('#name').hasClass('valid-aa-input') && $('#date').hasClass('valid-aa-input') && $('#type').find('.aa-select-option-selected').length > 0) {
-        $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#f4a261' });
-      } else {
-        $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-      }
-    });
-
-    if ($('#multiple-animals-container').children().length > 0) {
-      $('.ar-selected-animals-block').show();
-      $('.ar-selected-animals-block').css('opacity', '1');
-      $('#multiple-animals-container').children().css('pointer-events', 'none')
+    if (document.querySelector('#edit-general-reminder-container')) {
+      $('.ai-input').trigger('keyup')
+      $('.ai-textarea').trigger('keyup')
+      $('ai-select-item-selected').trigger('click');
     }
 
-    let inputMarkup = `<div class="aa-input-block aa-triple-date-block reminder">
-    <div class="additional-delete-btn"><ion-icon name="close-circle"></ion-icon></div>
-    <label class="aa-label" for="date">
-      <p>Уведомление</p>
-    </label>
-    <input class="aa-triple-date-input-big date" type="date"/>
-    <select class="aa-triple-date-input hour">
-      <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option>
-    </select>
-    <div class="aa-triple-date-divider">:</div>
-    <select class="aa-triple-date-input minute">
-      <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option><option value="51">51</option><option value="52">52</option><option value="53">53</option><option value="54">54</option><option value="55">55</option><option value="56">56</option><option value="57">57</option><option value="58">58</option><option value="59">59</option>
-    </select>
-  </div>`
+    if (document.querySelector('#general-reminder-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let subId = randomstring.generate(12);
+        if ($('.ai-selected-animals-item').length > 0) {
+          let doneAnimals = 0;
 
-    let addReminderBtn = `
-  <div class="aa-add-more-container">
-    <div class="aa-add-more" id="add-reminder">
-      <ion-icon class="aa-add-more-icon" name="calendar-number-outline"></ion-icon>
-      <p>Добавить уведомление</p>
-    </div>
-  </div>
-  `
+          $(this).empty();
+          $(this).append(`<div class="mini-loader"></div>`);
+          anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
 
-    $('#date').on('click change keyup focus blur', function () {
-      if ($(this).val() !== '' && !document.querySelector('.aa-add-more-container')) {
-        $('.ar-add-button').before(addReminderBtn);
-      }
-    });
+          $('#multiple-animals-container').find('.ai-selected-animals-item').each(async function () {
+            let animalId = $(this).attr('data-id');
+            let name = $('#name').val();
+            let date = new Date($('#date').val());
+            let note = $('#note').val() === '' ? undefined : $('#note').val();
+            let icon = ($('.icon-selected-box').find('img').attr('src')).replace('/img/svgs/', '');
+            let module = $('#type').find('.ai-select-item-selected').attr('data-value');
 
-    $('.main-section').delegate('#add-reminder', 'click', function () {
-      $(this).parent().before(inputMarkup);
-    });
+            const response = await addReminder({ animalId, name, date, note, icon, module, subId });
 
-    $('.main-section').delegate('.additional-delete-btn', 'click', function () {
-      $(this).parent().remove();
-    });
+            if (response) doneAnimals++;
 
-    $('input').trigger('click');
+            if (doneAnimals === $('#multiple-animals-container').find('.ai-selected-animals-item').length) {
+              addConfirmationEmpty($('.animal-results-window'));
+              setTimeout(() => { location.reload(true); }, 1500)
+            }
+          });
 
-    $('.ar-add-button').click(async function () {
-      $('.ar-add-button').append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
+        } else {
+          let name = $('#name').val();
+          let date = new Date($('#date').val());
+          let note = $('#note').val() === '' ? undefined : $('#note').val();
+          let icon = ($('.icon-selected-box').find('img').attr('src')).replace('/img/svgs/', '');
+          let module = $('#type').find('.ai-select-item-selected').attr('data-value');
 
-      let id = $(this).attr('data-reminder-id')
-      let name = $('#name').val();
-      let date = new Date(moment(new Date($('#date').val())).hour(parseFloat($('#hour').val())).minute(parseFloat($('#minute').val())));
-      let note = $('#note').val() === '' ? undefined : $('#note').val();
-      let module = $('#type').attr('data-value');
-      let reminders = [];
-      $('.reminder').each(function () {
-        reminders.push({
-          date: new Date(moment(new Date($(this).find('.date').val())).hour(parseFloat($(this).find('.hour').val())).minute(parseFloat($(this).find('.minute').val())))
-        });
-      });
+          const response = await addReminder({ name, date, note, icon, module, subId });
 
-      const response = await editReminder(id, { name, date, note, module, reminders });
-      //console.log({ name, date, note, subId, module, reminders });
+          if (response) {
+            addConfirmationEmpty($('.animal-results-window'));
+            setTimeout(() => { location.reload(true); }, 1500)
+          }
+        }
+      })
+    } else if (document.querySelector('#edit-general-reminder-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let id = $(this).attr('data-reminder-id');
+        let name = $('#name').val();
+        let date = new Date($('#date').val());
+        let note = $('#note').val() === '' ? undefined : $('#note').val();
+        let icon = ($('.icon-selected-box').find('img').attr('src')).replace('/img/svgs/', '');
+        let module = $('#type').find('.ai-select-item-selected').attr('data-value');
 
-      if (response) {
-        $('.mini-loader').hide();
-        addConfirmationEmpty($('.animal-results-container'));
-        setTimeout(() => {
-          location.reload(true);
-        }, 1500)
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-        /* location.assign('/herd/all-animals'); */
-      }
+        const response = await editReminder(id, { name, date, note, icon, module });
 
-    })
+        if (response) {
+          addConfirmationEmpty($('.animal-results-window'));
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      })
+    }
+
   }
 
   ///////////////////////
@@ -1555,7 +1698,16 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
-  /* THE MAIN PAGE */
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  /* THE MAIN PAGE  */
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  /* MAIN | WELCOME SECTION */
   ///////////////////////
   if (document.querySelector('.main-welcome-block')) {
     $('.mw-small-link-block').on('mouseenter', function () {
@@ -1583,179 +1735,235 @@ $(document).ready(async function () {
     });
   }
 
-  if (document.querySelector('.main-page-herd-block')) {
-    let herdData = []
-    $('.mph-data').each(function () {
-      herdData.push({
-        result: parseFloat($(this).attr('data-result')),
-        date: new Date($(this).attr('data-date')),
+  ///////////////////////
+  /* MAIN | HERD SECTION */
+  ///////////////////////
+  if (document.querySelector('.main-herd-section')) {
+    const animals = await getAnimalsForGraph($('.main-page-container').attr('data-farm-id'));
+    let last12Months = [
+      { month: 0, total: 0, day: 0, results: 0, average: 0 },
+      { month: 1, total: 0, day: 0, results: 0, average: 0 },
+      { month: 2, total: 0, day: 0, results: 0, average: 0 },
+      { month: 3, total: 0, day: 0, results: 0, average: 0 },
+      { month: 4, total: 0, day: 0, results: 0, average: 0 },
+      { month: 5, total: 0, day: 0, results: 0, average: 0 },
+      { month: 6, total: 0, day: 0, results: 0, average: 0 },
+      { month: 7, total: 0, day: 0, results: 0, average: 0 },
+      { month: 8, total: 0, day: 0, results: 0, average: 0 },
+      { month: 9, total: 0, day: 0, results: 0, average: 0 },
+      { month: 10, total: 0, day: 0, results: 0, average: 0 },
+      { month: 11, total: 0, day: 0, results: 0, average: 0 },
+    ]
+    animals.cows.forEach(cow => {
+      for (let i = 0; i < 12; i++) {
+        let results = 0;
+        let total = 0;
+
+        /*  */
+        /*  */
+        /*  */
+        /*  */
+        /*  */
+        let requiredMonth = moment(new Date(moment())).subtract(i, 'month');
+
+        cow.milkingResults.forEach(result => {
+          if (moment(result.date).month() !== moment(requiredMonth).month() || moment(result.date).year() !== moment(requiredMonth).year()) return;
+
+          results++;
+          total += result.result;
+        });
+
+        if (results === 0) return;
+
+        let month = last12Months.find(mon => mon.month === i);
+        month.day += total / results;
+        month.total = month.day * 30;
+        month.results++;
+        month.average = month.day / month.results;
+      }
+    });
+
+    console.log(last12Months);
+
+    $('.mhs-mi-text-block-months').empty();
+    $('.mhs-mi-text-block-results').empty();
+    let max = 0;
+    last12Months.forEach((month, inx) => {
+      if (inx === 0) {
+        max = month.total;
+      } else {
+        if (max < month.total) max = month.total;
+      }
+
+    })
+    last12Months.forEach(month => {
+
+      $('.mhs-mi-text-block-months').append(`<div class="mhs-mi-text" data-month="${month.month}">${moment().subtract(month.month, 'month').locale('ru').format('MMM').replace('.', '').toUpperCase()}</div>`)
+
+      let monthTotal;
+
+      if (month.total < 1000) {
+        monthTotal = month.total
+      } else if (month.total >= 1000 && month.total < 100000) {
+        monthTotal = `${(month.total / 1000).toFixed(1)} к`;
+      } else if (month.total >= 100000 && month.total < 1000000) {
+        monthTotal = `${Math.round(month.total / 1000)} к`
+      } else if (month.total >= 1000000) {
+        monthTotal = `${(month.total / 1000000).toFixed(1)} кк`;
+      }
+      $('.mhs-mi-text-block-results').append(`<div class="mhs-mi-text" data-month="${month.month}">${monthTotal}</div>`)
+
+      $('.mhs-mi-graph-item').each(function () {
+        if (parseFloat($(this).attr('data-month')) !== month.month) return;
+
+        $(this).attr('day', Math.round(month.day)).attr('average', (month.average).toFixed(1)).css({ 'background-color': `rgb(251, 141, 52, ${Math.round(month.total / (max / 100)) > 50 ? Math.round(month.total / (max / 100)) / 100 : 0.50})` });
+
+        anime({ targets: $(this)[0], height: `${50 + (300 * (Math.round(month.total / (max / 100)) / 100))}px`, duration: 100, delay: 50 * (11 - month.month), easing: 'easeOutQuint' });
       });
     });
 
-    herdData.sort((a, b) => a.date - b.date);
 
-    let lastMonthHerdData = [];
-    herdData.forEach((data) => {
-      if (moment(data.date).month() === moment(herdData[herdData.length - 1].date).month() && moment(data.date).year() === moment(herdData[herdData.length - 1].date).year()) {
-        lastMonthHerdData.push(data);
-      }
+    $('.mhs-mi-graph-item').on('mouseenter', function () {
+      const number = parseFloat($(this).attr('data-month'));
+
+      $('.mhs-mi-text-block').scrollTop(number * 78);
+      $('#day').text(`${$(this).attr('day')} л.`)
+      $('#average').text(`${$(this).attr('average')} л.`)
+
     });
 
-    let total = 0;
-    lastMonthHerdData.forEach(data => {
-      total += data.result;
+    $('.mhs-main-info-block').on('mouseleave', function () {
+      $('.mhs-mi-graph-item').last().trigger('mouseenter');
     });
+    $('.mhs-main-info-block').trigger('mouseleave');
 
-    /* Adding all the info */
-    $('#mph-average').text(`${(total / lastMonthHerdData.length).toFixed(1)}`)
-    $('#mph-day').text(`${Math.round(total)}`)
-    if (total * 30 > 1000) {
-      $('#mph-month').text(`${((total * 30) / 1000).toFixed(1)}`);
-      $('#mph-month').parent().find('.mph-info-box-text').text('тыс. литров');
-    } else {
-      $('#mph-month').text(`${Math.round(total * 30)}`)
-    }
-
-    let rusDate = moment(lastMonthHerdData[0].date).lang('ru').format('MMMM YYYY');
-    rusDate = rusDate.charAt(0).toUpperCase() + rusDate.slice(1);
-    $('.mph-info-month').text(rusDate)
+    /* Working with sliding block */
+    setInterval(() => {
+      let curEl = $('.mhs-bi-item-switch-active');
+      let nextEl = $('.mhs-bi-item-switch-active').hasClass('mhs-bi-item-switch-last') ? $('.mhs-bi-item-switch-first') : $('.mhs-bi-item-switch-active').next();
 
 
+      curEl.addClass('animate__animated animate__fadeOutDown');
+      document.querySelector('.mhs-bi-item-switch-active').addEventListener('animationend', () => {
+        curEl.removeClass('animate__animated animate__fadeOutDown animate__fadeInDown mhs-bi-item-switch-active');
+        curEl.hide();
+        nextEl.removeClass('animate__animated animate__fadeOutDown animate__fadeInDown');
+        nextEl.addClass('mhs-bi-item-switch-active');
+        nextEl.addClass('animate__animated animate__fadeInDown').css({ 'display': 'flex' });;
+      })
 
-    /* Adding animation of appearence */
-    $(window).on('scroll', function () {
-      let itemsBottom = $('.mph-info-box').position().top + ($('.mph-info-box').height() / 2);
-      if ($(this).scrollTop() >= 300) {
-        $('body').css({ 'transition': '0.5s', 'background-color': '#0A0908' })
-      } else if ($(this).scrollTop() < 300) {
-        $('body').css({ 'transition': '0.5s', 'background-color': '#ffffff' })
-      }
-      if ($(this).scrollTop() >= itemsBottom) {
-        $('#box-1').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1');
-        setTimeout(() => { $('#box-2').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1'); }, 250);
-        setTimeout(() => { $('#box-3').addClass('animate__animated').addClass('animate__slideInDown').css('opacity', '1'); }, 500);
+    }, 5000)
 
-      }
-    });
   }
+  ///////////////////////
+  /* MAIN | VET SECTION */
+  ///////////////////////
+  if (document.querySelector('.main-vet-section')) {
+    const animals = await getAnimalsForGraph($('.main-page-container').attr('data-farm-id'));
+    let data = {
+      toInsem: [],
+      over: [],
+      inseminated: [],
+      wait: [],
+      total: 0
+    }
+    animals.cows.forEach(cow => {
+      if (cow.inseminations.length === 0 && cow.lactations.length === 0 && new Date() < new Date(moment(cow.birthDate).add(18, 'month'))) return;
+
+      let lastInsem = cow.inseminations.length > 0 ? new Date(cow.inseminations.at(-1).date) : undefined;
+      let lastInsemResult = cow.inseminations.length > 0 ? cow.inseminations.at(-1).success : undefined;
+      let lastLact = cow.lactations.length > 0 ? new Date(cow.lactations.at(-1).startDate) : undefined;
 
 
-  if (document.querySelector('mp-herd-container')) {
-    /* Making navigation work */
-    $('.mp-block-changer-item-on').click(function () {
-      $('.mp-block-changer-item-off').show(200);
-      $('.mp-block-changer-item-off').css('opacity', '1');
-    });
+      /* Dry period */
+      if (lastInsem && lastInsemResult === undefined && lastInsem > lastLact || lastInsem && lastInsemResult === undefined && lastInsem > new Date(moment(cow.birthDate).add(18, 'month'))) data.wait.push(cow);
 
-    /* Making quick info image smaller */
-    $(window).resize(function () {
-      $('.mp-main-info-image').width($('.mp-main-info-image').height());
-    });
-    $(window).resize();
+      data.total++;
 
+      /* Insemination after lactation */
+      if (lastLact) {
+        if (!lastInsem || !lastInsemResult || lastInsemResult && lastLact > lastInsem) {
+          /* To inseminate */
+          if (new Date() > new Date(moment(lastLact).add(50, 'day')) && new Date() < new Date(moment(lastLact).add(5, 'month'))) data.toInsem.push(cow);
 
-    /* Making top animals scroll horizontaly */
-    let scrollContainer = document.querySelector('.mp-top-cows-container');
-
-    scrollContainer.addEventListener("wheel", (event) => {
-      event.preventDefault();
-      scrollContainer.scrollLeft += event.deltaY;
-    });
-
-    /* Adding all related milk results */
-    let milkingData = [];
-    $('.mp-graph-data').each(function () {
-      milkingData.push({
-        result: parseFloat($(this).attr('data-result')),
-        lactationNumber: parseFloat($(this).attr('data-lact')),
-        date: new Date($(this).attr('data-date')),
-        cowPhoto: $(this).attr('data-cow-photo'),
-        cowNumber: $(this).attr('data-cow-number'),
-        cowName: $(this).attr('data-cow-name'),
-        cowId: $(this).attr('data-cow-id'),
-
-      });
-    });
-
-    milkingData.sort((a, b) => a.date - b.date);
-
-    let lastMonthMD = [];
-    milkingData.forEach((el, indexm, arr) => {
-      if (moment(el.date).month() === moment(arr[arr.length - 1].date).month() && moment(el.date).year() === moment(arr[arr.length - 1].date).year()) {
-        lastMonthMD.push(el);
+          /* Over staying */
+          if (new Date() > new Date(moment(lastLact).add(5, 'month'))) data.over.push(cow);
+        }
       }
+
+      /* Insemination at certain age */
+      if (!lastLact && new Date() > new Date(moment(cow.birthDate).add(18, 'month')) && !lastInsemResult) data.toInsem.push(cow);
+
+      /* Inseminated */
+      if (lastInsemResult && lastLact && lastInsem > lastLact || lastInsemResult && new Date() > new Date(moment(cow.birthDate).add(18, 'month'))) data.inseminated.push(cow);
     });
 
-    let avgRes = { total: 0, amount: 0 }
-    lastMonthMD.forEach(el => {
-      $('#mp-milk-per-day').attr('data-total', parseFloat($('#mp-milk-per-day').attr('data-total')) + el.result);
-      $('#mp-milk-per-day').text(`${$('#mp-milk-per-day').attr('data-total')} л.`)
-      $('#mp-milk-per-month').text(`${parseFloat($('#mp-milk-per-day').attr('data-total')) * 30} л.`);
+    /* Creating a graph */
+    let max = 0;
+    if (data.toInsem.length / data.total > max) max = data.toInsem.length / data.total;
+    if (data.over.length / data.total > max) max = data.over.length / data.total;
+    if (data.inseminated.length / data.total > max) max = data.inseminated.length / data.total;
+    if (data.wait.length / data.total > max) max = data.wait.length / data.total;
 
-      avgRes.total += el.result;
-      avgRes.amount++;
+    if (max < 0.5) data.total = data.total / 1.5;
+
+    $(window).on('resize', function () {
+      $('.basic-graph-svg').remove();
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      svg.classList.add('basic-graph-svg')
+      $('.mvs-info-graph').append(svg);
+      svg.style.width = $('.mvs-info-graph').width();
+      svg.style.height = $('.mvs-info-graph').height();
+
+      let verCenter = $('.mvs-info-graph').width() / 2;
+      let horCenter = $('.mvs-info-graph').height() / 2;
+
+      let line1 = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      line1.classList.add('mvs-svg-line');
+      line1.setAttribute('x1', 0);
+      line1.setAttribute('x2', $('.mvs-info-graph').width());
+      line1.setAttribute('y1', horCenter);
+      line1.setAttribute('y2', horCenter);
+      svg.append(line1);
+      let line2 = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      line2.classList.add('mvs-svg-line');
+      line2.setAttribute('x1', verCenter);
+      line2.setAttribute('x2', verCenter);
+      line2.setAttribute('y1', 0);
+      line2.setAttribute('y2', $('.mvs-info-graph').height());
+      svg.append(line2);
+
+      let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+      path.classList.add('mvs-svg-path');
+
+      path.setAttribute('d', `M ${verCenter} ${horCenter - horCenter * (data.toInsem.length / data.total)}`)
+
+      path.setAttribute('d', `${path.getAttribute('d')} L ${verCenter + verCenter * (data.inseminated.length / data.total)} ${horCenter}`);
+
+      path.setAttribute('d', `${path.getAttribute('d')} L ${verCenter} ${horCenter + horCenter * (data.wait.length / data.total)}`);
+
+      path.setAttribute('d', `${path.getAttribute('d')} L ${verCenter - verCenter * (data.over.length / data.total)} ${horCenter} Z`);
+
+      svg.append(path);
     });
-    $('#mp-milk-average').text(`${(avgRes.total / avgRes.amount).toFixed(1)} л.`)
+    $(window).trigger('resize');
+    removeloadingBlock($('.mvs-info-graph'));
 
-    lastMonthMD.sort((a, b) => b.result - a.result)
+    $('.mvs-ig-text').on('mouseenter', function() {
+      let el = $(this).attr('data-el');
+      let text = $(this).text();
 
-    for (let i = 0; i < 7; i++) {
-      $('.mp-top-cows-container').append(`
-        <a class="mp-top-cow" href="/herd/animal-card/${lastMonthMD[i].cowId}">
-          <img src="/img/images/${lastMonthMD[i].cowPhoto}">
-          <div class="mp-top-cow-overlay">
-            <div class="mp-tc-name">${lastMonthMD[i].cowName}</div>
-            <div class="mp-tc-number">#${lastMonthMD[i].cowNumber}</div>
-          </div>
-      </a>
-      `);
-    }
-
-    /* Implementing lists */
-    $('.mpt-list-item').each(function () {
-      let date = new Date($(this).find('.mpt-list-item-date').attr('data-date'));
-
-      $(this).find('.mpt-list-item-date').text(`${moment(date).lang('ru').format('DD MMMM YYYY')}`)
-      $(this).find('.mpt-list-item-day-text').text(`${Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000)} дн.`)
-      $(this).find('.mpt-list-item-day-text').attr('data-days', Math.round((date.getTime() - Date.now()) / 24 / 60 / 60 / 1000));
+      $('.basic-graph-svg').css('filter', 'blur(4px)');
+      $('.mvs-ig-details-block').css('display', 'flex');
+      $('.mvs-ig-details-block-title').text(text);
+      $('.mvs-ig-details-block-count').html(`Количество: &nbsp; ${data[el].length}`);
     });
 
-
-    /* Sorting lists */
-    let length;
-
-    length = $('#mp-soon-to-calv-list').find('.mpt-list-item').length
-    for (let i = 0; i < length; i++) {
-      $('#mp-soon-to-calv-list').find('.mpt-list-item').each(function () {
-        let currentDays = parseFloat($(this).find('.mpt-list-item-day-text').attr('data-days'));
-        let prevDays = parseFloat($(this).prev().find('.mpt-list-item-day-text').attr('data-days'));
-
-        if (currentDays < prevDays) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-    length = $('#mp-soon-to-insem-list').find('.mpt-list-item').length
-    for (let i = 0; i < length; i++) {
-      $('#mp-soon-to-insem-list').find('.mpt-list-item').each(function () {
-        let currentDays = parseFloat($(this).find('.mpt-list-item-day-text').attr('data-days'));
-        let prevDays = parseFloat($(this).prev().find('.mpt-list-item-day-text').attr('data-days'));
-
-        if (currentDays < prevDays) {
-          let element = $(this);
-          let prevElement = $(this).prev();
-
-          $(this).detach();
-          prevElement.before(element);
-        }
-      });
-    }
-
-
+    $('.mvs-ig-text').on('mouseleave', function() {
+      $('.basic-graph-svg').css('filter', 'unset');
+      $('.mvs-ig-details-block').css('display', 'none');
+    });
   }
 
   ///////////////////////
@@ -2139,8 +2347,6 @@ $(document).ready(async function () {
     $('.ai-input-submit-btn').on('click', async function () {
       let aNumber = $('#number').val();
       let name = $('#name').val() !== '' ? $('#name').val() : undefined;
-      let building = $('#building').val() !== '' ? $('#building').val() : undefined;
-      let spot = $('#spot').val() !== '' ? $('#spot').val() : undefined;
       let buyCost = $('#buy-cost').val() !== '' ? $('#buy-cost').val() : undefined;
       let mother = $('#mother').attr('data-id') !== '' ? $('#mother').attr('data-id') : undefined;
       let father = $('#father').attr('data-id') !== '' ? $('#father').attr('data-id') : undefined;
@@ -2156,7 +2362,7 @@ $(document).ready(async function () {
       $(this).append(`<div class="mini-loader"></div>`);
       anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-      let result = await addAnimal({ number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors, building, spot });
+      let result = await addAnimal({ number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors });
 
       if (result) {
 
@@ -2316,8 +2522,6 @@ $(document).ready(async function () {
     $('.ai-input-submit-btn').on('click', async function () {
       let aNumber = $('#number').val();
       let name = $('#name').val() !== '' ? $('#name').val() : undefined;
-      let building = $('#building').val() !== '' ? $('#building').val() : undefined;
-      let spot = $('#spot').val() !== '' ? $('#spot').val() : undefined;
       let buyCost = $('#buy-cost').val() !== '' ? $('#buy-cost').val() : undefined;
       let mother = $('#mother').attr('data-id') !== '' ? $('#mother').attr('data-id') : undefined;
       let father = $('#father').attr('data-id') !== '' ? $('#father').attr('data-id') : undefined;
@@ -2333,7 +2537,7 @@ $(document).ready(async function () {
       $(this).append(`<div class="mini-loader"></div>`);
       anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-      let result = await editAnimal($(this).attr('data-id'), { number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors, building, spot });
+      let result = await editAnimal($(this).attr('data-id'), { number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors });
 
       if (result) {
 
@@ -3215,9 +3419,16 @@ $(document).ready(async function () {
   /* ALL ANIMALS PAGE */
   ///////////////////////
   if (document.querySelector('.all-animals-container')) {
-    $('#all-animals-search').keyup(function () {
+    $('#all-animals-search').on('keyup', function () {
       $('.al-animal').each(function () {
-        if ($(this).find('.al-item-name').text().startsWith($('#all-animals-search').val()) || $(this).find('.al-item-number').text().startsWith($('#all-animals-search').val())) {
+        let name = $(this).find('.al-item-name').text().toLowerCase();
+        let number = $(this).find('.al-item-number').text();
+        let searchValue = $('#all-animals-search').val().toLowerCase()
+
+        if (name.includes(searchValue) || number.includes(searchValue)) {
+          $(this).detach().prependTo($('.animals-list-block'));
+        }
+        if (name.startsWith(searchValue) || number.startsWith(searchValue)) {
           $(this).detach().prependTo($('.animals-list-block'));
         }
       });
@@ -3234,13 +3445,146 @@ $(document).ready(async function () {
         $(this).attr('data-state', 'show');
       }
     });
+
+    /* Animal actions */
+    $('.al-add-action-btn').on('click', function (e) {
+      e.preventDefault();
+
+      if ($(this).find('ion-icon').attr('name') === 'ellipsis-horizontal') {
+        $('.al-add-action-btn').find('ion-icon').attr('name', 'ellipsis-horizontal').css('transform', 'rotate(0deg)');
+        $('.animal-actions-block').hide();
+        $(this).find('ion-icon').attr('name', 'close').css('transform', 'rotate(90deg)');
+        $(this).parent().find('.animal-actions-block').css({ 'display': 'block', "right": '100px', "left": 'unset', 'top': '10px' });
+      } else {
+        $(this).find('ion-icon').attr('name', 'ellipsis-horizontal').css('transform', 'rotate(0deg)');
+        $(this).parent().find('.animal-actions-block').hide();
+      }
+    });
+
+    $('body').on('click', function (e) {
+      if (e.target.classList[0] !== 'animal-actions-block' && e.target.classList[0] !== 'al-add-action-btn') {
+        $('.animal-actions-block').hide()
+        $('.al-add-action-btn').find('ion-icon').attr('name', 'ellipsis-horizontal').css('transform', 'rotate(0deg)');
+      }
+    });
+
+    /* Multiple animals selection */
+    $('.al-animal-select-box ').on('click', function () {
+      if (!$(this).hasClass('al-animal-select-box-selected')) {
+        $(this).addClass('al-animal-select-box-selected');
+        $(this).parent().addClass('al-animal-selected-animal');
+      } else {
+        $(this).removeClass('al-animal-select-box-selected');
+        $(this).parent().removeClass('al-animal-selected-animal');
+      }
+
+      if ($('.al-animal-selected-animal').length > 0) {
+        $('.al-selected-animal-line').css('display', 'flex');
+        $('.al-sl-text').text(`Выбрано животных: ${$('.al-animal-selected-animal').length}`)
+
+      } else {
+        $('.al-selected-animal-line').css('display', 'none');
+        $('.al-sl-text').text(`Выбрано животных: ${$('.al-animal-selected-animal').length}`)
+      }
+    });
+
+    $('.al-sl-action-selector').on('click', function () {
+      if ($('.al-sl-action-list').css('display') === 'none') {
+        $('.al-sl-action-list').show();
+      } else {
+        $('.al-sl-action-list').hide();
+      }
+    });
+
+    $(document).on('scroll', function () {
+      $('.al-sl-action-list').hide();
+    });
+
+    $('.al-sl-action-item').on('click', function () {
+      if ($(this).hasClass('al-sl-action-item-selected')) return;
+
+      $('.al-sl-action-item-selected').removeClass('al-sl-action-item-selected');
+      $(this).addClass('al-sl-action-item-selected');
+      $('.al-sl-action-selector p').text($(this).text());
+    });
+
+    $('.al-sl-btn').on('click', function () {
+      if ($('.al-sl-action-item-selected').length === 0) return;
+
+      let link = $('.al-sl-action-item-selected').attr('data-link');
+      $('.al-animal-selected-animal').each(function () {
+        link = `${link}${$(this).attr('data-number')},`
+      });
+
+      location.assign(link)
+    });
   }
 
   ///////////////////////
   /* ANIMAL CARD PAGE */
   ///////////////////////
   if (document.querySelector('.animal-card-body')) {
-    /* Working with problem block */
+    /* Animal's additional info*/
+    $('.aih-ai-item').on('click', function (e) {
+      if ($(this).find('.aih-ai-select-block').length === 0) return;
+
+      if ($(this).find('.aih-ai-select-block').css('display') === 'none') {
+        $('.aih-ai-select-block').hide();
+        $(this).find('.aih-ai-select-block').css('display', 'flex');
+      }
+    });
+
+    $('body').on('click', function (e) {
+      if (e.target.classList.value.includes('aih-ai-item') || e.target.classList.value.includes('aih-input') || e.target.classList.value.includes('aih-ai-select-item-btn')) return;
+
+      $('.aih-ai-select-block').hide();
+    });
+
+    /* Adding more results to farm model */
+    $('.aih-ai-select-item-btn').on('click', async function () {
+      if ($(this).parent().find('input').val().length === 0) return;
+      let value = $(this).parent().find('input').val();
+      let res = false;
+      if ($(this).parent().parent().attr('id') === 'category') {
+        res = await addCategory($('.main-section').attr('data-farm-id'), value)
+      } else if ($(this).parent().parent().attr('id') === 'building') {
+        res = await addBuilding($('.main-section').attr('data-farm-id'), value)
+      }
+
+      if (res) {
+        $(this).parent().before(`<div class="aih-ai-select-item"><p>${value}</p></div>`);
+        $(this).parent().find('input').val('')
+      }
+    });
+
+    /* Changing the data for the animal */
+    $('.aih-ai-select-item').on('click', async function () {
+      let value = $(this).find('p').text();
+      let res = false;
+
+      if ($(this).parent().attr('id') === 'category') {
+        res = await editAnimal($('.main-section').attr('data-animal-id'), { category: value })
+      } else if ($(this).parent().attr('id') === 'building') {
+        res = await editAnimal($('.main-section').attr('data-animal-id'), { building: value })
+      }
+
+      if (res) {
+        $(this).parent().hide();
+        $(this).parent().parent().find('.aih-ai-item-text').text(value);
+      }
+    });
+
+    /* Changing the spot for the animal */
+    $('#spot-input').on('focus', function () {
+      if ($(this).text() === 'Место') $(this).text('');
+    });
+    $('#spot-input').on('blur', function () {
+      if ($(this).text().length === 0) $(this).text('Место');
+    });
+
+    $('#spot-input').on('keyup change', async function () {
+      await editAnimal($('.main-section').attr('data-animal-id'), { spot: $(this).text() });
+    });
 
     /* Formating dates */
     $('.ac-vp-body-point-date').each(function () {
@@ -3310,51 +3654,54 @@ $(document).ready(async function () {
 
     $('.ac-vet-problems-item').first().find('.ac-vp-header-more').trigger('click');
 
-    /* Working with scheme block */
-    $('.ac-big-point-date').each(function () {
-      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD YYYY, HH:mm');
-      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
-    });
+    if (document.querySelector('.ac-vet-scheme-block')) {
+      /* Working with scheme block */
+      $('.ac-big-point-date').each(function () {
+        let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD YYYY, HH:mm');
+        $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
+      });
 
-    /* Making the line work */
-    let last = 0
-    let width = $('.ac-vs-progress-line').width() / parseFloat($('.ac-vs-progress-line').attr('data-total'));
-    $('.ac-vs-progress-point').each(function () {
-      if (!$(this).hasClass('ac-vs-progress-point-over')) return;
-      last = parseFloat($(this).attr('data-index'));
-    });
-    $('.ac-vs-progress-line-inner').width(last * width);
-    $('.ac-big-points-block').scrollLeft((last + 1) * 370);
+      /* Making the line work */
+      let last = 0
+      let width = $('.ac-vs-progress-line').width() / parseFloat($('.ac-vs-progress-line').attr('data-total'));
+      $('.ac-vs-progress-point').each(function () {
+        if (!$(this).hasClass('ac-vs-progress-point-over')) return;
+        last = parseFloat($(this).attr('data-index'));
+      });
+      $('.ac-vs-progress-line-inner').width(last * width);
+      $('.ac-big-points-block').scrollLeft((last + 1) * 370);
 
-    /* drag scroll */
-    const slider = document.querySelector('.ac-big-points-block');
-    let isDown = false;
-    let startX;
-    let scrollLeft;
+      /* drag scroll */
+      const slider = document.querySelector('.ac-big-points-block');
+      let isDown = false;
+      let startX;
+      let scrollLeft;
 
-    slider.addEventListener('mousedown', (e) => {
-      isDown = true;
-      slider.classList.add('active');
-      startX = e.pageX - slider.offsetLeft;
-      scrollLeft = slider.scrollLeft;
-      slider.style.cursor = "grabbing";
-    });
-    slider.addEventListener('mouseleave', () => {
-      isDown = false;
-      slider.classList.remove('active');
-    });
-    slider.addEventListener('mouseup', () => {
-      isDown = false;
-      slider.classList.remove('active');
-      slider.style.cursor = "pointer";
-    });
-    slider.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 3; //scroll-fast
-      slider.scrollLeft = scrollLeft - walk;
-    });
+      slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        slider.classList.add('active');
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        slider.style.cursor = "grabbing";
+      });
+      slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.classList.remove('active');
+      });
+      slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.classList.remove('active');
+        slider.style.cursor = "pointer";
+      });
+      slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 3; //scroll-fast
+        slider.scrollLeft = scrollLeft - walk;
+      });
+
+    }
 
 
     /* Working with insem block */
@@ -3403,17 +3750,11 @@ $(document).ready(async function () {
       }
     });
     /* Working with bring back animal block */
-    if (document.querySelector('.ami-write-off-container')) {
-      $('.ami-write-off-close').click(function () {
-        $('.ami-write-off-container').hide();
-        $('.ami-write-off-disclaimer').css('display', 'flex');
-      });
-      $('.ami-write-off-disclaimer').click(function () {
-        $(this).hide();
-        $('.ami-write-off-container').css('display', 'flex');
-      });
+    if (document.querySelector('.animal-write-off-disclaimer')) {
+      /* Format date */
+      $('.awo-date').text(moment($(this).attr('data-date')).locale('ru').format('DD MMMM, YYYY'));
 
-      $('.ami-bring-back-btn').click(async function () {
+      $('#bring-back').click(async function () {
         let animalId = $(this).attr('data-animal-id');
 
         let result = await bringBackAnimal(animalId);
@@ -3432,6 +3773,8 @@ $(document).ready(async function () {
     let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
     let farmData = await getAnimalsForGraph($('.main-section').attr('data-farm-id'));
     let milkingDataByLact = [];
+
+    removeloadingBlock($('.animal-card-graph-block'));
 
     let firstRes, lastRes;
     /* Getting the milking data and sorting it by lactations */
@@ -3592,11 +3935,23 @@ $(document).ready(async function () {
         $(`#legend-item-average`).find('.mp-herd-li-mark-average').css('border-color', '#d9d9d9');
 
         /* Adding data */
+        $('.ac-results-block').empty();
         milkingDataByLact.forEach((lact, index) => {
           let circleTimer = 0;
+          $('.ac-results-block').append(`<div class="ac-rb-container"></div>`)
+          let resultCont = $('.ac-rb-container').last();
+
+
           lact.results.forEach((res, inx) => {
             let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(graphObj.start).getTime()) / 1000 / 60 / 60 / 24);
 
+            resultCont.append(`
+              <div class="ac-rb-result" style="background-color:${colors[index]}" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}">
+                <div class="ac-rb-result-number">${index + 1} - #${inx + 1}</div>
+                <div class="ac-rb-result-data">${res.result}</div>
+                <div class="ac-rb-result-month">${moment(res.date).format('DD.MM.YYYY')}</div>
+              </div>
+            `)
             /* Adding data line */
             let path;
             if (inx === 0) {
@@ -3607,9 +3962,9 @@ $(document).ready(async function () {
               graphObj.svg.append(path);
               path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
 
-              path.setAttribute('id', `lact-months-${index}`);
+              path.classList.add(`lact-months-${index}`);
             } else {
-              path = document.getElementById(`lact-months-${index}`);
+              path = document.querySelector(`.lact-months-${index}`);
               path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
 
             }
@@ -3627,7 +3982,8 @@ $(document).ready(async function () {
             circle.setAttribute('data-result', res.result);
             circle.setAttribute('data-date', res.date);
             circle.setAttribute('data-lact', lact.lactationNumber);
-            circle.setAttribute('id', `lact-months-${index}`);
+            circle.setAttribute('data-rel', `${index}-${inx}`)
+            circle.classList.add(`lact-months-${index}`);
 
             circle.style.animation = `fadeIn ${circleTimer}s ease-out`
             circleTimer += 0.1;
@@ -3685,25 +4041,59 @@ $(document).ready(async function () {
           $('.ac-graph-tooltip').hide();
         });
 
+        /* Adding result point selections */
+        $('.basic-graph-point').off();
+        $('.basic-graph-point').on('mouseenter', function () {
+          const rel = $(this).attr('data-rel');
+          $('.ac-rb-result').each(function () {
+            if ($(this).attr('data-rel') === rel) {
+              $('.ac-rb-result').css('opacity', '0.5')
+              $(this).css('opacity', '1');
+              $('.ac-results-block').scrollTop($(this).height() * (Math.ceil(($('.ac-rb-result').index($(this)) + 1) / 2)) - $(this).height())
+
+            }
+          });
+        });
+        $('.basic-graph-point').on('mouseleave', function () {
+          $('.ac-rb-result').css('opacity', '1')
+        });
+
       } else if ($(this).attr('data-graph') === 'compare') {
+        min = 100;
         milkingProjectionByLact.forEach(lact => {
           lact.results.forEach((res, inx, arr) => {
-            if (res.average > max) max = res.average
+            if (res.average > max) max = res.average;
+            if (res.average < min) min = res.average;
 
             let days = Math.round((new Date(res.date).getTime() - new Date(arr[0].date).getTime()) / 24 / 60 / 60 / 1000)
             if (!maxDays || days > maxDays) maxDays = days;
           })
         });
-        max = Math.ceil(max / 10) * 10 * 1.5;
+        max = Math.ceil(max * 1.1);
+        min = Math.floor(min * 0.9);
+
 
         /* Adding graph base */
         const graphObj = graphBaseNoDate('#card-milking-graph', min, max, maxDays, true, false);
 
         /* Adding data */
+        $('.ac-results-block').empty();
         milkingProjectionByLact.forEach((lact, index) => {
           let circleTimer = 0;
+          $('.ac-results-block').append(`<div class="ac-rb-container"></div>`)
+          let resultCont = $('.ac-rb-container').last();
+
           lact.results.forEach((res, inx, arr) => {
             let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(arr[0].date).getTime()) / 1000 / 60 / 60 / 24);
+
+            let background = res.type !== 'projected' ? `background-color:${colors[index]}` : `background: repeating-linear-gradient(135deg, ${colors[index]}, ${colors[index]} 64px, #ffffff 64px, #ffffff 128px);`;
+            resultCont.append(`
+              <div class="ac-rb-result ${res.type === 'projected' && 'ac-rb-result-proj'}" style="${background}" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}">
+                <div class="ac-rb-result-number">${index + 1} - #${inx + 1}</div>
+                <div class="ac-rb-result-data">${res.total ? res.total : Math.round(res.average)}</div>
+                <div class="ac-rb-result-month">${moment(res.date).format('DD.MM.YYYY')}</div>
+              </div>
+            `)
 
             /* Adding data line */
             let path;
@@ -3715,9 +4105,9 @@ $(document).ready(async function () {
               graphObj.svg.append(path);
               path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.average / (graphObj.max / 100) / 100))}`)
 
-              path.setAttribute('id', `lact-months-${index}`);
+              path.classList.add(`lact-months-${index}`);
             } else {
-              path = document.getElementById(`lact-months-${index}`);
+              path = document.querySelector(`.lact-months-${index}`);
               path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.average / (graphObj.max / 100) / 100))}`)
 
             }
@@ -3736,7 +4126,8 @@ $(document).ready(async function () {
             circle.setAttribute('data-result', res.average);
             circle.setAttribute('data-date', res.date);
             circle.setAttribute('data-lact', lact.lactation);
-            circle.setAttribute('id', `lact-months-${index}`);
+            circle.setAttribute('data-rel', `${index}-${inx}`)
+            circle.classList.add(`lact-months-${index}`);
 
             circle.style.animation = `fadeIn ${circleTimer}s ease-out`
             circleTimer += 0.1;
@@ -3789,6 +4180,23 @@ $(document).ready(async function () {
         $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
           $('.ac-graph-tooltip').hide();
         });
+
+        /* Adding result point selections */
+        $('.basic-graph-point').off();
+        $('.basic-graph-point').on('mouseenter', function () {
+          const rel = $(this).attr('data-rel');
+          $('.ac-rb-result').each(function () {
+            if ($(this).attr('data-rel') === rel) {
+              $('.ac-rb-result').css('opacity', '0.5')
+              $(this).css('opacity', '1');
+              $('.ac-results-block').scrollTop(($(this).height() + 15) * (Math.ceil(($('.ac-rb-result').index($(this)) + 1) / 2)) - $(this).height())
+
+            }
+          });
+        });
+        $('.basic-graph-point').on('mouseleave', function () {
+          $('.ac-rb-result').css('opacity', '1')
+        });
       } else if ($(this).attr('data-graph') === 'days') {
         milkingDataByDay.forEach(lact => {
           lact.results.forEach(res => {
@@ -3821,9 +4229,9 @@ $(document).ready(async function () {
               graphObj.svg.append(path);
               path.setAttribute('d', `M ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
 
-              path.setAttribute('id', `lact-days-${index}`);
+              path.classList.add(`lact-days-${index}`);
             } else {
-              path = document.getElementById(`lact-days-${index}`);
+              path = document.querySelector(`.lact-days-${index}`);
               path.setAttribute('d', `${path.getAttribute('d')} L ${graphObj.horGap + Math.round(graphObj.workingAreaWidth * (currentDaysSpan / (graphObj.daysSpan / 100) / 100))} ${graphObj.workingAreaHeight + graphObj.horGap - Math.round(graphObj.workingAreaHeight * (res.result / (graphObj.max / 100) / 100))}`)
 
             }
@@ -3842,7 +4250,7 @@ $(document).ready(async function () {
             circle.setAttribute('data-date', currentDaysSpan);
             circle.setAttribute('data-lact', lact.lactationNumber);
             circle.setAttribute('data-color', colors[index]);
-            circle.setAttribute('id', `lact-days-${index}`);
+            circle.classList.add(`lact-days-${index}`);
 
             circle.style.animation = `fadeIn ${circleTimer}s ease-out`
             circleTimer += 0.01;
@@ -4354,6 +4762,151 @@ $(document).ready(async function () {
         duration: 1000
       });
     });
+
+    const bdAnimals = await getAnimalsForGraph($('#mp-herd').attr('data-farm-id'));
+
+    $('#herd-breakdown').find('.mp-block-outside-header-btn').on('click', function () {
+      $('#herd-breakdown').find('.mp-block-outside-header-btn-active').removeClass('mp-block-outside-header-btn-active');
+      $(this).addClass('mp-block-outside-header-btn-active');
+
+      const type = $(this).attr('id');
+      let total = 0;
+      let dataArr = [];
+      if (type === 'category') {
+        bdAnimals.animals.forEach(animal => {
+          if (!animal.category) return;
+
+          total++;
+          if (dataArr.find(el => el.value === animal.category)) {
+            let el = dataArr.find(el => el.value === animal.category);
+            el.count++;
+            el.animals.push(animal)
+          } else {
+            dataArr.push({
+              value: animal.category,
+              count: 1,
+              animals: [animal]
+            });
+          }
+        });
+        dataArr.sort((a, b) => b.count - a.count);
+
+        $('.hbb-line').remove();
+        dataArr.forEach((data, inx) => {
+          $('.herd-breakdown-block').append(`
+            <div class="hbb-line hbb-line-${inx}">
+              <div class="hbb-line-text">${data.value}</div>
+              <div class="hbb-line-text hbb-line-text-second">${data.count / (total / 100)}%</div>
+              <div class="hbb-animals-block"></div>
+            </div>
+          `)
+          data.animals.forEach(animal => {
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+          });
+        });
+      } else if (type === 'gender') {
+        bdAnimals.animals.forEach(animal => {
+          if (!animal.gender) return;
+
+          total++;
+          if (dataArr.find(el => el.value === animal.gender)) {
+            let el = dataArr.find(el => el.value === animal.gender);
+            el.count++;
+            el.animals.push(animal)
+          } else {
+            dataArr.push({
+              value: animal.gender,
+              count: 1,
+              animals: [animal]
+            });
+          }
+        });
+        dataArr.sort((a, b) => b.count - a.count);
+
+        $('.hbb-line').remove();
+        dataArr.forEach((data, inx) => {
+          $('.herd-breakdown-block').append(`
+            <div class="hbb-line hbb-line-${inx}">
+              <div class="hbb-line-text">${data.value === 'male' ? 'Мужской' : 'Женский'}</div>
+              <div class="hbb-line-text hbb-line-text-second">${data.count / (total / 100)}%</div>
+              <div class="hbb-animals-block"></div>
+            </div>
+          `)
+          data.animals.forEach(animal => {
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+          });
+        });
+      } else if (type === 'age') {
+        bdAnimals.animals.forEach(animal => {
+          if (!animal.birthDate) return;
+
+          let age = Math.floor((new Date().getTime() - new Date(animal.birthDate).getTime()) / 1000 / 60 / 60 / 24 / 365)
+          total++;
+          if (dataArr.find(el => el.value === age)) {
+            let el = dataArr.find(el => el.value === age);
+            el.count++;
+            el.animals.push(animal)
+          } else {
+            dataArr.push({
+              value: age,
+              count: 1,
+              animals: [animal]
+            });
+          }
+        });
+        dataArr.sort((a, b) => b.count - a.count);
+
+        $('.hbb-line').remove();
+        dataArr.forEach((data, inx) => {
+          $('.herd-breakdown-block').append(`
+            <div class="hbb-line hbb-line-${inx}">
+              <div class="hbb-line-text">${data.value} г.</div>
+              <div class="hbb-line-text hbb-line-text-second">${data.count / (total / 100)}%</div>
+              <div class="hbb-animals-block"></div>
+            </div>
+          `)
+          data.animals.forEach(animal => {
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+          });
+        });
+      } else if (type === 'breed') {
+        bdAnimals.animals.forEach(animal => {
+          if (!animal.breedRussian) return;
+
+          total++;
+          if (dataArr.find(el => el.value === animal.breedRussian)) {
+            let el = dataArr.find(el => el.value === animal.breedRussian);
+            el.count++;
+            el.animals.push(animal)
+          } else {
+            dataArr.push({
+              value: animal.breedRussian,
+              count: 1,
+              animals: [animal]
+            });
+          }
+        });
+        dataArr.sort((a, b) => b.count - a.count);
+
+        $('.hbb-line').remove();
+        dataArr.forEach((data, inx) => {
+          $('.herd-breakdown-block').append(`
+            <div class="hbb-line hbb-line-${inx}">
+              <div class="hbb-line-text">${data.value}</div>
+              <div class="hbb-line-text hbb-line-text-second">${data.count / (total / 100)}%</div>
+              <div class="hbb-animals-block"></div>
+            </div>
+          `)
+          data.animals.forEach(animal => {
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+          });
+        });
+      }
+
+      removeloadingBlock($('#herd-breakdown'));
+    });
+
+    $('#herd-breakdown').find('.mp-block-outside-header-btn-active').trigger('click');
   }
 
   //////////////////////////
@@ -4422,7 +4975,7 @@ $(document).ready(async function () {
     });
 
     $('#table-btns').find('.mp-block-outside-header-btn').on('click', function () {
-      $('.mp-block-outside-header-btn-active').removeClass('mp-block-outside-header-btn-active');
+      $('#table-btns').find('.mp-block-outside-header-btn-active').removeClass('mp-block-outside-header-btn-active');
       $(this).addClass('mp-block-outside-header-btn-active');
 
       if ($(this).attr('id') === 'insem') {
@@ -4971,8 +5524,8 @@ $(document).ready(async function () {
       });
 
       /* Making legend work */
-      $('#legend-btn').off('click')
-      $('#legend-btn').on('click', function () {
+      $('.legend-btn').off('click')
+      $('.legend-btn').on('click', function () {
         if ($('.mp-herd-legend').css('display') === 'flex') {
           $('.mp-herd-legend').hide()
         } else {
@@ -5659,35 +6212,35 @@ $(document).ready(async function () {
     });
 
     /* Adding tooltips on mouse hover */
-/*     $('.basic-graph-point').off()
-    $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
-      $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
-
-      if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('#weight-graph').width()) {
-        $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
-      } else {
-        $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
-      }
-
-      $('.mp-graph-tooltip').empty();
-      $('.mp-graph-tooltip').append(`
-          <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
-          <div class="mp-graph-tooltip-title">Средний результат</div>
-          <div class="mp-graph-tooltip-gap"></div>
-          <div class="mp-graph-tooltip-sub-res">${Math.round(parseFloat($(this).attr('data-total')))}</div>
-          <div class="mp-graph-tooltip-title">Всего молока</div>
-          <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
-          <div class="mp-graph-tooltip-title">Кол-во результатов</div>
-          <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
-        `)
-
-
-      $('.mp-graph-tooltip').show();
-    });
-
-    $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
-      $('.mp-graph-tooltip').hide();
-    }); */
+    /*     $('.basic-graph-point').off()
+        $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+          $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
+    
+          if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('#weight-graph').width()) {
+            $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
+          } else {
+            $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
+          }
+    
+          $('.mp-graph-tooltip').empty();
+          $('.mp-graph-tooltip').append(`
+              <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
+              <div class="mp-graph-tooltip-title">Средний результат</div>
+              <div class="mp-graph-tooltip-gap"></div>
+              <div class="mp-graph-tooltip-sub-res">${Math.round(parseFloat($(this).attr('data-total')))}</div>
+              <div class="mp-graph-tooltip-title">Всего молока</div>
+              <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
+              <div class="mp-graph-tooltip-title">Кол-во результатов</div>
+              <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+            `)
+    
+    
+          $('.mp-graph-tooltip').show();
+        });
+    
+        $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+          $('.mp-graph-tooltip').hide();
+        }); */
 
   }
 
@@ -5831,6 +6384,15 @@ $(document).ready(async function () {
       }
     });
 
+    /* Showing a sub reason block */
+    $('#reason').find('.ai-pick').on('click', function () {
+      if ($('#reason').find('.ai-pick-active').attr('id') === 'sold') {
+        $('#sub-reason-sold').css('display', 'flex');
+      } else {
+        $('#sub-reason-sold').hide();
+      }
+    });
+
     $('*').on('click change keyup mouseenter', function () {
       if ($('#reason').find('.ai-pick-active').length > 0 && $('#date').hasClass('ai-valid-input')) {
         $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
@@ -5850,10 +6412,15 @@ $(document).ready(async function () {
         $('#multiple-animals-container').find('.ai-selected-animals-item').each(async function () {
           let animalId = $(this).attr('data-id');
           let writeOffReason = $('#reason').find('.ai-pick-active').attr('id');
+          let writeOffSubReason = undefined;
+          if (writeOffReason === 'sold') {
+            writeOffSubReason = $('#sub-reason-sold').find('.ai-pick-active').attr('id');
+
+          }
           let writeOffDate = new Date($('#date').val());
           let writeOffNote = $('#note').val() === '' ? undefined : $('#note').val();
 
-          const response = await writeOffAnimal(animalId, { writeOffReason, writeOffDate, writeOffNote });
+          const response = await writeOffAnimal(animalId, { writeOffReason, writeOffSubReason, writeOffDate, writeOffNote });
 
           if (response) doneAnimals++;
 
@@ -5866,6 +6433,11 @@ $(document).ready(async function () {
       } else {
         let animalId = $(this).attr('data-animal-id');
         let writeOffReason = $('#reason').find('.ai-pick-active').attr('id');
+        let writeOffSubReason = undefined;
+        if (writeOffReason === 'sold') {
+          writeOffSubReason = $('#sub-reason-sold').find('.ai-pick-active').attr('id');
+
+        }
         let writeOffDate = new Date($('#date').val());
         let writeOffNote = $('#note').val() === '' ? undefined : $('#note').val();
 
@@ -5873,7 +6445,7 @@ $(document).ready(async function () {
         $(this).append(`<div class="mini-loader"></div>`);
         anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-        const response = await writeOffAnimal(animalId, { writeOffReason, writeOffDate, writeOffNote });
+        const response = await writeOffAnimal(animalId, { writeOffReason, writeOffSubReason, writeOffDate, writeOffNote });
 
         if (response) {
           addConfirmationEmpty($('.animal-results-window'));
@@ -7449,276 +8021,254 @@ $(document).ready(async function () {
   /* BOTH ADD/EDIT ORDER PAGE*/
   ///////////////////////
 
-  if (document.querySelector('#dist-order-container') || document.querySelector('#dist-order-container')) {
+  if (document.querySelector('#dist-order-container') || document.querySelector('#edit-dist-order-container')) {
+
+    /* Toggling between once and recurring order */
+    $('.ai-switch-btn').on('click', function () {
+
+      if ($(this).attr('id') === 'once') {
+        $('#once-date').css('display', 'flex');
+        $('#recuring-date').hide();
+      } else {
+        $('#recuring-date').css('display', 'flex');
+        $('#once-date').hide();
+      }
+    });
+
+    /* Hiding elements if quantity is 0 */
+    $('body').on('click', '.product-input', function () {
+      $('.ai-select-item').each(function () {
+        let selectEl = $(this);
+        $('.arc-inventory-data').each(function () {
+          if (selectEl.attr('data-value') === $(this).attr('data-product') && $(this).attr('data-quantity') == 0) {
+            selectEl.hide();
+          }
+        });
+      });
+    });
 
     /* Preventing double selection */
-    $('body').on('click', '.aa-select-option', function () {
+    $('body').on('click', '.ai-select-item', function () {
       let selectedOption = $(this);
-      $('.aa-select-option').each(function () {
-        if (!$(this).is(selectedOption) && $(this).attr('data-val') === selectedOption.attr('data-val')) {
-          $(this).addClass('aa-select-option-taken');
-        } else if ($(this).attr('data-val') === selectedOption.parent().attr('data-val')) {
-          $(this).removeClass('aa-select-option-taken');
+      $('.ai-select-item').each(function () {
+        if (!$(this).is(selectedOption) && $(this).attr('data-value') === selectedOption.attr('data-value')) {
+          $(this).addClass('ai-select-item-unvail');
+        } else if ($(this).attr('data-value') === selectedOption.parent().attr('data-value')) {
+          $(this).removeClass('ai-select-item-unvail');
         }
       });
-      $(this).parent().attr('data-val', $(this).attr('data-val'))
+
+      $('.arc-inventory-data').each(function () {
+        if (selectedOption.attr('data-value') === $(this).attr('data-product') && $(this).attr('data-quantity') != 0) {
+          selectedOption.parent().parent().parent().find('.range-text').html(`/ ${parseFloat($(this).attr('data-quantity'))/* .toFixed(1) */}`);
+          selectedOption.parent().parent().parent().find('.size').attr('data-max', $(this).attr('data-quantity')).trigger('change');
+        }
+      });
     });
 
     $('#add-product-input').on('click', function () {
+      let number = $('.ai-combined-block').length + 1;
       $(this).parent().before(`
-        <div class="aa-input-united-block" data-new="true"> 
-        <div class="aa-input-block"> 
-          <label class="aa-label" for="type">
-            <p>Продукт</p>
-          </label>
-          <div class="aa-select-box aa-select-box-one">
-            <div class="aa-select-text">Выберите продукт</div>
-            <ion-icon name="chevron-down"></ion-icon>
-            <div class="aa-select-options-box">
-              <div class="aa-select-option" data-val="milk">Молоко</div>
-              <div class="aa-select-option" data-val="cottage-cheese">Творог</div>
-              <div class="aa-select-option" data-val="butter">Масло </div>
-              <div class="aa-select-option" data-val="cream">Сливки </div>
-              <div class="aa-select-option" data-val="cheese">Сыр  </div>
-              <div class="aa-select-option" data-val="whey">Сыворотка </div>
-              <div class="aa-select-option" data-val="sour-cream">Сметана  </div>
-              <div class="aa-select-option" data-val="meat">Мясо  </div>
+      <div class="ai-combined-block ai-combined-block-${number}" data-product="${number}">
+        <div class="ai-combined-block-title">ПРОДУКТ #${number}</div>
+        <div class="ai-combined-block-remove">
+          <ion-icon name="close"></ion-icon>
+        </div>
+        <div class="ai-input-block ai-input-block-text">
+          <div class="ai-input-label">Наименование продукта</div>
+          <input class="ai-input ai-input-select ai-input-validation product-input" type="text" placeholder="Выберите продукт"/>
+          <div class="ai-select-block shadow ai-input-validation product">
+            <div class="ai-select-item" data-value="milk">
+              <p class="ai-select-name">Молоко</p>
+            </div>
+            <div class="ai-select-item" data-value="meat">
+              <p class="ai-select-name">Мясо</p>
+            </div>
+            <div class="ai-select-item" data-value="cottage-cheese">
+              <p class="ai-select-name">Творог</p>
+            </div>
+            <div class="ai-select-item" data-value="cheese">
+              <p class="ai-select-name">Сыр</p>
+            </div>
+            <div class="ai-select-item" data-value="butter">
+              <p class="ai-select-name">Масло</p>
+            </div>
+            <div class="ai-select-item" data-value="whey">
+              <p class="ai-select-name">Сыворотка</p>
+            </div>
+            <div class="ai-select-item" data-value="cream">
+              <p class="ai-select-name">Сливки</p>
+            </div>
+            <div class="ai-select-item" data-value="sour-cream">
+              <p class="ai-select-name">Сметана</p>
             </div>
           </div>
         </div>
-        <div class="aa-input-block">
-          <lable class="aa-label" for="price"> 
-            <p>Вес | Объем</p>
-          </lable>
-          <div class="aa-double-input-block">
-            <input class="aa-double-input size-input" type="number" />
-            <select class="aa-double-input unit-input">
-              <option value="l" selected="selected">Л.</option>
-              <option value="kg">Кг.  </option>
-            </select>
+        <div class="ai-input-block ai-input-block-small-select">
+          <div class="ai-input-label">Вес | Объем</div>
+          <div class="ai-input-text-wraper">
+            <input class="ai-input ai-input-text ai-input-small-select ai-input-validation size" type="number"/>
+            <div class="ai-inside-text range-text"></div>
           </div>
-        </div>
-        <div class="aa-iu-remove">  
-          <ion-icon name="close"></ion-icon>
+          <div class="ai-small-select unit">
+            <p>л.</p>
+            <div class="ai-select-line"></div>
+            <div class="ai-small-select-block shadow">
+              <div class="ai-small-select-item" data-val="kg">кг.</div>
+              <div class="ai-small-select-item ai-small-select-item-selected" data-val="l">л.</div>
+            </div>
+          </div>
         </div>
       </div>
       `);
 
-      $('.aa-select-option-selected').trigger('click');
-      $('.aa-select-option-selected').trigger('click');
+      $('.ai-select-item-selected').trigger('click').trigger('click');
     });
 
-    $('.main-section').on('click', '.aa-iu-remove', async function () {
-      if ($(this).parent().attr('data-new') === 'false') {
-        $(this).find('ion-icon').remove();
-        $(this).append(`<div class="mini-loader"></div>`);
+    /* Removing product */
+    $('.ai-form-container').on('click', '.ai-combined-block-remove', function () {
+      let product = $(this).parent().find('.ai-select-item-selected').attr('data-value');
+      $(this).parent().remove();
 
-        let response = await deleteReminder($(this).parent().attr('data-id'));
-        if (response) $(this).parent().remove();
-
-      } else if ($(this).parent().attr('data-new') === 'true') {
-        $(this).parent().remove();
-      }
-    });
-
-    /* Validating the date */
-    $('#date').on('keyup click change', function () {
-      if ($(this).val().length !== 0 && new Date($(this).val()) > new Date()) {
-        $(this).addClass('valid-aa-input');
-        $(`#${$(this).attr('id')}-warning`).remove();
-      } else {
-        $(this).removeClass('valid-aa-input');
-      }
-    });
-
-    $('#date').on('blur', function () {
-      if ($(this).val().length !== 0 && new Date($(this).val()) <= new Date()) {
-        $(`#${$(this).attr('id')}-warning`).remove();
-        $(this).parent().after(`<div class="aa-input-ps aa-input-ps-warning" id="${$(this).attr('id')}-warning">Введите правильную дату</div>`);
-      }
-    });
-
-    $('*').on('click focus blur change keyup', function () {
-      $('.aa-input-united-block ').each(function () {
-        if ($(this).find('.aa-select-option-selected').length > 0 && parseFloat($(this).find('.size-input').val()) > 0) {
-          $(this).addClass('aa-input-united-block-valid')
-        } else {
-          $(this).removeClass('aa-input-united-block-valid')
+      $('.ai-combined-block').each(function () {
+        if ($(this).prev() && $(this).prev().hasClass('ai-combined-block') && parseFloat($(this).prev().attr('data-product')) + 1 !== parseFloat($(this).attr('data-product'))) {
+          $(this).attr('data-product', parseFloat($(this).prev().attr('data-product')) + 1);
+          $(this).find('.ai-combined-block-title').text(`ПРОДУКТ #${parseFloat($(this).prev().attr('data-product')) + 1}`)
+        } else if ($(this).prev() && !$(this).prev().hasClass('ai-combined-block')) {
+          $(this).attr('data-product', 1);
+          $(this).find('.ai-combined-block-title').text(`ПРОДУКТ #1`)
         }
       });
 
-      if ($('.ar-switch-btn-active').attr('id') === 'once') {
-        if ($('#date').hasClass('valid-aa-input') && $('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
+      $('.ai-select-item').each(function () {
+        if (product && $(this).attr('data-value') === product) {
+          $(this).removeClass('ai-select-item-unvail');
         }
+      });
+    });
+
+    /* Validation from */
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-combined-block').each(function () {
+        if ($(this).find('.size').val().length > 0 && $(this).find('.product').find('.ai-select-item-selected').length > 0) {
+          $(this).addClass('ai-combined-block-valid')
+        } else {
+          $(this).removeClass('ai-combined-block-valid')
+        }
+      });
+      let dateValid = false;
+      if ($('#once').hasClass('ai-switch-btn-active') && $('#date').val() !== '' || $('#recuring').hasClass('ai-switch-btn-active') && $('#time').val() !== '') dateValid = true;
+
+      if (dateValid && $('.ai-combined-block-valid').length > 0 && $('body').find('.ai-warning-text').length === 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
-        if ($('body').find('.aa-input-ps-warning').length === 0 && $('.aa-input-united-block-valid').length > 0) {
-          $('.ar-add-button').css({ 'pointer-events': 'auto', 'background-color': '#000000' });
-        } else {
-          $('.ar-add-button').css({ 'pointer-events': 'none', 'background-color': '#afafaf' });
-        }
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
       }
     });
 
-    if (document.querySelector('#edit-order-container')) {
-      $('input').trigger('click');
-      $('input').trigger('click');
+    if (document.querySelector('#edit-dist-order-container')) {
+      $('.ai-input').trigger('keyup');
+      $('.ai-select-item-selected').trigger('click').trigger('click');
+      $('.ai-small-select-item-selected').trigger('click').trigger('click');
+      $('.ai-switch-btn-to-active').trigger('click');
+    }
 
-      $('.aa-select-option-selected').trigger('click');
-      $('.aa-select-option-selected').trigger('click');
+    if (document.querySelector('#dist-order-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let note = $('#note').val();
+        let subId = randomstring.generate(12);
 
-      $('#rec-date').find('option').each(function () {
-        if ($(this).attr('value') === $('#rec-date').attr('data-val')) {
-          $(this).attr('selected', true)
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+        let date;
+        if ($('#once').hasClass('ai-switch-btn-active')) {
+          date = { date: new Date($('#date').val()) };
+        } else if ($('#recuring').hasClass('ai-switch-btn-active')) {
+          date = {
+            recuring: true,
+            recuringDay: parseFloat($('#weekday').find('.ai-small-select-item-selected').attr('data-value')),
+            recuringTime: $("#time").val(),
+          }
         }
+
+        let counter = 0;
+        $('.ai-combined-block-valid').each(async function () {
+          const response = await addReminder({
+            client: $('#client').find('.ai-select-item-selected').attr('data-id'),
+            size: parseFloat($(this).find('.size').val()),
+            unit: $(this).find('.ai-small-select-item-selected').attr('data-val'),
+            product: $(this).find('.ai-select-item-selected').attr('data-value'),
+            subId,
+            note,
+            module: 'order',
+            ...date
+          });
+
+          if (response) counter++;
+
+          if (counter === $('.ai-combined-block-valid').length) {
+            addConfirmationEmpty($('.animal-results-window'));
+            setTimeout(() => { location.reload(true); }, 1500)
+          }
+        });
+      });
+    } else if (document.querySelector('#edit-dist-order-container')) {
+      $('.ai-input-submit-btn').click(async function () {
+        let note = $('#note').val();
+        let subId = $(this).attr('data-sub-id');
+
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+        let date;
+        if ($('#once').hasClass('ai-switch-btn-active')) {
+          date = {
+            date: new Date($('#date').val()),
+            recuring: false,
+          };
+        } else if ($('#recuring').hasClass('ai-switch-btn-active')) {
+          date = {
+            recuring: true,
+            recuringDay: parseFloat($('#weekday').find('.ai-small-select-item-selected').attr('data-value')),
+            recuringTime: $("#time").val(),
+          }
+        }
+
+        let delRes = await deleteSubIdReminders(subId);
+        if (delRes) {
+          let counter = 0;
+          $('.ai-combined-block-valid').each(async function () {
+            let response = await addReminder({
+              client: $('#client').find('.ai-select-item-selected').attr('data-id'),
+              size: parseFloat($(this).find('.size').val()),
+              unit: $(this).find('.ai-small-select-item-selected').attr('data-val'),
+              product: $(this).find('.ai-select-item-selected').attr('data-value'),
+              subId,
+              note,
+              module: 'order',
+              ...date
+            });
+
+            if (response) counter++;
+
+            if (counter === $('.ai-combined-block-valid').length) {
+              addConfirmationEmpty($('.animal-results-window'));
+              setTimeout(() => { location.reload(true); }, 1500)
+            }
+          });
+        }
+
       });
     }
 
-    /* Submiting data */
-    $('.ar-add-button').click(async function () {
-      let note = undefined;
-      if ($('#note').val().length > 0) {
-        note = $('#note').val();
-      }
-
-
-      $(this).append(`<div class="mini-loader"></div>`);
-      $('.mini-loader').css({
-        'position': 'absolute',
-        'right': '-35px'
-      });
 
 
 
-      /* Submiting data to ADD order */
-      if (document.querySelector('#add-order-container')) {
-        let subId = randomstring.generate(12);
-
-        let counter = 0;
-        $('.aa-input-united-block-valid').each(async function () {
-          let response;
-          if ($('.ar-switch-btn-active').attr('id') === 'once') {
-            response = await addReminder({
-              size: parseFloat($(this).find('.size-input').val()),
-              date: new Date($('#date').val()),
-              unit: $(this).find('.unit-input').val(),
-              product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
-            });
-          } else {
-            response = await addReminder({
-              size: parseFloat($(this).find('.size-input').val()),
-              recuring: true,
-              recuringDay: parseFloat($('#rec-date').val()),
-              recuringHour: parseFloat($('#rec-hour').val()),
-              recuringMinute: parseFloat($('#rec-minute').val()),
-              unit: $(this).find('.unit-input').val(),
-              product: $(this).find('.aa-select-option-selected').attr('data-val'),
-              subId: subId,
-              module: 'order',
-              client: $('#client').attr('data-id'),
-              note: note
-            });
-          }
 
 
-          if (response) counter++;
-          if (counter === $('.aa-input-united-block-valid').length) {
-            $('.mini-loader').hide();
-            addConfirmationEmpty($('.animal-results-container'));
-            setTimeout(() => {
-              location.reload(true);
-            }, 1500)
 
-            //location.assign('/herd/all-animals');
-          }
-
-        });
-
-      }
-
-      /* Submiting data to EDIT inventory */
-      if (document.querySelector('#edit-order-container')) {
-        let subId = $(this).attr('data-order-id');
-        let counter = 0;
-        $('.aa-input-united-block-valid').each(async function () {
-          let response;
-          if ($(this).attr('data-new') === 'false') {
-            if ($('.ar-switch-btn-active').attr('id') === 'once') {
-              response = await editReminder($(this).attr('data-id'), {
-                size: parseFloat($(this).find('.size-input').val()),
-                date: new Date($('#date').val()),
-                unit: $(this).find('.unit-input').val(),
-                product: $(this).find('.aa-select-option-selected').attr('data-val'),
-                subId: subId,
-                module: 'order',
-                client: $('#client').attr('data-id'),
-                note: note,
-                recuring: false,
-              });
-            } else {
-              response = await editReminder($(this).attr('data-id'), {
-                size: parseFloat($(this).find('.size-input').val()),
-                recuring: true,
-                recuringDay: parseFloat($('#rec-date').val()),
-                recuringHour: parseFloat($('#rec-hour').val()),
-                recuringMinute: parseFloat($('#rec-minute').val()),
-                unit: $(this).find('.unit-input').val(),
-                product: $(this).find('.aa-select-option-selected').attr('data-val'),
-                subId: subId,
-                module: 'order',
-                client: $('#client').attr('data-id'),
-                note: note
-              });
-            }
-          } else if ($(this).attr('data-new') === 'true') {
-            if ($('.ar-switch-btn-active').attr('id') === 'once') {
-              response = await addReminder({
-                size: parseFloat($(this).find('.size-input').val()),
-                date: new Date($('#date').val()),
-                unit: $(this).find('.unit-input').val(),
-                product: $(this).find('.aa-select-option-selected').attr('data-val'),
-                subId: subId,
-                module: 'order',
-                client: $('#client').attr('data-id'),
-                note: note
-              });
-            } else {
-              response = await addReminder({
-                size: parseFloat($(this).find('.size-input').val()),
-                recuring: true,
-                recuringDay: parseFloat($('#rec-date').val()),
-                recuringHour: parseFloat($('#rec-hour').val()),
-                recuringMinute: parseFloat($('#rec-minute').val()),
-                unit: $(this).find('.unit-input').val(),
-                product: $(this).find('.aa-select-option-selected').attr('data-val'),
-                subId: subId,
-                module: 'order',
-                client: $('#client').attr('data-id'),
-                note: note
-              });
-            }
-          }
-
-          if (response) counter++;
-          if (counter === $('.aa-input-united-block-valid').length) {
-            $('.mini-loader').hide();
-            addConfirmationEmpty($('.animal-results-container'));
-            setTimeout(() => {
-              location.reload(true);
-            }, 1500)
-
-            //location.assign('/herd/all-animals');
-          }
-
-        });
-      }
-    });
 
 
 
@@ -8308,7 +8858,7 @@ $(document).ready(async function () {
 
   if (document.querySelector('#all-clients-page')) {
     /* Animating each clients line */
-    $('.ci-footer-line-inner').each(function() {
+    $('.ci-footer-line-inner').each(function () {
       if (parseFloat($(this).attr('data-width')) < 5) $(this).css('background-color', '#D44D5C');
       if (parseFloat($(this).attr('data-width')) >= 5 && parseFloat($(this).attr('data-width')) < 15) $(this).css('background-color', '#f6b91d');
       if (parseFloat($(this).attr('data-width')) >= 15) $(this).css('background-color', '#0EAD69');
@@ -8322,8 +8872,8 @@ $(document).ready(async function () {
     });
 
     /* Picking a client */
-    $('.client-item').on('click', async function() {
-      if($(this).hasClass('client-item-active')) return;
+    $('.client-item').on('click', async function () {
+      if ($(this).hasClass('client-item-active')) return;
 
       /* Adding loading blocks for multiple elements */
       loadingBlock($('.client-detailed-info'))
@@ -8338,7 +8888,7 @@ $(document).ready(async function () {
       removeloadingBlock($('.client-list-block'));
 
       /* Hiding block if there is no sales */
-      if(clientData.sales.length === 0) {
+      if (clientData.sales.length === 0) {
         $('.client-revenue-block').hide();
         $('.client-list-block').hide();
       } else {
@@ -8348,9 +8898,9 @@ $(document).ready(async function () {
 
       /* Setting basic info */
       $('#name').text(clientData.client.name);
-      if(clientData.client.adress) $('#adress').text(clientData.client.adress);
-      if(clientData.client.phoneNumber) $('#phone').text(`+7 ${clientData.client.phoneNumber}`);
-      if(clientData.client.email) $('#email').text(clientData.client.email);
+      if (clientData.client.adress) $('#adress').text(clientData.client.adress);
+      if (clientData.client.phoneNumber) $('#phone').text(`+7 ${clientData.client.phoneNumber}`);
+      if (clientData.client.email) $('#email').text(clientData.client.email);
 
       /* Adding listed products */
       $('.cdi-product-line').empty()
@@ -8381,7 +8931,7 @@ $(document).ready(async function () {
 
       const salesFormated = [];
       clientData.sales.forEach(sale => {
-        if(salesFormated.find(el => el.product === sale.product)) {
+        if (salesFormated.find(el => el.product === sale.product)) {
           let el = salesFormated.find(el => el.product === sale.product);
 
           el.size += sale.size;
@@ -8403,7 +8953,7 @@ $(document).ready(async function () {
       salesFormated.sort((a, b) => b.revenueShare - a.revenueShare);
 
       $('#revenue-details').find('.crd-dropdown-block').empty();
-      
+
       salesFormated.forEach((sale, index) => {
         $('#revenue-details').find('.crd-dropdown-block').append(`
           <div class="crd-item">
@@ -8429,7 +8979,7 @@ $(document).ready(async function () {
       salesFormated.sort((a, b) => b.sizeShare - a.sizeShare);
 
       $('#size-details').find('.crd-dropdown-block').empty();
-      
+
       salesFormated.forEach((sale, index) => {
         $('#size-details').find('.crd-dropdown-block').append(`
           <div class="crd-item">
@@ -8457,7 +9007,7 @@ $(document).ready(async function () {
       clientData.sales.sort((a, b) => new Date(b.date) - new Date(a.date));
       clientData.sales.forEach(sale => {
         $('#all-purchases').append(`
-          <div class="dist-info-list-item">
+          <div class="dist-info-list-item" rc-title="Редактировать покупку" rc-link="/distribution/edit-sale/${sale._id}">
             <div class="dist-info-list-item-header">
               <div class="dist-info-list-item-img">
                 <img src="/img/icons/sale-small-icon.png">
@@ -8470,7 +9020,6 @@ $(document).ready(async function () {
           </div>
         `);
       });
-      console.log(clientData);
     });
 
     $('.client-item').first().trigger('click');
@@ -9861,6 +10410,213 @@ $(document).ready(async function () {
         }
       }
 
+    });
+  }
+
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  /* REPORT CREATION PAGE */
+  /////////////////////////
+  /////////////////////////
+  /////////////////////////
+  if (document.querySelector('#reports-page')) {
+
+    $('.rml-item').on('click', async function () {
+
+      /* CREATING TEST SHEETS */
+      /* var wb = XLSX.utils.book_new();
+      wb.Props = {
+        Title: "SheetJS Tutorial",
+        Subject: "Test",
+        Author: "Red Stapler",
+        CreatedDate: new Date()
+      };
+      wb.SheetNames.push("Test Sheet");
+      var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']];
+      var ws = XLSX.utils.aoa_to_sheet(ws_data);
+      wb.Sheets["Test Sheet"] = ws;
+
+      var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      function s2ab(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+      }
+
+      const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+      saveAs(blob, 'new.xlsx'); */
+
+
+
+      if ($(this).attr('id') === 'milking-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+        let cowsData = [];
+        animals.cows.forEach(cow => {
+          cowsData.push({
+            name: cow.name,
+            number: cow.number,
+            results: cow.milkingResults,
+            lactations: cow.lactations
+          });
+        });
+
+        const curYearDay = moment().dayOfYear();
+        let everyDayData = [];
+        cowsData.forEach(data => {
+          /* Create an estimate result for each day in lactational period*/
+          /* From start of each lactation to the finish (or today if lactation isn't over) */
+          let obj = {};
+          obj.number = data.number;
+          obj.name = data.name ? data.name : undefined;
+          obj.lactations = [];
+          obj.results = [];
+
+          data.lactations.forEach(lact => {
+            obj.lactations.push(lact);
+            const start = new Date(lact.startDate);
+            const finish = lact.finishDate ? new Date(lact.finishDate) : new Date();
+            const daysInLactation = Math.round((finish.getTime() - start.getTime()) / 24 / 60 / 60 / 1000);
+            for (let i = 0; i <= daysInLactation; i++) {
+              let date = new Date(moment(lact.startDate).add(i, 'day'));
+              let result;
+              let daysClose = 10000;
+              data.results.forEach(res => {
+                if (!res.date || res.lactationNumber !== lact.number) return;
+
+                const resDate = new Date(res.date);
+                if (Math.abs((resDate.getTime() - date.getTime()) / 24 / 60 / 60 / 1000) < daysClose) {
+                  daysClose = Math.abs((resDate.getTime() - date.getTime()) / 24 / 60 / 60 / 1000);
+                  result = res;
+                }
+
+              });
+
+              if (result) obj.results.push({ date, result: result.result, daysClose, lactationNumber: lact.number });
+            }
+          });
+          everyDayData.push(obj);
+        });
+
+
+        everyDayData.forEach(data => {
+          data.currentYearTotal = 0;
+          data.fullLifeTotal = 0;
+
+          data.results.forEach(res => {
+            if (new Date(res.date) >= new Date(moment().startOf('year'))) data.currentYearTotal += res.result;
+
+            data.fullLifeTotal += res.result;
+          });
+
+          data.lactations.forEach(lact => {
+            lact.total = 0;
+
+            data.results.forEach(res => {
+              if (lact.number === res.lactationNumber) lact.total += res.result;
+            });
+          });
+        });
+
+        everyDayData.sort((a, b) => b.currentYearTotal - a.currentYearTotal);
+
+        /* Preparing data for excel sheet format */
+        let milkingResultsReport = [];
+        let maxLacts = 0;
+        everyDayData.forEach(data => {
+          let currentArr = [];
+          currentArr.push(data.number);
+          data.name ? currentArr.push(data.name) : currentArr.push('-');
+          data.currentYearTotal ? currentArr.push(data.currentYearTotal) : currentArr.push('-');
+          data.fullLifeTotal ? currentArr.push(data.fullLifeTotal) : currentArr.push('-');
+
+          data.lactations.forEach((lact, inx) => {
+            if (inx === 0) {
+              if (lact.number === 1) return;
+
+              for (let i = 1; i < lact.number; i++) {
+                currentArr.push('-');
+              }
+            }
+
+            currentArr.push(lact.total);
+            if (lact.number > maxLacts) maxLacts = lact.number;
+          });
+
+          milkingResultsReport.push(currentArr);
+        });
+
+        let headerLine = ['Номер', 'Кличка', 'Текущий год', 'Всего'];
+        for (let i = 0; i < maxLacts; i++) {
+          headerLine.push(`Лактация #${i + 1}`)
+        }
+        milkingResultsReport.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Milking results report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(milkingResultsReport);
+        ws['!cols'] = fitToColumn(milkingResultsReport);
+
+        function fitToColumn(milkingResultsReport) {
+          // get maximum character of each column
+          return milkingResultsReport[0].map((a, i) => ({ wch: Math.max(...milkingResultsReport.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'milking report.xlsx');
+      }
+
+      if ($(this).attr('id') === 'insemination-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+
+        let formatedData = [];
+        animals.cows.forEach(cow => {
+          let status = 'not-inseminated';
+
+          if (cow.lactations.length > 0 && !cow.lactations.at(-1).finishDate && new Date() < new Date(moment(cow.lactations.at(-1).startDate).add(60, 'day'))) status = 'dry-period';
+
+          if (cow.lactations.length === 0 && cow.inseminations.length > 0 && cow.inseminations.at(-1).success) status = 'inseminated-first';
+
+          if (cow.lactations.length > 0 && cow.inseminations.length > 0 && cow.inseminations.at(-1).success && new Date(cow.inseminations.at(-1).date) > new Date(cow.lactations.at(-1).startDate)) status = 'inseminated-lactation'
+
+          let insemDaysAfterCalv = undefined;
+          if (status === 'inseminated-lactation') {
+            insemDaysAfterCalv = Math.round((new Date(cow.inseminations.at(-1).date).getTime() - new Date(cow.lactations.at(-1).startDate).getTime()) / 24 / 60 / 60 / 1000)
+          }
+          let calvingDate = undefined;
+          if (status === 'inseminated-lactation' || status === 'inseminated-first') {
+            calvingDate = new Date(moment(cow.inseminations.at(-1).date).add(283, 'day'));
+          }
+
+          formatedData.push({
+            name: cow.name,
+            number: cow.number,
+            status,
+            calvingDate,
+            insemDaysAfterCalv
+          });
+        });
+
+        /* console.log(formatedData); */
+      }
     });
   }
 

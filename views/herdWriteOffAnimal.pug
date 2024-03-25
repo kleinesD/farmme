@@ -16,6 +16,9 @@ block content
           .ai-block-title Животных
 
         -if(!forOne)
+          -if(selectedAnimals.length > 0)
+            each number in selectedAnimals
+              .ai-selected-animals-pre-set(data-number=`${number}`)
           .ai-selected-animals-block.ai-input-hidden#multiple-animals-container
             .ai-input-label Выбранные животные
             //-.ai-selected-animals-item #120231
@@ -28,16 +31,21 @@ block content
             input.ai-input.ai-input-select(type="text" placeholder="Номер или имя животного")
             .ai-select-block.ai-input-validation.shadow#multiple-animals
               each animal in animals
-                .ai-select-item(data-id=`${animal._id}`)
+                .ai-select-item(data-id=`${animal._id}` data-number=`${animal.number}`)
                   p.ai-select-name= `#${animal.number}`
                   -if(animal.name)
                     p.ai-select-sub-name= animal.name
 
         .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#reason
           .ai-input-label Причина
-          .ai-pick#slaughtered Забой
-          .ai-pick#sickness Болезнь
+          //-.ai-pick#slaughtered Забой
+          .ai-pick#sickness Падеж
           .ai-pick#sold Продажа
+
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#sub-reason-sold
+          .ai-input-label Способ продажи
+          .ai-pick#slaughtered Забой
+          .ai-pick#alive Живьем 
 
         //-.ai-input-block.ai-input-block-small-select
           .ai-input-label Сумма
@@ -48,7 +56,7 @@ block content
 
 
         .ai-input-block.ai-input-block-text
-          .ai-input-label Дата рождения
+          .ai-input-label Дата
           input.ai-input.ai-input-date#date(type="date")
           .ai-input-marker.ai-input-marker-r
             ion-icon(name="alert")

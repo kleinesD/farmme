@@ -24,6 +24,10 @@ const animalSchema = new mongoose.Schema({
     type: String,
     enum: ['sickness', 'slaughtered', 'sold']
   },
+  writeOffSubReason: {
+    type: String,
+    enum: ['alive', 'slaughtered']
+  },
   writeOffNote: String,
   writeOffMoneyReceived: Number,
   writeOffDate: Date,

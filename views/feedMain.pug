@@ -1,11 +1,16 @@
 extends base
 
 block content
-  //include _rcmFeed
+  include _rcmFeed
   section.main-section.feed-module
     .dist-main-section#mp-feed(data-farm-id=`${user.farm}`)
       .main-page-header
         .main-page-header-title КОРМЛЕНИЕ
+        .mph-actions-line
+          a.mph-action-btn(href="/feed/sample" qt="Добавить вид")
+            img(src='/img/svgs/grains.svg')
+          a.mph-action-btn(href="/feed/record" qt="Добавить запись")
+            img(src='/img/svgs/clipboard-text.svg')
 
       .feed-warning-container
         each feed in formated
@@ -19,7 +24,7 @@ block content
       .feed-history-block
         each feed in formated   
           each record in feed.records
-            .feed-history-item(class=`${record.status === 'increase' ? 'feed-history-item-pos' : 'feed-history-item-neg'}` data-max=`${feed.max}` data-num=`${record.amount}` data-date=`${record.date}`)
+            .feed-history-item(class=`${record.status === 'increase' ? 'feed-history-item-pos' : 'feed-history-item-neg'}` data-max=`${feed.max}` data-num=`${record.amount}` data-date=`${record.date}` rc-title="Редактировать запись" rc-link=`/feed/record/edit/${record._id}`)
               -if(record.autoAction || record.firstAction)
                 ion-icon(name="time-outline")
               -else

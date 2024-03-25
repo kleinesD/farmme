@@ -8,9 +8,7 @@ export const addReminder = async (data) => {
       data
     });
 
-    if(res.data.status === 'success') {
-      return true;
-    }
+    if(res.data.status === 'success') return true;
   } catch (err) {
     console.log(err);
   }
@@ -70,6 +68,20 @@ export const getFarmReminders = async( from, to) => {
 
     if(res.data.status === 'success') {
       return res.data.data.reminders
+    }
+  } catch(err) {
+    console.log(err);
+  }
+}
+export const deleteSubIdReminders = async(subId) => {
+  try {
+    const res = await axios({
+      method: 'DELETE',
+      url: `/api/calendar/delete-sub-id/${subId}`,
+    });
+
+    if(res.data.status === 'success') {
+      return true
     }
   } catch(err) {
     console.log(err);

@@ -25,6 +25,17 @@ block content
 
       .main-page-header
         .main-page-header-title ПРОДУКЦИЯ
+        .mph-actions-line
+          a.mph-action-btn(href="/distribution/add-client" qt="Добавить клиента")
+            img(src='/img/svgs/user-plus.svg')
+          a.mph-action-btn(href="/distribution/add-product-decide" qt="Добавить продукт")
+            img(src='/img/svgs/basket.svg')
+          a.mph-action-btn(href="/distribution/add-outgo-decide" qt="Добавить продажу")
+            img(src='/img/svgs/money.svg')
+          a.mph-action-btn(href="/distribution/all-products" qt="Все продукты")
+            img(src='/img/svgs/storefront.svg')
+          a.mph-action-btn(href="/distribution/all-clients" qt="Все клиенты")
+            img(src='/img/svgs/users-three.svg')
         .main-page-header-period-box
           input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
           .main-page-header-devider -
@@ -36,7 +47,7 @@ block content
       
       .dist-main-columns-block
         .dist-main-column-left
-          .dist-main-money-block
+          .dist-main-money-block(rc-title="Подробнее о клиентах" rc-link=`/distribution/all-clients/`)
             img.dmm-icon-1(src="/img/icons/dist-total.png")
             img.dmm-icon-2(src="/img/icons/dist-total.png")
             img.dmm-icon-3(src="/img/icons/dist-total.png")
@@ -54,7 +65,7 @@ block content
                 .dmm-list-item-group
                   .dmm-list-item-sub-text 48,315.00 ₽
                   .dmm-list-item-text 14%
-        .dist-main-column-right
+        .dist-main-column-right(rc-title="Подробнее о продуктах" rc-link=`/distribution/all-products/`)
           .dist-main-product-btns-block
             .dmp-btn.dmp-btn-active МОЛОКО
             .dmp-btn ТВОРОГ

@@ -6,6 +6,13 @@ block content
     .dist-main-section#mp-vet-container
       .main-page-header
         .main-page-header-title ВЕТЕРИНАРИЯ
+        .mph-actions-line
+          a.mph-action-btn(href="/vet/add-action/multiple" qt="Добавить действие")
+            img(src='/img/images/vet-action-icon.png')
+          a.mph-action-btn(href="/vet/add-problem/multiple" qt="Добавить проблему")
+            img(src='/img/images/vet-problem-icon.png')
+          a.mph-action-btn(href="//vet/add-scheme" qt="Добавить схему")
+            img(src='/img/images/vet-scheme-icon.png')
 
       -if(problemsFormated.length > 0)
         .main-flex-block

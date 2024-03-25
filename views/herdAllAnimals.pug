@@ -17,7 +17,17 @@ block content
         a.aa-filter-item(href="/herd/all-animals/?filter=all" class=`${filter === 'all' ? 'aa-filter-item-active' : ''}`) ВСЕ ЖИВОТНЫЕ
         a.aa-filter-item(href="/herd/all-animals/?filter=bulls" class=`${filter === 'bulls' ? 'aa-filter-item-active' : ''}`) БЫКИ
         a.aa-filter-item(href="/herd/all-animals/?filter=cows" class=`${filter === 'cows' ? 'aa-filter-item-active' : ''}`) КОРОВЫ
-        a.aa-filter-item(href="/herd/all-animals/?filter=calfs" class=`${filter === 'calfs' ? 'aa-filter-item-active' : ''}`) ТЕЛЯТА
+        a.aa-filter-item(href="/herd/all-animals/?filter=heifers" class=`${filter === 'heifers' ? 'aa-filter-item-active' : ''}`) НЕТЕЛИ
+        a.aa-filter-item(href="/herd/all-animals/?filter=calves" class=`${filter === 'calves' ? 'aa-filter-item-active' : ''}`) ТЕЛЯТА
+      
+      .al-selected-animal-line
+        .al-sl-text Выберите действие
+        .al-sl-action-selector 
+          p Выберите действие
+          .al-sl-action-list
+            .al-sl-action-item(data-link=`/herd/write-off-animal/multiple?animals=`) Списать животных
+        .al-sl-btn 
+          ion-icon(name="arrow-forward")
       .animal-list-header
         .alh-item.alh-item-photo Фото 
         .alh-item # 
@@ -28,9 +38,12 @@ block content
       .animals-list-block
         each animal in animals
           -if(animal.status === 'alive')
-            a.al-animal(href=`/herd/animal-card/${animal._id}`)
-              .al-item.al-item-photo 
-                img(src=`/img/images/${animal.mainPhoto}`)
+            .al-animal(href=`/herd/animal-card/${animal._id}` rc-title="Редактировать животное" rc-link=`/herd/edit-animal/${animal._id}` data-number=`${animal.number}`)
+              .al-animal-select-box 
+                .al-animal-selected 
+                  ion-icon(name="checkmark")
+              .al-item.al-item-photo
+                img(src=`/img/images/${animal.mainPhoto}` class=`${animal.gender === 'male' ? 'al-item-photo-male' : 'al-item-photo-female'}`)
               .al-item.al-item-number= animal.number
               -if([1, 21].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
                 .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} год`
@@ -44,8 +57,27 @@ block content
                   .ar-outter-circle
                   .ar-important-text= animal.currentInfoAB.message
               .al-item.al-item-name= animal.name
+              .al-add-action-btn
+                ion-icon(name="ellipsis-horizontal")
+              .animal-actions-block.rc-menu
+                a.rc-menu-item(href=`/herd/animal-card/${animal._id}`)
+                  p Карта животного
+                -if(animal.gender === 'female')
+                  -if(animal.lactations.length > 0 && !animal.lactations.at(-1).finishDate)
+                    a.rc-menu-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.length - 1}`)
+                      p Окончить лактацию
+                  a.rc-menu-item(href=`/herd/add-milking-result/${animal._id}`)
+                    p Добавить результат доения
+                  a.rc-menu-item(href=`/herd/add-lactation/${animal._id}`)
+                    p Добавить лактацию
+                  a.rc-menu-item(href=`/herd/add-insemination/${animal._id}`)
+                    p Добавить осеменение
+                a.rc-menu-item(href=`/herd/add-weight-result/${animal._id}`)
+                  p Добавить взвешивание
+                a.rc-menu-item(href=`/herd/write-off-animal/${animal._id}`)
+                  p Списать животное
           -else
-            a.al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}`)
+            .al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}` rc-title="Редактировать животное" rc-link=`/herd/edit-animal/${animal._id}`)
               .al-former-icon 
                 ion-icon(name="close")
               .al-item.al-item-photo 
@@ -62,6 +94,11 @@ block content
                   .ar-important-text= `Болезнь: ${animal.writeOffDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.writeOffDate.toLocaleString('ru-RU', {year: 'numeric'})}`
                   
               .al-item.al-item-name= animal.name
+              .al-add-action-btn
+                ion-icon(name="ellipsis-horizontal")
+              .rc-menu.animal-actions-block
+                a.rc-menu-item(href="/")
+                  p Добавить результат доения
           
 
 

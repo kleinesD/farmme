@@ -14,5 +14,7 @@ router.post('/module-and-period', authController.protect, calendarController.get
 
 router.post('/farm-and-period', authController.protect, calendarController.getFarmReminders);
 
+router.delete('/delete-sub-id/:subId', authController.protect, calendarController.deleteSubIdReminders);
+
 
 module.exports = router;

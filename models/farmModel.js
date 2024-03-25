@@ -47,6 +47,7 @@ const farmSchema = new mongoose.Schema({
       recuringFrequency: Number
     }
   ],
+  buildings: [String],
   nextPayment: {
     type: Date
   },

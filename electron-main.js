@@ -56,16 +56,20 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/?start=2023-03-06T18:10:26.040Z');
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/add-action/multiple');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/feed/sample/edit/652fd3a080804169f6efea4b');
   contentWindow.loadURL('http://127.0.0.1:604/feed/record/edit/653224d737d09684fad2b4ec');
   contentWindow.loadURL('http://127.0.0.1:604/feed/sample/');
   contentWindow.loadURL('http://127.0.0.1:604/feed/record/');
-  contentWindow.loadURL('http://127.0.0.1:604/');
   contentWindow.loadURL('http://127.0.0.1:604/feed/');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/add-animal/');
   contentWindow.loadURL('http://127.0.0.1:604/vet/edit-started-scheme/64ac40eb9effaba47b01d5d6');
+  contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/65b0b43a94091d06bb6912a7');
+  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
+  contentWindow.loadURL('http://127.0.0.1:604/vet');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple?animals=31207,31432,31365');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
+  contentWindow.loadURL('http://127.0.0.1:604/herd');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple');
   contentWindow.loadURL('http://127.0.0.1:604/');
   
 

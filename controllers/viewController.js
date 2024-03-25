@@ -1,3 +1,4 @@
+const fs = require('fs');
 const moment = require('moment')
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -21,10 +22,47 @@ exports.renderLogin = catchAsync(async (req, res, next) => {
 });
 
 exports.renderMain = catchAsync(async (req, res, next) => {
-  const cows = await Animal.find({ gender: 'female', farm: req.user.farm });
+  const data = {};
+
+  const animals = await Animal.find({ farm: req.user.farm, status: 'alive' });
+  const cows = await Animal.find({ farm: req.user.farm, gender: 'female', status: 'alive' });
+  const bulls = await Animal.find({ farm: req.user.farm, gender: 'male', status: 'alive' });
+
+  data.milkingCows = 0;
+  data.inseminatedCows = 0;
+  data.bullsReady = 0;
+  data.soonToCalv = 0;
+  data.calves = 0;
+  data.animals = animals;
+  data.cows = cows;
+  data.bulls = bulls;
+
+  animals.forEach(animal => {
+    if (Date.now() < animal.birthDate.getTime() + 18 * 30 * 24 * 60 * 60 * 1000) data.calves++;
+  });
+
+  cows.forEach(cow => {
+    if (cow.lactations.length > 0 && cow.lactations[cow.lactations.length - 1].finishDate === null) data.milkingCows++;
+    if (cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success) {
+      if (cow.lactations.length === 0 || cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate) {
+        data.inseminatedCows++
+        if (cow.inseminations[cow.inseminations.length - 1].date.getTime() > cow.inseminations[cow.inseminations.length - 1].date.getTime() + 225 * 24 * 60 * 60 * 1000) data.soonToCalv++;
+      }
+    }
+
+  });
+
+  bulls.forEach(bull => {
+    if ((bull.birthDate.getTime() + 24 * 30 * 24 * 60 * 60 * 1000) > Date.now()) data.bullsReady++;
+  });
+
+  const problems = await Vet.find({ category: 'problem', cured: { $ne: true } });
+
 
   res.status(200).render('main', {
-    cows
+    data,
+    cows,
+    problems
   });
 });
 
@@ -40,6 +78,7 @@ exports.renderAddReminder = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animals = await Animal.find({ farm: req.user.farm });
 
+
   res.status(200).render('generalReminder', {
     animals,
     forEdit
@@ -48,15 +87,10 @@ exports.renderAddReminder = catchAsync(async (req, res, next) => {
 
 exports.renderEditReminder = catchAsync(async (req, res, next) => {
   const forEdit = true;
-  const reminder = await Calendar.findById(req.params.reminderId);
-  let animal;
-  if (reminder.animal) {
-    animal = await Animal.findById(reminder.animal);
-  }
+  const reminder = await Calendar.findById(req.params.reminderId).populate('animal');
 
   res.status(200).render('generalReminder', {
     reminder,
-    animal,
     forEdit
   });
 });
@@ -96,6 +130,13 @@ exports.renderAllEmployees = catchAsync(async (req, res, next) => {
 
 exports.renderDataHandler = catchAsync(async (req, res, next) => {
 
+});
+
+exports.renderReports = catchAsync(async (req, res, next) => {
+
+  res.status(200).render('reports', {
+
+  });
 });
 
 /////////////////
@@ -174,7 +215,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
   const topAnimals = [];
 
   cows.forEach(cow => {
-    if(cow.milkingResults.length === 0) return;
+    if (cow.milkingResults.length === 0) return;
     let total = 0;
     cow.milkingResults.forEach(result => {
       total += result.result;
@@ -184,7 +225,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
       cow,
       result: parseFloat((total / cow.milkingResults.length).toFixed(1))
     });
-  }); 
+  });
 
   topAnimals.sort((a, b) => b.result - a.result);
   let topAnimalsFormated = topAnimals.slice(0, 10);
@@ -194,7 +235,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
 
   cows.forEach(cow => {
     cow.milkingResults.forEach(result => {
-      if(monthsResults.find(el => moment(el.date).isSame(result.date, 'month'))) {
+      if (monthsResults.find(el => moment(el.date).isSame(result.date, 'month'))) {
         let monthRes = monthsResults.find(el => moment(el.date).isSame(result.date, 'month'));
 
         monthRes.results.push(result.result);
@@ -211,7 +252,7 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
         })
       }
     });
-  }); 
+  });
   monthsResults.sort((a, b) => b.date - a.date);
   let lastMonthsResult = monthsResults[0];
 
@@ -306,9 +347,11 @@ exports.renderAllAnimals = catchAsync(async (req, res, next) => {
   } else if (req.query.filter === 'bulls') {
     animals = await Animal.find({ farm: req.user.farm, gender: 'male' });
   } else if (req.query.filter === 'cows') {
-    animals = await Animal.find({ farm: req.user.farm, gender: 'female' });
-  } else if (req.query.filter === 'calfs') {
-    animals = await Animal.find({ farm: req.user.farm, birthDate: { $lte: new Date(moment().subtract(1, 'year')) } });
+    animals = await Animal.find({ farm: req.user.farm, gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, 'lactations.0': { $exists: true } });
+  } else if (req.query.filter === 'heifers') {
+    animals = await Animal.find({ farm: req.user.farm, gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, lactations: { $size: 0 } });
+  } else if (req.query.filter === 'calves') {
+    animals = await Animal.find({ farm: req.user.farm, birthDate: { $gte: new Date(moment().subtract(1, 'year')) } });
   }
 
 
@@ -320,19 +363,22 @@ exports.renderAllAnimals = catchAsync(async (req, res, next) => {
 
 exports.renderAnimalCard = catchAsync(async (req, res, next) => {
   const animal = await Animal.findById(req.params.animalId);
+  const farm = await Farm.findById(req.user.farm);
   const allFarmAnimals = await Animal.find({ farm: animal.farm });
   let lastInsem, lastLact;
   if (animal.inseminations.length > 0) lastInsem = animal.inseminations[animal.inseminations.length - 1];
   if (animal.lactations.length > 0) lastLact = animal.lactations[animal.lactations.length - 1];
   const scheme = await Vet.findOne({ animal: animal._id, schemeStarter: true, finished: { $ne: true } }).populate('otherPoints').populate('animal').populate('scheme');
   const problems = await Vet.find({ animal: animal._id, category: 'problem' }).populate('treatments');
+
   res.status(200).render('herdAnimalCard', {
     animal,
     allFarmAnimals,
     lastInsem,
     lastLact,
     scheme,
-    problems
+    problems,
+    farm
   });
 });
 
@@ -385,19 +431,20 @@ exports.renderEditWeightResults = catchAsync(async (req, res, next) => {
 exports.renderEditInsemination = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const animal = await Animal.findById(req.params.animalId).populate({ path: 'inseminations', populate: { path: 'bull', model: 'Animal' } });
-  /* const animal = await Animal.findById(req.params.animalId).populate(`inseminations.${req.params.index}.bull`); */
+
   const bulls = await Animal.find({ gender: 'male' });
 
   const insemination = animal.inseminations[req.params.index];
 
   const index = req.params.index;
 
+
   res.status(200).render('herdInsemination', {
+    forEdit,
     animal,
     insemination,
     index,
     bulls,
-    forEdit
   });
 });
 
@@ -446,10 +493,16 @@ exports.renderWriteOffAnimal = catchAsync(async (req, res, next) => {
     animal = await Animal.findById(req.params.animalId);
   }
 
+  let selectedAnimals = [];
+  if (req.query.animals) {
+    selectedAnimals = req.query.animals.split(',');
+  }
+
   res.status(200).render('herdWriteOffAnimal', {
     forOne,
     animal,
-    animals
+    animals,
+    selectedAnimals
   });
 });
 
@@ -481,11 +534,21 @@ exports.renderAddVetAction = catchAsync(async (req, res, next) => {
     forOne = false;
   }
 
+  let selectedAnimals = [];
+  if (req.query.animals) {
+    req.query.animals.split(',').forEach(async number => {
+      let anim = await Animal.findOne({ farm: req.user.farm, number: number })
+      selectedAnimals.push(anim);
+    });
+  }
+
+
   res.status(200).render('vetAction', {
     forOne,
     animal,
     animals,
-    forEdit
+    forEdit,
+    selectedAnimals
   });
 });
 
@@ -693,7 +756,7 @@ exports.renderVetMain = catchAsync(async (req, res, next) => {
   /* Getting current schemes */
   let currentSchemes = [];
   schemes.forEach(scheme => {
-    if(new Date(scheme.otherPoints[scheme.otherPoints.length - 1].date) > new Date()) currentSchemes.push(scheme)
+    if (new Date(scheme.otherPoints[scheme.otherPoints.length - 1].date) > new Date()) currentSchemes.push(scheme)
   });
   schemes.sort((a, b) => b.date - a.date)
 
@@ -875,7 +938,7 @@ exports.renderAddOrder = catchAsync(async (req, res, next) => {
 exports.renderEditOrder = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const clients = await Client.find({ farm: req.user.farm });
-  const orders = await Calendar.find({ subId: req.params.id }).populate('client');
+  const orders = await Calendar.find({ subId: req.params.id });
 
   res.status(200).render('distOrder', {
     forEdit,
@@ -1001,7 +1064,7 @@ exports.renderAddOutgoDecide = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAllProducts = catchAsync(async (req, res, next) => {
-  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(1, 'month'));
+  let startDate = req.query.start ? new Date(req.query.start) : new Date(moment().subtract(12, 'month'));
   let endDate = req.query.end ? new Date(req.query.end) : new Date();
   const products = await Product.find({ farm: req.user.farm, date: { $gte: startDate, $lte: endDate } }).populate('client').populate('rawProduct').populate('produced').populate('user').sort('-date');
 
@@ -1041,17 +1104,17 @@ exports.renderAllClients = catchAsync(async (req, res, next) => {
   let revenueTotal = 0;
   const clientsFormated = [];
   clients.forEach(client => {
-    if(clientsFormated.find(el => el.client.id.toString() === client.id.toString())) return;
+    if (clientsFormated.find(el => el.client.id.toString() === client.id.toString())) return;
 
-    let quantity = {total: 0, count: 0};
-    let revenue = {total: 0, count: 0};
+    let quantity = { total: 0, count: 0 };
+    let revenue = { total: 0, count: 0 };
     sales.forEach(sale => {
-      if(sale.client.toString() !== client._id.toString()) return;
+      if (sale.client.toString() !== client._id.toString()) return;
 
-      if(sale.size) {
+      if (sale.size) {
         quantity.total += sale.size;
       }
-      if(sale.price) {
+      if (sale.price) {
         revenue.total += sale.price;
       }
     });
@@ -1067,7 +1130,7 @@ exports.renderAllClients = catchAsync(async (req, res, next) => {
   });
 
   clientsFormated.forEach(client => {
-    client.shareIndex = parseFloat((((client.quantity / quantityTotal) + (client.revenue / revenueTotal)) * 100 / 2 ).toFixed(1));
+    client.shareIndex = parseFloat((((client.quantity / quantityTotal) + (client.revenue / revenueTotal)) * 100 / 2).toFixed(1));
   });
 
   clientsFormated.sort((a, b) => b.shareIndex - a.shareIndex);

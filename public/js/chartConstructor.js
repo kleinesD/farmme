@@ -620,8 +620,8 @@ export const graphBase = (parent, min, max, start, end, showLineHorShow, showLin
  
 
   /* Making legend work */
-  $('#legend-btn').off('click')
-  $('#legend-btn').on('click', function () {
+  $('.legend-btn').off('click')
+  $('.legend-btn').on('click', function () {
     if ($('.mp-herd-legend').css('display') === 'flex') {
       $('.mp-herd-legend').hide()
     } else {
@@ -816,8 +816,8 @@ export const graphBaseNoDate = (parent, min, max, maxDays, showLineHorShow, show
  
 
   /* Making legend work */
-  $('#legend-btn').off('click')
-  $('#legend-btn').on('click', function () {
+  $('.legend-btn').off('click')
+  $('.legend-btn').on('click', function () {
     if ($('.mp-herd-legend').css('display') === 'flex') {
       $('.mp-herd-legend').hide()
     } else {

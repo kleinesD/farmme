@@ -35,7 +35,7 @@ exports.editReminder = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteReminder = catchAsync(async(req, res, next) => {
+exports.deleteReminder = catchAsync(async (req, res, next) => {
   const reminder = await Calendar.findByIdAndDelete(req.params.id)
 
   res.status(203).json({
@@ -43,8 +43,8 @@ exports.deleteReminder = catchAsync(async(req, res, next) => {
   });
 });
 
-exports.getModuleAndPeriod = catchAsync(async(req, res, next) => {
-  const reminders = await Calendar.find({farm: req.user.farm, module: req.body.module, date: { $gte: req.body.from, $lte: req.body.to }}).populate('animal').populate('user');
+exports.getModuleAndPeriod = catchAsync(async (req, res, next) => {
+  const reminders = await Calendar.find({ farm: req.user.farm, module: req.body.module, date: { $gte: req.body.from, $lte: req.body.to } }).populate('animal').populate('user');
 
   res.status(200).json({
     status: 'success',
@@ -54,8 +54,9 @@ exports.getModuleAndPeriod = catchAsync(async(req, res, next) => {
   });
 });
 
-exports.getFarmReminders = catchAsync(async(req, res, next) => {
-  const reminders = await Calendar.find({farm: req.user.farm, date: { $gte: req.body.from, $lte: req.body.to }}).populate('animal').populate('user');
+exports.getFarmReminders = catchAsync(async (req, res, next) => {
+  const reminders = await Calendar.find({ farm: req.user.farm, module: {$ne: 'order'}, date: { $gte: req.body.from, $lte: req.body.to } }).populate('animal').populate('user');
+  
 
 
   res.status(200).json({
@@ -63,5 +64,13 @@ exports.getFarmReminders = catchAsync(async(req, res, next) => {
     data: {
       reminders
     }
+  });
+});
+
+exports.deleteSubIdReminders = catchAsync(async (req, res, next) => {
+  await Calendar.deleteMany({ subId: req.params.subId });
+
+  res.status(200).json({
+    status: 'success'
   });
 });

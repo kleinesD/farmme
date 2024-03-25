@@ -6,6 +6,17 @@ block content
     .dist-main-section#mp-herd(data-farm-id=`${user.farm}`)
       .main-page-header
         .main-page-header-title ЖИВОТНЫЕ
+        .mph-actions-line
+          a.mph-action-btn(href="/herd/all-animals/?filter=all" qt="Все животные")
+            img(src='/img/images/default-cow-image.png')
+          a.mph-action-btn(href="/herd/list-milking-results" qt="Добавить результаты доения")
+            img(src='/img/images/milk-icon.png')
+          a.mph-action-btn(href="/herd/list-inseminations" qt="Добавить осеменения")
+            img(src='/img/images/needle-icon.png')
+          a.mph-action-btn(href="/herd/write-off-animal/multiple" qt="Списать животных")
+            img(src='/img/images/butcher-icon.png')
+          a.mph-action-btn(href="/herd/add-animals" qt="Добавить животное")
+            img(src='/img/svgs/plus.svg')
         //-.main-page-header-period-box
           input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
           .main-page-header-devider -
@@ -44,7 +55,7 @@ block content
           .herd-mp-quick-info-item(data-index="2" data-res=`${data.bulls.length}`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-bull.png")
             .herd-mp-quick-info-item-img-shadow
-            .herd-mp-quick-info-item-title БЫКОВ
+            .herd-mp-quick-info-item-title БЫКИ
             .herd-mp-quick-info-item-res= data.bulls.length
           .herd-mp-quick-info-item(data-index="3" data-res=`${data.milkingCows}`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-milking-cow.png")
@@ -125,6 +136,59 @@ block content
                     .herd-mp-list-line-item.date.herd-mp-list-line-indicator-text
                     .herd-mp-list-line-item.day.herd-mp-list-line-indicator-text 
 
+      .herd-breakdown-block#herd-breakdown
+        .loading-block  
+          .loading-icon
+        .mp-block-outside-header
+            .mp-block-outside-header-title Классификация животных
+            .mp-block-outside-header-btn-block
+              .mp-block-outside-header-btn.mp-block-outside-header-btn-active#category Группа
+              .mp-block-outside-header-btn#gender Пол
+              .mp-block-outside-header-btn#age Возраст
+              //-.mp-block-outside-header-btn#colors Окрас
+              .mp-block-outside-header-btn#breed Порода
+        //-.hbb-btns-row 
+          .hbb-btn Группы
+          .hbb-btn Возраст
+          .hbb-btn Корпуса
+        .hbb-line
+          .hbb-line-text Корпус #1
+          .hbb-line-text.hbb-line-text-second 30%
+          .hbb-animals-block 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+            a.hbb-animal-item(href="")
+              img(src="/img/images/default-cow-image.png") 
+
+
       -if(topAnimalsFormated.length >= 2)
         .mp-results-flex-block
           .mp-block-outside-header
@@ -181,7 +245,7 @@ block content
             .mp-hg-btn(data-months="60") 5г
             .mp-hg-btn(data-months="all")
               ion-icon(name="infinite")
-          .mp-herd-legend-btn#legend-btn  
+          .mp-herd-legend-btn.legend-item  
             ion-icon(name="settings")
 
           .mp-graph-tooltip

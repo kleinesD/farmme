@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import axios from 'axios';
 
 
 export const addConfirmationEmpty = (parentEl) => {
@@ -22,7 +23,7 @@ export const askAus = (parent, title, btn1, btn2, danger, data) => {
 
 export const emptyBlock = (parent, title, text) => {
   if (parent.css('position') !== 'absolute') parent.css('position', 'relative');
-  
+
   parent.prepend(`
     <div class="no-info-block">
       <div class="no-info-block-background"></div>
@@ -38,7 +39,7 @@ export const removeEmptyBlock = (parent) => {
 
 export const loadingBlock = (parent) => {
   if (parent.css('position') !== 'absolute') parent.css('position', 'relative');
-  
+
   parent.prepend(`
     <div class="loading-block">
       <div class="loading-icon"></div>
@@ -48,4 +49,36 @@ export const loadingBlock = (parent) => {
 
 export const removeloadingBlock = (parent) => {
   parent.find('.loading-block').remove();
+}
+
+export const quickTitle = () => {
+  $('body').on('mouseenter', '*', function () {
+    if ($(this).attr('qt') === undefined) return;
+
+    if($(this).css('position') === 'static') $(this).css('position', 'relative');
+    
+    $(this).append(`
+      <div class="quick-title">${$(this).attr('qt')}</div>
+    `);
+  });
+
+  $('body').on('mouseleave', '*', function () {
+    $(this).find('.quick-title').remove();
+  });
+
+
+};
+
+export const getIcons = async () => {
+  try{
+    const res = await axios({
+      method: 'GET',
+      url: '/api/users/icons/get/'
+    });
+
+    if(res.data.status === 'success') return res.data.data.files;
+
+  } catch(err) {
+    console.log(err);
+  }
 }

@@ -3,217 +3,209 @@ extends base
 block content
   include _rcmMain
   section.main-section 
-    .main-welcome-block
-      .mw-title-block
+    .main-page-container(data-farm-id=`${user.farm}`)
+      .main-welcome-block
         .mw-title FARMME
-      a.mw-account-block.mw-link-block(href="/edit-user")
-        .mw-marquee-container
-          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
-          .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
-        .mw-block-line
-          .mw-account-name= `${user.firstName} ${user.lastName}`
-          img.mw-account-image(src="/img/images/user-default.png")
-        .mw-block-line
-          .mw-block-name.mw-white Мой Аккаунт
-          ion-icon.mw-block-icon.mw-white(name="arrow-forward")
-        .mw-animation-block
-          //-img.mw-animation-icon.mw-animation-icon-1(src="/img/images/cow-icon.png")
-          //-img.mw-animation-icon.mw-animation-icon-2(src="/img/images/med-cross-icon.png")
-          //-img.mw-animation-icon.mw-animation-icon-3(src="/img/images/inventory-icon.png")
-          ion-icon.mw-animation-icon.mw-animation-icon-1#herd-main-icon(name="paw")
-          ion-icon.mw-animation-icon.mw-animation-icon-2#vet-main-icon(name="thermometer")
-          ion-icon.mw-animation-icon.mw-animation-icon-3#warehouse-main-icon(name="cube")
+        a.mw-account-block.mw-link-block(href="/edit-user")
+          .mw-marquee-container
+            .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
+            .mw-marquee-text.mw-marquee-text-white Настройки аккаунта. Настройки фермы.  
+          .mw-block-line
+            .mw-account-name= `${user.firstName} ${user.lastName}`
+            img.mw-account-image(src="/img/images/user-default.png")
+          .mw-block-line
+            .mw-block-name.mw-white Мой Аккаунт
+            ion-icon.mw-block-icon.mw-white(name="arrow-forward")
+          .mw-animation-block
+            //-img.mw-animation-icon.mw-animation-icon-1(src="/img/images/cow-icon.png")
+            //-img.mw-animation-icon.mw-animation-icon-2(src="/img/images/med-cross-icon.png")
+            //-img.mw-animation-icon.mw-animation-icon-3(src="/img/images/inventory-icon.png")
+            ion-icon.mw-animation-icon.mw-animation-icon-1#herd-main-icon(name="paw")
+            ion-icon.mw-animation-icon.mw-animation-icon-2#vet-main-icon(name="thermometer")
+            ion-icon.mw-animation-icon.mw-animation-icon-3#dist-main-icon(name="cart")
+            ion-icon.mw-animation-icon.mw-animation-icon-4#feed-main-icon(name="ice-cream")
 
-      a.mw-link-herd-block.mw-link-block.mw-small-link-block#herd-main-block(href="/herd/")
-        .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
-          .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
-        .mw-block-line
-          .mw-block-name Животные
-          ion-icon.mw-block-icon(name="paw")
-      a.mw-link-vet-block.mw-link-block.mw-small-link-block#vet-main-block(href="/vet/")
-        .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
-          .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
-        .mw-block-line
-          .mw-block-name Ветеринария
-          ion-icon.mw-block-icon(name="thermometer")
-      a.mw-link-warehouse-block.mw-link-block.mw-small-link-block#warehouse-main-block(href="/warehouse/")
-        .mw-marquee-container
-          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря. 
-          .mw-marquee-text.mw-marquee-small Отслеживание инвентаря. 
-        .mw-block-line
-          .mw-block-name Склад
-          ion-icon.mw-block-icon(name="cube")
-      a.mw-link-quick-block.mw-link-block(href="#")
-        .mw-block-line
-          .mw-block-name Быстрая информация
-          ion-icon.mw-block-icon(name="chevron-down")
+        a.mw-link-herd-block.mw-link-block.mw-small-link-block#herd-main-block(href="/herd/")
+          .mw-marquee-container
+            .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
+            .mw-marquee-text.mw-marquee-small Учет стада. Молочная и весовая статистика. Осемения и отелы.  
+          .mw-block-line
+            .mw-block-name ЖИВОТНЫЕ
+            ion-icon.mw-block-icon(name="paw")
+        a.mw-link-vet-block.mw-link-block.mw-small-link-block#vet-main-block(href="/vet/")
+          .mw-marquee-container
+            .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
+            .mw-marquee-text.mw-marquee-small Ведение проблем животных и их лечения. Схемы. Учет ветеринарных действий.  
+          .mw-block-line
+            .mw-block-name ВЕТЕРИНАРИЯ
+            ion-icon.mw-block-icon(name="thermometer")
+        a.mw-link-feed-block.mw-link-block.mw-small-link-block#feed-main-block(href="/feed/")
+          .mw-marquee-container
+            .mw-marquee-text.mw-marquee-small Добавление, расход и учет кормов. 
+            .mw-marquee-text.mw-marquee-small Добавление, расход и учет кормов. 
+          .mw-block-line
+            .mw-block-name КОРМЛЕНИЕ
+            ion-icon.mw-block-icon(name="ice-cream")
+        a.mw-link-dist-block.mw-link-block.mw-small-link-block#dist-main-block(href="/distribution/")
+          .mw-marquee-container
+            .mw-marquee-text.mw-marquee-small Учет сырого продукта. Продажи. Списание. Переработка сырья. Заказы. Клиенты. 
+            .mw-marquee-text.mw-marquee-small Учет сырого продукта. Продажи. Списание. Переработка сырья. Заказы. Клиенты. 
+          .mw-block-line
+            .mw-block-name ПРОДУКИЯ
+            ion-icon.mw-block-icon(name="cart")
+        a.mw-link-quick-block.mw-link-block(href="#")
+          .mw-block-line
+            .mw-block-name Быстрая информация
+            ion-icon.mw-block-icon(name="chevron-down")
 
-    .main-page-herd-block
-      each cow in cows
-        each result in cow.milkingResults
-          .mph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
-      .mph-info-month Январь 2023
-      .mph-info-box#box-1
-        .mph-info-box-result#mph-average 19
-        .mph-info-box-text литров
-        .mph-info-box-title МОЛОКА В СРЕДНЕМ
-        //-.mph-diff-block.mph-diff-block-pos 
-          ion-icon(name="chevron-up") 
-          p 12%
-      .mph-info-box#box-2
-        .mph-info-box-result#mph-day 560
-        .mph-info-box-text литров
-        .mph-info-box-title МОЛОКА В ДЕНЬ
-        //-.mph-diff-block.mph-diff-block-pos 
-          ion-icon(name="chevron-up") 
-          p 6%
-      .mph-info-box#box-3 
-        .mph-info-box-result#mph-month 15
-        .mph-info-box-text литров
-        .mph-info-box-title МОЛОКА В МЕСЯЦ
-        //-.mph-diff-block.mph-diff-block-neg 
-          ion-icon(name="chevron-down") 
-          p -1%
+      .main-herd-section
+        .main-page-header.main-page-header-sub-section
+          .main-page-header-title ЖИВОТНЫЕ
+          .mph-actions-line
+            a.mph-action-btn(href="/herd/all-animals/?filter=all" qt="Все животные")
+              img(src='/img/images/default-cow-image.png')
+            a.mph-action-btn(href="/herd/list-milking-results" qt="Добавить результаты доения")
+              img(src='/img/images/milk-icon.png')
+            a.mph-action-btn(href="/herd/list-inseminations" qt="Добавить осеменения")
+              img(src='/img/images/needle-icon.png')
+            a.mph-action-btn(href="/herd/write-off-animal/multiple" qt="Списать животных")
+              img(src='/img/images/butcher-icon.png')
+            a.mph-action-btn(href="/herd/add-animals" qt="Добавить животное")
+              img(src='/img/svgs/plus.svg')
 
-    //-.main-page-vet-block
-      .mpv-big-info
-        img(src="/img/images/thermometer-main-icon.png")
-        .mpv-big-info-text-box
-          .mpv-big-info-title 3
-          .mpv-big-info-text Животных
-          .mpv-big-info-text Требуют внимания
-      .mpv-problems-list
-        .mpv-problems-item
-          img(src="/img/images/default-cow-image.png")
+        .mhs-main-info-block
+          .mhs-main-info-title КОЛИЧЕСТВО МОЛОКА В МЕСЯЦ (Л.)
+          .mhs-mi-text-block.mhs-mi-text-block-left.mhs-mi-text-block-months
+            .mhs-mi-text ЯНВ
+            .mhs-mi-text ФЕВ
+            .mhs-mi-text МАРТ
+            .mhs-mi-text АПР
+            .mhs-mi-text МАЙ
+            .mhs-mi-text ИЮНЬ
+            .mhs-mi-text ИЮЛЬ
+            .mhs-mi-text АВГ
+            .mhs-mi-text СЕН
+            .mhs-mi-text ОКТ
+            .mhs-mi-text НОЯ
+            .mhs-mi-text ДЕК
+          .mhs-mi-graph 
+            .mhs-mi-graph-item(data-month="11")
+            .mhs-mi-graph-item(data-month="10")
+            .mhs-mi-graph-item(data-month="9")
+            .mhs-mi-graph-item(data-month="8")
+            .mhs-mi-graph-item(data-month="7")
+            .mhs-mi-graph-item(data-month="6")
+            .mhs-mi-graph-item(data-month="5")
+            .mhs-mi-graph-item(data-month="4")
+            .mhs-mi-graph-item(data-month="3")
+            .mhs-mi-graph-item(data-month="2")
+            .mhs-mi-graph-item(data-month="1")
+            .mhs-mi-graph-item(data-month="0")
+          .mhs-mi-text-block.mhs-mi-text-block-right.mhs-mi-text-block-results
+            .mhs-mi-text 27.3 к
 
+        .mhs-bottom-info 
+          .mhs-bi-switch-block
+            .mhs-bi-item-switch.mhs-bi-item-switch-first.mhs-bi-item-switch-active
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-animal.png")
+                div
+              .mhs-bi-text
+                p Животные
+                p= data.animals.length
+            .mhs-bi-item-switch
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-cow.png")
+                div
+              .mhs-bi-text
+                p Коровы
+                p= data.cows.length
+            .mhs-bi-item-switch
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-bull.png")
+                div
+              .mhs-bi-text
+                p Быки
+                p= data.bulls.length
+            .mhs-bi-item-switch
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-milking-cow.png")
+                div
+              .mhs-bi-text
+                p Доящиеся коровы
+                p= data.milkingCows
+            .mhs-bi-item-switch
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-inseminated-cow.png")
+                div
+              .mhs-bi-text
+                p Осемененные коровы
+                p= data.inseminatedCows
+            .mhs-bi-item-switch
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-ready-bull.png")
+                div
+              .mhs-bi-text
+                p Быки на забой
+                p= data.bullsReady
+            .mhs-bi-item-switch.mhs-bi-item-switch-last
+              .mhs-bi-icon 
+                img(src="/img/icons/herd-calf-alone.png")
+                div
+              .mhs-bi-text
+                p Телята
+                p= data.calves
 
+          .mhs-bi-item
+            .mhs-bi-icon 
+              img(src="/img/svgs/wave-sine.svg")
+              div
+            .mhs-bi-text
+              p Средний результат
+              p#average 21.3 л.
+          .mhs-bi-item
+            .mhs-bi-icon 
+              img(src="/img/svgs/chart-donut.svg")
+              div
+            .mhs-bi-text
+              p Молока в день
+              p#day 436 л.
 
+      .main-vet-section#main-vet-section
+        .main-page-header.main-page-header-sub-section
+          .main-page-header-title ВЕТЕРИНАРИЯ
+          .mph-actions-line
+            a.mph-action-btn(href="/vet/add-action/multiple" qt="Добавить действие")
+              img(src='/img/images/vet-action-icon.png')
+            a.mph-action-btn(href="/vet/add-problem/multiple" qt="Добавить проблему")
+              img(src='/img/images/vet-problem-icon.png')
+            a.mph-action-btn(href="//vet/add-scheme" qt="Добавить схему")
+              img(src='/img/images/vet-scheme-icon.png')
 
+        .mvs-info-graph
+          .loading-block 
+            .loading-icon
+          .mvs-ig-text.mvs-ig-text-1(data-el="toInsem") Пора осеменять 
+          .mvs-ig-text.mvs-ig-text-2(data-el="over") Перестой
+          .mvs-ig-text.mvs-ig-text-3(data-el="inseminated") Осемененные
+          .mvs-ig-text.mvs-ig-text-4(data-el="wait") Ожидание результата
 
+          .mvs-ig-details-block
+            .mvs-ig-details-block-title Осеменение
+            .mvs-ig-details-block-count Количество: &nbsp; 16
 
-    //-.main-page-container#mp-herd-container 
-      .mp-info-block
-        each cow in cows
-          each result in cow.milkingResults
-            .mp-graph-data(data-result=`${result.result}` data-date=`${result.date}` data-lact=`${result.lactationNumber}` data-cow-id=`${cow._id}` data-cow-photo=`${cow.mainPhoto}` data-cow-name=`${cow.name}` data-cow-number=`${cow.number}`)
-        .mp-animal-graph-container   
-          //-.mp-tooltip-box
-            .mp-tooltip-title Ноябрь 2022
-            .mp-tooltip-info-line
-              .mp-tooltip-info Результатов:
-              .mp-tooltip-info 27
-            .mp-tooltip-devider
-            .mp-tooltip-result-line
-              .mp-tooltip-marker
-              .mp-tooltip-result-info Сред. результат
-              .mp-tooltip-result 17 л.
-          svg.mp-animal-block-graph.graph-info-hidden#mp-graph(data-graph-name="milk-average" data-period-months="12")
-            //-path.line-graph-average-line(d=`M 100 300 Q 127 212 200 200 Q 287 191 300 250 L 400 100 L 500 75 L 600 400 L 700 300 L 800 250` stroke="black" fill="transparent")
-          .mp-animal-graphs-switch
-            .mp-animal-graphs-switch-btn.mp-animal-graphs-switch-btn-active#milk-average Молоко среднее
-            .mp-animal-graphs-switch-btn#milk-total Молоко всего
-            .mp-animal-graphs-switch-btn#milk-lact Лактации
-          .mp-animal-graphs-period
-            .mp-animal-graphs-period-btn.mp-animal-graphs-period-btn-active(data-period=`12`) 1г
-            .mp-animal-graphs-period-btn(data-period=`24`) 2г
-            .mp-animal-graphs-period-btn(data-period=`36`) 3г
-            .mp-animal-graphs-period-btn(data-period=`60`) 5г
-            .mp-animal-graphs-period-btn(data-period=`120`) 10г
-            .mp-animal-graphs-period-btn(data-period=`all-time`) Все время
-          .mp-animal-graphs-legend
-            //-.mp-animal-graphs-legend-item
-              .mp-animal-graphs-legend-item-line
-              .mp-animal-graphs-legend-item-text Результат ( 26 коров )
-        .mp-two-list-blocks
-          .mpt-list-block
-            .mpt-list-block-header
-              .mpt-list-block-title Ближайший отел
-              .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
-              a.mpt-list-block-more-btn(href="#") Показать больше
-              img(src='/img/images/no-data-image.png')
-            .mpt-list-block-devider
-            .mpt-list-animals#mp-soon-to-calv-list
-              each cow in cows
-                -if(cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.lactations.length === 0 || cow.inseminations.length > 0 && cow.inseminations[cow.inseminations.length - 1].success && cow.inseminations[cow.inseminations.length - 1].date > cow.lactations[cow.lactations.length - 1].startDate)
-                  a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
-                    //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
-                    .mpt-list-item-number= `#${cow.number}`
-                    .mpt-list-item-date(data-date=`${new Date(cow.inseminations[cow.inseminations.length - 1].date.getTime() + 283 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
-                    .mpt-list-item-day
-                      .mpt-list-item-day-text 11 дней
-
-
-          .mpt-list-block
-            .mpt-list-block-header
-              .mpt-list-block-title Ближайшие осеменение
-              .mpt-list-block-sub-title Для полного списка нажмите на 'Показать больше'. <br> Для более подробной информации нажмите на нужное животное.
-              a.mpt-list-block-more-btn(href="#") Показать больше
-              img(src='/img/images/no-data-image.png')
-            .mpt-list-block-devider
-            .mpt-list-animals#mp-soon-to-insem-list
-              each cow in cows
-                -if(cow.lactations.length === 0 && cow.inseminations.length === 0 || cow.lactations.length === 0 && cow.inseminations.length > 0 && !cow.inseminations[cow.inseminations.length - 1].success)
-                  a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
-                    //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
-                    .mpt-list-item-number= `#${cow.number}`
-                    .mpt-list-item-else Пора осеменять
-
-                -if(cow.lactations.length > 0)
-                  -if(cow.inseminations.length === 0 || cow.lactations[cow.lactations.length - 1].startDate > cow.inseminations[cow.inseminations.length - 1].date || cow.lactations[cow.lactations.length - 1].startDate < cow.inseminations[cow.inseminations.length - 1].date && !cow.inseminations[cow.inseminations.length - 1].success)
-                    a.mpt-list-item(href=`/herd/animal-card/${cow._id}`)
-                      //-img.mpt-list-item-image(src="/img/images/default-cow-image.png")
-                      .mpt-list-item-number= `#${cow.number}`
-                      .mpt-list-item-date(data-date=`${new Date(cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000)}`) 26 Ноября 2022
-                      .mpt-list-item-day
-                        -if((cow.lactations[cow.lactations.length - 1].startDate.getTime() + 2 * 30 * 24 * 60 * 60 * 1000) - Date.now() > 0 )
-                          .mpt-list-item-day-text.mpt-list-item-day-pos 11 дней
-                        -else 
-                          .mpt-list-item-day-text.mpt-list-item-day-neg 11 дней
-
-
-
-      .mp-fixed-block
-        .mp-main-info-container
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-1
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в день
-              .mp-mi-data#mp-milk-per-day(data-total='0') 585 л.
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-2
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в месяц
-              .mp-mi-data#mp-milk-per-month 17250 л.
-          .mp-main-info-block
-            .mp-main-info-image.mp-main-info-image-color-3
-              img(src="/img/images/milk-icon.png")
-            .mp-mi-content-block
-              .mp-mi-title Молока в среднем
-              .mp-mi-data#mp-milk-average 22 л.
-        .mp-top-cows-block
-          .mp-top-cows-header
-            .mp-tc-title Лучшие результат
-            a.mp-tc-link(href="#") Смотреть еще
-          .mp-top-cows-container
-            //-a.mp-top-cow(href='#')
-              img(src="/img/images/default-cow-image.png")
-              .mp-top-cow-overlay
-                .mp-tc-name Березка
-                .mp-tc-number #5036
-        a.mp-to-block-page-btn(href="/herd")
-          .mp-bpb-main-text 
-            | Перейти на 
-            span страницу 
-            | модуля
-          .mp-bpb-sub-text Больше информации и статистики
-          ion-icon.mp-bpb-icon(name="paw")
-
-
-
-
-
-
+        .mhs-bottom-info
+          .mhs-bi-item
+            .mhs-bi-icon 
+              img(src="/img/svgs/first-aid.svg")
+              div
+            .mhs-bi-text
+              p Не вылеченные проблемы
+              p#sick= problems.length
+          //-.mhs-bi-item
+            .mhs-bi-icon 
+              img(src="/img/svgs/stethoscope.svg")
+              div
+            .mhs-bi-text
+              p Животных на лечении
+              p#treatment 436 л.
