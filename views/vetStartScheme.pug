@@ -4,9 +4,9 @@ block content
   include _rcmVet
   section.main-section.vet-module
 
-    include _animalHeader
-
     -if(!forEdit)
+      -if(forOne)
+        include _animalHeader
       .animal-results-window
         .ai-form-container.ai-form-vet.ai-form-container-headerful#vet-start-scheme-container
 
@@ -14,9 +14,30 @@ block content
           .ai-block-sub-title НАЧАТЬ
           .ai-block-title Ветеринарную схему
 
+          -if(!forOne)
+            -if(selectedAnimals.length > 0)
+              each number in selectedAnimals
+                .ai-selected-animals-pre-set(data-number=`${number}`)
+            .ai-selected-animals-block.ai-input-hidden#multiple-animals-container
+              .ai-input-label Выбранные животные
+              //-.ai-selected-animals-item #120231
+                .ai-selected-animals-remove 
+                  ion-icon(name="close")
+
+            .ai-input-block.ai-input-block-select
+              .ai-select-line
+              .ai-input-label Животные
+              input.ai-input.ai-input-select(type="text" placeholder="Номер или имя животного")
+              .ai-select-block.ai-input-validation.shadow#multiple-animals
+                each animal in animals
+                  .ai-select-item(data-id=`${animal._id}` data-number=`${animal.number}`)
+                    p.ai-select-name= `#${animal.number}`
+                    -if(animal.name)
+                      p.ai-select-sub-name= animal.name
+
           .ai-input-block.ai-input-block-text
             .ai-input-label Дата и время
-            input.ai-input.ai-input-date.ai-input-validation#date(type="datetime-local" data-animal-birth=`${animal.birthDate}`)
+            input.ai-input.ai-input-date.ai-input-validation#date(type="datetime-local" class=`${forOne ? 'ai-input-validation' : ''}` data-animal-birth=`${forOne ? animal.birthDate : 'none'}`)
             .ai-input-marker.ai-input-marker-r
               ion-icon(name="alert")
             .ai-input-explain-block.ai-input-explain-block-required
@@ -39,8 +60,9 @@ block content
               .ai-input-eb-tri
               .ai-input-eb-text Обязательно
 
-          a.ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
+          .ai-input-submit-btn(data-animal-id=`${forOne ? animal._id : ''}`) Сохранить
     -if(forEdit)
+      include _animalHeader
       .animal-results-window
         .ai-form-container.ai-form-vet.ai-form-container-headerful#edit-vet-start-scheme-container
 

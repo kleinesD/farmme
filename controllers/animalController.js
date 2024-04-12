@@ -4,6 +4,69 @@ const Farm = require('../models/farmModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+let updateCurrentInfoOneAnimal = catchAsync(async (animal) => {
+  if (animal.gender === 'female') {
+    let lastLact = animal.lactations.at(-1);
+    let lastInsem = animal.inseminations.at(-1);
+
+    /* Empty current info if nothing happens */
+    animal.currentInfoAB.message = ``;
+    animal.currentInfoAB.status = 'regular';
+
+    /* Regular lactation info */
+    if (lastLact && lastLact.finishDate === null) {
+      animal.currentInfoAB.message = `Лактация: ${lastLact.number} | День: ${Math.round((Date.now() - lastLact.startDate.getTime()) / 1000 / 60 / 60 / 24)}`;
+      animal.currentInfoAB.status = 'regular';
+    }
+
+    /* Insemination info */
+    if (lastLact) {
+      if (lastLact && !lastInsem || lastInsem.date > lastLact.startDate && !lastInsem.success || lastInsem.date < lastLact.startDate) {
+        if (Date.now() < lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000 && Date.now() >= lastLact.startDate.getTime() + 30 * 24 * 60 * 60 * 1000) {
+          animal.currentInfoAB.message = `Пора осеменять через: ${Math.round(((lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`;
+          animal.currentInfoAB.status = 'on-schedule';
+        } else if (Date.now() > lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000) {
+          animal.currentInfoAB.message = `Перестой: ${Math.round((Date.now() - (lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000)) / 1000 / 60 / 60 / 24)} дн.`;
+          animal.currentInfoAB.status = 'urgent';
+        }
+      }
+    }
+
+    if (!lastLact && !lastInsem || !lastLact && !lastInsem.success) {
+      if (Date.now() < animal.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000 && Date.now() >= animal.birthDate.getTime() + 14 * 30 * 24 * 60 * 60 * 1000) {
+        animal.currentInfoAB.message = `Пора осеменять`;
+        animal.currentInfoAB.status = 'on-schedule';
+      } else if (Date.now() > animal.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000) {
+        animal.currentInfoAB.message = `Пора осеменять`;
+        animal.currentInfoAB.status = 'urgent';
+      }
+    }
+
+    if (lastInsem && lastInsem.success === undefined) {
+      animal.currentInfoAB.message = `Не подтвержденное осеменение: ${Math.round((Date.now() - lastInsem.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`;
+      animal.currentInfoAB.status = 'regular';
+    }
+
+    /* Calving info */
+    if (lastInsem && lastInsem.success) {
+      if (!lastLact || lastInsem.date > lastLact.startDate) {
+        if (Date.now() > lastInsem.date.getTime() + 223 * 24 * 60 * 60 * 1000) {
+          animal.currentInfoAB.message = `Отел через: ${Math.round(((lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`;
+          animal.currentInfoAB.status = 'on-schedule';
+        }
+      }
+    }
+
+    await animal.save();
+  } else if (animal.gender === 'male') {
+    /* Empty current info if nothing happens */
+    animal.currentInfoAB.message = ``;
+    animal.currentInfoAB.status = 'regular';
+
+    await animal.save();
+  }
+})
+
 exports.getAllAnimals = catchAsync(async (req, res, next) => {
   const animals = await Animal.find();
 
@@ -43,10 +106,6 @@ exports.addOneAnimal = catchAsync(async (req, res, next) => {
   req.body.farm = req.user.farm;
   const animal = await Animal.create(req.body);
 
-  if (req.body.mother) {
-    const motherAnimal = await Animal.findByIdAndUpdate(req.body.mother, { $push: { calvings: { child: animal._id, date: animal.birthDate, childCondition: 'alive', withHelp: req.body.withHelp }, lactations: { startDate: animal.birthDate, number: req.body.lactationNumber } } });
-  }
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -74,6 +133,7 @@ exports.updateOneAnimal = catchAsync(async (req, res, next) => {
 });
 
 exports.addLactation = catchAsync(async (req, res, next) => {
+  req.body.user = req.user._id;
   let animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: req.body } });
 
   animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: { $each: [], $sort: { startDate: 1 } } } });
@@ -125,6 +185,7 @@ exports.deleteLactation = catchAsync(async (req, res, next) => {
 });
 
 exports.addMilkingResult = catchAsync(async (req, res, next) => {
+  req.body.user = req.user._id;
   const animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { milkingResults: req.body } });
 
   res.status(200).json({
@@ -169,6 +230,7 @@ exports.deleteMilkingResult = catchAsync(async (req, res, next) => {
 });
 
 exports.addWeightResult = catchAsync(async (req, res, next) => {
+  req.body.user = req.user._id;
   const animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { weightResults: req.body } });
 
   res.status(200).json({
@@ -212,6 +274,7 @@ exports.deleteWeightResult = catchAsync(async (req, res, next) => {
 });
 
 exports.addInsemination = catchAsync(async (req, res, next) => {
+  req.body.user = req.user._id;
   let animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { inseminations: req.body } });
 
   animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { inseminations: { $each: [], $sort: { date: 1 } } } });
@@ -266,8 +329,8 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
   let bulls = await Animal.find({ gender: 'male' });
 
   cows.forEach(async (cow) => {
-    let lastLact = cow.lactations[cow.lactations.length - 1];
-    let lastInsem = cow.inseminations[cow.inseminations.length - 1];
+    let lastLact = cow.lactations.at(-1);
+    let lastInsem = cow.inseminations.at(-1);
 
     /* Empty current info if nothing happens */
     cow.currentInfoAB.message = ``;
@@ -310,7 +373,7 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
     /* Calving info */
     if (lastInsem && lastInsem.success) {
       if (!lastLact || lastInsem.date > lastLact.startDate) {
-        if (Date.now() > lastInsem.date.getTime() + 223 * 24 * 60 * 60 * 1000) {
+        if (Date.now() < lastInsem.date.getTime() + 223 * 24 * 60 * 60 * 1000) {
           cow.currentInfoAB.message = `Отел через: ${Math.round(((lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`;
           cow.currentInfoAB.status = 'on-schedule';
         }
@@ -340,7 +403,7 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
 })
 
 exports.writeOffAnimal = catchAsync(async (req, res, next) => {
-  req.body.status = 'dead';
+  req.body.status = 'diseased';
 
   const animal = await Animal.findByIdAndUpdate(req.params.animalId, req.body);
 
@@ -359,7 +422,7 @@ exports.writeOffMultipleAnimals = catchAsync(async (req, res, next) => {
   const animalsObjects = req.body.animalsObjects;
 
   animalsObjects.forEach(async obj => {
-    obj.body.status = 'dead';
+    obj.body.status = 'diseased';
 
     let animal = await Animal.findByIdAndUpdate(obj.animalId, obj.body);
 
@@ -431,7 +494,7 @@ exports.getAnimalByCategory = catchAsync(async (req, res, next) => {
   if (req.params.category !== 'all') {
     animals = await Animal.find({ farm: req.user.farm, category: req.params.category });
   } else {
-    animals = await Animal.find({farm: req.user.farm, $or: [{ category: { $exists: false } }, { category: 'all' }, { catrgory: null }] })
+    animals = await Animal.find({ farm: req.user.farm, $or: [{ category: { $exists: false } }, { category: 'all' }, { catrgory: null }] })
   }
   res.status(200).json({
     status: 'success',
@@ -440,4 +503,53 @@ exports.getAnimalByCategory = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.addNote = catchAsync(async (req, res, next) => {
+  let animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { notes: req.body } });
+
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { notes: { $each: [], $sort: { date: 1 } } } });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      animal
+    }
+  });
+});
+
+exports.updateNote = catchAsync(async (req, res, next) => {
+  let animal = await Animal.findById(req.params.animalId);
+
+  animal.notes[req.params.index].text = req.body.text;
+  animal.notes[req.params.index].date = req.body.date;
+
+  animal.editedAtBy.push({
+    date: new Date(),
+    user: req.user._id
+  });
+
+  await animal.save();
+
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { notes: { $each: [], $sort: { date: 1 } } } });
+
+  res.status(203).json({
+    status: 'success',
+    data: {
+      animal
+    }
+  });
+});
+
+exports.deleteNote = catchAsync(async (req, res, next) => {
+  const note = await Animal.find({ _id: req.params.animalId }, { notes: { $elemMatch: { _id: req.params.id } } });
+  const animal = await Animal.findByIdAndUpdate({ _id: req.params.animalId }, { $pull: { notes: { _id: req.params.id } } })
+
+  res.status(203).json({
+    status: 'success',
+    data: {
+      animal
+    }
+  })
+});
+
 

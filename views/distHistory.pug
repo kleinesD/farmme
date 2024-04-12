@@ -1,0 +1,42 @@
+extends base
+
+block content
+  include _rcmVet
+  section.main-section 
+    .all-animals-container#vet-history-container
+      .loading-block-window
+        .loading-icon
+      .all-animals-search 
+        ion-icon(name="search-outline")
+        input#history-page-search(type="text" placeholder="Поиск по названию или номеру животного")
+      .history-page-categories-block
+        .hp-category.hp-category-action.hp-category-active#action 
+          p Действия
+        .hp-category.hp-category-problem.hp-category-active#problem
+          p Проблемы
+        .hp-category.hp-category-treatment.hp-category-active#treatment  
+          p Лечения
+      
+      .history-page-searched
+
+      .history-page-container
+        //-.history-page-month Январь, 2022
+
+        each doc in actions
+          .history-page-item-outter.history-page-action(data-date=`${doc.date}` data-doc-type=`action` data-doc-id=`${doc._id}`)
+            .history-page-item(data-date=`${doc.date}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              -if(doc.animal)
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${doc.animal._id}`)= `#${doc.animal.number}`
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-action/${doc._id}`)= doc.name
+              .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+      
+

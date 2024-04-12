@@ -31,6 +31,10 @@ const animalSchema = new mongoose.Schema({
   writeOffNote: String,
   writeOffMoneyReceived: Number,
   writeOffDate: Date,
+  client: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Client'
+  },
   healthStatus: {
     type: String,
     enum: ['healthy', 'sick'],
@@ -70,7 +74,11 @@ const animalSchema = new mongoose.Schema({
         default: Date.now()
       },
       date: Date,
-      result: Number
+      result: Number,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
     }
   ],
   lactations: [
@@ -81,7 +89,11 @@ const animalSchema = new mongoose.Schema({
       },
       number: Number,
       startDate: Date,
-      finishDate: Date
+      finishDate: Date,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
     }
   ],
   milkingResults: [
@@ -94,7 +106,11 @@ const animalSchema = new mongoose.Schema({
       result: Number,
       lactationNumber: Number,
       note: String,
-      subId: String
+      subId: String,
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
     }
   ],
   calvings: [
@@ -133,9 +149,20 @@ const animalSchema = new mongoose.Schema({
       bull: {
         type: mongoose.Schema.ObjectId,
         ref: 'Animal'
+      },
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
       }
     }
   ],
+  notes: [{
+    text: String,
+    date: {
+      type: Date,
+      default: Date.now()
+    }
+  }],
   currentInfoAB: {
     message: String,
     status: {

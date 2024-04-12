@@ -4,21 +4,19 @@ block content
   include _rcmHerd
   section.main-section 
     .all-animals-container#herd-history-container
+      .loading-block-window
+        .loading-icon
       .all-animals-search 
         ion-icon(name="search-outline")
-        input#history-page-search(type="text" placeholder="Поиск по названию")
+        input#history-page-search(type="text" placeholder="Поиск по названию или номеру животного")
       .history-page-categories-block
         .hp-category.hp-category-action.hp-category-active#milking-result 
-          ion-icon(name="medical")
           p Доение
         .hp-category.hp-category-problem.hp-category-active#weight-result
-          ion-icon(name="thermometer")
           p Взвешивание
         .hp-category.hp-category-treatment.hp-category-active#insemination 
-          ion-icon(name="bandage")
           p Осеменение
         .hp-category.hp-category-treatment.hp-category-active#lactation 
-          ion-icon(name="bandage")
           p Лактация
       
       .history-page-searched
@@ -29,11 +27,12 @@ block content
         each animal in animals 
 
           each doc in animal.milkingResults
-            .history-page-item-outter.history-page-milking-result(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`milking-results` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
-              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.indexOf(doc)}`)
-                .history-page-icon
-                  ion-icon(name="medical")
-                .history-page-title= `#${animal.number} | Результат доения: ${doc.result} л.`
+            .history-page-item-outter.history-page-milking-result(data-date=`${doc.date}` data-doc-type=`milking-results` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              .history-page-item
+                -if(doc.user && doc.user.firstName && doc.user._id)
+                  a.history-page-link(href="")= doc.user.firstName
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${animal._id}`)= `#${animal.number}`
+                a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.indexOf(doc)}`)= `Результат доения: ${doc.result} л.`
                 -if(!doc.addingDate)
                   .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
                 -else
@@ -46,11 +45,12 @@ block content
                   .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
 
           each doc in animal.weightResults
-            .history-page-item-outter.history-page-weight-result(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`weight` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
-              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-weight-result/${animal._id}/${animal.weightResults.indexOf(doc)}`)
-                .history-page-icon
-                  ion-icon(name="barbell")
-                .history-page-title= `#${animal.number} | Результат взвешивания: ${doc.result} кг.`
+            .history-page-item-outter.history-page-weight-result(data-date=`${doc.date}` data-doc-type=`weight` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              .history-page-item
+                -if(doc.user && doc.user.firstName && doc.user._id)
+                  a.history-page-link(href="")= doc.user.firstName
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${animal._id}`)= `#${animal.number}`
+                a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-weight-result/${animal._id}/${animal.weightResults.indexOf(doc)}`)= `Взвешивание: ${doc.result} кг.`
                 -if(!doc.addingDate)
                   .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
                 -else
@@ -63,14 +63,15 @@ block content
                   .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
 
           each doc in animal.inseminations
-            .history-page-item-outter.history-page-insemination(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.date}` data-doc-type=`insemination` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
-              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)
-                .history-page-icon
-                  ion-icon(name="add")
+            .history-page-item-outter.history-page-insemination(data-date=`${doc.date}` data-doc-type=`insemination` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              .history-page-item
+                -if(doc.user && doc.user.firstName && doc.user._id)
+                  a.history-page-link(href="")= doc.user.firstName
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${animal._id}`)= `#${animal.number}`
                 -if(doc.success !== undefined)
-                  .history-page-title= `#${animal.number} | Осеменение: ${doc.success === true ? 'успешно' : 'не успешно'}`
+                  a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: ${doc.success === true ? 'успешно' : 'не успешно'}`
                 -else
-                  .history-page-title= `#${animal.number} | Осеменение: не подтверждено`
+                  a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: не подтверждено`
                 -if(!doc.addingDate)
                   .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
                 -else
@@ -83,11 +84,12 @@ block content
                   .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
 
           each doc in animal.lactations
-            .history-page-item-outter.history-page-lactation(data-date=`${doc.addingDate !== undefined ? doc.addingDate : doc.startDate}` data-doc-type=`lactation` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
-              a.history-page-item(data-date=`${doc.date}` href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(doc)}`)
-                .history-page-icon
-                  ion-icon(name="glasses")
-                .history-page-title= `#${animal.number} | Лактация #${doc.number}`
+            .history-page-item-outter.history-page-lactation(data-date=`${doc.startDate}` data-doc-type=`lactation` data-animal-id=`${animal._id}` data-doc-id=`${doc._id}`)
+              .history-page-item
+                -if(doc.user && doc.user.firstName && doc.user._id)
+                  a.history-page-link(href="")= doc.user.firstName
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${animal._id}`)= `#${animal.number}`
+                a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(doc)}`)= `Лактация #${doc.number}`
                 -if(!doc.addingDate)
                   .history-page-date= `${doc.startDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.startDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.startDate.toLocaleString('ru-RU', {year: 'numeric'})}`
                 -else

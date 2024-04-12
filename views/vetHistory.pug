@@ -4,18 +4,17 @@ block content
   include _rcmVet
   section.main-section 
     .all-animals-container#vet-history-container
+      .loading-block-window
+        .loading-icon
       .all-animals-search 
         ion-icon(name="search-outline")
-        input#history-page-search(type="text" placeholder="Поиск по названию")
+        input#history-page-search(type="text" placeholder="Поиск по названию или номеру животного")
       .history-page-categories-block
         .hp-category.hp-category-action.hp-category-active#action 
-          ion-icon(name="medical")
           p Действия
         .hp-category.hp-category-problem.hp-category-active#problem
-          ion-icon(name="thermometer")
           p Проблемы
         .hp-category.hp-category-treatment.hp-category-active#treatment  
-          ion-icon(name="bandage")
           p Лечения
       
       .history-page-searched
@@ -25,10 +24,12 @@ block content
 
         each doc in actions
           .history-page-item-outter.history-page-action(data-date=`${doc.date}` data-doc-type=`action` data-doc-id=`${doc._id}`)
-            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-action/${doc._id}`)
-              .history-page-icon
-                ion-icon(name="medical")
-              .history-page-title= doc.name
+            .history-page-item(data-date=`${doc.date}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              -if(doc.animal)
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${doc.animal._id}`)= `#${doc.animal.number}`
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-action/${doc._id}`)= doc.name
               .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
               .history-page-delete  
                 ion-icon(name="close")
@@ -39,10 +40,12 @@ block content
 
         each doc in problems
           .history-page-item-outter.history-page-problem(data-date=`${doc.date}` data-doc-type=`problem` data-doc-id=`${doc._id}`)
-            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-problem/${doc._id}`)
-              .history-page-icon
-                ion-icon(name="thermometer")
-              .history-page-title= doc.name
+            .history-page-item(data-date=`${doc.date}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              -if(doc.animal)
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${doc.animal._id}`)= `#${doc.animal.number}`
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-problem/${doc._id}`)= doc.name
               .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
               .history-page-delete  
                 ion-icon(name="close")
@@ -53,10 +56,42 @@ block content
 
         each doc in treatments
           .history-page-item-outter.history-page-treatment(data-date=`${doc.date}` data-doc-type=`treatment` data-doc-id=`${doc._id}`)
-            a.history-page-item(data-date=`${doc.date}` href=`/vet/edit-treatment/${doc._id}`)
-              .history-page-icon
-                ion-icon(name="bandage")
-              .history-page-title= doc.name
+            .history-page-item(data-date=`${doc.date}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              -if(doc.disease.animal)
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${doc.disease.animal._id}`)= `#${doc.disease.animal.number}`
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-treatment/${doc._id}`)= doc.name
+              .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+        each doc in schemes
+          .history-page-item-outter.history-page-treatment(data-date=`${doc.creationDate}` data-doc-type=`scheme` data-doc-id=`${doc._id}`)
+            .history-page-item(data-date=`${doc.creationDate}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-scheme/${doc._id}`)= doc.name
+              .history-page-date= `${doc.creationDate.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.creationDate.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.creationDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+              .history-page-delete  
+                ion-icon(name="close")
+            .hp-delete-block
+                p Вы уверенны?
+                .hp-delete-block-btn.hp-delete-block-btn-keep Оставить
+                .hp-delete-block-btn.hp-delete-block-btn-delete Удалить
+
+        each doc in schemePoints
+          .history-page-item-outter.history-page-action(data-date=`${doc.date}` data-doc-type=`started-scheme` data-doc-id=`${doc._id}`)
+            .history-page-item(data-date=`${doc.date}` )
+              -if(doc.user && doc.user.firstName && doc.user._id)
+                a.history-page-link(href="")= doc.user.firstName
+              -if(doc.animal)
+                a.history-page-link.hpl-animal(href=`/herd/animal-card/${doc.animal._id}`)= `#${doc.animal.number}`
+              a.history-page-link.history-page-link-main.hpl-name(href=`/vet/edit-started-scheme/${doc._id}`)= `Начало схемы: ${doc.scheme.name}`
               .history-page-date= `${doc.date.toLocaleString('ru-RU', {day: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {month: '2-digit'})}.${doc.date.toLocaleString('ru-RU', {year: 'numeric'})}`
               .history-page-delete  
                 ion-icon(name="close")

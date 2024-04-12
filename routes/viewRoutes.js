@@ -163,6 +163,8 @@ router.get('/distribution/edit-write-off/:id', authController.protect, authContr
 
 router.get('/distribution/', authController.protect, authController.isLoggedIn, viewController.renderDistMain);
 
+router.get('/distribution/history', authController.protect, authController.isLoggedIn, viewController.renderDistHistory)
+
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////

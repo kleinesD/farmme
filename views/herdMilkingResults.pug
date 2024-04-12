@@ -67,7 +67,7 @@ block content
           .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
             .ai-input-label Лактация
             each lact in animal.lactations
-              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null || undefined ? new Date() : lact.finishDate}` data-finish-date-exist=`${lact.finishDate === null || undefined ? false : true}`)= `#${lact.number}`
+              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${!lact.finishDate ? new Date() : lact.finishDate}` data-finish-date-exist=`${!lact.finishDate ? false : true}`)= `#${lact.number}`
 
                    
           .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
@@ -93,7 +93,7 @@ block content
           .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#lactation-number
             .ai-input-label Лактация
             each lact in animal.lactations
-              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null || undefined ? new Date() : lact.finishDate}` data-finish-date-exist=`${lact.finishDate === null || undefined ? false : true}`)= `#${lact.number}`
+              .ai-pick.ai-pick-restricted(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${!lact.finishDate ? new Date() : lact.finishDate}` data-finish-date-exist=`${!lact.finishDate ? false : true}`)= `#${lact.number}`
 
           .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить
 

@@ -14,6 +14,9 @@ block content
           .ai-block-title Ветеринарную проблему
 
           -if(!forOne)
+            -if(selectedAnimals.length > 0)
+              each number in selectedAnimals
+                .ai-selected-animals-pre-set(data-number=`${number}`)
             .ai-selected-animals-block.ai-input-hidden#multiple-animals-container
               .ai-input-label Выбранные животные
               //-.ai-selected-animals-item #120231
@@ -25,7 +28,7 @@ block content
               input.ai-input.ai-input-select(type="text" placeholder="Номер или имя животного")
               .ai-select-block.ai-input-validation.shadow#multiple-animals
                 each animal in animals
-                  .ai-select-item(data-id=`${animal._id}`)
+                  .ai-select-item(data-id=`${animal._id}` data-number=`${animal.number}`)
                     p.ai-select-name= `#${animal.number}`
                     -if(animal.name)
                       p.ai-select-sub-name= animal.name

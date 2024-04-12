@@ -2,6 +2,23 @@ extends base
 
 block content
   include _rcmHerd
+  .acp-note-btn
+    ion-icon(name="attach-outline")
+  .acp-notes-block.shadow
+    .acp-add-note-header
+      input#note-text(type="text")
+      .acp-btn#add-note
+        ion-icon(name="add")
+    .acp-notes-container
+      -if(animal.notes.length === 0)
+        .acp-notes-empty Заметки отсутствуют
+      each note in animal.notes
+        .acp-note-item(data-id=`${note._id}`)
+          p.acp-note-text= note.text
+          p.acp-note-date(data-date=`${note.date}`)
+          .acp-note-delete-btn 
+            ion-icon(name="trash")
+
   section.main-section(data-animal-id=`${animal._id}` data-farm-id=`${animal.farm}`)
     .animal-card-section
       -if(animal.status !== 'alive')
@@ -104,6 +121,10 @@ block content
               .aih-actions-item-mark
               img(src="/img/images/weight-icon.png")
               .aih-actions-item-title Взвешивание
+            a.aih-actions-item(href=`/herd/add-animal/?mother=${animal._id}`) 
+              .aih-actions-item-mark
+              img(src="/img/images/cow-icon.png")
+              .aih-actions-item-title Отел
 
           -if(user.accessBlocks.includes('vet'))
             .aih-actions-column.vet-actions-column
@@ -128,6 +149,38 @@ block content
               img(src="/img/images/butcher-icon.png")
               .aih-actions-item-title Списать животное
 
+      .ac-lactations-info
+        .mp-block-outside-header
+          .mp-block-outside-header-title Лактации
+        -if(animal.lactations.length > 0 && !animal.lactations.at(-1).finishDate)
+          .current-animal-info-block(data-date=`${animal.lactations.at(-1).startDate}`)
+            .cai-item.cai-item-row
+              .current-lact-mark
+                .current-lact-mark-inner 
+              .current-lact-text Текущая лактация
+            .cai-item
+              .cai-item-title ##{animal.lactations.at(-1).number}
+              .cai-item-text Номер
+            .cai-item
+              .cai-item-title#cur-lact-date 14 июля 2023
+              .cai-item-text Начало
+            .cai-item
+              .cai-item-title#cur-lact-day 235
+              .cai-item-text День
+            .cai-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.indexOf(animal.lactations.at(-1))}`)
+              .cai-item-btn Окончить лактацию
+
+        -if(animal.lactations.length > 1)
+          .lact-comp-container
+            each lact in animal.lactations
+              .lact-comp-item(data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate ? lact.finishDate : undefined}`)
+                .lact-comp-number ##{lact.number}
+                .lact-comp-body
+                  .lact-text-line
+                    p.start 14 июля 2023
+                    p.day 100 дней
+                    p.finish 14 сентября 2023
+                  .lact-visual-line
 
 
       -if(animal.milkingResults.length > 0)
@@ -177,7 +230,7 @@ block content
                 .ac-rb-result-month 14.23.2023
 
 
-            
+
 
       .ac-bouble-block
         .ac-bouble-block-column

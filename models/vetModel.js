@@ -54,6 +54,10 @@ const vetSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  creationDate: {
+    type: Date,
+    default: Date.now()
+  },
   editedAtBy: [
     {
       date: Date,

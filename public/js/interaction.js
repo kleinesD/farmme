@@ -49,6 +49,7 @@ export const loadingBlock = (parent) => {
 
 export const removeloadingBlock = (parent) => {
   parent.find('.loading-block').remove();
+  parent.find('.loading-block-window').remove();
 }
 
 export const quickTitle = () => {

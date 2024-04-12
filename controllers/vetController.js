@@ -248,7 +248,15 @@ exports.useScheme = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteScheme = catchAsync(async (req, res, next) => {
+exports.deleteScheme = catchAsync(async(req, res, next) => {
+  const scheme = await Scheme.findByIdAndDelete(req.params.schemeId);
+
+  res.status(200).json({
+    status: 'success'
+  });
+});
+
+exports.deleteStartedScheme = catchAsync(async (req, res, next) => {
   let firstSchemeAction = await Vet.findByIdAndDelete(req.params.firstSchemeAction);
   let otherPoints = await Vet.deleteMany({ firstSchemeAction: req.params.firstSchemeAction });
 

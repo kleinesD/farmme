@@ -26,9 +26,15 @@ router.post('/schedule', authController.protect, vetController.createVetSchedule
 
 router.post('/create-scheme', authController.protect, vetController.createScheme);
 
+router.patch('/edit-scheme/:schemeId', authController.protect, vetController.editScheme);
+
+router.delete('/scheme/:schemeId', authController.protect, vetController.deleteScheme);
+
 router.post('/use-scheme/:animalId/', authController.protect, vetController.useScheme);
 
 router.patch('/edit-started-scheme/:firstSchemeAction', authController.protect, vetController.editStartedScheme);
+
+router.delete('/started-scheme/:firstSchemeAction', authController.protect, vetController.deleteStartedScheme)
 
 router.post('/edit-scheme/:schemeId', authController.protect, vetController.editScheme);
 

@@ -47,6 +47,18 @@ block content
           .ai-pick#slaughtered Забой
           .ai-pick#alive Живьем 
 
+        -if(clients.length > 0)
+          .ai-input-block.ai-input-block-select#client
+            .ai-select-line
+            .ai-input-label Клиент
+            input.ai-input.ai-input-select(type="text" placeholder="Имя или наименование клиента")
+            .ai-select-block.shadow#client
+              each client in clients
+                .ai-select-item(data-id=`${client._id}`)
+                  p.ai-select-name= client.name
+                  each product in client.products
+                    .asi-hidden(data-product=`${product.productName}` data-price=`${product.pricePer}`)
+
         //-.ai-input-block.ai-input-block-small-select
           .ai-input-label Сумма
           .ai-input-text-wraper

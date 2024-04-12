@@ -128,8 +128,6 @@ export const getMilkingProjection = async (animalId) => {
   farmAnimalsResSorted.sort((a, b) => a.lactation - b.lactation || a.monthIn - b.monthIn);
   allAnimalsResSorted.sort((a, b) => a.lactation - b.lactation || a.monthIn - b.monthIn);
 
-
-
   /* GETTING THE PERCENTAGE INCREASE OR DECREASE MONTH TO MONTH*/
   animalResSorted.forEach((res, inx, arr) => {
     if (arr[inx + 1] !== undefined && res.lactation === arr[inx + 1].lactation && res.monthIn + 1 === arr[inx + 1].monthIn) {
@@ -148,22 +146,33 @@ export const getMilkingProjection = async (animalId) => {
       arr[inx + 1].diffPercent = 100 * ((arr[inx + 1].average - res.average) / ((res.average + arr[inx + 1].average) / 2))
     }
   });
-  /* console.log(animalResSorted);
-  console.log(farmAnimalsResSorted);
-  console.log(allAnimalsResSorted); */
 
   /* PROJECTING THE DATA */
   let baseChangeDuringLactation = [0, 50, 33, -11, -12, -13, -14, -15, -16, -17, -18]
 
-  let lastActLact = data.animal.lactations[data.animal.lactations.length - 1].number;
+  let lastActLact = data.animal.lactations.at(-1).number;
   let firstProjLact = lastActLact + 1;
 
   let existingResults = animalResSorted.filter(el => el.lactation === lastActLact);
-  let resultsToAdd = existingResults[existingResults.length - 1].monthIn;
+  let resultsToAdd = existingResults.length > 0 ? existingResults.at(-1).monthIn : -1;
 
 
   baseChangeDuringLactation.forEach((change, inx, arr) => {
-    if (inx > resultsToAdd) {
+    if (resultsToAdd === -1 && inx === 0) {
+      let afterChange = [4.92, 4.03, -20.34, -10, -10];
+      let numberStart = 10;
+
+      if (animalResSorted.find(el => el.lactation === lastActLact - 1 && el.monthIn === 0) !== undefined) numberStart = animalResSorted.find(el => el.lactation === lastActLact - 1 && el.monthIn === 0).average;
+      let nextNumber = numberStart + (numberStart / 100 * afterChange[lastActLact - 2]);
+
+      animalResSorted.push({
+        lactation: lastActLact,
+        monthIn: inx,
+        date: new Date(data.animal.lactations.at(-1).startDate),
+        average: nextNumber,
+        type: 'projected'
+      });
+    } else if (inx > 0 && inx > resultsToAdd) {
       let total = 0, devider = 0
       let animalPercent = 0, farmPercent = 0, allPercent = 0;
 
@@ -258,7 +267,7 @@ export const getMilkingProjection = async (animalId) => {
     });
 
   }
-
+  console.log(animalResSorted)
   return animalResSorted;
 
 };

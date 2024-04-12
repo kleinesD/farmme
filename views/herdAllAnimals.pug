@@ -9,7 +9,7 @@ block content
         input#all-animals-search(type="text" placeholder="Найти животное")
       .all-animals-page-info
         .all-animals-counter= `Всего животных: ${animals.length}` 
-        .all-former-animals(data-state="show")
+        //-.all-former-animals(data-state="show")
           .af-checkbox
             ion-icon(name="checkmark")
           p Показывать прошлых животных
@@ -19,6 +19,7 @@ block content
         a.aa-filter-item(href="/herd/all-animals/?filter=cows" class=`${filter === 'cows' ? 'aa-filter-item-active' : ''}`) КОРОВЫ
         a.aa-filter-item(href="/herd/all-animals/?filter=heifers" class=`${filter === 'heifers' ? 'aa-filter-item-active' : ''}`) НЕТЕЛИ
         a.aa-filter-item(href="/herd/all-animals/?filter=calves" class=`${filter === 'calves' ? 'aa-filter-item-active' : ''}`) ТЕЛЯТА
+        a.aa-filter-item(href="/herd/all-animals/?filter=diseased" class=`${filter === 'diseased' ? 'aa-filter-item-active' : ''}`) СПИСАННЫЕ
       
       .al-selected-animal-line
         .al-sl-text Выберите действие
@@ -26,6 +27,10 @@ block content
           p Выберите действие
           .al-sl-action-list
             .al-sl-action-item(data-link=`/herd/write-off-animal/multiple?animals=`) Списать животных
+            .al-sl-action-item(data-link=`/vet/add-action/multiple?animals=`) Вет. действие
+            .al-sl-action-item(data-link=`/vet/add-problem/multiple?animals=`) Вет. проблема
+            -if(filter === 'cows' || filter === 'heifers')
+              .al-sl-action-item(data-link=`/vet/start-scheme/multiple?animals=`) Начать схему
         .al-sl-btn 
           ion-icon(name="arrow-forward")
       .animal-list-header
@@ -66,8 +71,9 @@ block content
                   -if(animal.lactations.length > 0 && !animal.lactations.at(-1).finishDate)
                     a.rc-menu-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.length - 1}`)
                       p Окончить лактацию
-                  a.rc-menu-item(href=`/herd/add-milking-result/${animal._id}`)
-                    p Добавить результат доения
+                  -if(animal.lactations.length > 0)
+                    a.rc-menu-item(href=`/herd/add-milking-result/${animal._id}`)
+                      p Добавить результат доения
                   a.rc-menu-item(href=`/herd/add-lactation/${animal._id}`)
                     p Добавить лактацию
                   a.rc-menu-item(href=`/herd/add-insemination/${animal._id}`)
@@ -96,9 +102,9 @@ block content
               .al-item.al-item-name= animal.name
               .al-add-action-btn
                 ion-icon(name="ellipsis-horizontal")
-              .rc-menu.animal-actions-block
-                a.rc-menu-item(href="/")
-                  p Добавить результат доения
+              .animal-actions-block.rc-menu
+                a.rc-menu-item(href=`/herd/animal-card/${animal._id}`)
+                  p Карта животного
           
 
 

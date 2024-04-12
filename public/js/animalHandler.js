@@ -42,7 +42,11 @@ export const addAnimalResults = async (type, animalId, data) => {
     });
 
     if (response.data.status === 'success') {
-      return true
+      if(type !== 'note') {
+        return true
+      } else {
+        return response.data.data.animal;
+      }
     }
   } catch (err) {
     console.log(err);

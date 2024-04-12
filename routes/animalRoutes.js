@@ -51,4 +51,10 @@ router.get('/check-by-field/:field/:value', authController.protect, animalContro
 
 router.get('/category/:category', authController.protect, animalController.getAnimalByCategory);
 
+router.post('/note/:animalId', authController.protect, animalController.addNote);
+
+router.patch('/note/:animalId/:index', authController.protect, animalController.updateNote);
+
+router.delete('/note/:animalId/:id', authController.protect, animalController.deleteNote);
+
 module.exports = router;

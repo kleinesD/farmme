@@ -2,7 +2,7 @@ extends base
 
 block content
   include _rcmHerd
-  section.main-section 
+  section.main-section(data-mother=`${motherId}`)
     .add-animal-container#add-animal-container
       .ai-decide-block
         .ai-decide-block-item#birth
@@ -55,12 +55,46 @@ block content
           .ai-select-line
           .ai-input-label Мать
           input.ai-input.ai-input-select#mother(type="text" placeholder="Номер или имя коровы")
-          .ai-select-block.shadow
+          .ai-select-block.shadow#mother-select
             each animal in potMother
-              .ai-select-item(data-id=`${animal._id}`)
+              .ai-select-item(data-id=`${animal._id}` class=`${animal._id.toString() === motherId ? 'ai-select-item-selected' : ''}`)
                 p.ai-select-name= `#${animal.number}`
                 -if(animal.name)
                   p.ai-select-sub-name= animal.name
+
+        .ai-add-input-container.ai-input-hidden
+          .ai-add-input#add-lactation
+            p
+              | Добавить лактацию
+              span +
+
+        .ai-combined-block.ai-combined-block-1.ai-input-hidden
+          .ai-combined-block-title ЛАКТАЦИЯ
+          
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Начало
+            input.ai-input.ai-input-date.ai-input-validation#start-date(type="date")
+            //-.ai-input-marker.ai-input-marker-r
+              ion-icon(name="alert")
+            //-.ai-input-explain-block.ai-input-explain-block-required
+              .ai-input-eb-tri
+              .ai-input-eb-text Обязательно
+
+          .ai-input-block.ai-input-block-text
+            .ai-input-label Окончание
+            input.ai-input.ai-input.ai-input-date.ai-input-validation#finish-date(type="date")
+
+          .ai-input-block.ai-input-block-pick.ai-input-block-pick-one.ai-input-validation#lactation-number
+            .ai-input-label Номер лактации
+            .ai-pick 1
+            .ai-pick 2
+            .ai-pick 3
+            .ai-pick 4
+            .ai-pick 5
+            .ai-pick 6
+            .ai-pick 7
+            .ai-pick 8
+            .ai-pick 9
 
         .ai-input-block.ai-input-block-select.birth-input.id-select
           .ai-select-line
@@ -101,7 +135,7 @@ block content
           .ai-input-label Пол
           .ai-pick#male Мужской
           .ai-pick#female Женский
-          
+
           .ai-input-marker.ai-input-marker-r
             ion-icon(name="alert")
           .ai-input-explain-block.ai-input-explain-block-required

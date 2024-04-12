@@ -26,14 +26,13 @@ server.listen(port, () => { console.log(`Server running on port: ${port}`) });
 
 if(isDev) console.log(`Mode: ${process.env.NODE_ENV}`);
 
-
 animalController.updateCurrentInfo();
 feedController.autoAction();
 vetController.autoFinishScheme();
 notificationController.notificationCreator();
 setInterval(() => {
   animalController.updateCurrentInfo()
-}, 1 * 60 * 60 * 1000)
+}, 1 * 60 * 1000)
 setInterval(() => {
   feedController.autoAction();
 }, 24 * 60 * 60 * 1000)

@@ -268,12 +268,15 @@ exports.renderHerdMain = catchAsync(async (req, res, next) => {
 });
 
 exports.renderHerdAddAnimal = catchAsync(async (req, res, next) => {
-  const potMother = await Animal.find({ gender: 'female' });
+  const potMother = await Animal.find({ farm: req.user.farm, gender: 'female' });
   const potFather = await Animal.find({ farm: req.user.farm, gender: 'male' });
+
+  const motherId = req.query.mother ? req.query.mother : undefined;
 
   res.status(200).render('herdAddAnimal', {
     potMother,
-    potFather
+    potFather,
+    motherId
   });
 });
 
@@ -343,15 +346,17 @@ exports.renderAddInsemination = catchAsync(async (req, res, next) => {
 exports.renderAllAnimals = catchAsync(async (req, res, next) => {
   let animals = [];
   if (req.query.filter === 'all') {
-    animals = await Animal.find({ farm: req.user.farm });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', });
   } else if (req.query.filter === 'bulls') {
-    animals = await Animal.find({ farm: req.user.farm, gender: 'male' });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', gender: 'male' });
   } else if (req.query.filter === 'cows') {
-    animals = await Animal.find({ farm: req.user.farm, gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, 'lactations.0': { $exists: true } });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, 'lactations.0': { $exists: true } });
   } else if (req.query.filter === 'heifers') {
-    animals = await Animal.find({ farm: req.user.farm, gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, lactations: { $size: 0 } });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', gender: 'female', birthDate: { $lte: new Date(moment().subtract(18, 'month')) }, lactations: { $size: 0 } });
   } else if (req.query.filter === 'calves') {
-    animals = await Animal.find({ farm: req.user.farm, birthDate: { $gte: new Date(moment().subtract(1, 'year')) } });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', birthDate: { $gte: new Date(moment().subtract(1, 'year')) } });
+  } else if (req.query.filter === 'diseased') {
+    animals = await Animal.find({ farm: req.user.farm, status: { $ne: 'alive' }, });
   }
 
 
@@ -498,11 +503,14 @@ exports.renderWriteOffAnimal = catchAsync(async (req, res, next) => {
     selectedAnimals = req.query.animals.split(',');
   }
 
+  const clients = await Client.find({ farm: req.user.farm });
+
   res.status(200).render('herdWriteOffAnimal', {
     forOne,
     animal,
     animals,
-    selectedAnimals
+    selectedAnimals,
+    clients
   });
 });
 
@@ -536,12 +544,8 @@ exports.renderAddVetAction = catchAsync(async (req, res, next) => {
 
   let selectedAnimals = [];
   if (req.query.animals) {
-    req.query.animals.split(',').forEach(async number => {
-      let anim = await Animal.findOne({ farm: req.user.farm, number: number })
-      selectedAnimals.push(anim);
-    });
+    selectedAnimals = req.query.animals.split(',');
   }
-
 
   res.status(200).render('vetAction', {
     forOne,
@@ -575,11 +579,16 @@ exports.renderAddVetProblem = catchAsync(async (req, res, next) => {
     forOne = false;
   }
 
+  let selectedAnimals = [];
+  if (req.query.animals) {
+    selectedAnimals = req.query.animals.split(',');
+  }
   res.status(200).render('vetProblem', {
     forOne,
     animal,
     animals,
-    forEdit
+    forEdit,
+    selectedAnimals
   });
 });
 
@@ -640,13 +649,28 @@ exports.renderEditScheme = catchAsync(async (req, res, next) => {
 
 exports.renderStartVetScheme = catchAsync(async (req, res, next) => {
   const forEdit = false;
-  const animal = await Animal.findById(req.params.animalId);
   const schemes = await Scheme.find({ farm: req.user.farm });
 
+  let animal, animals, forOne;
+  if (req.params.animalId !== 'multiple') {
+    animal = await Animal.findById(req.params.animalId);
+    forOne = true;
+  } else {
+    animals = await Animal.find({ farm: req.user.farm, gender: 'female' });
+    forOne = false;
+  }
+
+  let selectedAnimals = [];
+  if (req.query.animals) {
+    selectedAnimals = req.query.animals.split(',');
+  }
   res.status(200).render('vetStartScheme', {
-    animal,
     schemes,
-    forEdit
+    forEdit,
+    animal,
+    animals,
+    forOne,
+    selectedAnimals
   });
 });
 
@@ -776,15 +800,18 @@ exports.renderVetMain = catchAsync(async (req, res, next) => {
 });
 
 exports.renderVetHistory = catchAsync(async (req, res, next) => {
-  let actions = await Vet.find({ farm: req.user.farm, category: 'action', scheduled: false });
-  let problems = await Vet.find({ farm: req.user.farm, category: 'problem', scheduled: false });
-  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment', scheduled: false });
-
+  let actions = await Vet.find({ farm: req.user.farm, category: 'action', scheduled: false }).populate('animal').populate('user');
+  let problems = await Vet.find({ farm: req.user.farm, category: 'problem', scheduled: false }).populate('animal').populate('user');
+  let treatments = await Vet.find({ farm: req.user.farm, category: 'treatment', scheduled: false }).populate('user').populate({ path: 'disease', populate: { path: 'animal' } });
+  let schemes = await Scheme.find({ farm: req.user.farm }).populate('user');
+  let schemePoints = await Vet.find({ farm: req.user.farm, category: 'scheme', schemeStarter: true }).populate('animal').populate('user').populate('scheme');
 
   res.status(200).render('vetHistory', {
     actions,
     problems,
-    treatments
+    treatments,
+    schemes,
+    schemePoints
   });
 });
 /////////////////
@@ -1211,6 +1238,14 @@ exports.renderDistMain = catchAsync(async (req, res, next) => {
     recOrders,
     startDate,
     endDate
+  });
+});
+
+exports.renderDistHistory = catchAsync(async (req, res, next) => {
+  const products = await Product.find({ farm: req.user.farm });
+
+  res.status(200).render('distHistory', {
+    products
   });
 });
 /////////////////

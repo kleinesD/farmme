@@ -21,7 +21,7 @@ const createWindow = () => {
   let displays = screen.getAllDisplays()
 
   /* Showing an app on external screen if there is one and if in development mode */
-  if (process.env.NODE_ENV === 'development' && displays.length > 1) {
+  /* if (process.env.NODE_ENV === 'development' && displays.length > 1) {
     contentWindow = new BrowserWindow({
       minWidth: 1200, minHeight: 600,
       x: displays[1].bounds.x, y: displays[1].bounds.y,
@@ -43,8 +43,18 @@ const createWindow = () => {
       autoHideMenuBar: true,
       backgroundColor: '#f7f0dd',
       show: false
-    });
-  }
+    }); 
+  }*/
+  contentWindow = new BrowserWindow({
+    minWidth: 1200, minHeight: 600,
+    webPreferences: {
+      contextIsolation: false,
+      nodeIntegration: true
+    },
+    autoHideMenuBar: true,
+    backgroundColor: '#f7f0dd',
+    show: false
+  });
 
 
 
@@ -53,7 +63,6 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/all-products');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/?start=2023-03-06T18:10:26.040Z');
   contentWindow.loadURL('http://127.0.0.1:604/herd/');
   contentWindow.loadURL('http://127.0.0.1:604/feed/sample/edit/652fd3a080804169f6efea4b');
@@ -61,15 +70,17 @@ const createWindow = () => {
   contentWindow.loadURL('http://127.0.0.1:604/feed/sample/');
   contentWindow.loadURL('http://127.0.0.1:604/feed/record/');
   contentWindow.loadURL('http://127.0.0.1:604/feed/');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/edit-started-scheme/64ac40eb9effaba47b01d5d6');
   contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/65b0b43a94091d06bb6912a7');
   contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
   contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
   contentWindow.loadURL('http://127.0.0.1:604/vet');
   contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple?animals=31207,31432,31365');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/edit-lactation/62a5ab01ed2710258c3ea856/0');
   contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
-  contentWindow.loadURL('http://127.0.0.1:604/herd');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/start-scheme/multiple?animals=5026');
+  contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme');
+  contentWindow.loadURL('http://127.0.0.1:604/vet/history');
   contentWindow.loadURL('http://127.0.0.1:604/');
   
 

@@ -3156,7 +3156,7 @@
 
 .al-animal-former {
     opacity: 0.65;
-    display: none;
+    /* display: none; */
 }
 
 .al-former-icon {
@@ -3501,6 +3501,25 @@
         font-size: 175%;
     }
 }
+.acp-note-btn {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+
+    ion-icon {
+        font-size: 150%;
+        color: #fff;
+    }
+}
 .aih-details-row {
     display: flex;
     align-items: center;
@@ -3558,7 +3577,7 @@
     bottom: -20px;
     left: 0;
     transform: translateY(100%);
-    z-index: 200;
+    z-index: 1001;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     display: none;
@@ -3574,7 +3593,7 @@
     margin-bottom: 40px;
 }
 .aih-actions-item {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 15px;
     padding: 15px;
@@ -3725,6 +3744,281 @@
     &:hover {
         opacity: 0.9;
     }
+}
+
+.ac-lactations-info {
+    width: 100%;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    position: relative;
+}
+.current-animal-info-block {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: #d9d9d9;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.cai-item {
+    padding: 20px 0;
+    flex-grow: 1;
+    border-right: 2px solid #d9d9d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    height: 100%;
+    text-decoration: none;
+
+    &:last-of-type {
+        border-right: unset;
+    }
+
+    &:hover {
+        .cai-item-btn {
+            opacity: 0.5;
+        }
+    }
+}
+.cai-item-row {
+    flex-direction: row;
+}
+.current-lact-mark {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #0ead687f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.current-lact-mark-inner {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #0EAD69;
+    animation: expand 2s infinite;
+}
+@keyframes expand {
+    0% {
+        width: 7px;
+        height: 7px;
+        opacity: 1;
+    }
+    100% {
+        width: 15px;
+        height: 15px;
+        opacity: 0;
+    }
+}
+.current-lact-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: $success;
+}
+.cai-item-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+.cai-item-title-green {
+    color: $green;
+}
+.cai-item-title-yellow {
+    
+    color: $yellow;
+}
+.cai-item-title-red {
+    color: $red;
+
+}
+.cai-item-text {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.5;
+}
+.cai-item-btn {
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.lact-comp-container {
+    width: calc(100% - 100px);
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+.lact-comp-item {
+    display: flex;
+    align-items: flex-end;
+    gap: 40px;
+    width: 50%;
+}
+.lact-comp-number {
+    font-size: 32px;
+    font-weight: 600;
+}
+.lact-comp-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.lact-text-line {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    p {
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .finish {
+        min-width: 110px;
+    }
+}
+.lact-visual-line {
+    width: 100%;
+    border-radius: 50px;
+    background-color: $herd;
+    height: 10px;
+}
+.lact-visual-line-yellow {
+    
+    background-color: $yellow;
+}
+.lact-visual-line-red {
+    background-color: $red;
+
+}
+
+/* ANIMAL NOTES BLOCK */
+.acp-notes-block {
+    width: calc(400px - 0px);
+    max-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    position: fixed;
+    top: 90px;
+    right: 90px;
+    z-index: 10000;
+    display: none;
+}
+.acp-add-note-header {
+    width: calc(100% - 20px);
+    padding: 10px;
+    background-color: #d9d9d9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    input{
+        flex-grow: 1;
+        outline: none;
+        border: none;
+        background-color: #fff;
+        border-radius: 50px;;
+        padding: 10px 15px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+}
+.acp-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $herd;
+    border-radius: 50%;
+    cursor: pointer;
+
+    filter: grayscale(1);
+    pointer-events: none;
+
+    ion-icon{
+        font-size: 125%;
+    }
+}
+.acp-notes-container {
+    padding: 20px;
+    width: calc(100% - 40px);
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 20px;
+
+    overflow: hidden;
+    &:hover {
+        overflow: auto;
+    }
+}
+.acp-note-item {
+    width: calc(100% - 0px);
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-shrink: 0;
+    position: relative;
+
+    p {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    &:hover {
+        .acp-note-delete-btn {
+            display: flex;
+        }
+    }
+}
+.acp-note-text {
+    flex-grow: 1;
+}
+.acp-note-date {
+    opacity: 0.5;
+}
+.acp-note-delete-btn {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #f0f0f04a, #f0f0f0, #f0f0f0, #f0f0f0);
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: none;
+    cursor: pointer;
+
+    ion-icon {
+        font-size: 150%;
+        color: $error;
+    }
+
+    &:hover {
+        ion-icon {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.acp-notes-empty {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.5;
 }
 
 /* ANIMAL CARD GRAPHS */
@@ -6034,4 +6328,7 @@
         width: 100%;
         height: 100%;
     }
+}
+#client {
+    display: none;
 }

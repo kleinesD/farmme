@@ -28,6 +28,14 @@ const schemeSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  creationDate: {
+    type: Date,
+    default: Date.now()
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User'
+  },
   editedAtBy: [
     {
       date: Date,
