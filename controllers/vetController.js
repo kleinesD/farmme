@@ -377,4 +377,29 @@ exports.autoFinishScheme = catchAsync(async(req, res, next) => {
   });
 }); 
 
+exports.addVetRecord = catchAsync(async(req, res, next) => {
+  req.body.user = req.user._id;
+  req.body.farm = req.user.farm;
+
+  const record = await Vet.create(req.body);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      record
+    }
+  })
+});
+
+exports.editVetRecord = catchAsync(async(req, res, next) => {
+  const record = await Vet.findByIdAndUpdate(req.params.id, req.body);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      record
+    }
+  })
+});
+
 

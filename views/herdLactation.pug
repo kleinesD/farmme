@@ -6,29 +6,28 @@ block content
     include _animalHeader
     .animal-results-window
 
-
-      //-.animal-results-history
-        .ar-block-title.ar-block-title-chart Дополнительная информация
-
-        .invis-animals-data-container
-          each anim in animals
-            each lact in anim.lactations 
-              .invis-animals-data(data-number=`${lact.number}`, data-start=`${lact.startDate}` data-finish=`${lact.finishDate}`)
-
-        .ar-bonus-info-line 
-          .ar-bi-big 293
-          .ar-bi-small дней - средняя длинна лактации на вашей ферме.
-
-        .ar-tip-container 
-          .ar-tip-icon 
-            ion-icon(name="bulb")
-          .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
-
-
       -if(!forEdit)
         .ai-form-container.ai-form-container-headerful#add-lactation-container
+          -if(animal.lactations.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.lactations.reverse()
+                  a.ar-h-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.length - animal.lactations.indexOf(result) - 1}`)
+                    p= `#${result.number}`
+                    p.date-format(data-date=`${result.startDate}`) 
           .ai-block-sub-title ДОБАВИТЬ
           .ai-block-title Лактацию
+
+          -if(unfinishedLactation)
+            .ai-detail-info-block(data-number=`${unfinishedLactation.number}` rc-title="Окончить лактацию" rc-link=`/herd/edit-lactation/${animal._id}/${unfinishedLactation.index}`)
+              .ai-input-label Неоконченная лактация
+              .ai-di-indicator 
+                .ai-di-indicator-inner.ai-di-indicator-inner-1
+                .ai-di-indicator-inner.ai-di-indicator-inner-2
+                .ai-di-indicator-inner.ai-di-indicator-inner-3
+              .ai-di-text= `Лактация #${unfinishedLactation.number}`
+              .ai-di-date(data-date=`${unfinishedLactation.startDate}`)
 
           .ai-input-block.ai-input-block-text
             .ai-input-label Начало
@@ -62,6 +61,14 @@ block content
 
       -if(forEdit)
         .ai-form-container.ai-form-container-headerful#edit-lactation-container
+          -if(animal.lactations.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.lactations.reverse()
+                  a.ar-h-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.length - animal.lactations.indexOf(result) - 1}`)
+                    p= `#${result.number}`
+                    p.date-format(data-date=`${result.startDate}`) 
           .ai-block-sub-title РЕДАКТИРОВАТЬ
           .ai-block-title Лактацию
           

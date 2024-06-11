@@ -68,8 +68,12 @@ block content
                 -if(doc.user && doc.user.firstName && doc.user._id)
                   a.history-page-link(href="")= doc.user.firstName
                 a.history-page-link.hpl-animal(href=`/herd/animal-card/${animal._id}`)= `#${animal.number}`
-                -if(doc.success !== undefined)
-                  a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: ${doc.success === true ? 'успешно' : 'не успешно'}`
+                -if(doc.success !== 'undefined')
+                  -if(doc.success === 'true')
+                    a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: успешно`
+                  -if(doc.success === 'false')
+                    a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: не успешно`
+                  
                 -else
                   a.history-page-link.history-page-link-main.hpl-name(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.indexOf(doc)}`)= `Осеменение: не подтверждено`
                 -if(!doc.addingDate)

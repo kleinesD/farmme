@@ -188,6 +188,8 @@ exports.addMilkingResult = catchAsync(async (req, res, next) => {
   req.body.user = req.user._id;
   const animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { milkingResults: req.body } });
 
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: { $each: [], $sort: { date: 1 } } } });
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -209,6 +211,8 @@ exports.updateMilkingResult = catchAsync(async (req, res, next) => {
   });
 
   await animal.save();
+
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: { $each: [], $sort: { date: 1 } } } });
 
   res.status(200).json({
     status: 'success',
@@ -233,6 +237,8 @@ exports.addWeightResult = catchAsync(async (req, res, next) => {
   req.body.user = req.user._id;
   const animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { weightResults: req.body } });
 
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: { $each: [], $sort: { date: 1 } } } });
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -253,6 +259,8 @@ exports.updateWeightResult = catchAsync(async (req, res, next) => {
   });
 
   await animal.save();
+
+  animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { lactations: { $each: [], $sort: { date: 1 } } } });
 
   res.status(200).json({
     status: 'success',
@@ -294,12 +302,12 @@ exports.updateInsemination = catchAsync(async (req, res, next) => {
   if (req.body.success) animal.inseminations[req.params.index].success = req.body.success;
   if (req.body.type) animal.inseminations[req.params.index].type = req.body.type;
   if (req.body.bull) animal.inseminations[req.params.index].bull = req.body.bull;
-
+  
   animal.editedAtBy.push({
     date: new Date(),
     user: req.user._id
   });
-
+  
   await animal.save();
 
   animal = await Animal.findOneAndUpdate({ _id: req.params.animalId }, { $push: { inseminations: { $each: [], $sort: { date: 1 } } } });
@@ -344,7 +352,7 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
 
     /* Insemination info */
     if (lastLact) {
-      if (lastLact && !lastInsem || lastInsem.date > lastLact.startDate && !lastInsem.success || lastInsem.date < lastLact.startDate) {
+      if (lastLact && !lastInsem || lastInsem.date > lastLact.startDate && lastInsem.success !== 'true' || lastInsem.date < lastLact.startDate) {
         if (Date.now() < lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000 && Date.now() >= lastLact.startDate.getTime() + 30 * 24 * 60 * 60 * 1000) {
           cow.currentInfoAB.message = `Пора осеменять через: ${Math.round(((lastLact.startDate.getTime() + 60 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`;
           cow.currentInfoAB.status = 'on-schedule';
@@ -355,7 +363,7 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
       }
     }
 
-    if (!lastLact && !lastInsem || !lastLact && !lastInsem.success) {
+    if (!lastLact && !lastInsem || !lastLact && lastInsem.success !== 'false') {
       if (Date.now() < cow.birthDate.getTime() + 15 * 30 * 24 * 60 * 60 * 1000 && Date.now() >= cow.birthDate.getTime() + 14 * 30 * 24 * 60 * 60 * 1000) {
         cow.currentInfoAB.message = `Пора осеменять`;
         cow.currentInfoAB.status = 'on-schedule';
@@ -365,13 +373,13 @@ exports.updateCurrentInfo = catchAsync(async (req, res, next) => {
       }
     }
 
-    if (lastInsem && lastInsem.success === undefined) {
+    if (lastInsem && lastInsem.success === 'undefined') {
       cow.currentInfoAB.message = `Не подтвержденное осеменение: ${Math.round((Date.now() - lastInsem.date.getTime()) / 1000 / 60 / 60 / 24)} дн. назад`;
       cow.currentInfoAB.status = 'regular';
     }
 
     /* Calving info */
-    if (lastInsem && lastInsem.success) {
+    if (lastInsem && lastInsem.success === 'true') {
       if (!lastLact || lastInsem.date > lastLact.startDate) {
         if (Date.now() < lastInsem.date.getTime() + 223 * 24 * 60 * 60 * 1000) {
           cow.currentInfoAB.message = `Отел через: ${Math.round(((lastInsem.date.getTime() + 283 * 24 * 60 * 60 * 1000) - Date.now()) / 1000 / 60 / 60 / 24)} дн.`;
@@ -550,6 +558,76 @@ exports.deleteNote = catchAsync(async (req, res, next) => {
       animal
     }
   })
+});
+
+exports.animalTracker = catchAsync(async (req, res, next) => {
+  const animals = await Animal.find().populate('farm');
+
+  animals.forEach(async animal => {
+
+    /* Write of cuz of age */
+    /* Write of cuz of weight */
+    animal.weightResults.sort((a, b) => b.date - a.date);
+    if (animal.gender === 'male') {
+
+      if (animal.weightResults.length > 0) {
+        if (animal.weightResults[0].result >= animal.farm.butcherWeight.male) {
+          animal.butcherSuggestion = true;
+          animal.butcherSuggestionReason = 'weight';
+          await animal.save();
+        } else if (animal.weightResults[0].result < animal.farm.butcherWeight.male && animal.butcherSuggestionReason !== 'age') {
+          animal.butcherSuggestion = false;
+          animal.butcherSuggestionReason = undefined;
+          await animal.save();
+        }
+      }
+      if (new Date() > new Date(moment(animal.birthDate).add(animal.farm.butcherAge.male, 'month'))) {
+        animal.butcherSuggestion = true;
+        animal.butcherSuggestionReason = 'age';
+        await animal.save();
+      }
+
+    }
+    if (animal.gender === 'female') {
+
+      if (animal.weightResults.length > 0) {
+        if (animal.weightResults[0].result >= animal.farm.butcherWeight.female) {
+          animal.butcherSuggestion = true;
+          animal.butcherSuggestionReason = 'weight';
+          await animal.save();
+        } else if (animal.weightResults[0].result < animal.farm.butcherWeight.female && animal.butcherSuggestionReason !== 'age') {
+          animal.butcherSuggestion = false;
+          animal.butcherSuggestionReason = undefined;
+          await animal.save();
+        }
+      }
+      if (new Date() > new Date(moment(animal.birthDate).add(animal.farm.butcherAge.female, 'month'))) {
+        animal.butcherSuggestion = true;
+        animal.butcherSuggestionReason = 'age';
+        await animal.save();
+      }
+
+
+    }
+    /* Write of cuz of hard to inseminate */
+    animal.lactations.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    let insemTotal = 0;
+    let insemSuccess = 0;
+    animal.inseminations.forEach(insem => {
+      insemTotal++;
+      if (insem.success) insemSuccess++;
+    });
+
+    if (insemSuccess / insemTotal < 0.20 && animal.lactations.at(-1).finishDate) {
+      animal.butcherSuggestion = true;
+      animal.butcherSuggestionReason = 'insemination';
+      await animal.save();
+    }
+
+
+    /* Write of cuz of constantly sick */
+    
+  });
 });
 
 

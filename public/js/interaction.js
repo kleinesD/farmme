@@ -54,7 +54,7 @@ export const removeloadingBlock = (parent) => {
 
 export const quickTitle = () => {
   $('body').on('mouseenter', '*', function () {
-    if ($(this).attr('qt') === undefined) return;
+    if ($(this).attr('qt') === undefined || $(this).attr('qt') === '') return;
 
     if($(this).css('position') === 'static') $(this).css('position', 'relative');
     
@@ -66,8 +66,38 @@ export const quickTitle = () => {
   $('body').on('mouseleave', '*', function () {
     $(this).find('.quick-title').remove();
   });
+};
 
+export const quickTitleLeft = () => {
+  $('body').on('mouseenter', '*', function () {
+    if ($(this).attr('qtl') === undefined || $(this).attr('qtl') === '') return;
 
+    if($(this).css('position') === 'static') $(this).css('position', 'relative');
+    
+    $(this).append(`
+      <div class="quick-title-left">${$(this).attr('qtl')}</div>
+    `);
+  });
+
+  $('body').on('mouseleave', '*', function () {
+    $(this).find('.quick-title-left').remove();
+  });
+};
+
+export const quickTitleRight = () => {
+  $('body').on('mouseenter', '*', function () {
+    if ($(this).attr('qtr') === undefined || $(this).attr('qtr') === '') return;
+
+    if($(this).css('position') === 'static') $(this).css('position', 'relative');
+    
+    $(this).append(`
+      <div class="quick-title-right">${$(this).attr('qtr')}</div>
+    `);
+  });
+
+  $('body').on('mouseleave', '*', function () {
+    $(this).find('.quick-title-right').remove();
+  });
 };
 
 export const getIcons = async () => {

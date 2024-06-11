@@ -4,6 +4,8 @@ block content
   include _rcmHerd
   section.main-section 
     .all-animals-container
+      .main-page-header
+        .main-page-header-title.main-page-header-title-center ЖИВОТНЫЕ СПИСОК
       .all-animals-search 
         ion-icon(name="search-outline")
         input#all-animals-search(type="text" placeholder="Найти животное")
@@ -20,6 +22,7 @@ block content
         a.aa-filter-item(href="/herd/all-animals/?filter=heifers" class=`${filter === 'heifers' ? 'aa-filter-item-active' : ''}`) НЕТЕЛИ
         a.aa-filter-item(href="/herd/all-animals/?filter=calves" class=`${filter === 'calves' ? 'aa-filter-item-active' : ''}`) ТЕЛЯТА
         a.aa-filter-item(href="/herd/all-animals/?filter=diseased" class=`${filter === 'diseased' ? 'aa-filter-item-active' : ''}`) СПИСАННЫЕ
+        a.aa-filter-item(href="/herd/all-animals/?filter=slaughter" class=`${filter === 'slaughter' ? 'aa-filter-item-active' : ''}`) ЗАБОЙ
       
       .al-selected-animal-line
         .al-sl-text Выберите действие
@@ -33,12 +36,39 @@ block content
               .al-sl-action-item(data-link=`/vet/start-scheme/multiple?animals=`) Начать схему
         .al-sl-btn 
           ion-icon(name="arrow-forward")
+      -if(filter === 'slaughter')
+        .al-suggestion-block
+          .al-sb-line
+            .al-sb-line-text 
+              | Причины для списания 
+              span.al-sb-line-text-female коров
+              | : 
+            .al-sb-item
+              p Возраст:
+              span= `${farm.butcherAge.female} мес.`
+            .al-sb-item
+              p Вес:
+              span= `${farm.butcherWeight.female} кг.`
+          .al-sb-line
+            .al-sb-line-text
+              | Причины для списания 
+              span.al-sb-line-text-male быков
+              | : 
+            .al-sb-item
+              p Возраст:
+              span= `${farm.butcherAge.male} мес.`
+            .al-sb-item
+              p Вес:
+              span= `${farm.butcherWeight.male} кг.`
       .animal-list-header
         .alh-item.alh-item-photo Фото 
         .alh-item # 
         .alh-item Возраст 
         .alh-item Пол
-        .alh-item.alh-item-info Важная информация
+        -if(filter === 'slaughter')
+          .alh-item.alh-item-info Причина для забоя
+        -else
+          .alh-item.alh-item-info Важная информация
         .alh-item Кличка 
       .animals-list-block
         each animal in animals
@@ -48,7 +78,8 @@ block content
                 .al-animal-selected 
                   ion-icon(name="checkmark")
               .al-item.al-item-photo
-                img(src=`/img/images/${animal.mainPhoto}` class=`${animal.gender === 'male' ? 'al-item-photo-male' : 'al-item-photo-female'}`)
+                .al-item-image-outter(class=`${animal.gender === 'male' ? 'al-item-photo-male' : 'al-item-photo-female'}`)
+                  img(src=`/img/images/${animal.mainPhoto}`)
               .al-item.al-item-number= animal.number
               -if([1, 21].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
                 .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} год`
@@ -57,16 +88,27 @@ block content
               -if(![1, 21, 2, 3, 4, 22, 23, 24].includes(Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)))
                 .al-item= `${Math.round((Date.now() - animal.birthDate.getTime()) / 1000 / 60 / 60 / 24 / 365)} лет`
               .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
-              .al-item.al-item-info(class=`current-info-${animal.currentInfoAB.status}`)
-                -if(animal.currentInfoAB && animal.currentInfoAB.status !== undefined && animal.currentInfoAB.message !== '')
-                  .ar-outter-circle
-                  .ar-important-text= animal.currentInfoAB.message
+
+              -if(filter === 'slaughter')
+                -if(animal.butcherSuggestionReason === 'weight')
+                  .al-item.al-item-info Вес
+                -if(animal.butcherSuggestionReason === 'age')
+                  .al-item.al-item-info Возраст
+                -if(animal.butcherSuggestionReason === 'insemination')
+                  .al-item.al-item-info Плохо осеменяется
+              -else
+                .al-item.al-item-info(class=`current-info-${animal.currentInfoAB.status}`)
+                  -if(animal.currentInfoAB && animal.currentInfoAB.status !== undefined && animal.currentInfoAB.message !== '')
+                    .ar-outter-circle
+                    .ar-important-text= animal.currentInfoAB.message
               .al-item.al-item-name= animal.name
               .al-add-action-btn
                 ion-icon(name="ellipsis-horizontal")
               .animal-actions-block.rc-menu
                 a.rc-menu-item(href=`/herd/animal-card/${animal._id}`)
                   p Карта животного
+                a.rc-menu-item(href=`/herd/edit-animal/${animal._id}`)
+                  p Редактировать животное
                 -if(animal.gender === 'female')
                   -if(animal.lactations.length > 0 && !animal.lactations.at(-1).finishDate)
                     a.rc-menu-item(href=`/herd/edit-lactation/${animal._id}/${animal.lactations.length - 1}`)
@@ -82,12 +124,13 @@ block content
                   p Добавить взвешивание
                 a.rc-menu-item(href=`/herd/write-off-animal/${animal._id}`)
                   p Списать животное
-          -else
+          -if(animal.status === 'diseased')
             .al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}` rc-title="Редактировать животное" rc-link=`/herd/edit-animal/${animal._id}`)
               .al-former-icon 
                 ion-icon(name="close")
               .al-item.al-item-photo 
-                img(src=`/img/images/${animal.mainPhoto}`)
+                .al-item-image-outter
+                  img(src=`/img/images/${animal.mainPhoto}`)
               .al-item.al-item-number= animal.number
               .al-item &dash;
               .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
@@ -105,7 +148,25 @@ block content
               .animal-actions-block.rc-menu
                 a.rc-menu-item(href=`/herd/animal-card/${animal._id}`)
                   p Карта животного
-          
+          -if(animal.status === 'dead-birth')
+            .al-animal.al-animal-former(href=`/herd/animal-card/${animal._id}` rc-title="Редактировать мертворождение" rc-link=`/herd/edit-dead-birth/${animal._id}`)
+              .al-former-icon 
+                ion-icon(name="close")
+              .al-item.al-item-photo 
+                .al-item-image-outter
+                  img(src=`/img/images/${animal.mainPhoto}`)
+              .al-item.al-item-number
+              .al-item &dash;
+              .al-item= `${animal.gender === 'female' ? 'Женский' : 'Мужской'}`
+              .al-item.al-item-info
+                .ar-important-text= `Мертворождение: ${animal.deadBirthDate.toLocaleString('ru-RU', {day: '2-digit'})}.${animal.deadBirthDate.toLocaleString('ru-RU', {month: '2-digit'})}.${animal.deadBirthDate.toLocaleString('ru-RU', {year: 'numeric'})}`
+                  
+              .al-item.al-item-name= animal.name
+              .al-add-action-btn
+                ion-icon(name="ellipsis-horizontal")
+              .animal-actions-block.rc-menu
+                a.rc-menu-item(href=`/herd/edit-dead-birth/${animal._id}`)
+                  p Редактировать мертворождение
 
 
       

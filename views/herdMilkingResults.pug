@@ -6,47 +6,16 @@ block content
 
     include _animalHeader
     .animal-results-window
-
-      //-.animal-results-history
-        .ar-block-title.ar-block-title-chart История результатов
-        -if(animal.milkingResults.length > 3)
-          .animal-results-data-box  
-            each result in animal.milkingResults 
-              .animal-result-data(data-date=`${result.date}` data-result=`${result.result}` data-lact-number=`${result.lactationNumber}` data-index=`${animal.milkingResults.indexOf(result)}`)
-          .animal-results-average-box  
-            each anim in animals 
-              each result in anim.milkingResults 
-                .animal-average-data(data-date=`${result.date}` data-result=`${result.result}` data-lact-number=`${result.lactationNumber}`)
-          svg.graph-canvas#the-graph(width="150" height="100" data-animal-id=`${animal._id}`) 
-          .history-graph-tooltip#history-graph-tooltip
-            .hgt-header-line
-              img(src="/img/images/default-cow-image.png")
-              .hgt-header-line-info
-                .hgt-number= `#${animal.number}`
-                -if(animal.name)
-                  .hgt-name= animal.name
-            .hgt-result-line#date-line
-              p Дата:
-              p#tooltip-date 26.01.2001
-            .hgt-result-line#result-line
-              p Результат:
-              p#tooltip-result 25 л.
-            .hgt-result-line#lactation-line
-              p Лактация:
-              p#tooltip-lactation #3
-            a.hgt-edit-btn(href="#") Редактировать 
-        -else
-          .ar-empty-history-block
-            img(src="/img/images/no-data-image.png")
-            p Слишком мало данных
-          
-        .ar-tip-container 
-          .ar-tip-icon 
-            ion-icon(name="bulb")
-          .ar-tip-text Мы любим животных и стараемся поддерживать тех из них, кому не посчастливилось иметь ласковых хозяев и тёплый кров. Один из проверенных способов это сделать — помочь приюту для животных Домашний. У этих ребят живёт более 1500 четвероногих, и благодаря их труду ежегодно сотни питомцев находят свой новый дом.
-
       -if(!forEdit)
         .ai-form-container.ai-form-container-headerful#milking-results-container
+          -if(animal.milkingResults.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.milkingResults.reverse()
+                  a.ar-h-item(href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.length - animal.milkingResults.indexOf(result) - 1}`)
+                    p= `${result.result} л.`
+                    p.date-format(data-date=`${result.date}`) 
           .ai-block-sub-title ДОБАВИТЬ
           .ai-block-title Контрольное доение
           
@@ -74,6 +43,14 @@ block content
 
       -if(forEdit)
         .ai-form-container.ai-form-container-headerful#edit-milking-results-container
+          -if(animal.milkingResults.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.milkingResults.reverse()
+                  a.ar-h-item(href=`/herd/edit-milking-result/${animal._id}/${animal.milkingResults.length - animal.milkingResults.indexOf(result) - 1}`)
+                    p= `${result.result} л.`
+                    p.date-format(data-date=`${result.date}`) 
           .ai-block-sub-title РЕДАКТИРОВАТЬ
           .ai-block-title Контрольное доение
 

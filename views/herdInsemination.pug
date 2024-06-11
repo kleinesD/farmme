@@ -8,6 +8,19 @@ block content
 
       -if(!forEdit)
         .ai-form-container.ai-form-container-headerful#add-insemination-container
+          -if(animal.inseminations.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.inseminations.reverse()
+                  a.ar-h-item(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.length - animal.inseminations.indexOf(result) - 1}`)
+                    -if(result.success !== 'undefined' && result.success === 'true')
+                      p УСПЕШНО
+                    -if(result.success !== 'undefined' && result.success === 'false')
+                      p НЕ УСПЕШНО
+                    -if(result.success === 'undefined')
+                      p НЕ ПОДТВЕРЖДЕНО
+                    p.date-format(data-date=`${result.date}`) 
           .ai-block-sub-title ДОБАВИТЬ
           .ai-block-title Осеменение
 
@@ -40,14 +53,29 @@ block content
           
           .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
             .ai-input-label Результат
-            .ai-pick#success Успешно
-            .ai-pick#fail Не успешно
+            .ai-pick#true Успешно
+            .ai-pick#false Не успешно
+            .ai-pick#undefined(qt="Нет результата")
+              ion-icon(name="help-circle-outline")
 
           
           .ai-input-submit-btn(data-animal-id=`${animal._id}`) Сохранить
 
       -if(forEdit)
-         .ai-form-container.ai-form-container-headerful#edit-insemination-container
+        .ai-form-container.ai-form-container-headerful#edit-insemination-container
+          -if(animal.inseminations.length > 0)
+            .ar-history-block
+              .ar-h-title ИСТОРИЯ
+              .ar-h-container
+                each result in animal.inseminations.reverse()
+                  a.ar-h-item(href=`/herd/edit-insemination/${animal._id}/${animal.inseminations.length - animal.inseminations.indexOf(result) - 1}`)
+                    -if(result.success !== 'undefined' && result.success === 'true')
+                      p УСПЕШНО
+                    -if(result.success !== 'undefined' && result.success === 'false')
+                      p НЕ УСПЕШНО
+                    -if(result.success === 'undefined')
+                      p НЕ ПОДТВЕРЖДЕНО
+                    p.date-format(data-date=`${result.date}`) 
           .ai-block-sub-title РЕДАКТИРОВАТЬ
           .ai-block-title Осеменение
 
@@ -85,11 +113,15 @@ block content
 
           .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#insemination
             .ai-input-label Результат
-            -if(insemination.success)
-              .ai-pick#success(class=`${insemination.success === true ? 'ai-to-pick' : ''}`) Успешно
-              .ai-pick#fail(class=`${insemination.success === false ? 'ai-to-pick' : ''}`) Не успешно
+            -if(insemination.success !== 'undefined')
+              .ai-pick#true(class=`${insemination.success === 'true' ? 'ai-to-pick' : ''}`) Успешно
+              .ai-pick#false(class=`${insemination.success === 'false' ? 'ai-to-pick' : ''}`) Не успешно
+              .ai-pick#undefined(qt="Нет результата" class=`${insemination.success === 'undefined' ? 'ai-to-pick' : ''}`)
+                ion-icon(name="help-circle-outline")
             -else
-              .ai-pick#success Успешно
-              .ai-pick#fail Не успешно
+              .ai-pick#true Успешно
+              .ai-pick#false Не успешно
+              .ai-pick#undefined(qt="Нет результата")
+                ion-icon(name="help-circle-outline")
 
           .ai-input-submit-btn(data-animal-id=`${animal._id}` data-index=`${index}`) Сохранить

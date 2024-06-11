@@ -66,6 +66,8 @@ router.get('/herd/edit-lactation/:animalId/:index', authController.protect, auth
 
 router.get('/herd/edit-animal/:animalId', authController.protect, authController.isLoggedIn, viewController.renderEditAnimal);
 
+router.get('/herd/edit-dead-birth/:animalId', authController.protect, authController.isLoggedIn, viewController.renderEditDeadBirth);
+
 router.get('/herd/list-milking-results', authController.protect, authController.isLoggedIn, viewController.renderListMilkingResults);
 
 router.get('/herd/list-inseminations', authController.protect, authController.isLoggedIn, viewController.renderListInseminations);

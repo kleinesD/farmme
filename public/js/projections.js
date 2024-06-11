@@ -267,7 +267,6 @@ export const getMilkingProjection = async (animalId) => {
     });
 
   }
-  console.log(animalResSorted)
   return animalResSorted;
 
 };

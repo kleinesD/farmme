@@ -235,3 +235,35 @@ export const getVetProblem = async(id) => {
     console.log(err);
   }
 }
+
+export const addVetRecord = async (data) => {
+  try {
+    const res = await axios({
+      method: 'POST',
+      url: `/api/vet/`,
+      data
+    });
+
+    if (res.data.status === 'success') {
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const editVetRecord = async (recordId, data) => {
+  try {
+    const res = await axios({
+      method: 'PATCH',
+      url: `/api/vet/${recordId}`,
+      data
+    });
+
+    if (res.data.status === 'success') {
+      return true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}

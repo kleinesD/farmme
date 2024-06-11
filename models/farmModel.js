@@ -48,6 +48,38 @@ const farmSchema = new mongoose.Schema({
     }
   ],
   buildings: [String],
+  butcherWeightEnable: {
+    type: Boolean,
+    default: true
+  },
+  butcherWeight: {
+    male: {
+      type: Number,
+      default: 500
+    },
+    female: {
+      type: Number,
+      default: 400
+    }
+  },
+  butcherAgeEnable: {
+    type: Boolean,
+    default: true
+  },
+  butcherAge: {
+    male: {
+      type: Number,
+      default: 24
+    },
+    female: {
+      type: Number,
+      default: 70
+    }
+  },
+  milkingResultExpectancy: {
+    type: Number,
+    default: 15
+  },
   nextPayment: {
     type: Date
   },

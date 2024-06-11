@@ -40,14 +40,10 @@ const userSchema = new mongoose.Schema({
     default: false
   },
   password: {
-    type: String,
-    required: true,
-    minlength: 6,
-    maxlength: 30,
+    type: String
   },
   passwordConfirm: {
     type: String,
-    required: true,
     validator: {
       validate: function (val) {
         return val === this.password;

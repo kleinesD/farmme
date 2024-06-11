@@ -15,7 +15,16 @@ const vetSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['action', 'problem', 'treatment', 'scheme']
+    enum: ['action', 'problem', 'treatment', 'scheme', 'insemination']
+  },
+  inseminationType: {
+    type: String,
+    enum: ['natural', 'artificial']
+  },
+  inseminationResult: Boolean,
+  bull: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Animal'
   },
   result: String,
   note: String,

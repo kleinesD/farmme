@@ -10,12 +10,12 @@ import validator from 'validator';
 import randomstring from 'randomstring';
 import { simpleLineChart, threeLinesChart, doughnutChart, multipleLinesChart, multipleLinesChartOneActive, mainPageCharts } from './charts';
 import { addAnimal, editAnimal, addAnimalResults, editAnimalResults, deleteAnimalResults, writeOffAnimal, writeOffMultipleAnimals, bringBackAnimal, getAnimalByNumber, checkByField, getAnimalsForGraph, getAnimalData, getAnimalsByCategory, addMilkQuality, editMilkQuality, getMilkQuality } from './animalHandler';
-import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc, getStartedScheme, getVetProblem } from './vetHandler';
+import { addVetAction, editVetAction, addVetProblem, editVetProblem, addVetTreatment, editVetTreatment, addVetScheme, startVetScheme, editStartedVetScheme, editVetScheme, deleteVetDoc, getStartedScheme, getVetProblem, addVetRecord, editVetRecord } from './vetHandler';
 import { addReminder, editReminder, deleteReminder, getModuleAndPeriod, getFarmReminders, deleteSubIdReminders } from './calendarHandler';
 import { addInventory, editInventory } from './inventoryHandler'
 import { login, logout, checkEmail } from './authHandler';
 import { editFarm, editUser, addCategory, addBuilding } from './manageHandler';
-import { addConfirmationEmpty, askAus, emptyBlock, removeEmptyBlock, loadingBlock, removeloadingBlock, quickTitle, getIcons } from './interaction';
+import { addConfirmationEmpty, askAus, emptyBlock, removeEmptyBlock, loadingBlock, removeloadingBlock, quickTitle, quickTitleLeft, quickTitleRight, getIcons } from './interaction';
 import { multiLinearChart, renderLineGraph, renderProgressChart, graphBase, graphBaseNoDate } from './chartConstructor';
 import { getMilkingProjection, getFarmProjections } from './projections';
 import { addClient, editClient, addProduct, addProductReturn, editProduct, editProductReturn, deleteProduct, deleteSubIdProducts, getClient } from './distributionHandler';
@@ -44,6 +44,8 @@ $(document).ready(async function () {
 
   /* Quick titles */
   quickTitle();
+  quickTitleLeft();
+  quickTitleRight();
 
 
   ///////////////////////
@@ -2000,9 +2002,9 @@ $(document).ready(async function () {
       $('.history-page-item-outter').each(function () {
         let date = $(this).attr('data-date');
 
-        if(moment(date).isSame(new Date(), 'day')) {
+        if (moment(date).isSame(new Date(), 'day')) {
           $(this).find('.history-page-date').text(`${moment(date).format('HH:mm')}`)
-        } else if(moment(date).isSame(new Date(moment().subtract('1', 'day')), 'day')) {
+        } else if (moment(date).isSame(new Date(moment().subtract('1', 'day')), 'day')) {
           $(this).find('.history-page-date').text(`Вчера`)
         } else {
           let curRusMonth = moment(date).locale('ru').format('MMMM');
@@ -2129,12 +2131,21 @@ $(document).ready(async function () {
       const name = $('#name').val().length > 0 ? $('#name').val() : undefined;
       const liquidUnit = $('#liquid-unit').find('.ai-pick-active').attr('id');
       const weightUnit = $('#weight-unit').find('.ai-pick-active').attr('id');
+      const butcherWeight = {
+        male: $('#male-weight').val().length > 0 ? parseFloat($('#male-weight').val()) : undefined,
+        female: $('#female-weight').val().length > 0 ? parseFloat($('#female-weight').val()) : undefined
+      }
+      const butcherAge = {
+        male: $('#male-age').val().length > 0 ? parseFloat($('#male-age').val()) : undefined,
+        female: $('#female-age').val().length > 0 ? parseFloat($('#female-age').val()) : undefined
+      }
+      const milkingResultExpectancy = $('#milking-result').val().length > 0 ? parseFloat($('#milking-result').val()) : undefined;
 
       $(this).empty();
       $(this).append(`<div class="mini-loader"></div>`);
       anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-      const response = await editFarm(farmId, { name, liquidUnit, weightUnit });
+      const response = await editFarm(farmId, { name, liquidUnit, weightUnit, butcherWeight, butcherAge, milkingResultExpectancy });
 
       if (response) {
         addConfirmationEmpty($('.animal-results-window'));
@@ -2268,13 +2279,31 @@ $(document).ready(async function () {
 
     /* Choose type of add animal */
     $('.ai-decide-block-item').on('click', function () {
-      $(`.${$(this).attr('id')}-input`).css('display', 'flex');
-      $('#add-animal-container').attr('data-state', $(this).attr('id'));
+      if ($(this).attr('id') !== 'dead') {
+        $(`.${$(this).attr('id')}-input`).css('display', 'flex');
+        $('#add-animal-container').attr('data-state', $(this).attr('id'));
 
-      $('.ai-decide-block').removeClass('animate__animated').removeClass('animate__fadeOut').removeClass('animate__animated').removeClass('animate__fadeIn');
-      $('.ai-decide-block').addClass('animate__animated').addClass('animate__fadeOut').css('display', 'none');;
-      $('.add-animal-form').removeClass('animate__animated').removeClass('animate__fadeIn').removeClass('animate__animated').removeClass('animate__fadeOut');
-      $('.add-animal-form').addClass('animate__animated').addClass('animate__fadeIn').css('display', 'flex');
+        $('.ai-decide-block').removeClass('animate__animated').removeClass('animate__fadeOut').removeClass('animate__animated').removeClass('animate__fadeIn');
+        $('.ai-decide-block').addClass('animate__animated').addClass('animate__fadeOut').css('display', 'none');;
+        $('.add-animal-form-alive').removeClass('animate__animated').removeClass('animate__fadeIn').removeClass('animate__animated').removeClass('animate__fadeOut');
+        $('.add-animal-form-alive').addClass('animate__animated').addClass('animate__fadeIn').css('display', 'flex');
+
+        $('.main-section').attr('data-dead-birth', 'false');
+      } else {
+        $('.ai-decide-block').removeClass('animate__animated').removeClass('animate__fadeOut').removeClass('animate__animated').removeClass('animate__fadeIn');
+        $('.ai-decide-block').addClass('animate__animated').addClass('animate__fadeOut').css('display', 'none');;
+        $('.add-animal-form-dead').removeClass('animate__animated').removeClass('animate__fadeIn').removeClass('animate__animated').removeClass('animate__fadeOut');
+        $('.add-animal-form-dead').addClass('animate__animated').addClass('animate__fadeIn').css('display', 'flex');
+
+        $('.main-section').attr('data-dead-birth', 'true');
+      }
+    });
+
+    /* Adding warning text to mother's death */
+    $('#mother-death').on('click', function () {
+      if (!$(this).hasClass('ai-radio-active')) return $('#mother-death-write-off-block').css('display', 'none');
+
+      $('#mother-death-write-off-block').css('display', 'flex');
     });
 
     /* Ability to add a lactation */
@@ -2418,10 +2447,18 @@ $(document).ready(async function () {
         $('.ai-combined-block-1').removeClass('ai-combined-block-valid');
       }
 
-      if ($('#number').hasClass('ai-valid-input') && $('#birth-date').hasClass('ai-valid-input') && $('#gender').find('.ai-pick-active').length > 0) {
-        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      if ($('.main-section').attr('data-dead-birth') === 'false') {
+        if ($('#number').hasClass('ai-valid-input') && $('#birth-date').hasClass('ai-valid-input') && $('#gender').find('.ai-pick-active').length > 0) {
+          $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+        } else {
+          $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+        }
       } else {
-        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+        if ($('#date').hasClass('ai-valid-input') && $('#gender-dead').find('.ai-pick-active').length > 0) {
+          $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+        } else {
+          $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+        }
       }
     })
 
@@ -2441,42 +2478,82 @@ $(document).ready(async function () {
 
     /* Submitting data */
     $('.ai-input-submit-btn').on('click', async function () {
-      let aNumber = $('#number').val();
-      let name = $('#name').val() !== '' ? $('#name').val() : undefined;
-      let buyCost = $('#buy-cost').val() !== '' ? $('#buy-cost').val() : undefined;
-      let mother = $('#mother-select').find('.ai-select-item-selected').length > 0 ? $('#mother-select').find('.ai-select-item-selected').attr('data-id') : undefined;
-      let father = $('#father-select').find('.ai-select-item-selected').length > 0 ? $('#father-select').find('.ai-select-item-selected').attr('data-id') : undefined;
-      let birthDate = $('#birth-date').val() !== '' ? $('#birth-date').val() : undefined;
-      let gender = $('#gender').find('.ai-pick-active').attr('id');
-      let colors = [];
-      $('#colors').find('.ai-pick-active').each(function () { colors.push($(this).attr('id')) });
-      let breedRussian = $('#breed').attr('data-rus');
-      let breedEnglish = $('#breed').attr('data-eng');
+      if ($('.main-section').attr('data-dead-birth') === 'false') {
+        let aNumber = $('#number').val();
+        let name = $('#name').val() !== '' ? $('#name').val() : undefined;
+        let buyCost = $('#buy-cost').val() !== '' ? $('#buy-cost').val() : undefined;
+        let mother = $('#mother-select').find('.ai-select-item-selected').length > 0 ? $('#mother-select').find('.ai-select-item-selected').attr('data-id') : undefined;
+        let father = $('#father-select').find('.ai-select-item-selected').length > 0 ? $('#father-select').find('.ai-select-item-selected').attr('data-id') : undefined;
+        let birthDate = $('#birth-date').val() !== '' ? $('#birth-date').val() : undefined;
+        let gender = $('#gender').find('.ai-pick-active').attr('id');
+        let colors = [];
+        $('#colors').find('.ai-pick-active').each(function () { colors.push($(this).attr('id')) });
+        let breedRussian = $('#breed').attr('data-rus');
+        let breedEnglish = $('#breed').attr('data-eng');
+        let note = $('#note').val();
 
 
-      $(this).empty();
-      $(this).append(`<div class="mini-loader"></div>`);
-      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
-      let response1;
-      if ($('.ai-combined-block-valid').length > 0) {
-        response1 = await addAnimalResults('lactation', mother, {
-          startDate: new Date($('#start-date').val()),
-          finishDate: $('#finish-date').val() !== '' ? new Date($('#finish-date').val()) : undefined,
-          number: parseFloat($('#lactation-number').find('.ai-pick-active').text())
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+        let response1;
+        if ($('.ai-combined-block-valid').length > 0) {
+          response1 = await addAnimalResults('lactation', mother, {
+            startDate: new Date($('#start-date').val()),
+            finishDate: $('#finish-date').val() !== '' ? new Date($('#finish-date').val()) : undefined,
+            number: parseFloat($('#lactation-number').find('.ai-pick-active').text())
+          });
+        }
+        let response2 = await addAnimal({ number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors, notes: [{ text: note, date: new Date() }] });
+
+        if (response1 && response2) {
+
+          $('.add-animal-form-alive').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+          $('.add-animal-form-alive').addClass('animate__animated animate__fadeOut').css('display', 'none');;
+          $('.ai-success-block ').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+          $('.ai-success-block ').addClass('animate__animated animate__fadeIn').css('display', 'flex');
+
+          //setTimeout(() => { location.assign(`/herd/animal-card/${response2._id}`) }, 2000)
+          setTimeout(() => { location.reload(true) }, 2000)
+
+        }
+      } else {
+        $(this).empty();
+        $(this).append(`<div class="mini-loader"></div>`);
+        anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+        const response = await addAnimal({
+          status: 'dead-birth',
+          deadBirthDate: new Date($('#date').val()),
+          mother: $('#mother-select-dead').find('.ai-select-item-selected').length > 0 ? $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined,
+          father: $('#father-select-dead').find('.ai-select-item-selected').length > 0 ? $('#father-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined,
+          deadBirthMultipleFetuses: $('#multiple-fetuses').hasClass('ai-radio-active') ? true : false,
+          deadBirthMotherDeath: $('#mother-death').hasClass('ai-radio-active') ? true : false,
+          deadBirthMotherDeathAuto: $('#mother-death-write-off').hasClass('ai-radio-active') ? true : false,
+          deadBirthSize: $('#size').find('.ai-pick-active').attr('id'),
+          gender: $('#gender-dead').find('.ai-pick-active').attr('id'),
+          deadBirthNote: $('#note-dead').val()
         });
-      }
-      let response2 = await addAnimal({ number: aNumber, name, buyCost, mother, father, birthDate, breedRussian, breedEnglish, gender, colors });
 
-      if (response1 && response2) {
+        if (response) {
+          if ($('#mother-death').hasClass('ai-radio-active') && $('#mother-death-write-off').hasClass('ai-radio-active') && $('#mother-select-dead').find('.ai-select-item-selected').length) {
+            const response2 = await writeOffAnimal($('#mother-select-dead').find('.ai-select-item-selected').length > 0 ? $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined, { writeOffReason: 'birth-death', writeOffDate: new Date($('#date').val()) });
 
-        $('.add-animal-form').removeClass('animate__animated animate__fadeIn animate__fadeOut');
-        $('.add-animal-form').addClass('animate__animated animate__fadeOut').css('display', 'none');;
-        $('.ai-success-block ').removeClass('animate__animated animate__fadeIn animate__fadeOut');
-        $('.ai-success-block ').addClass('animate__animated animate__fadeIn').css('display', 'flex');
+            if (response2) {
 
-        //setTimeout(() => { location.assign(`/herd/animal-card/${response2._id}`) }, 2000)
-        setTimeout(() => { location.reload(true) }, 2000)
-
+              $('.add-animal-form-dead').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+              $('.add-animal-form-dead').addClass('animate__animated animate__fadeOut').css('display', 'none');
+              $('.ai-success-block ').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+              $('.ai-success-block ').addClass('animate__animated animate__fadeIn').css('display', 'flex');
+              setTimeout(() => { location.reload(true) }, 2000)
+            }
+          } else {
+            $('.add-animal-form-dead').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+            $('.add-animal-form-dead').addClass('animate__animated animate__fadeOut').css('display', 'none');
+            $('.ai-success-block ').removeClass('animate__animated animate__fadeIn animate__fadeOut');
+            $('.ai-success-block ').addClass('animate__animated animate__fadeIn').css('display', 'flex');
+            setTimeout(() => { location.reload(true) }, 2000)
+          }
+        }
       }
     });
 
@@ -2659,9 +2736,86 @@ $(document).ready(async function () {
   }
 
   ///////////////////////
+  /* EDIT DEAD BIRTH PAGE */
+  ///////////////////////
+  if (document.querySelector('#edit-dead-birth-container')) {
+    $('#mother-death').on('click', function () {
+      if (!$(this).hasClass('ai-radio-active')) return $('#mother-death-write-off-block').css('display', 'none');
+
+      $('#mother-death-write-off-block').css('display', 'flex');
+    });
+
+
+    /* Bringing mother back if choosen to */
+    $('#mother-death-write-off').on('click', function () {
+      if ($(this).attr('data-original') === 'true' && !$(this).hasClass('ai-radio-active')) {
+        $(this).parent().append(`<div class="ai-warning-text">Списание матери будет отменено</div>`)
+      } else {
+        $(this).parent().find('.ai-warning-text').remove();
+      }
+    });
+
+    /* Allow submit if requirments filled */
+    $('*').on('click change keyup', function () {
+      if ($('#date').hasClass('ai-valid-input') && $('#gender-dead').find('.ai-pick-active').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    $('.ai-input').trigger('keyup');
+    $('.ai-select-item-selected').trigger('click');
+    $('.ai-to-pick').trigger('click').removeClass('.ai-to-pick');
+    $('.ai-radio-active').trigger('click').trigger('click');
+
+    /* Submitting data */
+    $('.ai-input-submit-btn').on('click', async function () {
+      $(this).empty();
+      $(this).append(`<div class="mini-loader"></div>`);
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+      const response = await editAnimal($(this).attr('data-id'), {
+        status: 'dead-birth',
+        deadBirthDate: new Date($('#date').val()),
+        mother: $('#mother-select-dead').find('.ai-select-item-selected').length > 0 ? $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined,
+        father: $('#father-select-dead').find('.ai-select-item-selected').length > 0 ? $('#father-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined,
+        deadBirthMultipleFetuses: $('#multiple-fetuses').hasClass('ai-radio-active') ? true : false,
+        deadBirthMotherDeath: $('#mother-death').hasClass('ai-radio-active') ? true : false,
+        deadBirthMotherDeathAuto: $('#mother-death-write-off').hasClass('ai-radio-active') ? true : false,
+        deadBirthSize: $('#size').find('.ai-pick-active').attr('id'),
+        gender: $('#gender-dead').find('.ai-pick-active').attr('id'),
+        deadBirthNote: $('#note-dead').val()
+      });
+
+      if (response) {
+        if ($('#mother-death').hasClass('ai-radio-active') && $('#mother-death-write-off').hasClass('ai-radio-active') && $('#mother-select-dead').find('.ai-select-item-selected').length > 0) {
+
+          if ($('#mother-death-write-off').attr('data-original') === 'true' && $('#mother-death-write-off').attr('data-mother') !== 'undefined' && $('#mother-death-write-off').attr('data-mother') === $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id')) {
+            return;
+          } else if ($('#mother-death-write-off').attr('data-mother') !== 'undefined' && $('#mother-death-write-off').attr('data-mother') !== $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id')) {
+            await writeOffAnimal($('#mother-select-dead').find('.ai-select-item-selected').length > 0 ? $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined, { writeOffReason: 'birth-death', writeOffDate: new Date($('#date').val()) });
+
+            await bringBackAnimal($('#mother-death-write-off').attr('data-mother'));
+          } else {
+            await writeOffAnimal($('#mother-select-dead').find('.ai-select-item-selected').length > 0 ? $('#mother-select-dead').find('.ai-select-item-selected').attr('data-id') : undefined, { writeOffReason: 'birth-death', writeOffDate: new Date($('#date').val()) });
+          }
+
+        } else if (!$('#mother-death-write-off').hasClass('ai-radio-active') && $('#mother-death-write-off').attr('data-mother') !== 'undefined') {
+          await bringBackAnimal($('#mother-death-write-off').attr('data-mother'));
+        }
+
+        addConfirmationEmpty($('#edit-dead-birth-container'));
+        setTimeout(() => { location.reload(true) }, 2000)
+
+      }
+    });
+  }
+
+  ///////////////////////
   /* FOR ALL MILKING RESULTS PAGE */
   ///////////////////////
-  if (document.querySelector('#milking-results-container') || document.querySelector('#edit-milking-results-container')) {
+  if (document.querySelector('#milking-resultss-container') || document.querySelector('#edit-milking-resultss-container')) {
     /* Historical graph */
     if (document.querySelector('.animal-results-history')) {
       /* Declaring the graph element */
@@ -2879,7 +3033,7 @@ $(document).ready(async function () {
         $('#tooltip-date').text(moment(new Date($(this).attr('data-date'))).format('DD.MM.YYYY'))
         $('#tooltip-result').text(`${$(this).attr('data-result')} л.`);
         $('#tooltip-lactation').text(`#${$(this).attr('data-lact-number')}`);
-        $('.hgt-edit-btn').attr('href', `/herd/edit-milking-result/${$(this).attr('data-animal-id')}/${$(this).attr('data-index')}`)
+        $('.hgt-edit-btn').attr('href', `/herd/edit-milking-results/${$(this).attr('data-animal-id')}/${$(this).attr('data-index')}`)
         $('.history-graph-tooltip').css('border-color', $(this).css('stroke'));
 
 
@@ -2902,7 +3056,7 @@ $(document).ready(async function () {
   ///////////////////////
   /* ADD MILKING RESULTS PAGE */
   ///////////////////////
-  if (document.querySelector('#milking-results-container')) {
+  if (document.querySelector('#milking-resultss-container')) {
 
     $('#lactation-number').find('.ai-pick').on('mouseenter', function () {
       $(this).parent().append(`
@@ -2986,7 +3140,7 @@ $(document).ready(async function () {
       $(this).append(`<div class="mini-loader"></div>`);
       anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-      const response = await addAnimalResults('milking-results', animalId, { date, result, lactationNumber });
+      const response = await addAnimalResults('milking-resultss', animalId, { date, result, lactationNumber });
 
       if (response) {
         addConfirmationEmpty($('.animal-results-window'));
@@ -3370,7 +3524,7 @@ $(document).ready(async function () {
 
 
     $('*').on('click change keyup mouseenter', function () {
-      if ($('#start-date').hasClass('ai-valid-input') && $('#lactation-number').find('.ai-pick-active').length > 0) {
+      if ($('#start-date').hasClass('ai-valid-input') && $('#lactation-number').find('.ai-pick-active').length > 0 && $('.ai-form-container').find('.ai-big-warning-text').length === 0) {
         $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
       } else {
         $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
@@ -3382,6 +3536,30 @@ $(document).ready(async function () {
   /* ADD LACTATION */
   ///////////////////////
   if (document.querySelector('#add-lactation-container')) {
+    
+    /* UNFINISHED LACTATION BLOCK */
+  if (document.querySelector('.ai-detail-info-block')) {
+    if(new Date() > new Date(moment($('.ai-di-date').attr('data-date')).add(1, 'year'))) {
+      $('.ai-di-date').text(moment($('.ai-di-date').attr('data-date')).locale('ru').format('DD MMMM YYYY'));
+    } else {
+      $('.ai-di-date').text(moment($('.ai-di-date').attr('data-date')).locale('ru').format('DD MMMM'));
+    }
+
+    $('.ai-pick').on('click', function() {
+      let number = parseFloat($(this).text());
+
+      if(number > parseFloat($('.ai-detail-info-block').attr('data-number'))) {
+        if($('.ai-form-container').find('.ai-big-warning-text').length === 0) {
+          $('.ai-form-container').append(`<div class="ai-big-warning-text">Нельзя добавить новую лактацию до окончания текущей</div>`)
+        }
+        return;
+      }
+
+      $('.ai-form-container').find('.ai-big-warning-text').remove();
+    });
+  }
+
+  
 
     $('.ai-input-submit-btn').click(async function () {
       const animalId = $(this).attr('data-animal-id');
@@ -3469,7 +3647,7 @@ $(document).ready(async function () {
       }
       let success;
       if ($('#insemination').find('.ai-pick-active').length > 0) {
-        success = $('#insemination').find('.ai-pick-active').attr('id') === 'success';
+        success = $('#insemination').find('.ai-pick-active').attr('id');
       }
 
       $(this).empty();
@@ -3622,12 +3800,43 @@ $(document).ready(async function () {
 
       location.assign(link)
     });
+
+    $('.al-animal').each(function() {
+      if($('.animals-list-block').find('.al-animal').index($(this)) % 2 !== 0) $(this).css('background-color', '#f6f6f6');
+    });
   }
 
   ///////////////////////
   /* ANIMAL CARD PAGE */
   ///////////////////////
-  if (document.querySelector('.animal-card-body')) {
+  if (document.querySelector('.animal-card-section')) {
+    /* Actions block */
+    $('.acp-action-btn').on('click', function () {
+      if ($('.aih-actions-background').css('display') === 'none') {
+        $('.aih-actions-background').css('display', 'flex');
+        $(this).find('ion-icon').css('transform', 'rotate(45deg)');
+        $(this).attr('qtl', 'Скрыть');
+
+        $(this).trigger('mouseleave');
+        $(this).trigger('mouseenter');
+      } else {
+        $('.aih-actions-background').css('display', 'none');
+        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
+        $(this).attr('qtl', 'Добавить действие');
+        $(this).trigger('mouseleave');
+        $(this).trigger('mouseenter');
+      }
+    });
+
+    $(window).on('scroll', function () {
+      $('.aih-actions-background').css('display', 'none');
+      $('.acp-action-btn').find('ion-icon').css('transform', 'rotate(0deg)');
+      $('.acp-action-btn').attr('qtl', 'Добавить действие');
+    });
+    /* CHanging Date of calves */
+    $('.birth-date').each(function () {
+      $(this).text(moment($(this).attr('data-date')).locale('ru').format('DD MMMM YYYY'));
+    });
     /* Current lactation info */
     const curStartDate = new Date($('.current-animal-info-block').attr('data-date'))
     $('#cur-lact-date').text(moment(curStartDate).locale('ru').format('DD MMMM YYYY'));
@@ -3677,21 +3886,31 @@ $(document).ready(async function () {
     $('.acp-note-btn').on('click', function () {
       if ($('.acp-notes-block').css('display') === 'none') {
         $('.acp-notes-block').css('display', 'flex');
+        $(this).find('ion-icon').attr('name', 'add');
+        $(this).find('ion-icon').css('transform', 'rotate(45deg)');
+        $('#note-text').trigger('focus');
       } else {
         $('.acp-notes-block').css('display', 'none');
+        $(this).find('ion-icon').attr('name', 'attach-outline');
+        $(this).find('ion-icon').css('transform', 'rotate(0deg)');
+        $('#note-text').trigger('blur');
       }
     });
-
+    
     $(window).on('scroll', function () {
       $('.acp-notes-block').css('display', 'none');
+      $('.acp-note-btn').find('ion-icon').attr('name', 'attach-outline');
+      $('.acp-note-btn').find('ion-icon').css('transform', 'rotate(0deg)');
     });
 
-    $('#note-text').on('keyup change', function () {
+    $('#note-text').on('keyup change', function (e) {
       if ($(this).val().length > 0) {
         $('#add-note').css({ 'filter': 'grayscale(0)', 'pointer-events': 'auto' });
       } else {
         $('#add-note').css({ 'filter': 'grayscale(1)', 'pointer-events': 'none' });
       }
+
+      if(e.which === 13) $('#add-note').trigger('click');
     });
 
     $('#add-note').on('click', async function () {
@@ -3747,6 +3966,10 @@ $(document).ready(async function () {
       if ($(this).find('.aih-ai-select-block').css('display') === 'none') {
         $('.aih-ai-select-block').hide();
         $(this).find('.aih-ai-select-block').css('display', 'flex');
+        $(this).find('.invis-div').css('transform', 'rotate(180deg)');
+      } else {
+        $('.aih-ai-select-block').hide();
+        $('.invis-div').css('transform', 'rotate(0deg)');
       }
     });
 
@@ -3754,6 +3977,11 @@ $(document).ready(async function () {
       if (e.target.classList.value.includes('aih-ai-item') || e.target.classList.value.includes('aih-input') || e.target.classList.value.includes('aih-ai-select-item-btn')) return;
 
       $('.aih-ai-select-block').hide();
+      $('.invis-div').css('transform', 'rotate(0deg)');
+    });
+    $(window).on('scroll', function (e) {
+      $('.aih-ai-select-block').hide();
+      $('.invis-div').css('transform', 'rotate(0deg)');
     });
 
     /* Adding more results to farm model */
@@ -3919,37 +4147,28 @@ $(document).ready(async function () {
 
     }
 
-
-    /* Working with insem block */
-    $('.ac-insem-item-date').each(function () {
-      let dateFormat = moment($(this).attr('data-date')).lang('ru').format('MMMM DD, YYYY');
-      $(this).text(dateFormat.charAt(0).toUpperCase() + dateFormat.slice(1))
-    });
-
     /* Creating an event for unconfirmed insemination */
-    $('.acb-double-btn').on('click', async function () {
+    let uiDate = new Date($('.ac-id-text').find('span').attr('data-date'));
+    if(new Date() > new Date(moment(uiDate).add(1, 'year'))) {
+      $('.ac-id-text').find('span').text(moment(uiDate).locale('ru').format('DD MMMM YYYY').toUpperCase());
+    } else {
+      $('.ac-id-text').find('span').text(moment(uiDate).locale('ru').format('DD MMMM').toUpperCase());
+    }
+    
+    $('.ac-id-btn').on('click', async function () {
       const animalId = $(this).parent().attr('data-animal-id');
       const index = $(this).parent().attr('data-index');
-      let success = $(this).attr('id') === 'insem-true';
+      let success;
+      if($(this).attr('id') === 'insem-success') {
+         success = 'true';
+      } else {
+         success = 'false';
+      }
 
       const response = await editAnimalResults('insemination', animalId, index, { success });
 
-      if (response) location.reload(true)
+      if (response) location.reload(true);
     });
-
-    /* Making an insem graph works */
-    let totalInsem = $('.ac-insem-item').length;
-    let pos = 0, neg = 0;
-    $('.ac-insem-item').each(function () {
-      if ($(this).attr('data-res') === 'true') pos++
-      if ($(this).attr('data-res') === 'false') neg++
-    });
-    let posPer = Math.round(pos / (totalInsem / 100));
-    let negPer = 100 - posPer;
-    $('.ac-insem-graph-pos').css('height', `${posPer / 1.5}%`);
-    $('.ac-insem-graph-pos p').text(`${posPer}%`);
-    $('.ac-insem-graph-neg').css('height', `${negPer / 1.5}%`);
-    $('.ac-insem-graph-neg p').text(`${negPer}%`);
 
     /* Showing action block */
     $('.aih-actions-btn').on('click', function () {
@@ -3966,9 +4185,10 @@ $(document).ready(async function () {
       }
     });
     /* Working with bring back animal block */
+    
     if (document.querySelector('.animal-write-off-disclaimer')) {
       /* Format date */
-      $('.awo-date').text(moment($(this).attr('data-date')).locale('ru').format('DD MMMM, YYYY'));
+      $('.awo-date').text(moment($('.awo-date').attr('data-date')).locale('ru').format('DD MMMM, YYYY'));
 
       $('#bring-back').click(async function () {
         let animalId = $(this).attr('data-animal-id');
@@ -3989,6 +4209,10 @@ $(document).ready(async function () {
     let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
     let farmData = await getAnimalsForGraph($('.main-section').attr('data-farm-id'));
     let milkingDataByLact = [];
+    
+    if($('.main-section').attr('data-status') === 'diseased') {
+      milkingProjection = milkingProjection.filter(el => el.type !== 'projected');
+    }
 
     removeloadingBlock($('.animal-card-graph-block'));
 
@@ -4050,10 +4274,10 @@ $(document).ready(async function () {
     let milkingDataByDay = [];
     milkingDataByLact.forEach((lact, index, array) => {
       let results = [];
-      lact.results.sort((a, b) => a.date - b.date);
+      lact.results.sort((a, b) => new Date(a.date) - new Date(b.date));
       lact.results.forEach((res, inx, arr) => {
         results.push({
-          date: res.date,
+          date: new Date(res.date),
           result: res.result,
           type: 'actual'
         })
@@ -4062,8 +4286,14 @@ $(document).ready(async function () {
         let increment = parseFloat(((arr[inx + 1].result - res.result) / daysSpan).toFixed(2));
 
         for (let i = 1; i <= daysSpan; i++) {
+          /* Do not create projected element for the days where actual data present */
+
+          let date = new Date(moment(res.date).add(i, 'days'));
+
+          if (results.find(res => new Date(moment(date).startOf('day')) <= date && date > new Date(moment(date).endOf('day')))) return;
+
           results.push({
-            date: new Date(moment(res.date).add(i, 'days')),
+            date,
             result: res.result + i * increment,
             type: 'projected'
           });
@@ -4083,10 +4313,21 @@ $(document).ready(async function () {
     milkingProjectionByLact.sort((a, b) => a.lactation - b.lactation);
     milkingDataByDay.sort((a, b) => a.lactationNumber - b.lactationNumber);
     milkingDataAverage.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    milkingDataByLact.forEach(data => {
+      data.results.sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+    milkingProjectionByLact.forEach(data => {
+      data.results.sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+    milkingDataByDay.forEach(data => {
+      data.results.sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+
     /* console.log(milkingDataByLact)
-    console.log(milkingProjectionByLact)
+    console.log(milkingProjectionByLact) 
     console.log(milkingDataByDay)
-    console.log(milkingDataAverage) */
+    console.log(milkingDataAverage)*/
 
     /* Working with a graph */
     $('#card-milking-graph .mp-hg-btn').on('click', function () {
@@ -4162,10 +4403,13 @@ $(document).ready(async function () {
             let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(graphObj.start).getTime()) / 1000 / 60 / 60 / 24);
 
             resultCont.append(`
-              <div class="ac-rb-result" style="background-color:${colors[index]}" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}">
-                <div class="ac-rb-result-number">${index + 1} - #${inx + 1}</div>
-                <div class="ac-rb-result-data">${res.result}</div>
-                <div class="ac-rb-result-month">${moment(res.date).format('DD.MM.YYYY')}</div>
+            
+              <div class="ac-rb-result" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}">
+                <div class="ac-rb-result-body">
+                  <div class="ac-rb-result-body-text"> <span>Лактация: </span>&nbsp; #${index + 1}</div>
+                  <div class="ac-rb-result-body-text"> <span>Дата: </span>&nbsp; ${moment(res.date).locale('ru').format('DD MMMM YYYY')}</div>
+                </div>
+                <div class="ac-rb-result-number" style="color:${colors[index]}">${res.result}</div>
               </div>
             `)
             /* Adding data line */
@@ -4219,7 +4463,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1500, 0],
+          strokeDashoffset: [2000, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4265,7 +4509,7 @@ $(document).ready(async function () {
             if ($(this).attr('data-rel') === rel) {
               $('.ac-rb-result').css('opacity', '0.5')
               $(this).css('opacity', '1');
-              $('.ac-results-block').scrollTop($(this).height() * (Math.ceil(($('.ac-rb-result').index($(this)) + 1) / 2)) - $(this).height())
+              $('.ac-results-block').scrollTop($('.ac-rb-result').index($(this)) * 80)
 
             }
           });
@@ -4302,12 +4546,13 @@ $(document).ready(async function () {
           lact.results.forEach((res, inx, arr) => {
             let currentDaysSpan = Math.round((new Date(res.date).getTime() - new Date(arr[0].date).getTime()) / 1000 / 60 / 60 / 24);
 
-            let background = res.type !== 'projected' ? `background-color:${colors[index]}` : `background: repeating-linear-gradient(135deg, ${colors[index]}, ${colors[index]} 64px, #ffffff 64px, #ffffff 128px);`;
             resultCont.append(`
-              <div class="ac-rb-result ${res.type === 'projected' && 'ac-rb-result-proj'}" style="${background}" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}">
-                <div class="ac-rb-result-number">${index + 1} - #${inx + 1}</div>
-                <div class="ac-rb-result-data">${res.total ? res.total : Math.round(res.average)}</div>
-                <div class="ac-rb-result-month">${moment(res.date).format('DD.MM.YYYY')}</div>
+              <div class="ac-rb-result ${res.type === 'projected' ? 'ac-rb-result-proj' : ''}" data-index="${inx + 1}" data-lact="${index + 1}" data-rel="${index}-${inx}" qt="Спрогнозированные данные">
+                <div class="ac-rb-result-body">
+                  <div class="ac-rb-result-body-text"> <span>Лактация: </span>&nbsp; #${index + 1}</div>
+                  <div class="ac-rb-result-body-text"> <span>Дата: </span>&nbsp; ${moment(res.date).locale('ru').format('DD MMMM YYYY')}</div>
+                </div>
+                <div class="ac-rb-result-number" style="color:${colors[index]}">${res.total ? res.total : Math.round(res.average)}</div>
               </div>
             `)
 
@@ -4363,7 +4608,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1500, 0],
+          strokeDashoffset: [2000, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4405,8 +4650,7 @@ $(document).ready(async function () {
             if ($(this).attr('data-rel') === rel) {
               $('.ac-rb-result').css('opacity', '0.5')
               $(this).css('opacity', '1');
-              $('.ac-results-block').scrollTop(($(this).height() + 15) * (Math.ceil(($('.ac-rb-result').index($(this)) + 1) / 2)) - $(this).height())
-
+              $('.ac-results-block').scrollTop($('.ac-rb-result').index($(this)) * 80)
             }
           });
         });
@@ -4486,7 +4730,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.basic-graph-point-line',
-          strokeDashoffset: [1500, 0],
+          strokeDashoffset: [2000, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -4606,6 +4850,137 @@ $(document).ready(async function () {
       $('#growth').find('.acb-item-info').text(`-`)
     }); */
   }
+
+  /* INSEMINATION TIMELINE */
+  if (document.querySelector('.ac-insemination-block')) {
+    let animalData = await getAnimalData($('.main-section').attr('data-animal-id'));
+    let bundledData = [];
+
+    animalData.animal.inseminations.forEach((res, index) => {
+      bundledData.push({
+        type: 'insemination',
+        date: new Date(res.date),
+        result: res.success,
+        index,
+        animalId: animalData.animal._id
+      })
+    });
+    animalData.animal.lactations.forEach((res, index) => {
+      bundledData.push({
+        type: 'lactation',
+        date: new Date(res.startDate),
+        number: res.number,
+        index,
+        animalId: animalData.animal._id,
+        finish: false
+      });
+
+      if (res.finishDate) {
+        bundledData.push({
+          type: 'lactation',
+          date: new Date(res.finishDate),
+          number: res.number,
+          index,
+          animalId: animalData.animal._id,
+          finish: true
+        });
+      }
+    });
+    /* Get the percentage for each insemination */
+    bundledData.sort((a, b) => a.date - b.date);
+
+    let totalInsems = 0;
+    let sucInsems = 0;
+    bundledData.forEach(data => {
+      if (data.type === 'insemination') {
+        totalInsems++;
+        if (data.result === 'true') sucInsems++;
+      }
+
+      data.percent = totalInsems === 0 ? 0 : Math.round((sucInsems / totalInsems) * 100);
+    });
+
+    bundledData.sort((a, b) => b.date - a.date);
+
+    bundledData.forEach((data, index, arr) => {
+      if (index === 0) return;
+
+      data.months = Math.round(parseFloat((arr[index - 1].date.getTime() - data.date.getTime()) / 1000 / 60 / 60 / 24 / 30 / 3));
+    });
+
+    $('.ac-ib-timeline-block ').empty();
+    bundledData.forEach(data => {
+      for (let i = 0; i < data.months; i++) {
+        $('.ac-ib-timeline-block').append(`<div class="ac-ib-timeline-empty"></div>`)
+      }
+
+      let name;
+      if (data.type === 'insemination') {
+        name = 'ОСЕМЕНЕНИЕ';
+      } else if (data.type === 'lactation' && !data.finish) {
+        name = `НАЧАЛО ЛАКТАЦИИ #${data.number}`;
+      } else if (data.type === 'lactation' && data.finish) {
+        name = `ОКОНЧАНИЕ ЛАКТАЦИИ #${data.number}`;
+      }
+
+
+
+      $('.ac-ib-timeline-block').append(`
+        <div class="ac-ib-timeline-line">
+          <div class="ac-ib-ti-percent ${data.percent < 30 ? 'ac-ib-ti-percent-fail' : 'ac-ib-ti-percent-suc'}" qtr="Процент осеменяемости">${data.percent}%</div>
+          <div class="ac-ib-ti-icon"><img src="/img/images/${data.type === 'insemination' ? 'needle' : 'milking-cow'}-icon.png"/></div>
+          ${data.type === 'insemination' && data.result === 'undefined' ? '<div class="ac-ib-ti-icon" qtr="Результат не указан"><img src="/img/svgs/question-mark.svg"/></div>' : ''}
+          ${data.type === 'insemination' && data.result === 'true' ? '<div class="ac-ib-ti-icon" qtr="Успешно"><img src="/img/svgs/check.svg"/></div>' : ''}
+          ${data.type === 'insemination' && data.result === 'false' ? '<div class="ac-ib-ti-icon" qtr="Не успешно"><img src="/img/svgs/x.svg"/></div>' : ''}
+          <div class="ac-ib-ti-text">${name}</div>
+          <div class="ac-ib-ti-date">${moment(data.date).locale('ru').format('DD MMMM, YY').toUpperCase()}</div>
+        </div>
+      `);
+    });
+
+    removeloadingBlock($('.ac-insemination-block'))
+
+
+
+
+  };
+
+  /* WEIGHT BLOCK */
+  if (document.querySelector('.ac-weight-info-block')) {
+    $('.ac-all-weight-date').each(function() {
+      let date = new Date($(this).attr('data-date'));
+
+      if(date > new Date(moment().subtract(1, 'year'))) {
+        $(this).text(moment(date).locale('ru').format('DD MMMM').toUpperCase());
+      } else {
+        $(this).text(moment(date).locale('ru').format('DD MMMM YYYY').toUpperCase());
+      }
+    });
+
+    let maxWeight = 0;
+    $('.ac-all-weight').each(function() {
+      let res = parseFloat($(this).attr('data-res'));
+      
+      if(res > maxWeight) maxWeight = res;
+    }); 
+    
+    $('.ac-all-weight').each(function() {
+      let res = parseFloat($(this).attr('data-res'));
+      $(this).css('background-color', `rgb(251, 141, 52, ${res / maxWeight})`)
+      $(this).css('height', `calc(${(res / maxWeight) * 100}% - 20px)`)
+
+    }); 
+  }
+  ///////////////////////
+  /* ANIMAL RESULTS HISTORY BLOCK */
+  ///////////////////////
+  if (document.querySelector('.ar-history-block')) {
+    $('.ar-history-block').find('.date-format').each(function () {
+      let date = new Date($(this).attr('data-date'));
+      let year = new Date() > new Date(moment(date).add(1, 'year'));
+      $(this).text(year ? moment(date).locale('ru').format('DD MMM, YY').toUpperCase().replace('.', '') : moment(date).locale('ru').format('DD MMM').toUpperCase().replace('.', ''));
+    });
+  }
   ///////////////////////
   /* ALL EDIT PAGE */
   ///////////////////////
@@ -4641,7 +5016,7 @@ $(document).ready(async function () {
   ///////////////////////
   /* EDIT MILKING RESULTS PAGES */
   ///////////////////////
-  if (document.querySelector('#edit-milking-results-container')) {
+  if (document.querySelector('#edit-milking-resultss-container')) {
 
     $('#lactation-number').find('.ai-pick').on('mouseenter', function () {
       $(this).parent().append(`
@@ -4728,7 +5103,7 @@ $(document).ready(async function () {
       $(this).append(`<div class="mini-loader"></div>`);
       anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
 
-      const response = await editAnimalResults('milking-results', animalId, index, { date, result, lactationNumber });
+      const response = await editAnimalResults('milking-resultss', animalId, index, { date, result, lactationNumber });
 
       if (response) {
         addConfirmationEmpty($('.animal-results-window'));
@@ -4845,7 +5220,7 @@ $(document).ready(async function () {
       }
       let success;
       if ($('#insemination').find('.ai-pick-active').length > 0) {
-        success = $('#insemination').find('.ai-pick-active').attr('id') === 'success';
+        success = $('#insemination').find('.ai-pick-active').attr('id');
       }
 
       $(this).empty();
@@ -4895,8 +5270,9 @@ $(document).ready(async function () {
   ///////////////////////
   /* HERD MAIN PAGE */
   ///////////////////////
+  let animals;
   if (document.querySelector('#mp-herd')) {
-    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
+    animals = await getAnimalsForGraph($('#mp-herd').attr('data-farm-id'));
     /* Working with projectrion data */
     await getFarmProjections($('#mp-herd').attr('data-farm-id'), 10);
     removeloadingBlock($('.herd-mp-quick-info-block'));
@@ -5015,12 +5391,12 @@ $(document).ready(async function () {
           $('.herd-breakdown-block').append(`
             <div class="hbb-line hbb-line-${inx}">
               <div class="hbb-line-text">${data.value}</div>
-              <div class="hbb-line-text hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
+              <div class="hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
               <div class="hbb-animals-block"></div>
             </div>
           `)
           data.animals.forEach(animal => {
-            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<div class="hbb-animal-item"></div>`)
           });
         });
       } else if (type === 'gender') {
@@ -5049,12 +5425,12 @@ $(document).ready(async function () {
           $('.herd-breakdown-block').append(`
             <div class="hbb-line hbb-line-${inx}">
               <div class="hbb-line-text">${data.value === 'male' ? 'Мужской' : 'Женский'}</div>
-              <div class="hbb-line-text hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
+              <div class="hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
               <div class="hbb-animals-block"></div>
             </div>
           `)
           data.animals.forEach(animal => {
-            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<div class="hbb-animal-item"></div>`)
           });
         });
       } else if (type === 'age') {
@@ -5084,12 +5460,12 @@ $(document).ready(async function () {
           $('.herd-breakdown-block').append(`
             <div class="hbb-line hbb-line-${inx}">
               <div class="hbb-line-text">${data.value} г.</div>
-              <div class="hbb-line-text hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
+              <div class="hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
               <div class="hbb-animals-block"></div>
             </div>
           `)
           data.animals.forEach(animal => {
-            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<div class="hbb-animal-item"></div>`)
           });
         });
       } else if (type === 'breed') {
@@ -5118,12 +5494,12 @@ $(document).ready(async function () {
           $('.herd-breakdown-block').append(`
             <div class="hbb-line hbb-line-${inx}">
               <div class="hbb-line-text">${data.value}</div>
-              <div class="hbb-line-text hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
+              <div class="hbb-line-text-second">${(data.count / (total / 100)).toFixed(1)}%</div>
               <div class="hbb-animals-block"></div>
             </div>
           `)
           data.animals.forEach(animal => {
-            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<a class="hbb-animal-item" href="/herd/animal-card/${animal._id}"><img src="/img/images/default-cow-image.png"></a>`)
+            $(`.hbb-line-${inx}`).find('.hbb-animals-block').append(`<div class="hbb-animal-item"></div>`)
           });
         });
       }
@@ -5132,6 +5508,104 @@ $(document).ready(async function () {
     });
 
     $('#herd-breakdown').find('.mp-block-outside-header-btn-active').trigger('click');
+
+    /* MILKING RESULTS BLOCK */
+    if (document.querySelector('.mp-milking-results-block')) {
+      let lastResDate = undefined;
+      animals.cows.forEach(cow => {
+        cow.milkingResults.forEach(res => {
+          if (!lastResDate || new Date(res.date) > lastResDate) lastResDate = new Date(res.date);
+        })
+      })
+
+      if (!lastResDate) lastResDate = new Date();
+
+      removeloadingBlock($('.mp-milking-results-block'));
+
+      $('#mp-mr-date').val(moment(lastResDate).format('YYYY-MM'));
+      $('#mp-mr-date').on('change', function () {
+
+        let animalsResultsSorted = [];
+        animals.cows.forEach(cow => {
+          /* Change back */
+          let start = new Date(moment($(this).val()).startOf('month'));
+          let end = new Date(moment($(this).val()).endOf('month'));
+          /* let start = new Date(moment($(this).val()).subtract(5, 'year').startOf('year'));
+          let end = new Date(moment($(this).val()).endOf('year')); */
+          let cowTotal = 0;
+          let cowCount = 0;
+          let lactationNumber;
+          cow.milkingResults.forEach(result => {
+            const date = new Date(result.date);
+            if (start < date && date < end) {
+              cowTotal += result.result;
+              cowCount++;
+              lactationNumber = result.lactationNumber;
+            }
+          });
+
+          if (cowCount === 0) return;
+          animalsResultsSorted.push({
+            cow,
+            result: parseFloat((cowTotal / cowCount).toFixed(1)),
+            lactationNumber
+          });
+        });
+
+        if (animalsResultsSorted.length === 0) return emptyBlock($('.mp-mr-animals-block'), 'Данные отсутствуют', 'Результаты за данный период отсутствуют');
+
+        removeEmptyBlock($('.mp-mr-animals-block'));
+
+        animalsResultsSorted.sort((a, b) => b.result - a.result);
+        $('.mp-mr-animals-block').empty();
+        let counter = 1;
+        let counterMax = 1;
+        $('.mp-mr-animals-block').append('<div class="mp-mr-ab-line mp-mr-ab-line-1"></div>');
+        if (animalsResultsSorted.length > 20) {
+          $('.mp-mr-animals-block').append('<div class="mp-mr-ab-line mp-mr-ab-line-2"></div>');
+          counterMax++;
+        }
+        if (animalsResultsSorted.length > 30) {
+          $('.mp-mr-animals-block').append('<div class="mp-mr-ab-line mp-mr-ab-line-3"></div>');
+          counterMax++;
+        }
+
+        animalsResultsSorted.forEach(res => {
+          $(`.mp-mr-ab-line-${counter}`).append(`
+
+            <div class="mp-mr-ab-item" data-result="${res.result}">
+              <div class="mp-mr-ab-item-info">
+                <div class="mp-mr-ab-item-info-line"><img src="/img/svgs/hash-straight.svg"/>
+                  <p>${res.cow.number}</p>
+                </div>
+                <div class="mp-mr-ab-item-info-line"> <img src="/img/svgs/tree-structure.svg"/>
+                  <p>${res.lactationNumber}</p>
+                </div>
+              </div>
+              <div>${res.result} л.</div>
+            </div>
+          `)
+
+          if (counter !== counterMax) {
+            counter++
+          } else {
+            counter = 1;
+          }
+        });
+
+        $('.mp-mr-ab-item').each(function () {
+          let result = parseFloat($(this).attr('data-result'));
+          if (result >= 16) {
+            $(this).css('background-color', `rgb(14, 173, 105, ${result / 20 / 1.15})`);
+          } else if (result <= 13) {
+            $(this).css('background-color', `rgb(212, 77, 92, ${10 / result / 1.15})`);
+          }
+        });
+
+
+      });
+      $('#mp-mr-date').trigger('change');
+    }
   }
 
   //////////////////////////
@@ -5190,12 +5664,12 @@ $(document).ready(async function () {
 
     $('.herd-mp-list-block-insem').find('.herd-mp-list-line').each(function () {
       if ($('.herd-mp-list-block-insem').find('.herd-mp-list-line').index($(this)) % 2 === 0) {
-        $(this).css('background-color', '#d9d9d9')
+        $(this).css('background-color', '#e4e4e4')
       }
     });
     $('.herd-mp-list-block-calv').find('.herd-mp-list-line').each(function () {
       if ($('.herd-mp-list-block-calv').find('.herd-mp-list-line').index($(this)) % 2 === 0) {
-        $(this).css('background-color', '#d9d9d9')
+        $(this).css('background-color', '#e4e4e4')
       }
     });
 
@@ -5238,16 +5712,16 @@ $(document).ready(async function () {
       });
     });
 
+    removeloadingBlock($('.herd-mp-list-block-combined'));
     $('#table-btns').find('.mp-block-outside-header-btn-active').trigger('click');
   }
   //////////////////////////
   //////////////////////////
   //////////////////////////
-  /* Herd main page graph */
+  /* Herd main page graph milking results */
   //////////////////////////
   //////////////////////////
   if (document.querySelector('#mp-results-graph')) {
-    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
     removeloadingBlock($('.mp-herd-graph-block'));
     let data = [];
     animals.cows.forEach((animal) => {
@@ -5344,10 +5818,10 @@ $(document).ready(async function () {
     $('#mp-results-graph .mp-hg-btn').on('click', function () {
       $(this).addClass('mp-hg-btn-active');
       $(this).siblings().removeClass('mp-hg-btn-active');
-      const graphState = $('#graph-btns').find('.mp-hg-btn-active').attr('data-graph') === 'average' ? 'average' : 'total';
+      const graphState = $('#mp-results-graph').find('.graph-btns').find('.mp-hg-btn-active').attr('data-graph') === 'average' ? 'average' : 'total';
 
       /* Allowing time buttons with 5 and more results */
-      $('#months-btns').find('.mp-hg-btn').each(function () {
+      $('#mp-results-graph').find('.months-btns').find('.mp-hg-btn').each(function () {
         if ($(this).attr('data-months') === 'all') return;
         let startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'months'));
         if (dataByMonth.filter(el => el.date >= startDate).length < 5) {
@@ -5357,13 +5831,13 @@ $(document).ready(async function () {
         }
       });
 
-      if ($('#months-btns').find('.mp-hg-btn-active').length === 0) {
-        $('#months-btns').find('.mp-hg-btn').not('.mp-hg-btn-unav').first().addClass('mp-hg-btn-active');
+      if ($('#mp-results-graph').find('.months-btns').find('.mp-hg-btn-active').length === 0) {
+        $('#mp-results-graph').find('.months-btns').find('.mp-hg-btn').not('.mp-hg-btn-unav').first().addClass('mp-hg-btn-active');
       }
 
       let workingArr
-      if ($('#months-btns').find('.mp-hg-btn-active').attr('data-months') !== 'all') {
-        let startDate = new Date(moment().subtract(parseFloat($('#months-btns').find('.mp-hg-btn-active').attr('data-months')), 'months'));
+      if ($('#mp-results-graph').find('.months-btns').find('.mp-hg-btn-active').attr('data-months') !== 'all') {
+        let startDate = new Date(moment().subtract(parseFloat($('#mp-results-graph').find('.months-btns').find('.mp-hg-btn-active').attr('data-months')), 'months'));
         workingArr = dataByMonth.filter(el => el.date >= startDate);
       } else {
         workingArr = dataByMonth;
@@ -5386,8 +5860,8 @@ $(document).ready(async function () {
       max = Math.ceil(max / 10) * 10 * 1.5;
 
       /* Cleaning previously created graph */
-      $('#main-column').find('.mp-herd-legend-item').remove();
-      $('#additional-column').find('.mp-herd-legend-item').remove();
+      $('#mp-results-graph').find('.main-column').find('.mp-herd-legend-item').remove();
+      $('#mp-results-graph').find('.additional-column').find('.mp-herd-legend-item').remove();
 
       $('#mp-results-graph').find('.basic-graph-svg').remove()
 
@@ -5476,7 +5950,7 @@ $(document).ready(async function () {
           if (res.top) mode = 'mp-herd-graph-info-item-top';
           if (res.bottom) mode = 'mp-herd-graph-info-item-bottom';
           $('.mp-herd-graph-info-block').append(`
-            <div class="mp-herd-graph-info-item ${mode}" data-id="${id}">
+            <div class="mp-herd-graph-info-item ${mode}" data-id="${id}" qt="${moment(res.date).locale('ru').format('DD MMMM, YY')}">
               <div class="mp-herd-graph-info-item-group">
                 <div class="mp-herd-graph-info-text">#${res.number}</div>
                 <div class="mp-herd-graph-info-sub-text">${res.name ? res.name : ''}</div>
@@ -5570,21 +6044,21 @@ $(document).ready(async function () {
 
       anime({
         targets: '.basic-graph-point-line',
-        strokeDashoffset: [1500, 0],
+        strokeDashoffset: [2000, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
       });
       anime({
         targets: '.basic-graph-top-line',
-        strokeDashoffset: [1500, 0],
+        strokeDashoffset: [2000, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
       });
       anime({
         targets: '.basic-graph-bottom-line',
-        strokeDashoffset: [1500, 0],
+        strokeDashoffset: [2000, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
@@ -5759,7 +6233,7 @@ $(document).ready(async function () {
       });
 
       if (graphState === 'average') {
-        $('#main-column').append(`
+        $('#mp-results-graph').find('.main-column').append(`
           <div class="mp-herd-legend-item" data-rel-element='average-graph-data'>
             <div class="mp-herd-li-mark">
               <div class="mp-herd-li-mark-average"></div>
@@ -5768,7 +6242,7 @@ $(document).ready(async function () {
           </div>
         `)
       } else {
-        $('#main-column').append(`
+        $('#mp-results-graph').find('.main-column').append(`
           <div class="mp-herd-legend-item" data-rel-element='average-graph-data'>
             <div class="mp-herd-li-mark">
               <div class="mp-herd-li-mark-average"></div>
@@ -5780,7 +6254,7 @@ $(document).ready(async function () {
       }
 
       if (graphState === 'average') {
-        $('#additional-column').append(`
+        $('#mp-results-graph').find('.additional-column').append(`
         <div class="mp-herd-legend-item" data-rel-element='basic-graph-average-dot'>
           <div class="mp-herd-li-mark">
             <div class="mp-herd-li-mark-average-dot"></div>
@@ -5819,7 +6293,7 @@ $(document).ready(async function () {
       });
     });
 
-    $('#graph-btns').find('.mp-hg-btn-active').trigger('click');
+    $('#mp-results-graph').find('.graph-btns').find('.mp-hg-btn-active').trigger('click');
 
 
 
@@ -5834,7 +6308,18 @@ $(document).ready(async function () {
   //////////////////////////
   //////////////////////////
   if (document.querySelector('#mp-herd-projection-chart')) {
-    const projData = await getFarmProjections($('#mp-herd').attr('data-farm-id'), 5);
+
+
+    let projData = await getFarmProjections($('#mp-herd').attr('data-farm-id'), 5);
+
+    let prevProj = JSON.parse(localStorage.getItem('herdProjection'));
+
+    if (!prevProj || projData[0].animals.length === prevProj[0].animals.length) {
+      projData = prevProj;
+    } else {
+      localStorage.setItem('herdProjection', JSON.stringify(projData));
+    }
+
     removeloadingBlock($('.mp-projection-block'));
     const projDataFormat = [];
 
@@ -5899,8 +6384,19 @@ $(document).ready(async function () {
     })
 
     $('.mp-projection-graph-working-area').on('mouseenter', '.mp-projection-graph-item', function () {
+      let change, changeClass;
+      if (parseFloat($(this).attr('data-change')) > 0) {
+        change = `+${$(this).attr('data-change')}`;
+        changeClass = `span-success`;
+      } else if (parseFloat($(this).attr('data-change')) < 0) {
+        change = `${$(this).attr('data-change')}`;
+        changeClass = `span-fail`;
+      } else {
+        change = `${$(this).attr('data-change')}`;
+        changeClass = ``;
+      }
       $(`.mp-projection-info-item-active`).find('.mp-projection-info-item-res').text($(this).attr('data-count'));
-      $(`.mp-projection-info-item-active`).find('.mp-projection-info-item-title span').text($(this).attr('data-change')).removeClass().addClass(parseFloat($(this).attr('data-change')) < 0 ? 'span-fail' : 'span-success');
+      $(`.mp-projection-info-item-active`).find('.mp-projection-info-item-title span').text(change).removeClass().addClass(changeClass);
 
       $(this).find('.mp-projection-graph-item-bar').css('opacity', '1');
       $(this).siblings().find('.mp-projection-graph-item-bar').css('opacity', '0.5');
@@ -5913,10 +6409,9 @@ $(document).ready(async function () {
     $('.mp-projection-info-item').on('click', function () {
       if ($(this).hasClass('mp-projection-info-item-active')) return;
 
-      $(this).siblings().addClass('mp-projection-info-item-transp');
-      $(this).siblings().removeClass('mp-projection-info-item-active');
-      $(this).removeClass('mp-projection-info-item-transp');
-      $(this).addClass('mp-projection-info-item-active');
+      $(this).siblings().addClass('mp-projection-info-item-transp').removeClass('mp-projection-info-item-active');
+      $(this).removeClass('mp-projection-info-item-transp').addClass('mp-projection-info-item-active');
+
       const unit = $(this).attr('data-unit');
       $('.mp-projection-info-item-animals').find('.mp-projection-info-item-res').text(projDataFormat.at(-1).animals.count)
       $(`.mp-projection-info-item-animals`).find('.mp-projection-info-item-title span').text(projDataFormat.at(-1).animals.change).removeClass().addClass(projDataFormat.at(-1).animals.change < 0 ? 'span-fail' : 'span-success');
@@ -5979,6 +6474,86 @@ $(document).ready(async function () {
   //////////////////////////
   //////////////////////////
   if (document.querySelector('#milk-quality-graph')) {
+    /* Info and suggestions about each item */
+    $('.mqg-info-btn').on('click', function () {
+      if ($(this).find('ion-icon').attr('name') === 'help') {
+        $(this).find('ion-icon').attr('name', 'close');
+        $('.mqg-info-block').show();
+      } else {
+        $(this).find('ion-icon').attr('name', 'help');
+        $('.mqg-info-block').hide();
+      }
+    });
+
+    const milkQualitySuggestions = [
+      {
+        item: 'water',
+        name: 'Вода',
+        text: 'Вода является основным компонентом молока, ее содержание в коровьем молоке обычно составляет около 87-88%. Оптимальное количество воды в молоке зависит от индивидуальных потребностей и предпочтений каждого человека. Для некоторых людей может быть предпочтительнее молоко с более низким содержанием воды, например, обезжиренное или полужирное молоко, в то время как другие могут предпочитать молоко с более высоким содержанием воды, такое как молоко с высоким содержанием белка или обогащенное витаминами и минералами.'
+      },
+      {
+        item: 'fat',
+        name: 'Жиры',
+        text: 'Оптимальное количество жира в молоке может варьироваться в зависимости от индивидуальных предпочтений и целей питания. В целом, молоко с низким содержанием жира (около 1-2% жира) может быть более подходящим для людей, следящих за своим весом или уровнем холестерина, в то время как молоко со средним содержанием жира (около 2-3% жира) считается наиболее сбалансированным для большинства людей. Однако, если вы стремитесь к получению определенных питательных веществ, которые содержатся в жире, таком как витамин K2 и конъюгированная линолевая кислота, то вам может подойти молоко с более высоким содержанием жира (3,25-4% жира). В конечном итоге, выбор жирности молока должен основываться на ваших индивидуальных потребностях и целях питания.'
+      },
+      {
+        item: 'dryResidue',
+        name: 'Сухой остаток',
+        text: 'Сухие вещества молока - это все вещества, которые остаются в молоке после удаления из него воды. Содержание сухих веществ в молоке составляет около 11-12%. Оптимальное количество сухого остатка в молоке зависит от многих факторов, таких как возраст, здоровье и индивидуальные потребности животного. В целом, чем больше сухого остатка в молоке, тем больше в нем питательных веществ и витаминов. Однако слишком высокое содержание сухого остатка может привести к снижению качества молока и его вкусовых свойств.'
+      },
+      {
+        item: 'casein',
+        name: 'Казеин',
+        text: 'Казеин - это один из основных белков, содержащихся в молоке. Его содержание в коровьем молоке составляет около 2-4%. Оптимальное количество казеина в молоке зависит от потребностей организма и индивидуальных особенностей каждого человека. Некоторые люди могут иметь повышенную чувствительность к казеину или аллергию на него, в этом случае им может быть рекомендовано молоко с низким содержанием казеина или без него вообще. Однако для большинства людей молоко с естественным уровнем казеина является оптимальным выбором.'
+      },
+      {
+        item: 'sugar',
+        name: 'Сахар',
+        text: 'В молоке содержится небольшое количество сахара, в основном лактозы. Оптимальное количество сахара в молоке зависит от возраста, состояния здоровья и индивидуальных потребностей человека. В целом, молоко с естественным содержанием сахара подходит большинству людей. Однако если у человека есть непереносимость лактозы или аллергия на молоко, то ему может потребоваться молоко без сахара или с пониженным его содержанием.'
+      },
+      {
+        item: 'phosphatides',
+        name: 'Фосфатиды',
+        text: 'В молоке содержатся различные виды жиров, включая фосфатиды. Оптимальное количество фосфатидов в молоке зависит от множества факторов, включая породу коровы, ее рацион, возраст и состояние здоровья. Обычно содержание фосфатидов в молоке находится в пределах от 0,1 до 0,5%. Однако более точные значения могут быть определены только для конкретного образца молока.'
+      },
+      {
+        item: 'sterols',
+        name: 'Стерины',
+        text: 'В молоке содержатся стерины, которые являются одной из форм холестерина. Оптимальное количество стеринов в молоке зависит от индивидуальных потребностей человека и может варьироваться. В среднем, содержание стеринов в коровьем молоке составляет около 0,5-1%. Однако, если у человека есть заболевания, связанные с холестерином, ему может потребоваться молоко с более низким содержанием стеринов.'
+      },
+      {
+        item: 'albumen',
+        name: 'Альбумин',
+        text: 'Альбумин - это белок, который содержится в молоке. Оптимальное количество альбумина в молоке зависит от многих факторов, включая здоровье коровы, ее питание и генетику. Обычно содержание альбумина в коровьем молоке колеблется 0,02-0,04%. Для людей с аллергией на альбумин может быть полезно молоко с более низким содержанием альбумина. Однако для большинства людей молоко с естественным уровнем альбумина является оптимальным выбором.'
+      },
+      {
+        item: 'otherProteins',
+        name: 'Другие белки',
+        text: 'В молоке содержатся различные белки, включая казеин, альбумин и глобулин. Оптимальное количество белков в молоке зависит от индивидуальных потребностей человека и его целей. В целом, молоко с естественным содержанием белков подходит большинству людей. Однако, если у человека есть аллергия на определенные белки, ему может потребоваться молоко, которое было обработано для удаления этих аллергенов.'
+      },
+      {
+        item: 'nonProteinCompounds',
+        name: 'Небелковые соединения',
+        text: 'В молоке содержится множество небелковых соединений, включая жиры, углеводы, витамины, минералы и другие вещества. Оптимальное количество этих соединений зависит от индивидуальных потребностей и целей человека. Для людей, стремящихся к снижению веса или контролю уровня холестерина, нежирное молоко (с низким содержанием жиров) может быть оптимальным выбором. Для тех, кто нуждается в определенных питательных веществах, таких как витамин K2 или конъюгированная линолевая кислота, может быть предпочтительным молоко с более высоким содержанием жиров. Для большинства людей подходит молоко со средним содержанием жиров, так как оно является наиболее сбалансированным по питательным веществам.'
+      },
+      {
+        item: 'saltsOfInorganicAcids',
+        name: 'Соли неорганических кислот',
+        text: 'В молоке содержатся соли неорганических кислот, такие как фосфаты, хлориды, сульфаты и другие. Оптимальное количество солей в молоке зависит от породы коровы, ее рациона, возраста и состояния здоровья. Обычно содержание солей в молоке находится в пределах нормы и не требует коррекции. Однако, если у человека есть заболевание, связанное с нарушением солевого обмена, ему может потребоваться молоко с пониженным содержанием солей.'
+      },
+      {
+        item: 'ash',
+        name: 'Зола',
+        text: 'Зола - это остаток, который образуется после сжигания молока. Она содержит минеральные вещества, такие как кальций, фосфор, магний, калий, натрий, хлор и другие. Количество золы в молоке зависит от содержания минеральных веществ в исходном сырье и может колебаться в довольно широких пределах. Однако, обычно содержание золы в коровьем молоке находится в диапазоне 0.5-1.5%. Для большинства людей молоко с естественным содержанием золы является оптимальным выбором, однако, если у вас есть особые потребности в минеральных веществах, вы можете выбрать молоко с повышенным содержанием определенных минералов.'
+      },
+      {
+        item: 'pigments',
+        name: 'Пигменты',
+        text: 'В молоке содержатся пигменты, которые придают ему определенный цвет. Оптимальное количество пигментов в молоке зависит от многих факторов, включая породу коровы, её рацион и условия содержания. Обычно молоко имеет белый или слегка желтоватый цвет, и содержание пигментов в нем не превышает нескольких микрограммов на литр. Если вы хотите получить молоко с более интенсивным цветом, можно выбрать молоко от коров, которые пасутся на полях с большим количеством цветущих растений. Однако следует помнить, что слишком большое количество пигментов может негативно сказаться на вкусе и качестве молока.'
+      },
+    ]
+
+
     /* Get the milking quality data */
     const records = await getMilkQuality();
     removeloadingBlock($('.milk-quality-graph-container'));
@@ -6004,6 +6579,14 @@ $(document).ready(async function () {
 
       /* Making an event for parameter change */
       $('.milk-quality-info-item').on('click', function () {
+        let item = $(this).attr('id');
+        milkQualitySuggestions.forEach(sug => {
+          if (sug.item !== item) return;
+
+          $('.mqg-info-title').text(sug.name);
+          $('.mqg-info-text').text(sug.text);
+        });
+
         if ($(this).hasClass('milk-quality-info-item-active')) return;
         removeEmptyBlock($('#milk-quality-graph'))
 
@@ -6032,7 +6615,7 @@ $(document).ready(async function () {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         svg.classList.add('basic-graph-svg')
         $('#milk-quality-graph').append(svg);
-        svg.style.height = $('#milk-quality-graph').height();
+        svg.style.height = '400px';
         let expandedWidth = 0;
         records.forEach(rec => {
           if (rec[component] !== null) {
@@ -6117,18 +6700,18 @@ $(document).ready(async function () {
 
         anime({
           targets: '.milking-quality-line',
-          strokeDashoffset: [1500, 0],
+          strokeDashoffset: [2000, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
         });
 
-        $('#milk-quality-graph').find('.basic-graph-text').off();
-        $('#milk-quality-graph').find('.basic-graph-text').on('mouseenter', function () {
-          $(`.milking-date-${$(this).attr('data-number')}`).css('opacity', 1);
+        $('#milk-quality-graph').off('mouseenter').off('mouseleave');
+        $('#milk-quality-graph').on('mouseenter', function () {
+          $(`.basic-graph-text-date`).css('opacity', 1);
         });
-        $('#milk-quality-graph').find('.basic-graph-text').on('mouseleave', function () {
-          $(`.milking-date-${$(this).attr('data-number')}`).css('opacity', 0);
+        $('#milk-quality-graph').on('mouseleave', function () {
+          $(`.basic-graph-text-date`).css('opacity', 0);
         });
 
 
@@ -6146,18 +6729,24 @@ $(document).ready(async function () {
   ///////////////////////
   ///////////////////////
   ///////////////////////
-  if (document.querySelector('#weight-graph')) {
-    loadingBlock($('#weight-graph'));
-    const animals = await getAnimalsForGraph($('#mp-herd-graph').attr('data-farm-id'));
-    removeloadingBlock($('#weight-graph'))
+  if (document.querySelector('#hm-weight-graph')) {
+    removeloadingBlock($('#hm-weight-graph'))
     const weightAverage = [];
     const weightCows = [];
     const weightBulls = [];
+    const currentWeightData = [];
 
     animals.animals.forEach((animal) => {
       if (animal.weightResults.length === 0) return;
+      /* Prepare adata for current animal weight items */
+      animal.weightResults.sort((a, b) => b.date - a.date);
+      currentWeightData.push({
+        animal,
+        currentWeightResult: animal.weightResults[0]
+      });
 
       animal.weightResults.forEach(result => {
+        result.animal = animal;
         if (weightAverage.find(el => moment(el.date).isSame(result.date, 'month'))) {
           let res = weightAverage.find(el => moment(el.date).isSame(result.date, 'month'));
           res.results.push(result);
@@ -6211,264 +6800,632 @@ $(document).ready(async function () {
         }
       });
     });
+    weightAverage.sort((a, b) => a.date - b.date);
+    weightCows.sort((a, b) => a.date - b.date);
+    weightBulls.sort((a, b) => a.date - b.date);
+    ////////////////////////
+    ////////////////////////
+    ////////////////////////
+    /* Current weight results block */
+    ////////////////////////
+    ////////////////////////
+    ////////////////////////
+    $('.weight-results-block').empty();
+    currentWeightData.forEach(data => {
+      $('.weight-results-block').append(`
+      <div class="wrb-item-outter ${data.animal.butcherSuggestion ? 'wrb-item-outter-ready' : ''}" rc-title="Списать животное" rc-link='/herd/write-off-animal/${data.animal._id}' qt="Текущий вес на ${moment(data.currentWeightResult.date).locale('ru').format('DD.MM.YYYY')}">
+        <div class="wrb-item" >
+          <div class="wrb-item-image"> <img src="/img/images/default-cow-image.png"/></div>
+          <div class="wrb-item-text">#${data.animal.number}</div>
+          <div class="wrb-item-text wrb-item-res">${data.currentWeightResult.result} кг.</div>
+        </div>
+        ${data.animal.butcherSuggestion ? `<div class="wrb-item-disclaimer">${data.animal.gender === 'male' ? 'Бык готов' : 'Корова готова'} для забоя</div>` : ''}
+      </div>
+    `);
+    });
 
-    //console.log(weightAverage, weightCows, weightBulls);
 
+    ////////////////////////
+    ////////////////////////
+    ////////////////////////
     /* Working with graph */
-    /* Setting max and min */
-    let max, min;
-    max = 0;
-    min = 0;
-    let start, end;
+    ////////////////////////
+    ////////////////////////
+    ////////////////////////
 
-    [weightAverage, weightCows, weightBulls].forEach(el => {
-      el.forEach(subEl => {
-        if (max < subEl.average) max = subEl.average;
-        if (min > subEl.average) min = subEl.average;
+    $('#hm-weight-graph .mp-hg-btn').on('click', function () {
+      removeloadingBlock($('.weight-graph-block'));
+      $(this).addClass('mp-hg-btn-active');
+      $(this).siblings().removeClass('mp-hg-btn-active');
 
-        if (!start || new Date(subEl.date) < start) start = new Date(subEl.date);
-        if (!end || new Date(subEl.date) > end) end = new Date(subEl.date);
-      })
-    });
-    max = Math.ceil(max / 10) * 10 * 1.5;
+      /* Allowing time buttons with 5 and more results */
+      $('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn').each(function () {
+        if ($(this).attr('data-months') === 'all') return;
+        let startDate = new Date(moment().subtract(parseFloat($(this).attr('data-months')), 'months'));
+        if (weightAverage.filter(el => el.date >= startDate).length < 5) {
+          $(this).addClass('mp-hg-btn-unav')
+        } else {
+          $(this).removeClass('mp-hg-btn-unav')
+        }
+      });
 
+      if ($('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn-active').length === 0) {
+        $('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn').not('.mp-hg-btn-unav').first().addClass('mp-hg-btn-active');
+      }
 
-    $('#weight-graph').find('.basic-graph-svg').remove()
-
-    /* Adding main SVG */
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-    svg.classList.add('basic-graph-svg')
-    $('#weight-graph').append(svg);
-    svg.style.height = $('#weight-graph').height();
-
-    const expWidth = $('#weight-graph').width() > ((end.getTime() - start.getTime()) / 30 / 24 / 60 / 60 / 1000) * 100 ? $('#weight-graph').width() : ((end.getTime() - start.getTime()) / 30 / 24 / 60 / 60 / 1000) * 100;
-    svg.style.width = expWidth;
-
-    /* Creating showlines */
-    const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-    showLineHor.classList.add('basic-graph-show-line')
-    showLineHor.setAttribute('id', 'graph-show-line-hor')
-    svg.append(showLineHor);
-
-    const showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-    showLineVer.classList.add('basic-graph-show-line')
-    showLineVer.setAttribute('id', 'graph-show-line-ver')
-    svg.append(showLineVer);
-
-    /* Creating ticks */
-    const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-    tickHor.classList.add('basic-graph-tick');
-    svg.append(tickHor);
-    const tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-    tickVer.classList.add('basic-graph-tick-date');
-    svg.append(tickVer);
-
-    /* Counting the horizontal gap */
-    let horGap = parseFloat($('#weight-graph').height()) / 12;
-
-    const workingAreaHeight = Math.round($('#weight-graph').find('.basic-graph-svg').height() - horGap * 2);
-    const workingAreaWidth = Math.round($('#weight-graph').find('.basic-graph-svg').width() - horGap * 2);
-
-    /* Adding horizontal grid lines and ticks */
-    for (let i = 11; i >= 1; i--) {
-      const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-      gridLine.classList.add('basic-graph-grid-line')
-      svg.append(gridLine);
-      gridLine.setAttribute('x1', 0)
-      gridLine.setAttribute('y1', i * horGap)
-      gridLine.setAttribute('x2', parseFloat($('#weight-graph').find('.basic-graph-svg').width()))
-      gridLine.setAttribute('y2', i * horGap)
-    }
-
-    /* Adding the vertical grid lines */
-    for (let i = 1; i <= parseFloat($('#weight-graph').find('.basic-graph-svg').width()) / horGap; i++) {
-      const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-      gridLine.classList.add('basic-graph-grid-line')
-      svg.append(gridLine);
-      gridLine.setAttribute('x1', i * horGap)
-      gridLine.setAttribute('y1', 0)
-      gridLine.setAttribute('x2', i * horGap)
-      gridLine.setAttribute('y2', parseFloat($('#weight-graph').find('.basic-graph-svg').height()))
-    }
-
-    /* Adding data */
-
-    let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
-
-
-    let circleTimer = 0;
-    weightAverage.forEach((data, inx, arr) => {
-      let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
-
-      /* Adding data line */
-      let path;
-      if (inx === 0) {
-        path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-        path.classList.add('basic-graph-point-line');
-        path.classList.add('average-weight-data');
-        svg.append(path);
-        path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
-
-        path.setAttribute('id', `weight-line-average`);
+      let workingArr, workingArrCows, workingArrBulls;
+      if ($('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn-active').attr('data-months') !== 'all') {
+        let startDate = new Date(moment().subtract(parseFloat($('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn-active').attr('data-months')), 'months'));
+        workingArr = weightAverage.filter(el => el.date >= startDate);
+        workingArrCows = weightCows.filter(el => el.date >= startDate);
+        workingArrBulls = weightBulls.filter(el => el.date >= startDate);
       } else {
-        path = document.getElementById(`weight-line-average`);
-        path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
-
+        workingArr = weightAverage;
+        workingArrCows = weightCows;
+        workingArrBulls = weightBulls;
       }
 
-      /* Adding data points */
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-      circle.classList.add('basic-graph-point')
-      circle.classList.add('average-graph-data');
-      svg.append(circle);
-      circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100)))
-      circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100)))
+      /* Setting max and min */
+      let max, min;
+      max = 0;
+      min = 0;
 
-      circle.setAttribute('r', 4);
-      circle.setAttribute('data-average', data.average);
-      circle.setAttribute('data-total', data.total);
-      circle.setAttribute('data-results', data.results.length);
-      circle.setAttribute('data-date', data.date);
+      workingArr.forEach(el => {
+        if (max < el.average) max = el.average;
+        if (min > el.average) min = el.average;
 
-      circle.style.animation = `fadeIn ${circleTimer}s ease-out`
-      circleTimer += 0.1;
-    });
+      });
+      max = Math.ceil(max / 100) * 100 * 1.5;
 
-    anime({
-      targets: '#weight-line-average',
-      strokeDashoffset: [1500, 0],
-      easing: 'easeInOutSine',
-      duration: 1500,
-      delay: function (el, i) { return i * 250 },
-    });
-    /* anime({
-      targets: '.basic-graph-top-line',
-      strokeDashoffset: [1500, 0],
-      easing: 'easeInOutSine',
-      duration: 1500,
-      delay: function (el, i) { return i * 250 },
-    });
-    anime({
-      targets: '.basic-graph-bottom-line',
-      strokeDashoffset: [1500, 0],
-      easing: 'easeInOutSine',
-      duration: 1500,
-      delay: function (el, i) { return i * 250 },
-    }); */
+      /* Cleaning previously created graph */
+      $('#hm-weight-graph').find('.main-column').find('.mp-herd-legend-item').remove();
+      $('#hm-weight-graph').find('.additional-column').find('.mp-herd-legend-item').remove();
 
+      $('#hm-weight-graph').find('.basic-graph-svg').remove()
 
-    /* Adding ticks on mousemove */
-    $('#weight-graph').off()
-    $('#weight-graph').on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
-      let point = svg.createSVGPoint();
-      point.x = clientX;
-      point.y = clientY;
-      point = point.matrixTransform(svg.getScreenCTM().inverse());
+      /* Adding main SVG */
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+      svg.classList.add('basic-graph-svg')
+      $('#hm-weight-graph').append(svg);
+      svg.style.width = $('#hm-weight-graph').width();
+      svg.style.height = '400px';
 
+      /* Creating showlines */
+      const showLineHor = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      showLineHor.classList.add('basic-graph-show-line')
+      showLineHor.setAttribute('id', 'graph-show-line-hor')
+      svg.append(showLineHor);
 
-      let xStop = false;
-      let yStop = false;
-      if (point.x < horGap) {
-        showLineVer.setAttribute('x1', horGap + 1);
-        showLineVer.setAttribute('x2', horGap + 1);
-        showLineVer.setAttribute('y1', 0)
-        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
-        xStop = true;
-      }
-      if (point.y < horGap) {
-        showLineHor.setAttribute('y1', horGap + 1);
-        showLineHor.setAttribute('y2', horGap + 1);
-        showLineHor.setAttribute('x1', horGap);
-        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
-        yStop = true;
-      }
-      if (point.x > parseFloat($('#weight-graph').width()) - horGap) {
-        showLineVer.setAttribute('x1', parseFloat($('#weight-graph').width()) - horGap);
-        showLineVer.setAttribute('x2', parseFloat($('#weight-graph').width()) - horGap);
-        showLineVer.setAttribute('y1', 0)
-        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
-        xStop = true;
-      }
-      if (point.y > parseFloat($('#weight-graph').height()) - horGap) {
-        showLineHor.setAttribute('y1', parseFloat($('#weight-graph').height()) - horGap - 1);
-        showLineHor.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap - 1);
-        showLineHor.setAttribute('x1', horGap);
-        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
-        yStop = true;
+      const showLineVer = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+      showLineVer.classList.add('basic-graph-show-line')
+      showLineVer.setAttribute('id', 'graph-show-line-ver')
+      svg.append(showLineVer);
+
+      /* Creating ticks */
+      const tickHor = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      tickHor.classList.add('basic-graph-tick');
+      svg.append(tickHor);
+      const tickVer = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      tickVer.classList.add('basic-graph-tick-date');
+      svg.append(tickVer);
+
+      /* Counting the horizontal gap */
+      let horGap = parseFloat($('#hm-weight-graph').height()) / 12;
+
+      const workingAreaHeight = Math.round($('#hm-weight-graph').height() - horGap * 2);
+      const workingAreaWidth = Math.round($('#hm-weight-graph').width() - horGap * 2);
+
+      /* Adding horizontal grid lines and ticks */
+      for (let i = 11; i >= 1; i--) {
+        const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        gridLine.classList.add('basic-graph-grid-line')
+        svg.append(gridLine);
+        gridLine.setAttribute('x1', 0)
+        gridLine.setAttribute('y1', i * horGap)
+        gridLine.setAttribute('x2', parseFloat($('#hm-weight-graph').width()))
+        gridLine.setAttribute('y2', i * horGap)
       }
 
-
-      if (!yStop) {
-        showLineHor.setAttribute('y1', point.y);
-        showLineHor.setAttribute('y2', point.y);
-        showLineHor.setAttribute('x1', horGap);
-        showLineHor.setAttribute('x2', parseFloat($('#weight-graph').width()));
+      /* Adding the vertical grid lines */
+      for (let i = 1; i <= parseFloat($('#hm-weight-graph').width()) / horGap; i++) {
+        const gridLine = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        gridLine.classList.add('basic-graph-grid-line')
+        svg.append(gridLine);
+        gridLine.setAttribute('x1', i * horGap)
+        gridLine.setAttribute('y1', 0)
+        gridLine.setAttribute('x2', i * horGap)
+        gridLine.setAttribute('y2', parseFloat($('#hm-weight-graph').height()))
       }
 
-      if (!xStop) {
-        showLineVer.setAttribute('x1', point.x);
-        showLineVer.setAttribute('x2', point.x);
-        showLineVer.setAttribute('y1', 0)
-        showLineVer.setAttribute('y2', parseFloat($('#weight-graph').height()) - horGap)
-      }
+      /* Adding data */
+      let start = workingArr[0].date;
+      let end = workingArr[workingArr.length - 1].date;
 
+      let daysSpan = Math.round((end.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
 
-      tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
-      tickHor.setAttribute('x', 10)
-      tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+      /* Adding all data dots */
 
-      tickVer.textContent = moment(start).add(Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100)), 'day').lang('ru').format('DD MMMM, YY')
-      tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
-      tickVer.setAttribute('y', $('#weight-graph').height() - 10)
+      workingArr.forEach((data, inx, arr) => {
+        data.results.sort((a, b) => a.date - b.date);
+        data.results.forEach(res => {
+          let id = randomstring.generate(10);
+          let resDaysSpan = Math.round((new Date(res.date).getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+          circle.classList.add('basic-graph-average-dot')
+          svg.append(circle);
+          circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (resDaysSpan / (daysSpan / 100) / 100)))
+          circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (res.result / (max / 100) / 100)))
+          circle.setAttribute('r', 4);
+          circle.setAttribute('data-id', id);
+          circle.style.animation = `fadeIn ${Math.floor(Math.random() * (3 - 1 + 1) + 1)}s ease-in`;
 
-    });
-
-    $('#weight-graph').on('mouseleave', '.basic-graph-svg', function () {
-      showLineVer.setAttribute('x1', 0);
-      showLineVer.setAttribute('x2', 0);
-      showLineVer.setAttribute('y1', 0);
-      showLineVer.setAttribute('y2', 0);
-      showLineHor.setAttribute('x1', 0);
-      showLineHor.setAttribute('x2', 0);
-      showLineHor.setAttribute('y1', 0);
-      showLineHor.setAttribute('y2', 0);
-      tickHor.textContent = '';
-      tickVer.textContent = '';
-    });
-
-    /* Adding tooltips on mouse hover */
-    /*     $('.basic-graph-point').off()
-        $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
-          $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
-    
-          if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('#weight-graph').width()) {
-            $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
-          } else {
-            $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
-          }
-    
-          $('.mp-graph-tooltip').empty();
-          $('.mp-graph-tooltip').append(`
-              <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average')).toFixed(1)}</div>
-              <div class="mp-graph-tooltip-title">Средний результат</div>
-              <div class="mp-graph-tooltip-gap"></div>
-              <div class="mp-graph-tooltip-sub-res">${Math.round(parseFloat($(this).attr('data-total')))}</div>
-              <div class="mp-graph-tooltip-title">Всего молока</div>
-              <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
-              <div class="mp-graph-tooltip-title">Кол-во результатов</div>
-              <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
-            `)
-    
-    
-          $('.mp-graph-tooltip').show();
         });
-    
-        $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
-          $('.mp-graph-tooltip').hide();
-        }); */
+      });
+
+      /* Adding male and female lines */
+      workingArrCows.forEach((data, inx, arr) => {
+        let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+        /* Adding data line */
+        let path;
+        if (inx === 0) {
+          path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+          path.classList.add('basic-graph-point-line-female');
+          path.classList.add('weight-female-graph-data');
+          svg.append(path);
+          path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+          path.setAttribute('id', `weight-graph-line-average-cows`);
+        } else {
+          path = document.getElementById(`weight-graph-line-average-cows`);
+          path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+        }
+      });
+      workingArrBulls.forEach((data, inx, arr) => {
+        let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+        /* Adding data line */
+        let path;
+        if (inx === 0) {
+          path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+          path.classList.add('basic-graph-point-line-male');
+          path.classList.add('weight-male-graph-data');
+          svg.append(path);
+          path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+          path.setAttribute('id', `weight-graph-line-average-bulls`);
+        } else {
+          path = document.getElementById(`weight-graph-line-average-bulls`);
+          path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+        }
+      });
+
+      /* Adding main line and data */
+      let circleTimer = 0;
+      workingArr.forEach((data, inx, arr) => {
+        let currentDaysSpan = Math.round((data.date.getTime() - start.getTime()) / 1000 / 60 / 60 / 24);
+
+        /* Adding data line */
+        let path;
+        if (inx === 0) {
+          path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+          path.classList.add('basic-graph-point-line');
+          path.classList.add('weight-average-graph-data');
+          svg.append(path);
+          path.setAttribute('d', `M ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+          path.setAttribute('id', `weight-graph-line-average`);
+        } else {
+          path = document.getElementById(`weight-graph-line-average`);
+          path.setAttribute('d', `${path.getAttribute('d')} L ${horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100))} ${workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100))}`)
+
+        }
+
+        /* Adding data points */
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+        circle.classList.add('basic-graph-point')
+        circle.classList.add('weight-average-graph-data');
+        svg.append(circle);
+        circle.setAttribute('cx', horGap + Math.round(workingAreaWidth * (currentDaysSpan / (daysSpan / 100) / 100)))
+        circle.setAttribute('cy', workingAreaHeight + horGap - Math.round(workingAreaHeight * (data.average / (max / 100) / 100)))
+
+        circle.setAttribute('r', 4);
+        circle.setAttribute('data-average', data.average);
+        circle.setAttribute('data-total', data.total);
+        circle.setAttribute('data-results', data.results.length);
+        circle.setAttribute('data-date', data.date);
+
+        circle.style.animation = `fadeIn ${circleTimer}s ease-out`
+        circleTimer += 0.1;
+
+      });
+
+      anime({
+        targets: '#weight-graph-line-average',
+        strokeDashoffset: [2000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+      anime({
+        targets: '#weight-graph-line-average-cows',
+        strokeDashoffset: [2000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+      anime({
+        targets: '#weight-graph-line-average-bulls',
+        strokeDashoffset: [2000, 0],
+        easing: 'easeInOutSine',
+        duration: 1500,
+        delay: function (el, i) { return i * 250 },
+      });
+
+
+      /* Adding ticks on mousemove */
+      $('#hm-weight-graph').off()
+      $('#hm-weight-graph').on('mousemove', '.basic-graph-svg', function ({ clientX, clientY }) {
+        let point = svg.createSVGPoint();
+        point.x = clientX;
+        point.y = clientY;
+        point = point.matrixTransform(svg.getScreenCTM().inverse());
+
+
+        let xStop = false;
+        let yStop = false;
+        if (point.x < horGap) {
+          showLineVer.setAttribute('x1', horGap + 1);
+          showLineVer.setAttribute('x2', horGap + 1);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('#hm-weight-graph').height()) - horGap)
+          xStop = true;
+        }
+        if (point.y < horGap) {
+          showLineHor.setAttribute('y1', horGap + 1);
+          showLineHor.setAttribute('y2', horGap + 1);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('#hm-weight-graph').width()));
+          yStop = true;
+        }
+        if (point.x > parseFloat($('#hm-weight-graph').width()) - horGap) {
+          showLineVer.setAttribute('x1', parseFloat($('#hm-weight-graph').width()) - horGap);
+          showLineVer.setAttribute('x2', parseFloat($('#hm-weight-graph').width()) - horGap);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('#hm-weight-graph').height()) - horGap)
+          xStop = true;
+        }
+        if (point.y > parseFloat($('#hm-weight-graph').height()) - horGap) {
+          showLineHor.setAttribute('y1', parseFloat($('#hm-weight-graph').height()) - horGap - 1);
+          showLineHor.setAttribute('y2', parseFloat($('#hm-weight-graph').height()) - horGap - 1);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('#hm-weight-graph').width()));
+          yStop = true;
+        }
+
+
+        if (!yStop) {
+          showLineHor.setAttribute('y1', point.y);
+          showLineHor.setAttribute('y2', point.y);
+          showLineHor.setAttribute('x1', horGap);
+          showLineHor.setAttribute('x2', parseFloat($('#hm-weight-graph').width()));
+        }
+
+        if (!xStop) {
+          showLineVer.setAttribute('x1', point.x);
+          showLineVer.setAttribute('x2', point.x);
+          showLineVer.setAttribute('y1', 0)
+          showLineVer.setAttribute('y2', parseFloat($('#hm-weight-graph').height()) - horGap)
+        }
+
+
+        tickHor.textContent = Math.round(max - max * ((parseFloat(showLineHor.getAttribute('y1')) - horGap) / (workingAreaHeight / 100) / 100));
+        tickHor.setAttribute('x', 10)
+        tickHor.setAttribute('y', parseFloat(showLineHor.getAttribute('y1')) + 4)
+
+        tickVer.textContent = moment(start).add(Math.round(daysSpan * ((parseFloat(showLineVer.getAttribute('x1')) - horGap) / (workingAreaWidth / 100) / 100)), 'day').lang('ru').format('DD MMMM, YY')
+        tickVer.setAttribute('x', parseFloat(showLineVer.getAttribute('x1')))
+        tickVer.setAttribute('y', $('#hm-weight-graph').height() - 10)
+
+      });
+
+      $('#hm-weight-graph').on('mouseleave', '.basic-graph-svg', function () {
+        showLineVer.setAttribute('x1', 0);
+        showLineVer.setAttribute('x2', 0);
+        showLineVer.setAttribute('y1', 0);
+        showLineVer.setAttribute('y2', 0);
+        showLineHor.setAttribute('x1', 0);
+        showLineHor.setAttribute('x2', 0);
+        showLineHor.setAttribute('y1', 0);
+        showLineHor.setAttribute('y2', 0);
+        tickHor.textContent = '';
+        tickVer.textContent = '';
+      });
+
+      /* Adding tooltips on mouse hover */
+      $('.basic-graph-point').off()
+      $('.basic-graph-point').on('mouseenter', function ({ clientX, clientY }) {
+        $('.mp-graph-tooltip').css('height', workingAreaHeight - 30);
+
+        if (parseFloat($(this).attr('cx')) + 20 + $('.mp-graph-tooltip').width() < $('#hm-weight-graph').width()) {
+          $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) + 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(0%)' })
+        } else {
+          $('.mp-graph-tooltip').css({ 'top': horGap, 'left': parseFloat($(this).attr('cx')) - 20, 'border-color': $(this).css('stroke'), 'transform': 'translate(-100%)' })
+        }
+
+        $('.mp-graph-tooltip').empty();
+        $('.mp-graph-tooltip').append(`
+            <div class="mp-graph-tooltip-res">${parseFloat($(this).attr('data-average'))}</div>
+            <div class="mp-graph-tooltip-title">Средний результат</div>
+            <div class="mp-graph-tooltip-gap"></div>
+            <div class="mp-graph-tooltip-sub-res">${parseFloat($(this).attr('data-results'))}</div>
+            <div class="mp-graph-tooltip-title">Кол-во результатов</div>
+            <div class="mp-graph-tooltip-date">${moment($(this).attr('data-date')).lang('ru').format('MMMM, YYYY').toUpperCase()}</div>
+          `)
+
+
+        $('.mp-graph-tooltip').show();
+      });
+
+      $('.basic-graph-point').on('mouseleave', function ({ clientX, clientY }) {
+        $('.mp-graph-tooltip').hide();
+      });
+
+      /* Making legend work */
+      $('.legend-btn').off('click')
+      $('.legend-btn').on('click', function () {
+        if ($('.mp-herd-legend').css('display') === 'flex') {
+          $('.mp-herd-legend').hide()
+        } else {
+          $('.mp-herd-legend').css('display', 'flex')
+        }
+      });
+
+
+      $('#hm-weight-graph').find('.main-column').append(`
+          <div class="mp-herd-legend-item" data-rel-element='weight-average-graph-data'>
+            <div class="mp-herd-li-mark">
+              <div class="mp-herd-li-mark-average"></div>
+            </div>
+            <div class="mp-herd-li-text">Средний результат</div>
+          </div>
+        `)
+
+      $('#hm-weight-graph').find('.additional-column').append(`
+        <div class="mp-herd-legend-item" data-rel-element='basic-graph-average-dot'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-average-dot"></div>
+          </div>
+          <div class="mp-herd-li-text">Индивидуальный рез.</div>
+        </div>
+        <div class="mp-herd-legend-item" data-rel-element='weight-female-graph-data'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-female-line"></div>
+          </div>
+          <div class="mp-herd-li-text">Коровы</div>
+        </div>
+        <div class="mp-herd-legend-item" data-rel-element='weight-male-graph-data'>
+          <div class="mp-herd-li-mark">
+            <div class="mp-herd-li-mark-male-line"></div>
+          </div>
+          <div class="mp-herd-li-text">Быки</div>
+        </div>
+      `)
+
+
+      $('#hm-weight-graph').off('click')
+      $('#hm-weight-graph').on('click', '.mp-herd-legend-item', function () {
+        if ($(this).hasClass('mp-herd-legend-item-non-click')) return;
+
+        if (!$(this).hasClass('mp-herd-legend-item-off')) {
+          $(`.${$(this).attr('data-rel-element')}`).hide();
+
+          $(this).addClass('mp-herd-legend-item-off')
+        } else {
+          $(`.${$(this).attr('data-rel-element')}`).show();
+
+          $(this).removeClass('mp-herd-legend-item-off')
+        }
+      });
+    });
+
+    if (weightAverage.length < 5) {
+      emptyBlock($('.weight-graph-block'), 'Недостаточно данных', 'Информация появится когда будет добавлено больше данных');
+      removeloadingBlock($('.weight-graph-block'));
+    } else {
+      $('#hm-weight-graph').find('.months-btns').find('.mp-hg-btn-trig').trigger('click');
+    }
 
   }
 
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  /* SLAUGHTER BLOCK */
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  if (document.querySelector('.herd-slaughter-block')) {
+    const slaughterData = [];
+    animals.animals.forEach(animal => {
+      if (animal.status !== 'alive') return;
+
+      let monthReadyIn;
+      if (animal.gender === 'male') {
+        monthReadyIn = Math.round((new Date(moment(animal.birthDate).add(2, 'year')).getTime() - Date.now()) / 1000 / 60 / 60 / 24 / 30);
+      } else {
+        monthReadyIn = Math.round((new Date(moment(animal.birthDate).add(6, 'year')).getTime() - Date.now()) / 1000 / 60 / 60 / 24 / 30);
+      }
+      monthReadyIn = monthReadyIn < 0 ? 0 : monthReadyIn;
+
+      if (animal.gender === 'female') {
+        if (!slaughterData.find(data => data.readyIn === monthReadyIn)) {
+          slaughterData.push({
+            readyIn: monthReadyIn,
+            cows: [animal],
+            bulls: []
+          })
+        } else {
+          slaughterData.find(data => data.readyIn === monthReadyIn).cows.push(animal);
+        }
+      }
+      if (animal.gender === 'male') {
+        if (!slaughterData.find(data => data.readyIn === monthReadyIn)) {
+          slaughterData.push({
+            readyIn: monthReadyIn,
+            cows: [],
+            bulls: [animal]
+          })
+        } else {
+          slaughterData.find(data => data.readyIn === monthReadyIn).bulls.push(animal);
+        }
+      }
+    });
+
+    slaughterData.sort((a, b) => a.readyIn - b.readyIn);
+
+    removeloadingBlock($('.herd-slaughter-block'));
+    $('.sb-container').empty();
+    slaughterData.forEach(data => {
+      let monthTextFormat;
+      let cond2 = ['2', '3', '4'];
+      let cond3 = ['5', '6', '7', '8', '9', '0'];
+      if (data.readyIn.toString().split('').at(-1) === '1') {
+        monthTextFormat = 'МЕСЯЦ'
+      } else if (cond2.some(cond => data.readyIn.toString().split('').at(-1).includes(cond))) {
+        monthTextFormat = 'МЕСЯЦА'
+      } else if (cond3.some(cond => data.readyIn.toString().split('').at(-1).includes(cond))) {
+        monthTextFormat = 'МЕСЯЦЕВ'
+      }
+
+      $('.sb-container').append(`
+        <div class="sb-item ${data.readyIn === 0 ? 'sb-item-ready' : ''}">
+        ${data.cows.length > 0 ? `<div class="sb-item-top">
+        <div class="b-text">${data.cows.length}</div>
+        <div class="s-text">${data.readyIn > 0 ? 'КОРОВ БУДУТ ГОТОВЫ ДЛЯ ЗАБОЯ ЧЕРЕЗ' : 'КОРОВ ГОТОВЫ ДЛЯ ЗАБОЯ'} </div><img src="/img/icons/herd-cow.png"/>
+      </div>` : ''}
+        ${data.bulls.length > 0 ? `<div class="sb-item-top">
+        <div class="b-text">${data.bulls.length}</div>
+        <div class="s-text">${data.readyIn > 0 ? 'БЫКОВ БУДУТ ГОТОВЫ ДЛЯ ЗАБОЯ ЧЕРЕЗ' : 'БЫКОВ ГОТОВЫ ДЛЯ ЗАБОЯ'} </div><img src="/img/icons/herd-bull.png"/>
+      </div>` : ''}
+          ${data.readyIn === 0 ? `
+          <div class="sb-item-bottom">
+            <a class="sb-list-btn" href="/herd/all-animals/?filter=slaughter">СПИСОК </a>
+          </div>
+          ` : `
+          <div class="sb-item-bottom">
+            <div class="b-text">${data.readyIn}</div>
+            <div class="s-text">${monthTextFormat} </div>
+          </div>
+          `}
+          
+        </div>
+      `);
+    });
+
+  }
+
+
+
+  ///////////////////////
+  /* HERD LIST MILKING RESULTS */
+  ///////////////////////
+  if (document.querySelector('#list-milking-resultss-container')) {
+    $('.ail-small-lact').each(function () {
+      let start = moment($(this).attr('data-start-date')).locale('ru').format('DD.MM.YY');
+      let finish = $(this).attr('data-finish-exist') === 'true' ? moment($(this).attr('data-finish-date')).locale('ru').format('DD.MM.YY') : '...';
+
+      $(this).attr('qt', `${start} - ${finish}`);
+    });
+
+    $('#search').on('keyup change', function () {
+      let value = $(this).val();
+
+      if (value.length > 0) {
+        $('.ai-list-item').each(function () {
+          let container = $('.ai-box-list');
+          let name = $(this).find('.ail-item-name').text().toLowerCase();
+          let number = $(this).find('.ail-item-number').text().toLowerCase();
+
+          if (name.includes(value.toLowerCase()) || number.includes(value.toLowerCase())) {
+            $(this).detach().prependTo(container);
+          }
+        });
+      }
+    });
+
+    $('#date').on('keyup change', function () {
+      let date = new Date($(this).val());
+
+      $('.ail-small-lact').each(function () {
+        $(this).removeClass('ail-small-lact-active')
+        if (new Date($(this).attr('data-start-date')) < date && date < new Date($(this).attr('data-finish-date'))) {
+          $(this).addClass('ail-small-lact-active');
+        }
+      });
+
+      $('.ai-list-item').each(function () {
+        if ($(this).find('.ail-small-lact-active').length === 0) {
+          $(this).addClass('ai-list-item-unav');
+        } else {
+          $(this).removeClass('ai-list-item-unav');
+        }
+      });
+    });
+
+    $('#date').trigger('change');
+
+    $('*').on('click change keyup mouseenter', function () {
+      $('.ai-list-item').each(function () {
+        if ($(this).find('.ail-small-lact-active').length > 0 && $(this).find('.result').val().length > 0) {
+          $(this).addClass('ai-list-item-valid')
+          if ($(this).find('.ai-input-marker-s').length === 0) {
+            $(this).append(`
+            <div class="ai-input-marker ai-input-marker-s animate__animated animate__flipInY">
+            <ion-icon name="checkmark-sharp"></ion-icon>
+            </div>`)
+          }
+        } else {
+          $(this).removeClass('ai-list-item-valid')
+          $(this).find('.ai-input-marker-s').removeClass('animate__animated animate__flipInY').addClass('animate__animated animate__flipOutY animate__fast')
+          setTimeout(() => { $(this).find('.ai-input-marker-s').remove() }, 800)
+        }
+      });
+
+      if ($('.ai-list-item-valid').length > 0) {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'auto', 'filter': 'grayscale(0)' });
+      } else {
+        $('.ai-input-submit-btn').css({ 'pointer-events': 'none', 'filter': 'grayscale(1)' });
+      }
+    });
+
+    $('.ai-input-submit-btn').on('click', function () {
+      let doneAnimals = 0;
+
+      $(this).empty();
+      $(this).append(`<div class="mini-loader"></div>`);
+      anime({ targets: $(this)[0], width: '60px', borderRadius: '50%', duration: 100, easing: 'easeOutQuint' });
+
+      let subId = randomstring.generate(12);
+
+      $('.ai-list-item-valid').each(async function () {
+        let date = new Date($('#date').val());
+        let result = parseFloat($(this).find('.result').val());
+        let lactationNumber = parseFloat($(this).find('.ail-small-lact-active').attr('data-number'));
+        let animalId = $(this).attr('data-id');
+        let note = $(this).find('.note').val();
+
+        const response = await addAnimalResults('milking-results', animalId, { date, lactationNumber, result, note, subId });
+
+        if (response) doneAnimals++;
+
+        if (doneAnimals === $('.ai-list-item-valid').length) {
+          /* addConfirmationEmpty($('.animal-results-window')); */
+          setTimeout(() => { location.reload(true); }, 1500)
+        }
+      });
+    });
+  }
 
   ///////////////////////
   /* HERD LIST INSEMINATIONS */
@@ -6561,7 +7518,7 @@ $(document).ready(async function () {
 
       $('.ai-list-item-valid').each(async function () {
         let date = new Date($(this).find('.date').val());
-        let success = $(this).find('.success').find('.ail-select-item-active').attr('data-val') === 'success';
+        let success = $(this).find('.success').find('.ail-select-item-active').attr('data-val');
         let type = $(this).find('.type').find('.ail-select-item-active').attr('data-val');
         const bull = $(this).find('.bull').find('.ail-select-item-active').attr('data-val');
         let animalId = $(this).attr('data-id');
@@ -10361,7 +11318,7 @@ $(document).ready(async function () {
 
         anime({
           targets: '.history-graph-data',
-          strokeDashoffset: [1500, 0],
+          strokeDashoffset: [2000, 0],
           easing: 'easeInOutSine',
           duration: 1500,
           delay: function (el, i) { return i * 250 },
@@ -10558,7 +11515,7 @@ $(document).ready(async function () {
       });
       anime({
         targets: '.basic-graph-point-line',
-        strokeDashoffset: [1500, 0],
+        strokeDashoffset: [2000, 0],
         easing: 'easeInOutSine',
         duration: 1500,
         delay: function (el, i) { return i * 250 },
@@ -10708,37 +11665,12 @@ $(document).ready(async function () {
   if (document.querySelector('#reports-page')) {
 
     $('.rml-item').on('click', async function () {
-
-      /* CREATING TEST SHEETS */
-      /* var wb = XLSX.utils.book_new();
-      wb.Props = {
-        Title: "SheetJS Tutorial",
-        Subject: "Test",
-        Author: "Red Stapler",
-        CreatedDate: new Date()
-      };
-      wb.SheetNames.push("Test Sheet");
-      var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']];
-      var ws = XLSX.utils.aoa_to_sheet(ws_data);
-      wb.Sheets["Test Sheet"] = ws;
-
-      var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      function s2ab(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;
-      }
-
-      const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-      saveAs(blob, 'new.xlsx'); */
-
-
-
       if ($(this).attr('id') === 'milking-report') {
         const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
         let cowsData = [];
         animals.cows.forEach(cow => {
+          if(cow.status !== 'alive') return;
+
           cowsData.push({
             name: cow.name,
             number: cow.number,
@@ -10869,38 +11801,340 @@ $(document).ready(async function () {
         saveAs(blob, 'milking report.xlsx');
       }
 
-      if ($(this).attr('id') === 'insemination-report') {
+      if ($(this).attr('id') === 'weight-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+
+        let formatedData = [];
+        animals.animals.forEach(animal => {
+          if(animal.status !== 'alive' || animal.weightResults.length === 0) return;
+
+          animal.weightResults.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+
+          let growth = animal.weightResults[1] ? `${Math.round(animal.weightResults[0].result / animal.weightResults[1].result * 100 - 100)}%` : '-';
+
+          formatedData.push([
+            animal.number,
+            animal.name ? animal.name : '-',
+            animal.gender === 'male' ? 'Бык' : 'Корова',
+            animal.weightResults[0].result,
+            growth
+          ]);
+        });
+        let headerLine = ['Номер', 'Кличка', 'Пол', 'Текущий вес', 'Рост'];
+        formatedData.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Weight results report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(formatedData);
+        ws['!cols'] = fitToColumn(formatedData);
+
+        function fitToColumn(formatedData) {
+          // get maximum character of each column
+          return formatedData[0].map((a, i) => ({ wch: Math.max(...formatedData.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'weight report.xlsx');
+
+      }
+
+      if ($(this).attr('id') === 'slaughter-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+
+        let formatedData = [];
+        animals.animals.forEach(animal => {
+          if(animal.status !== 'alive' && !animal.butcherSuggestion) return;
+
+          let sug;
+
+          if(animal.butcherSuggestionReason === 'age') {
+            sug = 'Животное достигло установленного возраста для списания'
+          }
+          if(animal.butcherSuggestionReason === 'weight') {
+            sug = 'Животное достигло установленного веса для списания'
+          }
+          if(animal.butcherSuggestionReason === 'insemination') {
+            let percent = Math.round(animal.inseminations.filter(insem => insem.success).length / animal.inseminations.length * 100)
+
+            sug = `Животное плохо осеменяется (${percent}%)`;
+          }
+
+
+          formatedData.push([
+            animal.number,
+            animal.name ? animal.name : '-',
+            animal.gender === 'male' ? 'Бык' : 'Корова',
+            sug
+          ]);
+        });
+        let headerLine = ['Номер', 'Кличка', 'Пол', 'Причина для списания'];
+        formatedData.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Write off recomendation report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(formatedData);
+        ws['!cols'] = fitToColumn(formatedData);
+
+        function fitToColumn(formatedData) {
+          // get maximum character of each column
+          return formatedData[0].map((a, i) => ({ wch: Math.max(...formatedData.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'write off recomendation report.xlsx');
+
+      }
+
+      if ($(this).attr('id') === 'write-off-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+
+        let formatedData = [];
+        animals.animals.forEach(animal => {
+          if(animal.status === 'alive' || animal.status === 'dead-birth') return;
+
+          let reason = '-', subReason = '-';
+
+          if(animal.writeOffReason === 'sickness') reason = 'Падеж';
+          if(animal.writeOffReason === 'sold') reason = 'Продажа';
+
+          if(animal.writeOffSubReason === 'alive') subReason = 'Живьем';
+          if(animal.writeOffSubReason === 'slaughtered') subReason = 'Забой';
+
+
+          formatedData.push([
+            animal.number,
+            animal.name ? animal.name : '-',
+            animal.gender === 'male' ? 'Бык' : 'Корова',
+            reason,
+            subReason,
+            moment(animal.writeOffDate).format('DD.MM.YYYY'),
+            animal.writeOffNote ? animal.writeOffNote : ''
+          ]);
+        });
+
+        let headerLine = ['Номер', 'Кличка', 'Пол', '', '', 'Дата списания', 'Заметка'];
+        formatedData.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Write off report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(formatedData);
+        ws['!cols'] = fitToColumn(formatedData);
+
+        function fitToColumn(formatedData) {
+          // get maximum character of each column
+          return formatedData[0].map((a, i) => ({ wch: Math.max(...formatedData.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'write off report.xlsx');
+
+      }
+      /* Calving report */
+      if($(this).attr('id') === 'calving-report') {
         const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
 
         let formatedData = [];
         animals.cows.forEach(cow => {
-          let status = 'not-inseminated';
+          if(cow.status !== 'alive') return;
 
-          if (cow.lactations.length > 0 && !cow.lactations.at(-1).finishDate && new Date() < new Date(moment(cow.lactations.at(-1).startDate).add(60, 'day'))) status = 'dry-period';
+          cow.inseminations.sort((a, b) => new Date(a.date)- new Date(b.date));
+          cow.lactations.sort((a, b) => new Date(a.startDate)- new Date(b.startDate));
+
+          let status = undefined;
 
           if (cow.lactations.length === 0 && cow.inseminations.length > 0 && cow.inseminations.at(-1).success) status = 'inseminated-first';
 
           if (cow.lactations.length > 0 && cow.inseminations.length > 0 && cow.inseminations.at(-1).success && new Date(cow.inseminations.at(-1).date) > new Date(cow.lactations.at(-1).startDate)) status = 'inseminated-lactation'
 
-          let insemDaysAfterCalv = undefined;
+          let insemDaysAfterCalv = '-';
           if (status === 'inseminated-lactation') {
             insemDaysAfterCalv = Math.round((new Date(cow.inseminations.at(-1).date).getTime() - new Date(cow.lactations.at(-1).startDate).getTime()) / 24 / 60 / 60 / 1000)
           }
-          let calvingDate = undefined;
+          let calvingDate = '-';
           if (status === 'inseminated-lactation' || status === 'inseminated-first') {
-            calvingDate = new Date(moment(cow.inseminations.at(-1).date).add(283, 'day'));
+            calvingDate = moment(cow.inseminations.at(-1).date).add(283, 'day').format('DD.MM.YYYY');
           }
 
-          formatedData.push({
-            name: cow.name,
-            number: cow.number,
-            status,
-            calvingDate,
-            insemDaysAfterCalv
-          });
-        });
+          if(status === undefined) return;
 
-        /* console.log(formatedData); */
+          formatedData.push([
+            cow.number,
+            cow.name,
+            status === 'inseminated-first' ? 'Первое осеменение' : 'Осеменение после лактации',
+            insemDaysAfterCalv,
+            calvingDate
+          ]);
+        });
+        
+        let headerLine = ['Номер', 'Кличка', 'Тип осеменения', 'День осем. после отела', 'Дата отела'];
+        formatedData.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Calving report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(formatedData);
+        ws['!cols'] = fitToColumn(formatedData);
+
+        function fitToColumn(formatedData) {
+          // get maximum character of each column
+          return formatedData[0].map((a, i) => ({ wch: Math.max(...formatedData.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'calving report.xlsx');
+      }
+
+      /* Insemination report */
+      if($(this).attr('id') === 'insemination-report') {
+        const animals = await getAnimalsForGraph($('#reports-page').attr('data-farm-id'));
+
+        let formatedData = [];
+        animals.cows.forEach(cow => {
+          if(cow.status !== 'alive') return;
+
+          let status = undefined;
+          let overdueDays = undefined;
+
+          let insems = cow.inseminations.length > 0 ? true : false;
+          let lacts = cow.lactations.length > 0 ? true : false;
+          let fert = new Date() > new Date(moment(cow.birthDate).add('18', 'month')) ? true : false;
+
+          if(!fert) return;
+
+          cow.inseminations.sort((a, b) => new Date(a.date)- new Date(b.date));
+          cow.lactations.sort((a, b) => new Date(a.startDate)- new Date(b.startDate));
+
+          if(!lacts && !insems) {
+            status = 'first-insemination'
+          }
+          if(!lacts && insems && !cow.inseminations.at(-1).success) {
+            status = 'first-insemination'
+          }
+
+          if(lacts && new Date() > new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')) && !insems) {
+            status = 'lact-insemination'
+            overdueDays = Math.round((Date.now() - new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')).getTime()) / 1000 / 60 / 60 / 24)
+          }
+          if(lacts && new Date() > new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')) && insems && !cow.inseminations.at(-1).success) {
+            status = 'lact-insemination'
+            overdueDays = Math.round((Date.now() - new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')).getTime()) / 1000 / 60 / 60 / 24)
+          }
+          if(lacts && new Date() > new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')) && insems && cow.inseminations.at(-1).date < cow.lactations.at(-1).startDate) {
+            status = 'lact-insemination'
+            overdueDays = Math.round((Date.now() - new Date(moment(cow.lactations.at(-1).startDate).add('60', 'days')).getTime()) / 1000 / 60 / 60 / 24)
+          }
+
+
+          if(status === undefined) return;
+
+          formatedData.push([
+            cow.number,
+            cow.name,
+            status === 'first-insemination' ? 'Первое осеменение' : 'Осеменение после лактации',
+            overdueDays === undefined ? '-' : overdueDays
+          ]);
+        });
+        
+        let headerLine = ['Номер', 'Кличка', '', 'Перестой'];
+        formatedData.unshift(headerLine);
+
+        /* Creating a report */
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Insemination report",
+          Subject: "Report",
+          Author: "Farmme",
+          CreatedDate: new Date()
+        };
+        wb.SheetNames.push("Report Sheet");
+        /* var ws_data = [['1', '2', '3'], ['suck', 'on it'], ['1', '2', '3', '4']]; */
+        var ws = XLSX.utils.aoa_to_sheet(formatedData);
+        ws['!cols'] = fitToColumn(formatedData);
+
+        function fitToColumn(formatedData) {
+          // get maximum character of each column
+          return formatedData[0].map((a, i) => ({ wch: Math.max(...formatedData.map(a2 => a2[i] ? a2[i].toString().length : 0)) }));
+        }
+        wb.Sheets["Report Sheet"] = ws;
+
+        var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+          var view = new Uint8Array(buf);  //create uint8array as viewer
+          for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+          return buf;
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, 'insemination report.xlsx');
       }
     });
   }

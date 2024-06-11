@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const farmRouter = require('./routes/farmRoutes');
 const userRouter = require('./routes/userRoutes');
 const animalRouter = require('./routes/animalRoutes');
+const animalResultRouter = require('./routes/animalResultRoutes');
 const vetRouter = require('./routes/vetRoutes');
 const calendarRouter = require('./routes/calendarRoutes');
 const inventoryRouter = require('./routes/inventoryRoutes');
@@ -29,6 +30,7 @@ app.use(cookieParser())
 app.use('/api/farms', farmRouter);
 app.use('/api/users', userRouter);
 app.use('/api/animals', animalRouter);
+app.use('/api/animal-results', animalResultRouter);
 app.use('/api/vet', vetRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/inventory', inventoryRouter);

@@ -15,7 +15,7 @@ block content
         .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#liquid-unit
           .ai-input-label Единица измерения жидкости
           .ai-pick#l(class=`${farm.liquidUnit === 'l' ? 'ai-to-pick' : ''}`) Литр
-          .ai-pick#gl(class=`${farm.liquidUnit === 'gl' ? 'ai-to-pick' : ''}`) Галон
+          .ai-pick#gal(class=`${farm.liquidUnit === 'gal' ? 'ai-to-pick' : ''}`) Галон
           .ai-input-marker.ai-input-marker-r
             ion-icon(name="alert")
           .ai-input-explain-block.ai-input-explain-block-required
@@ -33,6 +33,41 @@ block content
             .ai-input-eb-tri
             //-.ai-input-eb-title Титуль
             .ai-input-eb-text Обязательно
+
+        .ai-double-input-block
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Вес для забоя быков
+            input.ai-input.ai-input-half.ai-input-half-text#male-weight(type="number" value=`${farm.butcherWeight.male}`)
+            .ai-inside-text кг.
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Вес для забоя коров
+            input.ai-input.ai-input-half.ai-input-half-text#female-weight(type="number" value=`${farm.butcherWeight.female}`)
+            .ai-inside-text кг.
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="help")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text  Животные достигшие данного веса будут отмечены как готовы для забоя
+
+        .ai-double-input-block
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Возраст для забоя быков
+            input.ai-input.ai-input-half.ai-input-half-text#male-age(type="number" value=`${farm.butcherAge.male}`)
+            .ai-inside-text м.
+          .ai-input-block-half.ai-input-block-text
+            .ai-input-label Возраст для забоя коров
+            input.ai-input.ai-input-half.ai-input-half-text#female-age(type="number" value=`${farm.butcherAge.female}`) 
+            .ai-inside-text м.
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="help")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            .ai-input-eb-text  Животные достигшие данного возрастав будут отмечены как готовы для забоя
+          
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Желаемый результат доения
+          input.ai-input.ai-input-text#milking-result(type="number" value=`${farm.milkingResultExpectancy}`)
+          .ai-inside-text литров с коровы
 
         .ai-input-submit-btn(data-farm-id=`${farm._id}`) Сохранить
 

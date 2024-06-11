@@ -57,31 +57,39 @@ const createWindow = () => {
   });
 
 
-
-  contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
-  contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
-  contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/all-products');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/?start=2023-03-06T18:10:26.040Z');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/sample/edit/652fd3a080804169f6efea4b');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/record/edit/653224d737d09684fad2b4ec');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/sample/');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/record/');
-  contentWindow.loadURL('http://127.0.0.1:604/feed/');
-  contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/65b0b43a94091d06bb6912a7');
-  contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
-  contentWindow.loadURL('http://127.0.0.1:604/vet');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple?animals=31207,31432,31365');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/edit-lactation/62a5ab01ed2710258c3ea856/0');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/start-scheme/multiple?animals=5026');
-  contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme');
-  contentWindow.loadURL('http://127.0.0.1:604/vet/history');
   contentWindow.loadURL('http://127.0.0.1:604/');
+
+  /* Only for dev */
+  /* if(isDev) {
+    contentWindow.loadURL('http://127.0.0.1:604/warehouse/add-inventory/');
+    contentWindow.loadURL('http://127.0.0.1:604/warehouse/edit-inventory/638f05bb4353feb473ad622d/');
+    contentWindow.loadURL('http://127.0.0.1:604/add-reminder');
+    contentWindow.loadURL('http://127.0.0.1:604/distribution/all-products');
+    contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
+    contentWindow.loadURL('http://127.0.0.1:604/distribution/?start=2023-03-06T18:10:26.040Z');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/');
+    contentWindow.loadURL('http://127.0.0.1:604/feed/sample/edit/652fd3a080804169f6efea4b');
+    contentWindow.loadURL('http://127.0.0.1:604/feed/record/edit/653224d737d09684fad2b4ec');
+    contentWindow.loadURL('http://127.0.0.1:604/feed/sample/');
+    contentWindow.loadURL('http://127.0.0.1:604/feed/record/');
+    contentWindow.loadURL('http://127.0.0.1:604/feed/');
+    contentWindow.loadURL('http://127.0.0.1:604/edit-reminder/65b0b43a94091d06bb6912a7');
+    contentWindow.loadURL('http://127.0.0.1:604/distribution/add-order');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=all');
+    contentWindow.loadURL('http://127.0.0.1:604/vet');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/write-off-animal/multiple?animals=31207,31432,31365');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/edit-lactation/62a5ab01ed2710258c3ea856/0');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628c8e193108dae81ddad038');
+    contentWindow.loadURL('http://127.0.0.1:604/vet/start-scheme/multiple?animals=5026');
+    contentWindow.loadURL('http://127.0.0.1:604/vet/add-scheme');
+    contentWindow.loadURL('http://127.0.0.1:604/vet/history');
+    contentWindow.loadURL('http://127.0.0.1:604/reports/');
+    contentWindow.loadURL('http://127.0.0.1:604/change-restrictions/655afe8315ae275c3e363d17');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/add-insemination/628c8e193108dae81ddad038');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/all-animals/?filter=slaughter');
+    contentWindow.loadURL('http://127.0.0.1:604/herd/animal-card/628d11c2aca019349b20c737');
+  } */
   
 
   contentWindow.maximize();
@@ -105,7 +113,7 @@ const createWindow = () => {
     contentWindow.removeBrowserView(preloadView);
   });
 
-  if (isDev) contentWindow.webContents.openDevTools();
+  /* if (isDev) contentWindow.webContents.openDevTools(); */
 
 
 

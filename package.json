@@ -1,16 +1,17 @@
 {
   "name": "farmme",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "farmme",
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
     "dev": "sudo nodemon --exec electron .",
-    "prod": "cross-env NODE_ENV=production nodemon --exec electron .",
+    "prod": "sudo cross-env NODE_ENV=production nodemon --exec electron .",
     "rebuild": "electron-rebuild -f -w yourmodule",
     "watch:js": "webpack watch --mode development --config webpack.config.js",
     "build:js": "webpack build --config webpack.config.js",
-    "build:app": "electron-builder -w"
+    "build:app-w": "sudo electron-builder -w",
+    "build:app-mac": "sudo electron-builder -m"
   },
   "author": "Denny Kleines",
   "license": "ISC",

@@ -13,6 +13,7 @@ const Client = require('../models/clientModel');
 const Product = require('../models/productModel');
 const Feed = require('../models/feedModel');
 const MilkQuality = require('../models/milkQualityModel');
+const AnimalResult = require('../models/animalResultModel');
 
 exports.renderLogin = catchAsync(async (req, res, next) => {
   //-const cows = await Animal.find({ farm: '628c8bc53108dae81ddad028', gender: 'female' });
@@ -104,7 +105,7 @@ exports.renderEditFarm = catchAsync(async (req, res, next) => {
 });
 
 exports.renderEditUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.user._id, req.body);
+  const user = await User.findByIdAndUpdate(req.user._id);
 
   res.status(200).render('editUser', {
     user
@@ -295,6 +296,18 @@ exports.renderEditAnimal = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.renderEditDeadBirth = catchAsync(async (req, res, next) => {
+  const animal = await Animal.findOne({ _id: req.params.animalId, status: 'dead-birth' });
+  const potMother = await Animal.find({ farm: req.user.farm, gender: 'female' });
+  const potFather = await Animal.find({ farm: req.user.farm, gender: 'male' });
+
+  res.status(200).render('herdEditDeadBirth', {
+    animal,
+    potMother,
+    potFather
+  });
+});
+
 exports.renderAddMilkingResults = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
@@ -323,10 +336,15 @@ exports.renderAddLactation = catchAsync(async (req, res, next) => {
   const forEdit = false;
   const animal = await Animal.findById(req.params.animalId);
   const animals = await Animal.find({ farm: req.user.farm });
+  animal.lactations.sort((a, b) => new Date(a.startDate) - new Date(b.date));
 
+  let unfinishedLactation = animal.lactations.find(lact => !lact.finishDate);
+  unfinishedLactation.index = animal.lactations.indexOf(unfinishedLactation);
+  
   res.status(200).render('herdLactation', {
     animal,
     animals,
+    unfinishedLactation,
     forEdit
   });
 });
@@ -344,9 +362,10 @@ exports.renderAddInsemination = catchAsync(async (req, res, next) => {
 });
 
 exports.renderAllAnimals = catchAsync(async (req, res, next) => {
+  let farm = await Farm.findById(req.user.farm);
   let animals = [];
   if (req.query.filter === 'all') {
-    animals = await Animal.find({ farm: req.user.farm, status: 'alive', });
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive' });
   } else if (req.query.filter === 'bulls') {
     animals = await Animal.find({ farm: req.user.farm, status: 'alive', gender: 'male' });
   } else if (req.query.filter === 'cows') {
@@ -357,17 +376,22 @@ exports.renderAllAnimals = catchAsync(async (req, res, next) => {
     animals = await Animal.find({ farm: req.user.farm, status: 'alive', birthDate: { $gte: new Date(moment().subtract(1, 'year')) } });
   } else if (req.query.filter === 'diseased') {
     animals = await Animal.find({ farm: req.user.farm, status: { $ne: 'alive' }, });
+  } else if (req.query.filter === 'slaughter') {
+    animals = await Animal.find({ farm: req.user.farm, status: 'alive', butcherSuggestion: true });
   }
+
 
 
   res.status(200).render('herdAllAnimals', {
     animals,
+    farm,
     filter: req.query.filter
   });
 });
 
 exports.renderAnimalCard = catchAsync(async (req, res, next) => {
   const animal = await Animal.findById(req.params.animalId);
+  const calves = await Animal.find({ mother: animal._id });
   const farm = await Farm.findById(req.user.farm);
   const allFarmAnimals = await Animal.find({ farm: animal.farm });
   let lastInsem, lastLact;
@@ -376,8 +400,12 @@ exports.renderAnimalCard = catchAsync(async (req, res, next) => {
   const scheme = await Vet.findOne({ animal: animal._id, schemeStarter: true, finished: { $ne: true } }).populate('otherPoints').populate('animal').populate('scheme');
   const problems = await Vet.find({ animal: animal._id, category: 'problem' }).populate('treatments');
 
+  animal.lactations.sort((a, b) => a.number - b.number);
+  animal.weightResults.sort((a, b) => new Date(b.date) - new Date(a.date));
+
   res.status(200).render('herdAnimalCard', {
     animal,
+    calves,
     allFarmAnimals,
     lastInsem,
     lastLact,
@@ -456,6 +484,7 @@ exports.renderEditInsemination = catchAsync(async (req, res, next) => {
 exports.renderEditLactation = catchAsync(async (req, res, next) => {
   const forEdit = true;
   const animal = await Animal.findById(req.params.animalId);
+  animal.lactations.sort((a, b) => new Date(a.startDate) - new Date(b.date));
 
   const lactation = animal.lactations[req.params.index];
 

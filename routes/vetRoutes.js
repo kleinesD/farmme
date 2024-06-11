@@ -42,4 +42,8 @@ router.get('/get-started-scheme/:schemeId', authController.protect, vetControlle
 
 router.get('/get-problem/:id', authController.protect, vetController.getVetProblem);
 
+router.post('/', authController.protect, vetController.addVetRecord);
+
+router.patch('/:id', authController.protect, vetController.editVetRecord);
+
 module.exports = router;

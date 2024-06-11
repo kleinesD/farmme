@@ -27,9 +27,9 @@ block content
               .ail-unit л.
             .ail-part.ail-item-lact-number
               each lact in animal.lactations
-                .ail-small-lact(data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)= lact.number
+                .ail-small-lact(data-number=`${lact.number}` data-start-date=`${lact.startDate}` data-finish-date=`${lact.finishDate === null ? new Date() : lact.finishDate}`)= lact.number
             .ail-item-result.ail-result-note
-              input.ail-input#note(type="text")
+              input.ail-input.note(type="text")
 
 
     

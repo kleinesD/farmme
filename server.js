@@ -3,6 +3,7 @@ const animalController = require('./controllers/animalController');
 const feedController = require('./controllers/feedController');
 const vetController = require('./controllers/vetController');
 const notificationController = require('./controllers/notificationController');
+const animalResultController = require('./controllers/animalResultController');
 const isDev = require('electron-is-dev');
 
 
@@ -26,14 +27,20 @@ server.listen(port, () => { console.log(`Server running on port: ${port}`) });
 
 if(isDev) console.log(`Mode: ${process.env.NODE_ENV}`);
 
-animalController.updateCurrentInfo();
+/* Scripts */
+//animalResultController.moveResults();
+
+/* Check if those functions should be recurring */
+//animalController.updateCurrentInfo();
 feedController.autoAction();
 vetController.autoFinishScheme();
 notificationController.notificationCreator();
+animalController.animalTracker();
 setInterval(() => {
-  animalController.updateCurrentInfo()
+  //animalController.updateCurrentInfo()
 }, 1 * 60 * 1000)
 setInterval(() => {
   feedController.autoAction();
+  animalController.animalTracker();
 }, 24 * 60 * 60 * 1000)
 module.exports = server;

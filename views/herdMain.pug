@@ -8,15 +8,19 @@ block content
         .main-page-header-title ЖИВОТНЫЕ
         .mph-actions-line
           a.mph-action-btn(href="/herd/all-animals/?filter=all" qt="Все животные")
-            img(src='/img/images/default-cow-image.png')
+            img(src='/img/svgs/list.svg')
           a.mph-action-btn(href="/herd/list-milking-results" qt="Добавить результаты доения")
-            img(src='/img/images/milk-icon.png')
+            img(src='/img/svgs/drop.svg')
           a.mph-action-btn(href="/herd/list-inseminations" qt="Добавить осеменения")
-            img(src='/img/images/needle-icon.png')
+            img(src='/img/svgs/syringe.svg')
           a.mph-action-btn(href="/herd/write-off-animal/multiple" qt="Списать животных")
-            img(src='/img/images/butcher-icon.png')
+            img(src='/img/svgs/knife.svg')
           a.mph-action-btn(href="/herd/add-animals" qt="Добавить животное")
-            img(src='/img/svgs/plus.svg')
+            img(src='/img/svgs/plus-circle.svg')
+          a.mph-action-btn(href="/herd/history" qt="История данных")
+            img(src='/img/svgs/clock-counter-clockwise.svg')
+          a.mph-action-btn(href="/reports" qt="Отчеты")
+            img(src='/img/svgs/clipboard-text.svg')
         //-.main-page-header-period-box
           input(type="date" value=`${startDate.toLocaleString('ru-RU', {year: 'numeric'})}-${startDate.toLocaleString('ru-RU', {month: '2-digit'})}-${startDate.toLocaleString('ru-RU', {day: '2-digit'})}`).main-page-header-period#start-date
           .main-page-header-devider -
@@ -42,44 +46,45 @@ block content
             .herd-mp-quick-info-counter(data-index="4")
             .herd-mp-quick-info-counter(data-index="5")
             .herd-mp-quick-info-counter(data-index="6")
-          .herd-mp-quick-info-item.herd-mp-quick-info-item-first(data-index="0" data-res=`${data.animals.length}`)
+          a.herd-mp-quick-info-item.herd-mp-quick-info-item-first(data-index="0" data-res=`${data.animals.length}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-animal.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title ЖИВОТНЫЕ
             .herd-mp-quick-info-item-res= data.animals.length
-          .herd-mp-quick-info-item(data-index="1" data-res=`${data.cows.length}`)
+          a.herd-mp-quick-info-item(data-index="1" data-res=`${data.cows.length}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-cow.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title КОРОВЫ
             .herd-mp-quick-info-item-res= data.cows.length
-          .herd-mp-quick-info-item(data-index="2" data-res=`${data.bulls.length}`)
+          a.herd-mp-quick-info-item(data-index="2" data-res=`${data.bulls.length}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-bull.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title БЫКИ
             .herd-mp-quick-info-item-res= data.bulls.length
-          .herd-mp-quick-info-item(data-index="3" data-res=`${data.milkingCows}`)
+          a.herd-mp-quick-info-item(data-index="3" data-res=`${data.milkingCows}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-milking-cow.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title ДОЯЩИЕСЯ КОРОВЫ
             .herd-mp-quick-info-item-res= data.milkingCows
-          .herd-mp-quick-info-item(data-index="4" data-res=`${data.inseminatedCows}`)
+          a.herd-mp-quick-info-item(data-index="4" data-res=`${data.inseminatedCows}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-inseminated-cow.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title ОСЕМЕНЕННЫЕ КОРОВЫ
             .herd-mp-quick-info-item-res= data.inseminatedCows
-          .herd-mp-quick-info-item(data-index="5" data-res=`${data.bullsReady}`)
+          a.herd-mp-quick-info-item(data-index="5" data-res=`${data.bullsReady}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-ready-bull.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title БЫКИ НА ЗАБОЙ
             .herd-mp-quick-info-item-res= data.bullsReady
-          .herd-mp-quick-info-item(data-index="6" data-res=`${data.calves}`)
+          a.herd-mp-quick-info-item(data-index="6" data-res=`${data.calves}` href=`/herd/all-animals/?filter=all`)
             img.herd-mp-quick-info-item-img(src="/img/icons/herd-calf-alone.png")
             .herd-mp-quick-info-item-img-shadow
             .herd-mp-quick-info-item-title ТЕЛЯТА
             .herd-mp-quick-info-item-res= data.calves
 
         .herd-mp-list-block-combined
-
+          .loading-block  
+            .loading-icon
           .mp-block-outside-header
             .mp-block-outside-header-title#table-title Список коров на осеменение
             .mp-block-outside-header-btn-block#table-btns
@@ -140,90 +145,58 @@ block content
         .loading-block  
           .loading-icon
         .mp-block-outside-header
-            .mp-block-outside-header-title Классификация животных
-            .mp-block-outside-header-btn-block
-              .mp-block-outside-header-btn.mp-block-outside-header-btn-active#age Возраст
-              .mp-block-outside-header-btn#category Группа
-              .mp-block-outside-header-btn#gender Пол
-              //-.mp-block-outside-header-btn#colors Окрас
-              .mp-block-outside-header-btn#breed Порода
+          .mp-block-outside-header-title Классификация животных
+          .mp-block-outside-header-btn-block
+            .mp-block-outside-header-btn.mp-block-outside-header-btn-active#age Возраст
+            .mp-block-outside-header-btn#category Группа
+            .mp-block-outside-header-btn#gender Пол
+            //-.mp-block-outside-header-btn#colors Окрас
+            .mp-block-outside-header-btn#breed Порода
         //-.hbb-btns-row 
           .hbb-btn Группы
           .hbb-btn Возраст
           .hbb-btn Корпуса
         .hbb-line
           .hbb-line-text Корпус #1
-          .hbb-line-text.hbb-line-text-second 30%
+          .hbb-line-text-second 30%
           .hbb-animals-block 
             a.hbb-animal-item(href="")
               img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
-            a.hbb-animal-item(href="")
-              img(src="/img/images/default-cow-image.png") 
+            
 
 
-      -if(topAnimalsFormated.length >= 2)
-        .mp-results-flex-block
-          .mp-block-outside-header
-            .mp-block-outside-header-title Лучшие результаты доения
-          .mp-top-results-block
-            each res in topAnimalsFormated
-              a.mp-top-result(class=`mp-top-result-${topAnimalsFormated.indexOf(res) + 1}` href=`/herd/animal-card/${res.cow._id}`)
-                .mp-tr-line
-                  img(src="/img/images/default-cow-image.png")
-                  .mp-tr-body
-                    .mp-tr-number ##{res.cow.number}
-                    -if(res.cow.name)
-                      .mp-tr-name= res.cow.name
-                  .mp-tr-place= topAnimalsFormated.indexOf(res) + 1
-                  .mp-tr-result= res.result
-
-          .mp-recent-results-block
-            .mp-recent-item(data-counter="0")
-              //-.mp-recent-marker-block
-                .mp-recent-marker
-              .mp-recent-number(data-number=`${lastMonthsResult.average}`) 0
-              .mp-recent-title СРЕДНИЙ РЕЗУЛЬТАТ
-            .mp-recent-item(data-counter="1")
-              //-.mp-recent-marker-block
-                .mp-recent-marker
-                .mp-recent-marker
-              .mp-recent-number(data-number=`${lastMonthsResult.dayTotal}`) 0
-              .mp-recent-title ВСЕГО ЗА ДЕНЬ
-            .mp-recent-item(data-counter="2")
-              //-.mp-recent-marker-block
-                .mp-recent-marker
-                .mp-recent-marker
-                .mp-recent-marker
-              .mp-recent-number(data-number=`${lastMonthsResult.monthTotal}`) 0
-              .mp-recent-title ВСЕГО ЗА МЕСЯЦ
+      .mp-milking-results-block
+        .loading-block
+          .loading-icon
+        .mp-block-outside-header
+          .mp-block-outside-header-title Результаты доения
+          input.mp-block-outside-header-date#mp-mr-date(type="month")
+        .mp-block-disclaimer
+          img(src="/img/svgs/hash-straight.svg")
+          p &dash;
+          p номер животного,
+          img(src="/img/svgs/tree-structure.svg")
+          p &dash;
+          p номер лактации
+          //-.mp-block-outside-header-btn-block#milking-results-btns
+            .mp-block-outside-header-btn.mp-block-outside-header-btn-active#tiles Животные
+        .mp-mr-animals-block
+          //-.mp-mr-ab-line
+            .mp-mr-ab-item
+              .mp-mr-ab-item-info
+                .mp-mr-ab-item-info-line
+                  img(src="/img/svgs/hash-straight.svg")
+                  p 50234123
+                .mp-mr-ab-item-info-line 
+                  img(src="/img/svgs/tree-structure.svg")
+                  p 3
+              div 21.5 л.
+        //-.mp-mr-treemap-block
+          .mp-mr-treemap-item#1
+          .mp-mr-treemap-item#2
+          .mp-mr-treemap-item#3
+          .mp-mr-treemap-item#4
+          .mp-mr-treemap-item#5
 
       #mp-herd-graph(data-farm-id=`${user.farm}`)  
 
@@ -235,17 +208,17 @@ block content
         .mp-herd-graph-container#mp-results-graph
           //-.mp-herd-graph-load 
 
-          .mp-hg-btn-block.mp-hg-btn-block-1#graph-btns
+          .mp-hg-btn-block.mp-hg-btn-block-1.graph-btns
             .mp-hg-btn.mp-hg-btn-active(data-graph="average") Средний
             .mp-hg-btn(data-graph="total") Всего
-          .mp-hg-btn-block.mp-hg-btn-block-2#months-btns
+          .mp-hg-btn-block.mp-hg-btn-block-2.months-btns
             .mp-hg-btn(data-months="6") 6м
             .mp-hg-btn(data-months="12") 12м
             .mp-hg-btn(data-months="24") 24м
             .mp-hg-btn(data-months="60") 5г
             .mp-hg-btn(data-months="all")
               ion-icon(name="infinite")
-          .mp-herd-legend-btn.legend-item  
+          .mp-herd-legend-btn.legend-btn  
             ion-icon(name="settings")
 
           .mp-graph-tooltip
@@ -260,7 +233,7 @@ block content
             .mp-graph-tooltip-date МАРТ, 2023
 
           .mp-herd-legend
-            .mp-herd-legend-column#main-column
+            .mp-herd-legend-column.main-column
               .mp-herd-legend-column-title ГЛАВНОЕ
               .mp-herd-legend-item
                 .mp-herd-li-mark
@@ -268,9 +241,9 @@ block content
               .mp-herd-legend-item.mp-herd-legend-item-off
                 .mp-herd-li-mark
                 .mp-herd-li-text Средние по лакт.
-            .mp-herd-legend-column#additional-column
+            .mp-herd-legend-column.additional-column
               .mp-herd-legend-column-title ДОПОЛНИТЕЛЬНОЕ
-            //.mp-herd-legend-column#edit-column
+            //-.mp-herd-legend-column#edit-column
               .mp-herd-legend-column-title ИЗМЕНИТЬ
               .mp-herd-legend-item.mp-herd-legend-item-non-click
                 .mp-herd-li-check
@@ -376,7 +349,13 @@ block content
           .loading-icon
         .mp-block-outside-header
           .mp-block-outside-header-title Качество молока
-        .milk-quality-graph#milk-quality-graph
+        .milk-quality-graph-outter  
+          .milk-quality-graph#milk-quality-graph
+          .mqg-info-btn 
+            ion-icon(name="help")
+          .mqg-info-block
+            .mqg-info-title Жиры
+            .mqg-info-text Оптимальное количество жира в молоке может варьироваться в зависимости от индивидуальных предпочтений и целей питания. В целом, молоко с низким содержанием жира (около 1-2% жира) может быть более подходящим для людей, следящих за своим весом или уровнем холестерина, в то время как молоко со средним содержанием жира (около 2-3% жира) считается наиболее сбалансированным для большинства людей. Однако, если вы стремитесь к получению определенных питательных веществ, которые содержатся в жире, таком как витамин K2 и конъюгированная линолевая кислота, то вам может подойти молоко с более высоким содержанием жира (3,25-4% жира). В конечном итоге, выбор жирности молока должен основываться на ваших индивидуальных потребностях и целях питания.
         .milk-quality-info-block
           .milk-quality-info-item#water
             .milk-quality-info-title Вода
@@ -419,6 +398,70 @@ block content
             .milk-quality-info-res 4.8%
 
 
-      //-.weight-graph-container#weight-graph
-        
-      
+      .weight-graph-block
+        .loading-block 
+          .loading-icon
+        .mp-block-outside-header
+          .mp-block-outside-header-title История взвешивание
+
+        .weight-graph-container#hm-weight-graph
+          .mp-hg-btn-block.mp-hg-btn-block-2.months-btns
+            .mp-hg-btn(data-months="6") 6м
+            .mp-hg-btn(data-months="12") 12м
+            .mp-hg-btn(data-months="24") 24м
+            .mp-hg-btn(data-months="60") 5г
+            .mp-hg-btn.mp-hg-btn-trig(data-months="all")
+              ion-icon(name="infinite")
+          .mp-herd-legend-btn.legend-btn  
+            ion-icon(name="settings")
+
+          .mp-graph-tooltip
+            .mp-graph-tooltip-res 27.1
+            .mp-graph-tooltip-title Средний результат
+            .mp-graph-tooltip-gap
+            .mp-graph-tooltip-sub-res 27.1
+            .mp-graph-tooltip-title Всего молока
+            .mp-graph-tooltip-sub-res 27.1
+            .mp-graph-tooltip-title Кол-во результатов
+
+            .mp-graph-tooltip-date МАРТ, 2023
+
+          .mp-herd-legend
+            .mp-herd-legend-column.main-column
+              .mp-herd-legend-column-title ГЛАВНОЕ
+              .mp-herd-legend-item
+                .mp-herd-li-mark
+                .mp-herd-li-text Результат
+              .mp-herd-legend-item.mp-herd-legend-item-off
+                .mp-herd-li-mark
+                .mp-herd-li-text Средние по лакт.
+            .mp-herd-legend-column.additional-column
+              .mp-herd-legend-column-title ДОПОЛНИТЕЛЬНОЕ
+        .weight-results-block
+          //-.wrb-item-outter.wrb-item-outter-ready
+            .wrb-item(qt="25 января, 2023")
+              .wrb-item-image 
+                img(src='/img/images/default-cow-image.png')
+              .wrb-item-text #5026312
+              .wrb-item-text.wrb-item-res 516 кг.
+            .wrb-item-disclaimer Корова готова для забоя
+
+      .herd-slaughter-block
+        .loading-block  
+          .loading-icon
+        .mp-block-outside-header
+          .mp-block-outside-header-title Животные на забой
+        .sb-info-text Критерии для отбора: быки старше 2-х лет, коровы старше 6-ти лет
+        .sb-container
+          .sb-item.sb-item-ready
+            .sb-item-top
+              .b-text 120
+              .s-text КОРОВ БУДУТ ГОТОВЫ ДЛЯ ЗАБОЯ ЧЕРЕЗ 
+              img(src="/img/icons/herd-cow.png")
+            .sb-item-top
+              .b-text 15
+              .s-text БЫКОВ БУДУТ ГОТОВЫ ДЛЯ ЗАБОЯ ЧЕРЕЗ
+              img(src="/img/icons/herd-bull.png")
+            .sb-item-bottom
+              .b-text 3
+              .s-text МЕСЯЦА 

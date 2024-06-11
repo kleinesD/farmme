@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+const AnimalResult = require('./animalResultModel');
+
+
+/* mongoose.set('debug', true); */
 
 const animalSchema = new mongoose.Schema({
   name: String,
@@ -17,20 +21,9 @@ const animalSchema = new mongoose.Schema({
   spot: String,
   status: {
     type: String,
-    enum: ['alive', 'diseased'],
+    enum: ['alive', 'diseased', 'dead-birth'],
     default: 'alive'
   },
-  writeOffReason: {
-    type: String,
-    enum: ['sickness', 'slaughtered', 'sold']
-  },
-  writeOffSubReason: {
-    type: String,
-    enum: ['alive', 'slaughtered']
-  },
-  writeOffNote: String,
-  writeOffMoneyReceived: Number,
-  writeOffDate: Date,
   client: {
     type: mongoose.Schema.ObjectId,
     ref: 'Client'
@@ -69,7 +62,7 @@ const animalSchema = new mongoose.Schema({
   birthDate: Date,
   weightResults: [
     {
-      addingDate: {
+      creationDate: {
         type: Date,
         default: Date.now()
       },
@@ -78,12 +71,14 @@ const animalSchema = new mongoose.Schema({
       user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-      }
+      },
+      note: String,
+      subId: String,
     }
   ],
   lactations: [
     {
-      addingDate: {
+      creationDate: {
         type: Date,
         default: Date.now()
       },
@@ -98,7 +93,7 @@ const animalSchema = new mongoose.Schema({
   ],
   milkingResults: [
     {
-      addingDate: {
+      creationDate: {
         type: Date,
         default: Date.now()
       },
@@ -113,38 +108,21 @@ const animalSchema = new mongoose.Schema({
       }
     }
   ],
-  calvings: [
-    {
-      addingDate: {
-        type: Date,
-        default: Date.now()
-      },
-      child: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Animal'
-      },
-      date: Date,
-      childCondition: {
-        type: String,
-        enum: ['alive', 'dead']
-      },
-      withHelp: {
-        type: Boolean,
-        default: false
-      }
-    }
-  ],
   inseminations: [
     {
-      addingDate: {
+      creationDate: {
         type: Date,
         default: Date.now()
       },
       date: Date,
-      success: Boolean,
+      success: {
+        type: String,
+        enum: ['true', 'false', 'undefined'],
+        default: 'undefined'
+      },
       type: {
         type: String,
-        enum: ['natural', 'artifical']
+        enum: ['natural', 'artificial']
       },
       bull: {
         type: mongoose.Schema.ObjectId,
@@ -170,14 +148,40 @@ const animalSchema = new mongoose.Schema({
       enum: ['on-schedule', 'urgent', 'regular']
     }
   },
-  pregnancy: Boolean,
-  pregnancyStart: Date,
   costOfServiceHistory: [
     {
       updateDate: Date,
       cost: Number
     }
   ],
+  deadBirthDate: Date,
+  deadBirthMotherDeath: Boolean,
+  deadBirthMotherDeathAuto: Boolean,
+  deadBirthMultipleFetuses: Boolean,
+  deadBirthSize: {
+    type: String,
+    enum: ['small', 'mid', 'large']
+  },
+  deadBirthNote: String,
+  butcherSuggestion: {
+    type: Boolean,
+    default: false
+  },
+  butcherSuggestionReason: {
+    type: String,
+    enum: ['weight', 'age', 'sick', 'insemination']
+  },
+  writeOffReason: {
+    type: String,
+    enum: ['sickness', 'slaughtered', 'sold', 'birth-death']
+  },
+  writeOffSubReason: {
+    type: String,
+    enum: ['alive', 'slaughtered']
+  },
+  writeOffNote: String,
+  writeOffMoneyReceived: Number,
+  writeOffDate: Date,
   creationDate: {
     type: Date,
     default: Date.now()
@@ -197,18 +201,23 @@ const animalSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
-});
+},
+  {
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
+  });
 
-animalSchema.pre(/^find/, function (next) {
-  this.populate('mother').populate('father');
-
-  next();
-});
-
-animalSchema.pre('updateOne', function (next) {
-  this.editedAtBy.push({ date: new Date });
-  next();
-});
+  
+  animalSchema.pre(/^find/, function (next) {
+    this.populate('mother').populate('father');
+    
+    next();
+  });
+  
+  animalSchema.pre('updateOne', function (next) {
+    this.editedAtBy.push({ date: new Date });
+    next();
+  });
 
 
 

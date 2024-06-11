@@ -2,7 +2,7 @@ extends base
 
 block content
   include _rcmHerd
-  section.main-section(data-mother=`${motherId}`)
+  section.main-section(data-mother=`${motherId}` data-dead-birth="false")
     .add-animal-container#add-animal-container
       .ai-decide-block
         .ai-decide-block-item#birth
@@ -15,8 +15,12 @@ block content
             | ЖИВОТНОЕ БЫЛО 
             span КУПЛЕНО
           img.ai-decide-block-item-img(src="/img/icons/herd-bought-animal.png")
+        .ai-decide-block-item#dead
+          .ai-decide-block-item-text 
+            | МЕРТВОРОЖДЕНИЕ
+          img.ai-decide-block-item-img(src="/img/icons/dead-birth.png")
 
-      .ai-form-container.add-animal-form
+      .ai-form-container.add-animal-form-alive
         .ai-block-sub-title ДОБАВИТЬ
         .ai-block-title Животное
 
@@ -70,7 +74,7 @@ block content
 
         .ai-combined-block.ai-combined-block-1.ai-input-hidden
           .ai-combined-block-title ЛАКТАЦИЯ
-          
+
           .ai-input-block.ai-input-block-text
             .ai-input-label Начало
             input.ai-input.ai-input-date.ai-input-validation#start-date(type="date")
@@ -100,7 +104,7 @@ block content
           .ai-select-line
           .ai-input-label Отец
           input.ai-input.ai-input-select#father(type="text" placeholder="Номер или имя быка")
-          .ai-select-block.shadow
+          .ai-select-block.shadow#father-select
             each animal in potFather
               .ai-select-item(data-id=`${animal._id}`)
                 p.ai-select-name= `#${animal.number}`
@@ -149,6 +153,10 @@ block content
           .ai-pick#red Красный
           .ai-pick#white Белый
 
+        .ai-input-block.ai-input-block-text.ai-input-block-textarea
+          .ai-input-label Заметка
+          textarea.ai-textarea.ai-input-text#note
+
         //-.ai-double-input-block
           .ai-input-block-half.ai-input-block-text
             .ai-input-label Корпус
@@ -163,3 +171,81 @@ block content
         ion-icon(name="checkmark-circle")
 
 
+
+      .ai-form-container.add-animal-form-dead
+        .ai-block-sub-title ДОБАВИТЬ
+        .ai-block-title Мертворождение
+
+        .ai-input-block.ai-input-block-text
+          .ai-input-label Дата
+          input.ai-input.ai-input-date#date(type="date")
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
+
+        .ai-input-block.ai-input-block-select
+          .ai-select-line
+          .ai-input-label Мать
+          input.ai-input.ai-input-select#mother(type="text" placeholder="Номер или имя коровы")
+          .ai-select-block.shadow#mother-select-dead
+            each animal in potMother
+              .ai-select-item(data-id=`${animal._id}` class=`${animal._id.toString() === motherId ? 'ai-select-item-selected' : ''}`)
+                p.ai-select-name= `#${animal.number}`
+                -if(animal.name)
+                  p.ai-select-sub-name= animal.name
+
+        .ai-input-block.ai-radio-block
+          .ai-radio#mother-death
+            .ai-radio-inner
+              ion-icon(name="checkmark")
+          .ai-radio-text Привело к смерти матери
+
+        .ai-input-block.ai-radio-block#mother-death-write-off-block
+          .ai-radio#mother-death-write-off
+            .ai-radio-inner
+              ion-icon(name="checkmark")
+          .ai-radio-text Автоматически списать мать
+
+        .ai-input-block.ai-input-block-select.id-select
+          .ai-select-line
+          .ai-input-label Отец
+          input.ai-input.ai-input-select#father(type="text" placeholder="Номер или имя быка")
+          .ai-select-block.shadow#father-select-dead
+            each animal in potFather
+              .ai-select-item(data-id=`${animal._id}`)
+                p.ai-select-name= `#${animal.number}`
+                -if(animal.name)
+                  p.ai-select-sub-name= animal.name
+        
+        .ai-input-block.ai-radio-block
+          .ai-radio#multiple-fetuses
+            .ai-radio-inner
+              ion-icon(name="checkmark")
+          .ai-radio-text Беременность с несколькими плодами
+        
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#size
+          .ai-input-label Размер плода
+          .ai-pick#small Маленький
+          .ai-pick#mid Средний
+          .ai-pick#large Большой
+        
+        .ai-input-block.ai-input-block-pick.ai-input-block-pick-one#gender-dead
+          .ai-input-label Пол
+          .ai-pick#male Мужской
+          .ai-pick#female Женский
+
+          .ai-input-marker.ai-input-marker-r
+            ion-icon(name="alert")
+          .ai-input-explain-block.ai-input-explain-block-required
+            .ai-input-eb-tri
+            //-.ai-input-eb-title Титуль
+            .ai-input-eb-text Обязательно
+
+        .ai-input-block.ai-input-block-text.ai-input-block-textarea
+          .ai-input-label Заметка
+          textarea.ai-textarea.ai-input-text#note-dead
+
+        .ai-input-submit-btn Сохранить
